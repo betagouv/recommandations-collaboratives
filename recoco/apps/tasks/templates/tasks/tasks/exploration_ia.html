@@ -3,10 +3,10 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% block title %}
-    Exploration assistee des ressources
+    Exploration assistée des ressources
 {% endblock title %}
 {% block og_title %}
-    Exploration assistee des ressources
+    Exploration assistée des ressources
 {% endblock og_title %}
 {% block css %}
     {% vite_asset 'js/styles/exploration-ia.css.js' %}
@@ -17,82 +17,22 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-        <div class="col-10 fr-p-3w"
-             x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-             data-test-id="exploration-ia-container">
+                                                                                                    <div class="col-10 fr-p-3w"
+                                                                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                                                                                                            data-test-id="exploration-ia-container">
         <!-- djlint:on -->
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-start fr-mb-3w">
-        <div>
-            <h1 class="fr-mb-1w" data-test-id="exploration-ia-title">Exploration assistee des ressources</h1>
-            <p class="text-secondary fr-mb-0" data-test-id="exploration-ia-subtitle">
-                Decouvrez des ressources pertinentes pour votre projet grace a l'intelligence artificielle
-            </p>
-        </div>
-        <button @click="resetExploration()"
-                class="fr-btn fr-btn--secondary fr-btn--sm"
-                x-show="currentPhase > 1 || results.length > 0"
-                data-test-id="exploration-ia-reset-btn">
-            <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
-            Recommencer
-        </button>
-    </div>
-    <!-- Stepper DSFR -->
-    <div class="fr-stepper fr-mb-3w" data-test-id="exploration-ia-stepper">
-        <h2 class="fr-stepper__title">
-            <span x-text="getPhaseTitle(currentPhase)"></span>
-            <span class="fr-stepper__state">Etape <span x-text="currentPhase"></span> sur 3</span>
-        </h2>
-        <div class="fr-stepper__steps"
-             :data-fr-current-step="currentPhase"
-             data-fr-steps="3"></div>
-        <p class="fr-stepper__details" x-show="currentPhase < 3">
-            <span class="fr-text--bold">Etape suivante :</span>
-            <span x-text="getPhaseTitle(currentPhase + 1)"></span>
-        </p>
-    </div>
-    <!-- Phase 1 & 2 : Recherche -->
-    <template x-if="currentPhase === 1 || currentPhase === 2">
-        <div data-test-id="exploration-ia-search-phase">
-            <!-- Contexte du projet -->
-            <div class="fr-callout fr-callout--blue-ecume fr-mb-3w"
-                 id="project-context"
-                 data-test-id="exploration-ia-project-context">
-                <div class="d-flex justify-content-between align-items-start">
-                    <p class="fr-callout__title fr-mb-0">Contexte du projet</p>
-                    <button @click="toggleEditContext()"
-                            class="fr-btn fr-btn--tertiary fr-btn--sm"
-                            :aria-label="isEditingContext ? 'Terminer la modification' : 'Modifier le contexte'"
-                            data-test-id="exploration-ia-edit-context-btn">
-                        <span x-show="!isEditingContext"
-                              class="fr-icon-edit-line"
-                              aria-hidden="true"></span>
-                        <span x-show="isEditingContext"
-                              class="fr-icon-check-line"
-                              aria-hidden="true"></span>
-                    </button>
-                </div>
-                <!-- Mode lecture -->
-                <p x-show="!isEditingContext"
-                   class="fr-callout__text fr-mt-1w"
-                   x-text="projectContext"></p>
-                <!-- Mode edition -->
-                <div x-show="isEditingContext" class="fr-mt-1w">
-                    <textarea x-model="projectContext"
-                              class="fr-input"
-                              rows="4"
-                              placeholder="Decrivez le contexte de votre projet..."
-                              data-test-id="exploration-ia-context-input"></textarea>
-                    <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA a mieux comprendre votre projet.</p>
-                </div>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-start fr-mb-3w">
+            <div>
+                <h1 class="fr-mb-1w" data-test-id="exploration-ia-title">Exploration assistée des ressources</h1>
+                <p class="text-secondary fr-mb-0" data-test-id="exploration-ia-subtitle">
+                    Découvrez des ressources pertinentes pour votre projet grâce à l'intelligence artificielle
+                </p>
             </div>
             <!-- Token API -->
             <div class="fr-input-group fr-mb-3w"
                  data-test-id="exploration-ia-token-group">
-                <label class="fr-label" for="exploration-api-token">
-                    Token API
-                    <span class="fr-hint-text">Token Bearer pour l'authentification a l'API</span>
-                </label>
+                <label class="fr-label" for="exploration-api-token">Token API</label>
                 <input class="fr-input"
                        type="password"
                        id="exploration-api-token"
@@ -100,350 +40,401 @@
                        placeholder="Saisissez votre token..."
                        data-test-id="exploration-ia-token-input">
             </div>
-            <!-- Barre de recherche -->
-            <div class="fr-search-bar fr-search-bar--lg fr-mb-3w"
-                 role="search"
-                 data-test-id="exploration-ia-searchbar">
-                <label class="fr-label visually-hidden" for="exploration-search">Rechercher des ressources</label>
-                <input class="fr-input"
-                       type="search"
-                       id="exploration-search"
-                       x-model="searchQuery"
-                       @keydown.enter.prevent="performSearch()"
-                       placeholder="Saisissez des mots-cles..."
-                       :disabled="isLoading"
-                       data-test-id="exploration-ia-search-input">
-                <button class="fr-btn"
-                        @click="performSearch()"
-                        :disabled="isLoading || !searchQuery.trim()"
-                        data-test-id="exploration-ia-search-btn">
-                    <span x-show="!isLoading">Rechercher</span>
-                    <span x-show="isLoading" class="spinner-border spinner-border-sm"></span>
-                </button>
-            </div>
-            <!-- Bouton de test (a supprimer en production) -->
-            <div class="fr-mb-3w">
-                <button class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left"
-                        @click="loadMockData()"
-                        data-test-id="exploration-ia-mock-btn">
-                    <span class="fr-icon-test-tube-line" aria-hidden="true"></span>
-                    Tester avec donnees mockees
-                </button>
-            </div>
-            <!-- Message d'erreur -->
-            <div x-show="error"
-                 class="fr-alert fr-alert--error fr-mb-3w"
-                 data-test-id="exploration-ia-error">
-                <p x-text="error"></p>
-            </div>
-            <!-- Indicateur de chargement -->
-            <div x-show="isLoading"
-                 class="exploration-ia-loading"
-                 data-test-id="exploration-ia-loading">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Chargement...</span>
+            <button @click="resetExploration()"
+                    class="fr-btn fr-btn--secondary fr-btn--sm"
+                    x-show="currentPhase > 1 || results.length > 0"
+                    data-test-id="exploration-ia-reset-btn">
+                <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
+                Recommencer
+            </button>
+        </div>
+        <!-- Stepper DSFR -->
+        <div class="fr-stepper fr-mb-3w" data-test-id="exploration-ia-stepper">
+            <h2 class="fr-stepper__title">
+                <span x-text="getPhaseTitle(currentPhase)"></span>
+                <span class="fr-stepper__state">Étape <span x-text="currentPhase"></span> sur 3</span>
+            </h2>
+            <div class="fr-stepper__steps"
+                 :data-fr-current-step="currentPhase"
+                 data-fr-steps="3"></div>
+            <p class="fr-stepper__details" x-show="currentPhase < 3">
+                <span class="fr-text--bold">Étape suivante :</span>
+                <span x-text="getPhaseTitle(currentPhase + 1)"></span>
+            </p>
+        </div>
+        <!-- Phase 1 & 2 : Recherche -->
+        <template x-if="currentPhase === 1 || currentPhase === 2">
+            <div data-test-id="exploration-ia-search-phase">
+                <!-- Contexte du projet -->
+                <div class="fr-callout fr-callout--blue-ecume fr-mb-3w"
+                     id="project-context"
+                     data-test-id="exploration-ia-project-context">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="fr-callout__title fr-mb-0">Contexte du projet</p>
+                        <button @click="toggleEditContext()"
+                                class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                :aria-label="isEditingContext ? 'Terminer la modification' : 'Modifier le contexte'"
+                                data-test-id="exploration-ia-edit-context-btn">
+                            <span x-show="!isEditingContext"
+                                  class="fr-icon-edit-line"
+                                  aria-hidden="true"></span>
+                            <span x-show="isEditingContext"
+                                  class="fr-icon-check-line"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <!-- Mode lecture -->
+                    <p x-show="!isEditingContext"
+                       class="fr-callout__text fr-mt-1w"
+                       x-text="projectContext"></p>
+                    <!-- Mode edition -->
+                    <div x-show="isEditingContext" class="fr-mt-1w">
+                        <textarea x-model="projectContext"
+                                  class="fr-input"
+                                  rows="4"
+                                  placeholder="Décrivez le contexte de votre projet..."
+                                  data-test-id="exploration-ia-context-input"></textarea>
+                        <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA a mieux comprendre votre projet.</p>
+                    </div>
                 </div>
-                <p class="text-secondary fr-mt-2w">Recherche en cours...</p>
-            </div>
-            <!-- Resultats IA : deux colonnes -->
-            <div x-show="hasAnswerResults() && !isLoading"
-                 class="row g-4 fr-mb-3w"
-                 data-test-id="exploration-ia-answer-results">
-                <!-- Colonne principale : Reponse -->
-                <div class="col-12 col-lg-8">
-                    <div class="card">
-                        <!-- Header avec actions de selection -->
-                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center"
-                             x-show="getSelectableChunksCount() > 0">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fr-text--sm text-secondary">
-                                    <span x-text="selectedChunks.length"></span> / <span x-text="getSelectableChunksCount()"></span> passage(s) selectionne(s)
-                                </span>
-                                <template x-if="selectedChunks.length > 0">
-                                    <button @click="clearChunkSelection()"
-                                            class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                            title="Deselectionner tout">
-                                        <span class="fr-icon-close-line" aria-hidden="true"></span>
-                                    </button>
-                                </template>
+                <!-- Barre de recherche -->
+                <label class="fr-label" for="exploration-search">Commencez par formuler votre besoin sur ce projet</label>
+                <div class="fr-search-bar fr-search-bar--lg fr-mb-3w"
+                     role="search"
+                     data-test-id="exploration-ia-searchbar">
+                    <input class="fr-input"
+                           type="search"
+                           id="exploration-search"
+                           x-model="searchQuery"
+                           @keydown.enter.prevent="performSearch()"
+                           placeholder="Formulez votre besoin sur ce projet. Ex: Quelles aides puis-je avoir pour mettre en place un jardin partagé ?"
+                           :disabled="isLoading"
+                           data-test-id="exploration-ia-search-input">
+                    <button class="fr-btn"
+                            @click="performSearch()"
+                            :disabled="isLoading || !searchQuery.trim()"
+                            data-test-id="exploration-ia-search-btn">
+                        <span x-show="!isLoading">Rechercher</span>
+                        <span x-show="isLoading" class="spinner-border spinner-border-sm"></span>
+                    </button>
+                </div>
+                <!-- Bouton de test (a supprimer en production) -->
+                <div class="fr-mb-3w">
+                    <button class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left"
+                            @click="loadMockData()"
+                            data-test-id="exploration-ia-mock-btn">
+                        <span class="fr-icon-test-tube-line" aria-hidden="true"></span>
+                        Tester avec données mockées
+                    </button>
+                </div>
+                <!-- Message d'erreur -->
+                <div x-show="error"
+                     class="fr-alert fr-alert--error fr-mb-3w"
+                     data-test-id="exploration-ia-error">
+                    <p x-text="error"></p>
+                </div>
+                <!-- Indicateur de chargement -->
+                <div x-show="isLoading"
+                     class="exploration-ia-loading"
+                     data-test-id="exploration-ia-loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="text-secondary fr-mt-2w">Recherche en cours...</p>
+                </div>
+                <!-- Resultats IA : deux colonnes -->
+                <div x-show="hasAnswerResults() && !isLoading"
+                     class="row g-4 fr-mb-3w"
+                     data-test-id="exploration-ia-answer-results">
+                    <!-- Colonne principale : Reponse -->
+                    <div class="col-12 col-lg-8">
+                        <div class="card">
+                            <!-- Header avec actions de selection -->
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                                 x-show="getSelectableChunksCount() > 0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fr-text--sm text-secondary">
+                                        <span x-text="selectedChunks.length"></span> / <span x-text="getSelectableChunksCount()"></span> passage(s) selectionne(s)
+                                    </span>
+                                    <template x-if="selectedChunks.length > 0">
+                                        <button @click="clearChunkSelection()"
+                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                                title="Deselectionner tout">
+                                            <span class="fr-icon-close-line" aria-hidden="true"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                                <button @click="searchRelatedRecommendations()"
+                                        :disabled="selectedChunks.length === 0"
+                                        class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left">
+                                    <span class="fr-icon-search-line" aria-hidden="true"></span>
+                                    Rechercher des recommandations liées
+                                </button>
                             </div>
-                            <button @click="searchRelatedRecommendations()"
-                                    :disabled="selectedChunks.length === 0"
-                                    class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left">
-                                <span class="fr-icon-search-line" aria-hidden="true"></span>
-                                Rechercher des recommandations liees
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <!-- Liste des chunks de reponse -->
-                            <template x-for="(chunk, index) in answerChunks" :key="index">
-                                <div class="exploration-ia-chunk"
-                                     :class="{
-                                         'exploration-ia-chunk--with-source': chunk.sources && chunk.sources.length > 0,
-                                         'exploration-ia-chunk--selected': isChunkSelected(index)
-                                     }"
-                                     @click="chunk.sources && chunk.sources.length > 0 ? toggleChunkSelection(index) : null"
-                                     @mouseenter="highlightSources(chunk.sources)"
-                                     @mouseleave="clearHighlight()"
-                                     :style="chunk.sources && chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
-                                     :data-test-id="'exploration-ia-chunk-' + index">
-                                    <!-- Checkbox de selection -->
-                                    <div class="d-flex align-items-start gap-3">
-                                        <div class="exploration-ia-chunk__checkbox"
-                                             x-show="chunk.sources && chunk.sources.length > 0">
-                                            <input type="checkbox"
-                                                   class="fr-checkbox"
-                                                   :id="'chunk-select-' + index"
-                                                   :checked="isChunkSelected(index)"
-                                                   @click.stop
-                                                   @change="toggleChunkSelection(index)">
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <!-- Texte du chunk (avec support Markdown) -->
-                                            <div class="exploration-ia-chunk__text" x-html="parseMarkdown(chunk.text)"></div>
-                                            <!-- Badges des sources -->
-                                            <div class="exploration-ia-chunk__sources fr-mt-1w" x-show="chunk.sources && chunk.sources.length > 0">
-                                                <template x-for="sourceLabel in chunk.sources" :key="sourceLabel">
-                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
-                                                          x-text="'Source ' + sourceLabel"></span>
-                                                </template>
+                            <div class="card-body">
+                                <!-- Liste des chunks de reponse -->
+                                <template x-for="(chunk, index) in answerChunks" :key="index">
+                                    <div class="exploration-ia-chunk"
+                                         :class="{ 'exploration-ia-chunk--with-source': chunk.sources && chunk.sources.length > 0, 'exploration-ia-chunk--selected': isChunkSelected(index) }"
+                                         @click="chunk.sources && chunk.sources.length > 0 ? toggleChunkSelection(index) : null"
+                                         @mouseenter="highlightSources(chunk.sources)"
+                                         @mouseleave="clearHighlight()"
+                                         :style="chunk.sources && chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
+                                         :data-test-id="'exploration-ia-chunk-' + index">
+                                        <!-- Checkbox de selection -->
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="exploration-ia-chunk__checkbox"
+                                                 x-show="chunk.sources && chunk.sources.length > 0">
+                                                <input type="checkbox"
+                                                       class="fr-checkbox"
+                                                       :id="'chunk-select-' + index"
+                                                       :checked="isChunkSelected(index)"
+                                                       @click.stop
+                                                       @change="toggleChunkSelection(index)">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <!-- Texte du chunk (avec support Markdown) -->
+                                                <div class="exploration-ia-chunk__text" x-html="parseMarkdown(chunk.text)"></div>
+                                                <!-- Badges des sources -->
+                                                <div class="exploration-ia-chunk__sources fr-mt-1w"
+                                                     x-show="chunk.sources && chunk.sources.length > 0">
+                                                    <template x-for="sourceLabel in chunk.sources" :key="sourceLabel">
+                                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
+                                                              x-text="'Source ' + sourceLabel"></span>
+                                                    </template>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Colonne secondaire : Bibliographie -->
+                    <div class="col-12 col-lg-4">
+                        <div class="card exploration-ia-bibliography">
+                            <div class="card-header bg-transparent">
+                                <h3 class="fr-text--md fr-mb-0">
+                                    <span class="fr-icon-book-2-line fr-mr-1v" aria-hidden="true"></span>
+                                    Bibliographie de la reponse
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <template x-for="citation in citations" :key="citation.label">
+                                    <div class="exploration-ia-citation fr-mb-2w fr-p-2w"
+                                         :class="{ 'exploration-ia-citation--highlighted': isSourceHighlighted(citation.label), 'exploration-ia-citation--selected': isSourceSelected(citation.label) }"
+                                         :data-test-id="'exploration-ia-citation-' + citation.label">
+                                        <div class="d-flex justify-content-between align-items-start fr-mb-1w">
+                                            <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                  x-text="'Source ' + citation.label"></span>
+                                            <span class="fr-badge fr-badge--sm fr-badge--no-icon"
+                                                  :class="{ 'fr-badge--green-emeraude': citation.source_type === 'Resource', 'fr-badge--purple-glycine': citation.source_type === 'Recommendation' }"
+                                                  x-text="getSourceTypeLabel(citation.source_type)"></span>
+                                        </div>
+                                        <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
+                                        <a :href="getCitationUrl(citation)"
+                                           class="fr-link fr-link--sm"
+                                           target="_blank"
+                                           x-show="getCitationUrl(citation)">
+                                            Consulter la fiche
+                                            <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
+                                        </a>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Colonne secondaire : Bibliographie -->
-                <div class="col-12 col-lg-4">
-                    <div class="card exploration-ia-bibliography">
-                        <div class="card-header bg-transparent">
-                            <h3 class="fr-text--md fr-mb-0">
-                                <span class="fr-icon-book-2-line fr-mr-1v" aria-hidden="true"></span>
-                                Bibliographie de la reponse
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <template x-for="citation in citations" :key="citation.label">
-                                <div class="exploration-ia-citation fr-mb-2w fr-p-2w"
-                                     :class="{
-                                         'exploration-ia-citation--highlighted': isSourceHighlighted(citation.label),
-                                         'exploration-ia-citation--selected': isSourceSelected(citation.label)
-                                     }"
-                                     :data-test-id="'exploration-ia-citation-' + citation.label">
-                                    <div class="d-flex justify-content-between align-items-start fr-mb-1w">
-                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
-                                              x-text="'Source ' + citation.label"></span>
-                                        <span class="fr-badge fr-badge--sm fr-badge--no-icon"
-                                              :class="{
-                                                  'fr-badge--green-emeraude': citation.source_type === 'Resource',
-                                                  'fr-badge--purple-glycine': citation.source_type === 'Recommendation'
-                                              }"
-                                              x-text="getSourceTypeLabel(citation.source_type)"></span>
-                                    </div>
-                                    <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
-                                    <a :href="getCitationUrl(citation)"
-                                       class="fr-link fr-link--sm"
-                                       target="_blank"
-                                       x-show="getCitationUrl(citation)">
-                                        Consulter la fiche
-                                        <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
-                                    </a>
-                                </div>
+                <!-- Message si pas de resultats -->
+                <div x-show="!hasAnswerResults() && !isLoading && searchQuery.length > 0 && foundAnswer === false"
+                     class="fr-callout fr-callout--blue-ecume fr-mb-3w"
+                     data-test-id="exploration-ia-no-results">
+                    <p class="fr-callout__title">Aucun resultat trouvé</p>
+                    <p class="fr-callout__text">Essayez d'autres mots-cles ou simplifiez votre recherche.</p>
+                </div>
+                <!-- Historique des selections (Phase 2) -->
+                <template x-if="currentPhase === 2 && allSelectedItems.length > 0">
+                    <div class="fr-mb-3w exploration-ia-history"
+                         data-test-id="exploration-ia-history">
+                        <h3 class="fr-text--md fr-mb-2w">
+                            <span class="fr-icon-history-line fr-mr-1v"></span>
+                            Elements deja selectionnes (<span x-text="allSelectedItems.length"></span>)
+                        </h3>
+                        <div class="exploration-ia-history__tags">
+                            <template x-for="item in allSelectedItems" :key="item.id">
+                                <span class="fr-tag fr-tag--sm" x-text="truncate(item.title, 30)"></span>
                             </template>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- Message si pas de resultats -->
-            <div x-show="!hasAnswerResults() && !isLoading && searchQuery.length > 0 && foundAnswer === false"
-                 class="fr-callout fr-callout--blue-ecume fr-mb-3w"
-                 data-test-id="exploration-ia-no-results">
-                <p class="fr-callout__title">Aucun resultat trouve</p>
-                <p class="fr-callout__text">Essayez d'autres mots-cles ou simplifiez votre recherche.</p>
-            </div>
-            <!-- Historique des selections (Phase 2) -->
-            <template x-if="currentPhase === 2 && allSelectedItems.length > 0">
-                <div class="fr-mb-3w exploration-ia-history"
-                     data-test-id="exploration-ia-history">
-                    <h3 class="fr-text--md fr-mb-2w">
-                        <span class="fr-icon-history-line fr-mr-1v"></span>
-                        Elements deja selectionnes (<span x-text="allSelectedItems.length"></span>)
-                    </h3>
-                    <div class="exploration-ia-history__tags">
-                        <template x-for="item in allSelectedItems" :key="item.id">
-                            <span class="fr-tag fr-tag--sm" x-text="truncate(item.title, 30)"></span>
-                        </template>
+                </template>
+                <!-- Actions de phase -->
+                <div class="d-flex justify-content-between align-items-center fr-py-3w border-top"
+                     data-test-id="exploration-ia-phase-actions">
+                    <p class="fr-mb-0 text-secondary"
+                       x-text="getPhaseDescription(currentPhase)"></p>
+                    <div class="d-flex gap-2">
+                        <button x-show="currentPhase === 2"
+                                @click="continueExploration()"
+                                class="fr-btn fr-btn--secondary"
+                                data-test-id="exploration-ia-continue-btn">
+                            <span class="fr-icon-search-line fr-mr-1v"></span>
+                            Nouvelle recherche
+                        </button>
+                        <button @click="proceedToNextPhase()"
+                                :disabled="!canProceedToNextPhase()"
+                                class="fr-btn fr-btn--primary"
+                                data-test-id="exploration-ia-next-phase-btn">
+                            <template x-if="currentPhase === 1">
+                                <span>
+                                    <span class="fr-icon-arrow-right-line fr-mr-1v"></span>
+                                    Continuer l'exploration
+                                </span>
+                            </template>
+                            <template x-if="currentPhase === 2">
+                                <span>
+                                    <span class="fr-icon-draft-line fr-mr-1v"></span>
+                                    Lancer la synthese
+                                </span>
+                            </template>
+                        </button>
                     </div>
                 </div>
-            </template>
-            <!-- Actions de phase -->
-            <div class="d-flex justify-content-between align-items-center fr-py-3w border-top"
-                 data-test-id="exploration-ia-phase-actions">
-                <p class="fr-mb-0 text-secondary"
-                   x-text="getPhaseDescription(currentPhase)"></p>
-                <div class="d-flex gap-2">
-                    <button x-show="currentPhase === 2"
-                            @click="continueExploration()"
-                            class="fr-btn fr-btn--secondary"
-                            data-test-id="exploration-ia-continue-btn">
-                        <span class="fr-icon-search-line fr-mr-1v"></span>
-                        Nouvelle recherche
-                    </button>
-                    <button @click="proceedToNextPhase()"
-                            :disabled="!canProceedToNextPhase()"
-                            class="fr-btn fr-btn--primary"
-                            data-test-id="exploration-ia-next-phase-btn">
-                        <template x-if="currentPhase === 1">
-                            <span>
-                                <span class="fr-icon-arrow-right-line fr-mr-1v"></span>
-                                Continuer l'exploration
-                            </span>
-                        </template>
-                        <template x-if="currentPhase === 2">
-                            <span>
-                                <span class="fr-icon-draft-line fr-mr-1v"></span>
-                                Lancer la synthese
-                            </span>
-                        </template>
-                    </button>
-                </div>
             </div>
-        </div>
-    </template>
-    <!-- Phase 3 : Synthese -->
-    <template x-if="currentPhase === 3">
-        <div data-test-id="exploration-ia-synthesis-phase">
-            <!-- Chargement synthese -->
-            <div x-show="isSynthesizing"
-                 class="exploration-ia-loading"
-                 data-test-id="exploration-ia-synthesizing">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Analyse en cours...</span>
+        </template>
+        <!-- Phase 3 : Synthese -->
+        <template x-if="currentPhase === 3">
+            <div data-test-id="exploration-ia-synthesis-phase">
+                <!-- Chargement synthese -->
+                <div x-show="isSynthesizing"
+                     class="exploration-ia-loading"
+                     data-test-id="exploration-ia-synthesizing">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Analyse en cours...</span>
+                    </div>
+                    <p class="text-secondary fr-mt-2w">Analyse de vos selections en cours...</p>
                 </div>
-                <p class="text-secondary fr-mt-2w">Analyse de vos selections en cours...</p>
-            </div>
-            <!-- Resultats de synthese -->
-            <div x-show="!isSynthesizing"
-                 data-test-id="exploration-ia-synthesis-results">
-                <!-- Resume des selections -->
-                <div class="fr-callout fr-callout--green-emeraude fr-mb-3w"
-                     data-test-id="exploration-ia-summary">
-                    <p class="fr-callout__title">
-                        Synthese basee sur <span x-text="allSelectedItems.length"></span> element(s)
-                    </p>
-                    <div class="exploration-ia-history__tags fr-mt-2w">
-                        <template x-for="item in allSelectedItems" :key="item.id">
-                            <span class="fr-tag fr-tag--sm" x-text="truncate(item.title, 40)"></span>
+                <!-- Resultats de synthese -->
+                <div x-show="!isSynthesizing"
+                     data-test-id="exploration-ia-synthesis-results">
+                    <!-- Resume des selections -->
+                    <div class="fr-callout fr-callout--green-emeraude fr-mb-3w"
+                         data-test-id="exploration-ia-summary">
+                        <p class="fr-callout__title">
+                            Synthese basee sur <span x-text="allSelectedItems.length"></span> element(s)
+                        </p>
+                        <div class="exploration-ia-history__tags fr-mt-2w">
+                            <template x-for="item in allSelectedItems" :key="item.id">
+                                <span class="fr-tag fr-tag--sm" x-text="truncate(item.title, 40)"></span>
+                            </template>
+                        </div>
+                    </div>
+                    <!-- Fiches ressources -->
+                    <div class="exploration-ia-synthesis__section"
+                         data-test-id="exploration-ia-similar-resources">
+                        <h3>
+                            <span class="fr-icon-file-text-line"></span>
+                            Fiches ressources (<span x-text="synthesis.resources.length"></span>)
+                        </h3>
+                        <template x-if="synthesis.resources.length > 0">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                                <template x-for="resource in synthesis.resources" :key="resource.id">
+                                    <div class="col">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mb-2w"
+                                                      x-text="resource.type || 'Ressource'"></span>
+                                                <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 60)"></h4>
+                                                <p class="card-text fr-text--sm text-secondary"
+                                                   x-text="truncate(resource.content, 100)"></p>
+                                            </div>
+                                            <div class="card-footer bg-transparent" x-show="resource.resourceId">
+                                                <button @click="viewResource(resource)"
+                                                        class="fr-btn fr-btn--tertiary fr-btn--sm">
+                                                    <span class="fr-icon-external-link-line fr-mr-1v"></span>
+                                                    Voir la ressource
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
                         </template>
+                        <p x-show="synthesis.resources.length === 0"
+                           class="exploration-ia-synthesis__empty">Aucune fiche ressource dans votre selection</p>
+                    </div>
+                    <!-- Projets similaires -->
+                    <div class="exploration-ia-synthesis__section"
+                         data-test-id="exploration-ia-similar-projects">
+                        <h3>
+                            <span class="fr-icon-folder-2-line"></span>
+                            Projets similaires (<span x-text="synthesis.projects.length"></span>)
+                        </h3>
+                        <template x-if="synthesis.projects.length > 0">
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                <template x-for="project in synthesis.projects" :key="project.id">
+                                    <div class="col">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <span class="fr-badge fr-badge--sm fr-badge--green-emeraude fr-mb-2w">Projet</span>
+                                                <h4 class="card-title fr-text--md" x-text="truncate(project.title, 60)"></h4>
+                                                <p class="card-text fr-text--sm text-secondary"
+                                                   x-text="truncate(project.content, 100)"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <p x-show="synthesis.projects.length === 0"
+                           class="exploration-ia-synthesis__empty">Aucun projet similaire dans votre selection</p>
+                    </div>
+                    <!-- Recommandations similaires -->
+                    <div class="exploration-ia-synthesis__section"
+                         data-test-id="exploration-ia-similar-recommendations">
+                        <h3>
+                            <span class="fr-icon-lightbulb-line"></span>
+                            Recommandations similaires (<span x-text="synthesis.recommendations.length"></span>)
+                        </h3>
+                        <template x-if="synthesis.recommendations.length > 0">
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                <template x-for="reco in synthesis.recommendations" :key="reco.id">
+                                    <div class="col">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <span class="fr-badge fr-badge--sm fr-badge--purple-glycine fr-mb-2w">Recommandation</span>
+                                                <h4 class="card-title fr-text--md" x-text="truncate(reco.title, 60)"></h4>
+                                                <p class="card-text fr-text--sm text-secondary"
+                                                   x-text="truncate(reco.content, 100)"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <p x-show="synthesis.recommendations.length === 0"
+                           class="exploration-ia-synthesis__empty">
+                            Aucune recommandation similaire dans votre selection
+                        </p>
+                    </div>
+                    <!-- Actions finales -->
+                    <div class="d-flex justify-content-center gap-3 fr-py-3w border-top"
+                         data-test-id="exploration-ia-final-actions">
+                        <button @click="resetExploration()"
+                                class="fr-btn fr-btn--secondary"
+                                data-test-id="exploration-ia-new-exploration-btn">
+                            <span class="fr-icon-refresh-line fr-mr-1v"></span>
+                            Nouvelle exploration
+                        </button>
+                        <a href="{% url 'projects-create-task' %}"
+                           class="fr-btn fr-btn--primary"
+                           data-test-id="exploration-ia-create-recommendation-btn">
+                            <span class="fr-icon-add-line fr-mr-1v"></span>
+                            Creer une recommandation
+                        </a>
                     </div>
                 </div>
-                <!-- Fiches ressources -->
-                <div class="exploration-ia-synthesis__section"
-                     data-test-id="exploration-ia-similar-resources">
-                    <h3>
-                        <span class="fr-icon-file-text-line"></span>
-                        Fiches ressources (<span x-text="synthesis.resources.length"></span>)
-                    </h3>
-                    <template x-if="synthesis.resources.length > 0">
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-                            <template x-for="resource in synthesis.resources" :key="resource.id">
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <div class="card-body">
-                                            <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mb-2w"
-                                                  x-text="resource.type || 'Ressource'"></span>
-                                            <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 60)"></h4>
-                                            <p class="card-text fr-text--sm text-secondary"
-                                               x-text="truncate(resource.content, 100)"></p>
-                                        </div>
-                                        <div class="card-footer bg-transparent" x-show="resource.resourceId">
-                                            <button @click="viewResource(resource)"
-                                                    class="fr-btn fr-btn--tertiary fr-btn--sm">
-                                                <span class="fr-icon-external-link-line fr-mr-1v"></span>
-                                                Voir la ressource
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                    <p x-show="synthesis.resources.length === 0"
-                       class="exploration-ia-synthesis__empty">Aucune fiche ressource dans votre selection</p>
-                </div>
-                <!-- Projets similaires -->
-                <div class="exploration-ia-synthesis__section"
-                     data-test-id="exploration-ia-similar-projects">
-                    <h3>
-                        <span class="fr-icon-folder-2-line"></span>
-                        Projets similaires (<span x-text="synthesis.projects.length"></span>)
-                    </h3>
-                    <template x-if="synthesis.projects.length > 0">
-                        <div class="row row-cols-1 row-cols-md-2 g-3">
-                            <template x-for="project in synthesis.projects" :key="project.id">
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <div class="card-body">
-                                            <span class="fr-badge fr-badge--sm fr-badge--green-emeraude fr-mb-2w">Projet</span>
-                                            <h4 class="card-title fr-text--md" x-text="truncate(project.title, 60)"></h4>
-                                            <p class="card-text fr-text--sm text-secondary"
-                                               x-text="truncate(project.content, 100)"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                    <p x-show="synthesis.projects.length === 0"
-                       class="exploration-ia-synthesis__empty">Aucun projet similaire dans votre selection</p>
-                </div>
-                <!-- Recommandations similaires -->
-                <div class="exploration-ia-synthesis__section"
-                     data-test-id="exploration-ia-similar-recommendations">
-                    <h3>
-                        <span class="fr-icon-lightbulb-line"></span>
-                        Recommandations similaires (<span x-text="synthesis.recommendations.length"></span>)
-                    </h3>
-                    <template x-if="synthesis.recommendations.length > 0">
-                        <div class="row row-cols-1 row-cols-md-2 g-3">
-                            <template x-for="reco in synthesis.recommendations" :key="reco.id">
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <div class="card-body">
-                                            <span class="fr-badge fr-badge--sm fr-badge--purple-glycine fr-mb-2w">Recommandation</span>
-                                            <h4 class="card-title fr-text--md" x-text="truncate(reco.title, 60)"></h4>
-                                            <p class="card-text fr-text--sm text-secondary"
-                                               x-text="truncate(reco.content, 100)"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                    <p x-show="synthesis.recommendations.length === 0"
-                       class="exploration-ia-synthesis__empty">Aucune recommandation similaire dans votre selection</p>
-                </div>
-                <!-- Actions finales -->
-                <div class="d-flex justify-content-center gap-3 fr-py-3w border-top"
-                     data-test-id="exploration-ia-final-actions">
-                    <button @click="resetExploration()"
-                            class="fr-btn fr-btn--secondary"
-                            data-test-id="exploration-ia-new-exploration-btn">
-                        <span class="fr-icon-refresh-line fr-mr-1v"></span>
-                        Nouvelle exploration
-                    </button>
-                    <a href="{% url 'projects-create-task' %}"
-                       class="fr-btn fr-btn--primary"
-                       data-test-id="exploration-ia-create-recommendation-btn">
-                        <span class="fr-icon-add-line fr-mr-1v"></span>
-                        Creer une recommandation
-                    </a>
-                </div>
             </div>
-        </div>
-    </template>
+        </template>
     </div>
-    </div>
+</div>
 {% endblock content %}

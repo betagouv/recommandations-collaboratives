@@ -3,12 +3,13 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { ToastType } from '../models/toastType';
 
-const ML_API_BASE_URL = 'https://ml.recoconseil.fr';
+// const ML_API_BASE_URL = 'https://ml.recoconseil.fr';
+const ML_API_BASE_URL = 'http://localhost:9080';
 
 Alpine.data('ExplorationIA', (config = {}) => ({
   // === CONFIGURATION ===
   projectId: config.projectId || null,
-  apiToken: config.apiToken || '',
+  apiToken: config.apiToken || 'blahblah',
 
   // === CONTEXTE DU PROJET ===
   projectContext: config.projectContext || '',
@@ -30,7 +31,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   // === REPONSE IA (nouveau format) ===
   answerChunks: [], // Textes de reponse avec sources
   citations: [], // Sources/bibliographie
-  foundAnswer: false, // Si une reponse a ete trouvee
+  foundAnswer: null, // Si une reponse a ete trouvee
   selectedChunks: [], // Indices des chunks selectionnes
   hoveredSources: [], // Labels des sources survolees
 
@@ -119,7 +120,6 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       this.error = 'Veuillez saisir des mots-cles';
       return;
     }
-
     this.isLoading = true;
     this.error = null;
     this.results = [];
@@ -554,9 +554,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   getPhaseDescription(phase) {
     const descriptions = {
-      1: 'Saisissez des mots-cles pour decouvrir des ressources pertinentes',
-      2: 'Continuez a explorer ou lancez la synthese',
-      3: 'Analyse des resultats selectionnes',
+      1: 'Formulez votre besoin sur ce projet et découvrez des ressources pertinentes',
+      2: 'Continuez à explorer ou lancez la synthèse',
+      3: 'Analyse des résultats sélectionnés',
     };
     return descriptions[phase] || '';
   },

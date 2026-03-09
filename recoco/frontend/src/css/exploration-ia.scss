@@ -222,10 +222,7 @@
 
   // Etat surligne au survol d'un chunk
   &--highlighted {
-    background-color: var(
-      --light-background-action-low-blue-france,
-      #e3e3fd
-    );
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
     border-color: var(--light-accent-blue-france, #000091);
     transform: scale(1.02);
     box-shadow: 0 4px 12px rgba(0, 0, 145, 0.15);
@@ -238,10 +235,7 @@
 
   // Etat selectionne (chunk coche)
   &--selected {
-    background-color: var(
-      --light-background-action-low-blue-france,
-      #e3e3fd
-    );
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
     border-color: var(--light-accent-blue-france, #000091);
     box-shadow: 0 2px 8px rgba(0, 0, 145, 0.1);
 
@@ -249,5 +243,19 @@
       background-color: var(--light-accent-blue-france, #000091);
       color: #fff;
     }
+  }
+}
+.fr-search-bar {
+  margin-top: 0.5rem;
+}
+
+.fr-callout {
+  padding: 1.5rem;
+  .fr-btn {
+    margin-top: 0;
+  }
+  &__text {
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 }
