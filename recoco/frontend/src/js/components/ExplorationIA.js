@@ -38,6 +38,12 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   // === ACCUMULATION POUR SYNTHESE ===
   allSelectedItems: [], // Tous les items selectionnes au fil des phases
 
+  // === CO-RECOMMANDATIONS (Etape 2) ===
+  coRecommendations: [], // Co-recommandations liées aux ressources sélectionnées
+  isLoadingCoRecos: false, // Chargement des co-recommandations
+  selectedCitationsForStep2: [], // Citations sélectionnées à l'étape 1, affichées à l'étape 2
+  selectedCoRecoIds: [], // IDs des co-recommandations sélectionnées à l'étape 2
+
   // === SYNTHESE (Phase 3) ===
   synthesis: {
     resources: [],
@@ -229,10 +235,12 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   // === NAVIGATION ENTRE PHASES ===
   canProceedToNextPhase() {
     if (this.currentPhase === 1) {
-      return this.hasSelection;
+      // Peut continuer si on a des chunks sélectionnés ou des résultats sélectionnés (ancien format)
+      return this.hasSelection || this.selectedChunks.length > 0;
     }
     if (this.currentPhase === 2) {
-      return this.allSelectedItems.length >= 1 || this.hasSelection;
+      // Peut continuer si on a des éléments sélectionnés (étape 1 ou co-recos étape 2)
+      return this.selectedCitationsForStep2.length > 0 || this.selectedCoRecoIds.length > 0;
     }
     return false;
   },
@@ -257,14 +265,41 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   },
 
   saveCurrentPhaseSelections() {
+    // Collecter les items depuis l'ancien format (results)
     const selectedItems = this.results.filter((r) => r.isSelected);
-    if (selectedItems.length > 0) {
+
+    // Collecter les citations des chunks sélectionnés (nouveau format)
+    const selectedCitations = [];
+    this.selectedChunks.forEach((index) => {
+      const chunk = this.answerChunks[index];
+      if (chunk && chunk.sources) {
+        chunk.sources.forEach((label) => {
+          const citation = this.getCitationByLabel(label);
+          if (citation && !selectedCitations.find((c) => c.label === citation.label)) {
+            selectedCitations.push({
+              id: citation.label,
+              title: citation.title,
+              content: citation.content,
+              type: citation.source_type,
+              resourceId: citation.resource_id,
+              recoId: citation.reco_id,
+              projectId: citation.project_id,
+            });
+          }
+        });
+      }
+    });
+
+    // Collecter les co-recommandations sélectionnées (à implémenter si besoin)
+    const allItems = [...selectedItems, ...selectedCitations];
+
+    if (allItems.length > 0) {
       this.phaseHistory.push({
         phase: this.currentPhase,
         query: this.searchQuery,
-        selectedItems: [...selectedItems],
+        selectedItems: [...allItems],
       });
-      this.allSelectedItems = [...this.allSelectedItems, ...selectedItems];
+      this.allSelectedItems = [...this.allSelectedItems, ...allItems];
     }
   },
 
@@ -306,14 +341,31 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.error = null;
 
     try {
-      // Regrouper les items selectionnes par type
+      // Regrouper les items sélectionnés par type
       const grouped = this.groupByType(this.allSelectedItems);
 
       this.synthesis = {
-        resources: grouped.resource || grouped.Document || [],
-        projects: grouped.project || [],
-        recommendations: grouped.recommendation || [],
+        resources: grouped.resource || grouped.Resource || grouped.Document || [],
+        projects: grouped.project || grouped.Project || [],
+        recommendations: grouped.recommendation || grouped.Recommendation || [],
       };
+
+      // Ajouter les co-recommandations SÉLECTIONNÉES aux ressources de la synthèse
+      const selectedCoRecos = this.getSelectedCoRecommendations();
+      if (selectedCoRecos.length > 0) {
+        const coRecoItems = selectedCoRecos.map((resource) => ({
+          id: resource.id || resource.resourceId,
+          title: resource.title,
+          content: resource.content || '',
+          type: 'Resource',
+          resourceId: resource.resourceId || resource.id,
+          category: resource.category,
+          tags: resource.tags,
+          coOccurrenceScore: resource.coOccurrenceScore,
+          isCoRecommendation: true, // Marqueur pour identifier les co-recos
+        }));
+        this.synthesis.resources = [...this.synthesis.resources, ...coRecoItems];
+      }
 
       // Si tous les types sont vides, mettre tout dans resources
       if (
@@ -362,6 +414,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.foundAnswer = false;
     this.selectedChunks = [];
     this.hoveredSources = [];
+    this.coRecommendations = [];
+    this.isLoadingCoRecos = false;
+    this.selectedCitationsForStep2 = [];
+    this.selectedCoRecoIds = [];
     this.synthesis = {
       resources: [],
       projects: [],
@@ -479,6 +535,288 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     } finally {
       this.isLoading = false;
     }
+  },
+
+  // === CO-RECOMMANDATIONS ===
+  getSelectedResourceIds() {
+    // Extraire les resource_ids directs des citations de type Resource
+    const resourceIds = new Set();
+    this.selectedChunks.forEach((index) => {
+      const chunk = this.answerChunks[index];
+      if (chunk && chunk.sources) {
+        chunk.sources.forEach((label) => {
+          const citation = this.getCitationByLabel(label);
+          if (citation && citation.resource_id) {
+            resourceIds.add(citation.resource_id);
+          }
+        });
+      }
+    });
+    return Array.from(resourceIds);
+  },
+
+  getSelectedRecommendationCitations() {
+    // Récupérer les citations de type Recommendation qui n'ont pas de resource_id direct
+    const recoCitations = [];
+    this.selectedChunks.forEach((index) => {
+      const chunk = this.answerChunks[index];
+      if (chunk && chunk.sources) {
+        chunk.sources.forEach((label) => {
+          const citation = this.getCitationByLabel(label);
+          if (citation && citation.source_type === 'Recommendation' && !citation.resource_id && citation.reco_id) {
+            if (!recoCitations.find((c) => c.reco_id === citation.reco_id)) {
+              recoCitations.push(citation);
+            }
+          }
+        });
+      }
+    });
+    return recoCitations;
+  },
+
+  async fetchResourceIdFromRecommendation(projectId, recoId) {
+    // Appeler l'API pour récupérer les détails de la recommandation et extraire le resource_id
+    try {
+      const response = await fetch(`/api/projects/${projectId}/tasks/${recoId}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+      });
+
+      if (!response.ok) {
+        console.warn(`Impossible de récupérer la task ${recoId}:`, response.status);
+        return null;
+      }
+
+      const task = await response.json();
+      console.log('ExplorationIA task details:', task);
+
+      // Extraire le resource_id depuis la recommandation
+      // La structure peut être task.resource ou task.recommendation.resource
+      if (task.resource?.id) {
+        return task.resource.id;
+      }
+      if (task.resource_id) {
+        return task.resource_id;
+      }
+      // Chercher dans les sous-objets si nécessaire
+      if (task.recommendations && task.recommendations.length > 0) {
+        const reco = task.recommendations[0];
+        if (reco.resource?.id) {
+          return reco.resource.id;
+        }
+      }
+
+      return null;
+    } catch (err) {
+      console.error('Erreur lors de la récupération de la task:', err);
+      return null;
+    }
+  },
+
+  async fetchResourceFromApi(resourceId) {
+    // Récupérer les détails d'une ressource via l'API
+    try {
+      const response = await fetch(`/api/resources/${resourceId}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+      });
+
+      if (!response.ok) {
+        console.warn(`Impossible de récupérer la ressource ${resourceId}:`, response.status);
+        return null;
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error('Erreur lors de la récupération de la ressource:', err);
+      return null;
+    }
+  },
+
+  async fetchCoRecommendations() {
+    // Collecter les resource_ids directs
+    let resourceIds = this.getSelectedResourceIds();
+
+    // Récupérer les resource_ids depuis les recommandations sélectionnées
+    const recoCitations = this.getSelectedRecommendationCitations();
+    if (recoCitations.length > 0) {
+      console.log('ExplorationIA: Récupération des resource_ids depuis les recommandations...', recoCitations);
+
+      // Appeler l'API en parallèle pour chaque recommandation
+      const resourceIdPromises = recoCitations.map(async (citation) => {
+        if (citation.project_id && citation.reco_id) {
+          const resourceId = await this.fetchResourceIdFromRecommendation(citation.project_id, citation.reco_id);
+          if (resourceId) {
+            // Mettre à jour la citation avec le resource_id trouvé
+            citation.resource_id = resourceId;
+          }
+          return resourceId;
+        }
+        return null;
+      });
+
+      const additionalResourceIds = await Promise.all(resourceIdPromises);
+      const validIds = additionalResourceIds.filter((id) => id !== null);
+      resourceIds = [...new Set([...resourceIds, ...validIds])];
+    }
+
+    if (resourceIds.length === 0) {
+      this.$store.app.displayToastMessage({
+        message: 'Aucune ressource trouvée dans les éléments sélectionnés',
+        type: ToastType.warning,
+      });
+      return;
+    }
+
+    console.log('ExplorationIA: Resource IDs pour co-recommandations:', resourceIds);
+
+    // Sauvegarder les citations sélectionnées avant de passer à l'étape 2
+    this.selectedCitationsForStep2 = this.getSelectedCitations();
+
+    this.isLoadingCoRecos = true;
+    this.error = null;
+
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (this.apiToken) {
+        headers['Authorization'] = `Bearer ${this.apiToken}`;
+      }
+
+      // Construire l'URL avec les resource_ids
+      const params = new URLSearchParams();
+      resourceIds.forEach((id) => params.append('resource_ids', id));
+      const url = `${ML_API_BASE_URL}/co-recommendations?${params.toString()}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('ExplorationIA co-recommendations response:', data);
+
+      // L'API retourne un tableau d'objets { resource_id, co_occurrence_score }
+      // Il faut récupérer les détails de chaque ressource via /api/resources/{id}/
+      const coRecoItems = data.co_recommendations || data || [];
+
+      if (coRecoItems.length > 0) {
+        console.log('ExplorationIA: Récupération des détails des ressources...', coRecoItems);
+
+        // Appeler l'API en parallèle pour chaque resource_id
+        const resourcePromises = coRecoItems.map(async (item) => {
+          const resourceId = item.resource_id || item;
+          const score = item.co_occurrence_score || null;
+          const resource = await this.fetchResourceFromApi(resourceId);
+          if (resource) {
+            return { resource, score };
+          }
+          return null;
+        });
+
+        const results = await Promise.all(resourcePromises);
+        // Filtrer les null (ressources non trouvées) et mapper vers le format attendu
+        this.coRecommendations = results
+          .filter((result) => result !== null)
+          .map(({ resource, score }) => ({
+            id: resource.id,
+            title: resource.title || 'Sans titre',
+            content: resource.summary || resource.content || resource.text || '',
+            url: resource.url || null,
+            category: resource.category?.name || null,
+            tags: resource.tags || [],
+            resourceId: resource.id,
+            coOccurrenceScore: score,
+          }));
+      } else {
+        this.coRecommendations = [];
+      }
+
+      // Passer à la phase 2 et effacer les chunks de l'étape 1
+      if (this.currentPhase === 1) {
+        this.currentPhase = 2;
+        // Effacer les résultats de l'étape 1 pour afficher les co-recommandations à la place
+        this.answerChunks = [];
+        this.citations = [];
+        this.selectedChunks = [];
+      }
+
+      this.$store.app.displayToastMessage({
+        message: `${this.coRecommendations.length} ressource(s) co-recommandée(s) trouvée(s)`,
+        type: ToastType.success,
+      });
+    } catch (err) {
+      this.error = 'Erreur lors de la récupération des co-recommandations.';
+      console.error('ExplorationIA co-recommendations error:', err);
+      this.$store.app.displayToastMessage({
+        message: 'Erreur lors de la récupération des co-recommandations',
+        type: ToastType.error,
+      });
+    } finally {
+      this.isLoadingCoRecos = false;
+    }
+  },
+
+  getSelectedCitations() {
+    // Récupérer les citations uniques liées aux chunks sélectionnés
+    const citations = [];
+    this.selectedChunks.forEach((index) => {
+      const chunk = this.answerChunks[index];
+      if (chunk && chunk.sources) {
+        chunk.sources.forEach((label) => {
+          const citation = this.getCitationByLabel(label);
+          if (citation && !citations.find((c) => c.label === citation.label)) {
+            citations.push({ ...citation });
+          }
+        });
+      }
+    });
+    return citations;
+  },
+
+  hasSelectedResources() {
+    // Vérifie s'il y a des ressources directes OU des recommandations (qui peuvent avoir des ressources liées)
+    const hasDirectResources = this.getSelectedResourceIds().length > 0;
+    const hasRecommendations = this.getSelectedRecommendationCitations().length > 0;
+    return hasDirectResources || hasRecommendations;
+  },
+
+  // === SÉLECTION DES CO-RECOMMANDATIONS (Étape 2) ===
+  toggleCoRecoSelection(resourceId) {
+    const idx = this.selectedCoRecoIds.indexOf(resourceId);
+    if (idx > -1) {
+      this.selectedCoRecoIds.splice(idx, 1);
+    } else {
+      this.selectedCoRecoIds.push(resourceId);
+    }
+  },
+
+  isCoRecoSelected(resourceId) {
+    return this.selectedCoRecoIds.includes(resourceId);
+  },
+
+  clearCoRecoSelection() {
+    this.selectedCoRecoIds = [];
+  },
+
+  selectAllCoRecos() {
+    this.selectedCoRecoIds = this.coRecommendations.map((r) => r.id);
+  },
+
+  getSelectedCoRecommendations() {
+    return this.coRecommendations.filter((r) => this.selectedCoRecoIds.includes(r.id));
   },
 
   getCitationByLabel(label) {

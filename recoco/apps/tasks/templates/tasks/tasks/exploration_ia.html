@@ -17,9 +17,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                                                                                                    <div class="col-10 fr-p-3w"
-                                                                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                                                                                                            data-test-id="exploration-ia-container">
+                                                                                                            <div class="col-10 fr-p-3w"
+                                                                                                                    x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                                                                                                                    data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -134,16 +134,166 @@
                     <p x-text="error"></p>
                 </div>
                 <!-- Indicateur de chargement -->
-                <div x-show="isLoading"
+                <div x-show="isLoading || isLoadingCoRecos"
                      class="exploration-ia-loading"
                      data-test-id="exploration-ia-loading">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Chargement...</span>
                     </div>
-                    <p class="text-secondary fr-mt-2w">Recherche en cours...</p>
+                    <p class="text-secondary fr-mt-2w"
+                       x-text="isLoadingCoRecos ? 'Recherche des co-recommandations...' : 'Recherche en cours...'"></p>
                 </div>
-                <!-- Resultats IA : deux colonnes -->
-                <div x-show="hasAnswerResults() && !isLoading"
+                <!-- ÉTAPE 2 : Sources sélectionnées (petites cartes en ligne) -->
+                <div x-show="currentPhase === 2 && selectedCitationsForStep2.length > 0 && !isLoadingCoRecos"
+                     class="fr-mb-3w"
+                     data-test-id="exploration-ia-selected-sources">
+                    <p class="fr-text--sm fr-text--bold fr-mb-2w">
+                        <span class="fr-icon-checkbox-circle-fill fr-mr-1v" aria-hidden="true"></span>
+                        Sources sélectionnées à l'étape 1 (<span x-text="selectedCitationsForStep2.length"></span>)
+                    </p>
+                    <div class="exploration-ia-selected-sources">
+                        <template x-for="citation in selectedCitationsForStep2" :key="citation.label">
+                            <div class="exploration-ia-source-card"
+                                 :data-test-id="'exploration-ia-source-card-' + citation.label">
+                                <div class="d-flex align-items-center gap-2 fr-mb-1v">
+                                    <span class="fr-badge fr-badge--sm"
+                                          :class="{ 'fr-badge--green-emeraude': citation.source_type === 'Resource', 'fr-badge--purple-glycine': citation.source_type === 'Recommendation' }"
+                                          x-text="citation.source_type === 'Resource' ? 'Ressource' : 'Reco'"></span>
+                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                          x-text="'#' + citation.label"></span>
+                                </div>
+                                <p class="exploration-ia-source-card__title"
+                                   x-text="truncate(citation.title, 50)"></p>
+                                <a :href="getCitationUrl(citation)"
+                                   class="fr-link fr-link--xs"
+                                   target="_blank"
+                                   x-show="getCitationUrl(citation)"
+                                   @click.stop>
+                                    Voir
+                                    <span class="fr-icon-external-link-line fr-icon--xs" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <!-- ÉTAPE 2 : Résultats co-recommandations (ressources associées) -->
+                <div x-show="currentPhase === 2 && coRecommendations.length > 0 && !isLoadingCoRecos"
+                     class="fr-mb-3w"
+                     data-test-id="exploration-ia-co-recommendations">
+                    <div class="card">
+                        <div class="card-header bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center fr-mb-2w">
+                                <h3 class="fr-text--md fr-mb-0">
+                                    <span class="fr-icon-file-text-line fr-mr-1v" aria-hidden="true"></span>
+                                    Ressources co-recommandées (<span x-text="coRecommendations.length"></span>)
+                                </h3>
+                                <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Étape 2</span>
+                            </div>
+                            <!-- Actions de sélection -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fr-text--sm text-secondary">
+                                        <span x-text="selectedCoRecoIds.length"></span> / <span x-text="coRecommendations.length"></span> ressource(s) sélectionnée(s)
+                                    </span>
+                                    <template x-if="selectedCoRecoIds.length > 0">
+                                        <button @click="clearCoRecoSelection()"
+                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                                title="Désélectionner tout">
+                                            <span class="fr-icon-close-line" aria-hidden="true"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button @click="selectAllCoRecos()"
+                                            class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                            x-show="selectedCoRecoIds.length < coRecommendations.length">
+                                        <span class="fr-icon-checkbox-line fr-mr-1v" aria-hidden="true"></span>
+                                        Tout sélectionner
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="fr-text--sm text-secondary fr-mb-3w">
+                                Sélectionnez les ressources à inclure dans la synthèse pour créer vos recommandations.
+                            </p>
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                                <template x-for="(resource, idx) in coRecommendations"
+                                          :key="resource.id || idx">
+                                    <div class="col">
+                                        <div class="card h-100 exploration-ia-co-reco"
+                                             :class="{ 'exploration-ia-co-reco--selected': isCoRecoSelected(resource.id) }"
+                                             @click="toggleCoRecoSelection(resource.id)"
+                                             style="cursor: pointer"
+                                             :data-test-id="'exploration-ia-co-reco-' + idx">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start fr-mb-2w">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <!-- Checkbox de sélection -->
+                                                        <input type="checkbox"
+                                                               class="fr-checkbox"
+                                                               :id="'co-reco-select-' + resource.id"
+                                                               :checked="isCoRecoSelected(resource.id)"
+                                                               @click.stop
+                                                               @change="toggleCoRecoSelection(resource.id)">
+                                                        <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Ressource</span>
+                                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                              x-show="resource.category"
+                                                              x-text="resource.category"></span>
+                                                    </div>
+                                                    <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
+                                                          x-show="resource.coOccurrenceScore"
+                                                          :title="'Score de co-occurrence : ' + resource.coOccurrenceScore">
+                                                        <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                        <span x-text="resource.coOccurrenceScore"></span>
+                                                    </span>
+                                                </div>
+                                                <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 80)"></h4>
+                                                <p class="card-text fr-text--sm text-secondary"
+                                                   x-html="parseMarkdown(truncate(resource.content, 120))"></p>
+                                                <!-- Tags -->
+                                                <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        <template x-for="(tag, tagIdx) in (resource.tags || []).slice(0, 3)"
+                                                                  :key="tagIdx">
+                                                            <span class="fr-badge fr-badge--sm fr-badge--grey"
+                                                                  x-text="truncate(tag.name || tag, 20)"></span>
+                                                        </template>
+                                                        <span x-show="(resource.tags || []).length > 3"
+                                                              class="fr-badge fr-badge--sm fr-badge--grey"
+                                                              x-text="'+' + ((resource.tags || []).length - 3)"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer bg-transparent">
+                                                <a :href="'/ressource/' + resource.resourceId + '/'"
+                                                   class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                                   target="_blank"
+                                                   x-show="resource.resourceId"
+                                                   @click.stop>
+                                                    <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                                    Voir la fiche
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Message si pas de co-recommandations à l'étape 2 -->
+                <div x-show="currentPhase === 2 && coRecommendations.length === 0 && selectedCitationsForStep2.length > 0 && !isLoadingCoRecos"
+                     class="fr-callout fr-callout--blue-ecume fr-mb-3w"
+                     data-test-id="exploration-ia-no-co-recos">
+                    <p class="fr-callout__title">Aucune ressource co-recommandée trouvée</p>
+                    <p class="fr-callout__text">
+                        Aucune ressource fréquemment associée n'a été trouvée pour vos sélections.
+                        Vous pouvez effectuer une nouvelle recherche ou passer à la synthèse.
+                    </p>
+                </div>
+                <!-- ÉTAPE 1 : Resultats IA (chunks + bibliographie) - masqué à l'étape 2 quand on a des co-recos -->
+                <div x-show="hasAnswerResults() && !isLoading && !(currentPhase === 2 && coRecommendations.length > 0)"
                      class="row g-4 fr-mb-3w"
                      data-test-id="exploration-ia-answer-results">
                     <!-- Colonne principale : Reponse -->
@@ -164,12 +314,26 @@
                                         </button>
                                     </template>
                                 </div>
-                                <button @click="searchRelatedRecommendations()"
-                                        :disabled="selectedChunks.length === 0"
-                                        class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left">
-                                    <span class="fr-icon-search-line" aria-hidden="true"></span>
-                                    Rechercher des recommandations liées
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button @click="fetchCoRecommendations()"
+                                            :disabled="!hasSelectedResources() || isLoadingCoRecos"
+                                            class="fr-btn fr-btn--primary fr-btn--sm fr-btn--icon-left"
+                                            data-test-id="exploration-ia-co-recos-btn">
+                                        <span x-show="!isLoadingCoRecos"
+                                              class="fr-icon-lightbulb-line"
+                                              aria-hidden="true"></span>
+                                        <span x-show="isLoadingCoRecos"
+                                              class="spinner-border spinner-border-sm"
+                                              aria-hidden="true"></span>
+                                        Co-recommandations
+                                    </button>
+                                    <button @click="searchRelatedRecommendations()"
+                                            :disabled="selectedChunks.length === 0"
+                                            class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left">
+                                        <span class="fr-icon-search-line" aria-hidden="true"></span>
+                                        Nouvelle recherche liée
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <!-- Liste des chunks de reponse -->
@@ -301,7 +465,7 @@
                 </div>
             </div>
         </template>
-        <!-- Phase 3 : Synthese -->
+        <!-- Phase 3 : Synthese et création de recommandation -->
         <template x-if="currentPhase === 3">
             <div data-test-id="exploration-ia-synthesis-phase">
                 <!-- Chargement synthese -->
@@ -311,126 +475,190 @@
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Analyse en cours...</span>
                     </div>
-                    <p class="text-secondary fr-mt-2w">Analyse de vos selections en cours...</p>
+                    <p class="text-secondary fr-mt-2w">Préparation de la synthèse...</p>
                 </div>
                 <!-- Resultats de synthese -->
                 <div x-show="!isSynthesizing"
                      data-test-id="exploration-ia-synthesis-results">
-                    <!-- Resume des selections -->
+                    <!-- En-tête avec résumé -->
                     <div class="fr-callout fr-callout--green-emeraude fr-mb-3w"
                          data-test-id="exploration-ia-summary">
                         <p class="fr-callout__title">
-                            Synthese basee sur <span x-text="allSelectedItems.length"></span> element(s)
+                            <span class="fr-icon-checkbox-circle-fill fr-mr-1v" aria-hidden="true"></span>
+                            Ressources sélectionnées pour votre recommandation
                         </p>
-                        <div class="exploration-ia-history__tags fr-mt-2w">
-                            <template x-for="item in allSelectedItems" :key="item.id">
-                                <span class="fr-tag fr-tag--sm" x-text="truncate(item.title, 40)"></span>
+                        <p class="fr-callout__text">
+                            Vous avez sélectionné <strong x-text="selectedCitationsForStep2.length + getSelectedCoRecommendations().length"></strong> ressource(s)
+                            au cours de votre exploration. Utilisez-les pour créer une nouvelle recommandation.
+                        </p>
+                    </div>
+                    <!-- Section 1 : Ressources de l'étape 1 (sources de la recherche initiale) -->
+                    <div class="exploration-ia-synthesis__section fr-mb-4w"
+                         x-show="selectedCitationsForStep2.length > 0"
+                         data-test-id="exploration-ia-step1-resources">
+                        <h3 class="d-flex align-items-center gap-2 fr-mb-2w">
+                            <span class="fr-icon-search-line" aria-hidden="true"></span>
+                            Ressources de la recherche initiale
+                            <span class="fr-badge fr-badge--sm fr-badge--blue-france"
+                                  x-text="selectedCitationsForStep2.length"></span>
+                        </h3>
+                        <p class="fr-text--sm text-secondary fr-mb-3w">Sources sélectionnées lors de l'étape 1 de votre exploration.</p>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                            <template x-for="citation in selectedCitationsForStep2" :key="citation.label">
+                                <div class="col">
+                                    <div class="card h-100 exploration-ia-synthesis-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start fr-mb-2w">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="fr-badge fr-badge--sm"
+                                                          :class="{ 'fr-badge--green-emeraude': citation.source_type === 'Resource', 'fr-badge--purple-glycine': citation.source_type === 'Recommendation' }"
+                                                          x-text="citation.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
+                                                </div>
+                                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                      x-text="'#' + citation.label"></span>
+                                            </div>
+                                            <h4 class="card-title fr-text--md" x-text="truncate(citation.title, 60)"></h4>
+                                            <p class="card-text fr-text--sm text-secondary"
+                                               x-text="truncate(citation.content, 100)"></p>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <a :href="getCitationUrl(citation)"
+                                               class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                               target="_blank"
+                                               x-show="getCitationUrl(citation)">
+                                                <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                                Voir la fiche
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </template>
                         </div>
                     </div>
-                    <!-- Fiches ressources -->
-                    <div class="exploration-ia-synthesis__section"
-                         data-test-id="exploration-ia-similar-resources">
-                        <h3>
-                            <span class="fr-icon-file-text-line"></span>
-                            Fiches ressources (<span x-text="synthesis.resources.length"></span>)
+                    <!-- Section 2 : Ressources de l'étape 2 (co-recommandations) -->
+                    <div class="exploration-ia-synthesis__section fr-mb-4w"
+                         x-show="getSelectedCoRecommendations().length > 0"
+                         data-test-id="exploration-ia-step2-resources">
+                        <h3 class="d-flex align-items-center gap-2 fr-mb-2w">
+                            <span class="fr-icon-links-line" aria-hidden="true"></span>
+                            Ressources co-recommandées
+                            <span class="fr-badge fr-badge--sm fr-badge--green-emeraude"
+                                  x-text="getSelectedCoRecommendations().length"></span>
                         </h3>
-                        <template x-if="synthesis.resources.length > 0">
-                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-                                <template x-for="resource in synthesis.resources" :key="resource.id">
-                                    <div class="col">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mb-2w"
-                                                      x-text="resource.type || 'Ressource'"></span>
-                                                <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 60)"></h4>
-                                                <p class="card-text fr-text--sm text-secondary"
-                                                   x-text="truncate(resource.content, 100)"></p>
+                        <p class="fr-text--sm text-secondary fr-mb-3w">Ressources fréquemment associées, sélectionnées lors de l'étape 2.</p>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                            <template x-for="resource in getSelectedCoRecommendations()" :key="resource.id">
+                                <div class="col">
+                                    <div class="card h-100 exploration-ia-synthesis-card exploration-ia-synthesis-card--co-reco">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start fr-mb-2w">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Ressource</span>
+                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                          x-show="resource.category"
+                                                          x-text="resource.category"></span>
+                                                </div>
+                                                <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
+                                                      x-show="resource.coOccurrenceScore"
+                                                      :title="'Score de co-occurrence'">
+                                                    <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                    <span x-text="resource.coOccurrenceScore"></span>
+                                                </span>
                                             </div>
-                                            <div class="card-footer bg-transparent" x-show="resource.resourceId">
-                                                <button @click="viewResource(resource)"
-                                                        class="fr-btn fr-btn--tertiary fr-btn--sm">
-                                                    <span class="fr-icon-external-link-line fr-mr-1v"></span>
-                                                    Voir la ressource
-                                                </button>
+                                            <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 60)"></h4>
+                                            <p class="card-text fr-text--sm text-secondary"
+                                               x-html="parseMarkdown(truncate(resource.content, 100))"></p>
+                                            <!-- Tags -->
+                                            <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <template x-for="(tag, tagIdx) in (resource.tags || []).slice(0, 2)"
+                                                              :key="tagIdx">
+                                                        <span class="fr-badge fr-badge--sm fr-badge--grey"
+                                                              x-text="truncate(tag.name || tag, 15)"></span>
+                                                    </template>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="card-footer bg-transparent">
+                                            <a :href="'/ressource/' + resource.resourceId + '/'"
+                                               class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                               target="_blank"
+                                               x-show="resource.resourceId">
+                                                <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                                Voir la fiche
+                                            </a>
+                                        </div>
                                     </div>
-                                </template>
-                            </div>
-                        </template>
-                        <p x-show="synthesis.resources.length === 0"
-                           class="exploration-ia-synthesis__empty">Aucune fiche ressource dans votre selection</p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                    <!-- Projets similaires -->
-                    <div class="exploration-ia-synthesis__section"
-                         data-test-id="exploration-ia-similar-projects">
-                        <h3>
-                            <span class="fr-icon-folder-2-line"></span>
-                            Projets similaires (<span x-text="synthesis.projects.length"></span>)
-                        </h3>
-                        <template x-if="synthesis.projects.length > 0">
-                            <div class="row row-cols-1 row-cols-md-2 g-3">
-                                <template x-for="project in synthesis.projects" :key="project.id">
-                                    <div class="col">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <span class="fr-badge fr-badge--sm fr-badge--green-emeraude fr-mb-2w">Projet</span>
-                                                <h4 class="card-title fr-text--md" x-text="truncate(project.title, 60)"></h4>
-                                                <p class="card-text fr-text--sm text-secondary"
-                                                   x-text="truncate(project.content, 100)"></p>
-                                            </div>
-                                        </div>
-                                    </div>
+                    <!-- Liste récapitulative des ressources pour la recommandation -->
+                    <div class="card fr-mb-3w exploration-ia-reco-summary"
+                         data-test-id="exploration-ia-reco-summary">
+                        <div class="card-header bg-transparent">
+                            <h3 class="fr-text--md fr-mb-0">
+                                <span class="fr-icon-draft-line fr-mr-1v" aria-hidden="true"></span>
+                                Récapitulatif pour votre recommandation
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="fr-text--sm text-secondary fr-mb-2w">
+                                Les ressources suivantes seront associées à votre nouvelle recommandation :
+                            </p>
+                            <ul class="exploration-ia-reco-list">
+                                <template x-for="citation in selectedCitationsForStep2"
+                                          :key="'step1-' + citation.label">
+                                    <li class="exploration-ia-reco-list__item">
+                                        <span class="fr-icon-file-text-line fr-mr-1v" aria-hidden="true"></span>
+                                        <span x-text="citation.title"></span>
+                                        <a :href="getCitationUrl(citation)"
+                                           class="fr-link fr-link--sm fr-ml-1w"
+                                           target="_blank"
+                                           x-show="getCitationUrl(citation)">
+                                            <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
+                                        </a>
+                                    </li>
                                 </template>
-                            </div>
-                        </template>
-                        <p x-show="synthesis.projects.length === 0"
-                           class="exploration-ia-synthesis__empty">Aucun projet similaire dans votre selection</p>
-                    </div>
-                    <!-- Recommandations similaires -->
-                    <div class="exploration-ia-synthesis__section"
-                         data-test-id="exploration-ia-similar-recommendations">
-                        <h3>
-                            <span class="fr-icon-lightbulb-line"></span>
-                            Recommandations similaires (<span x-text="synthesis.recommendations.length"></span>)
-                        </h3>
-                        <template x-if="synthesis.recommendations.length > 0">
-                            <div class="row row-cols-1 row-cols-md-2 g-3">
-                                <template x-for="reco in synthesis.recommendations" :key="reco.id">
-                                    <div class="col">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-                                                <span class="fr-badge fr-badge--sm fr-badge--purple-glycine fr-mb-2w">Recommandation</span>
-                                                <h4 class="card-title fr-text--md" x-text="truncate(reco.title, 60)"></h4>
-                                                <p class="card-text fr-text--sm text-secondary"
-                                                   x-text="truncate(reco.content, 100)"></p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <template x-for="resource in getSelectedCoRecommendations()"
+                                          :key="'step2-' + resource.id">
+                                    <li class="exploration-ia-reco-list__item exploration-ia-reco-list__item--co-reco">
+                                        <span class="fr-icon-links-line fr-mr-1v" aria-hidden="true"></span>
+                                        <span x-text="resource.title"></span>
+                                        <a :href="'/ressource/' + resource.resourceId + '/'"
+                                           class="fr-link fr-link--sm fr-ml-1w"
+                                           target="_blank"
+                                           x-show="resource.resourceId">
+                                            <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
+                                        </a>
+                                    </li>
                                 </template>
-                            </div>
-                        </template>
-                        <p x-show="synthesis.recommendations.length === 0"
-                           class="exploration-ia-synthesis__empty">
-                            Aucune recommandation similaire dans votre selection
-                        </p>
+                            </ul>
+                        </div>
                     </div>
                     <!-- Actions finales -->
-                    <div class="d-flex justify-content-center gap-3 fr-py-3w border-top"
+                    <div class="d-flex justify-content-between align-items-center fr-py-3w border-top"
                          data-test-id="exploration-ia-final-actions">
                         <button @click="resetExploration()"
                                 class="fr-btn fr-btn--secondary"
                                 data-test-id="exploration-ia-new-exploration-btn">
-                            <span class="fr-icon-refresh-line fr-mr-1v"></span>
+                            <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
                             Nouvelle exploration
                         </button>
-                        <a href="{% url 'projects-create-task' %}"
-                           class="fr-btn fr-btn--primary"
-                           data-test-id="exploration-ia-create-recommendation-btn">
-                            <span class="fr-icon-add-line fr-mr-1v"></span>
-                            Creer une recommandation
-                        </a>
+                        <div class="d-flex gap-2">
+                            <button @click="currentPhase = 2"
+                                    class="fr-btn fr-btn--tertiary"
+                                    data-test-id="exploration-ia-back-btn">
+                                <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
+                                Modifier la sélection
+                            </button>
+                            <a href="{% url 'projects-create-task' %}?project_id={{ project.pk }}&action=create&from=exploration"
+                               class="fr-btn fr-btn--primary fr-btn--icon-left"
+                               data-test-id="exploration-ia-create-recommendation-btn">
+                                <span class="fr-icon-add-line" aria-hidden="true"></span>
+                                Créer une recommandation
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
