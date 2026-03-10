@@ -1,26 +1,38 @@
 {% comment %}
 File card for shared contents panel.
-Displays file info with icon, name, size, and download button.
+Displays file info with icon, name, extension and download button.
 Data comes from Alpine: file object in x-for loop
 {% endcomment %}
-<div class="shared-contents-file-card">
+<div class="shared-contents-file-card"
+     x-data="{
+        getFullFilename() {
+            return file.filename || file.name || 'Fichier';
+        },
+        getFilenameWithoutExt() {
+            const filename = this.getFullFilename();
+            const lastDot = filename.lastIndexOf('.');
+            return lastDot > 0 ? filename.substring(0, lastDot) : filename;
+        },
+        getFileExtension() {
+            const filename = this.getFullFilename();
+            const lastDot = filename.lastIndexOf('.');
+            if (lastDot > 0) {
+                return filename.substring(lastDot + 1).toUpperCase();
+            }
+            return '';
+        }
+     }">
+    <div class="shared-contents-file-card__icon">
+        <span class="fr-icon fr-icon-file-line" aria-hidden="true"></span>
+    </div>
     <div class="shared-contents-file-card__info">
-        <div class="shared-contents-file-card__icon">
-            <span class="fr-icon fr-icon-file-line" aria-hidden="true"></span>
-        </div>
-        <div class="shared-contents-file-card__details">
-            <p class="shared-contents-file-card__name" x-text="file.filename || file.name || 'Fichier'"></p>
-            <template x-if="file.size">
-                <p class="shared-contents-file-card__meta" x-text="formatFileSize(file.size)"></p>
-            </template>
-        </div>
-    </div>
-    <div class="shared-contents-file-card__actions">
-        <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+        <a class="shared-contents-file-card__name"
            :href="file.the_file || file.url"
-           :download="file.filename || file.name || ''">
-            <span class="fr-icon fr-icon-download-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-            Télécharger
-        </a>
+           :download="getFullFilename()"
+           x-text="getFilenameWithoutExt()"></a>
+        <span class="shared-contents-file-card__ext" x-text="getFileExtension()"></span>
     </div>
+    <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm"
+       :href="file.the_file || file.url"
+       :download="getFullFilename()">Télécharger</a>
 </div>
