@@ -1,10 +1,16 @@
 {% comment %}
 External file card for shared contents panel (files from EDL - État des lieux).
-Displays file info with dashed border styling to distinguish from conversation files.
 Data comes from Alpine: file object in x-for loop
 {% endcomment %}
-<div class="shared-contents-file-card shared-contents-file-card--external"
+<div class="shared-contents-file-card"
      x-data="{
+        getFileUrl() {
+            const attachment = file.attachment || '';
+            if (attachment.startsWith('/') || attachment.startsWith('http')) {
+                return attachment;
+            }
+            return '/media/' + attachment;
+        },
         getFullFilename() {
             return file.filename || file.attachment?.split('/').pop() || 'Fichier';
         },
@@ -23,16 +29,16 @@ Data comes from Alpine: file object in x-for loop
         }
      }">
     <div class="shared-contents-file-card__icon">
-        <span class="fr-icon fr-icon-attachment-line" aria-hidden="true"></span>
+        <span class="fr-icon fr-icon-file-line" aria-hidden="true"></span>
     </div>
     <div class="shared-contents-file-card__info">
         <a class="shared-contents-file-card__name"
-           :href="file.attachment"
+           :href="getFileUrl()"
            :download="getFullFilename()"
            x-text="getFilenameWithoutExt()"></a>
         <span class="shared-contents-file-card__ext" x-text="getFileExtension()"></span>
     </div>
     <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm"
-       :href="file.attachment"
+       :href="getFileUrl()"
        :download="getFullFilename()">Télécharger</a>
 </div>

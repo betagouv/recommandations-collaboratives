@@ -111,10 +111,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                 <!-- External files from EDL -->
                                 <template x-if="$store.sharedContentsPanel.externalFiles.length > 0">
                                     <div class="shared-contents-panel__external-section">
-                                        <p class="shared-contents-panel__external-title">
-                                            <span class="fr-icon fr-icon-survey-line" aria-hidden="true"></span>
-                                            Fichiers de l'état des lieux
-                                        </p>
+                                        <p class="shared-contents-panel__external-title">Fichiers partagés hors de cette conversation</p>
                                         <template x-for="file in $store.sharedContentsPanel.externalFiles"
                                                   :key="file.id">
                                             {% include "conversations/messages/fragments/shared_contents_external_file_card.html" %}

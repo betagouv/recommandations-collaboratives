@@ -116,16 +116,14 @@
   &__external-section {
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 2px solid var(--border-default-grey, #e5e5e5);
   }
 
   &__external-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-mention-grey, #666);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
+    color: var(--light-text-mention-grey, #666);
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px; /* 150% */
 
     .fr-icon {
       margin-right: 0.25rem;
@@ -293,12 +291,6 @@
   &__download-btn {
     flex-shrink: 0;
     font-size: 0.875rem;
-  }
-
-  // External file variant (from EDL)
-  &--external {
-    background: var(--background-alt-grey, #f6f6f6);
-    border-style: dashed;
   }
 }
 
