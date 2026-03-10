@@ -919,7 +919,8 @@ def project_toggle_annotation(request, project_id=None):
 
 @login_required
 def resource_list(request):
-    has_perm_or_403(request.user, "use_crm", request.site)
+    # has_perm_or_403(request.user, "use_crm", request.site)
+    has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     departments = list(geomatics.Department.objects.values("code", "name"))
 
