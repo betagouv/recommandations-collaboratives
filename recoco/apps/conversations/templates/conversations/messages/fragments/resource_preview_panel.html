@@ -5,7 +5,7 @@ Managed by Alpine store: $store.resourcePreviewPanel
 <template x-if="$store.resourcePreviewPanel.isOpen">
     <div>
         <div class="resource-preview-panel"
-             @keydown.escape.window="$store.resourcePreviewPanel.close()">
+             @keydown.escape.window="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">
             <!-- Header -->
             <div class="resource-preview-panel__header">
                 <button type="button"
@@ -17,7 +17,7 @@ Managed by Alpine store: $store.resourcePreviewPanel
                 <button type="button"
                         class="resource-preview-panel__close-btn fr-btn--close fr-btn"
                         aria-label="Fermer"
-                        @click="$store.resourcePreviewPanel.close()">Fermer</button>
+                        @click="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">Fermer</button>
             </div>
             <template x-if="$store.resourcePreviewPanel.recommendation?.resource">
                 <!-- Scrollable content area -->

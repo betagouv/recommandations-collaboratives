@@ -119,6 +119,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
               ...recommendation,
               messageId: message.id,
               messageCreated: message.created,
+              messagePostedBy: message.posted_by,
               nodeId: node.id,
             });
           }

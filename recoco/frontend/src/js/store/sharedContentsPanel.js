@@ -43,6 +43,7 @@ Alpine.store('sharedContentsPanel', {
   },
 
   setFiles(files) {
+    console.log('setFiles', files);
     this.files = files;
   },
 

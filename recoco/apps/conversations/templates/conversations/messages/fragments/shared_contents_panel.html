@@ -68,7 +68,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                             <div>
                                 <template x-for="(reco, index) in $store.sharedContentsPanel.recommendations"
                                           :key="reco.id">
-                                    <div>
+                                    <div class="fr-mb-3v">
                                         <!-- Date header with grouping -->
                                         <template x-if="index === 0 || formatDateFrench(reco.messageCreated) !== formatDateFrench($store.sharedContentsPanel.recommendations[index - 1]?.messageCreated)">
                                             <p class="shared-contents-panel__date-header"
