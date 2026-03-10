@@ -21,7 +21,7 @@ Parameter Alpine:
             <div class="position-relative">
                 <div>
                     <template x-if="recommendation.resource">
-                        <p class="rendered-markdown--margin-lg"
+                        <p class="rendered-markdown rendered-markdown--margin-lg"
                            x-html="renderMarkdown(recommendation.content)"></p>
                     </template>
                     <div class="task-item__resource"
@@ -38,7 +38,12 @@ Parameter Alpine:
                                    x-text="recommendation.topic?.name"></p>
                             </div>
                         </template>
-                        <h4 class="fr-link" x-text="recommendation.intent"></h4>
+                        <h4>
+                            <button type="button"
+                                    class="fr-link"
+                                    x-text="recommendation.intent"
+                                    @click="await openResourcePreviewPanel(recommendation, element)"></button>
+                        </h4>
                         <template x-if="!recommendation.resource">
                             <div class="task-item__content task-item__content-ellipsis"
                                  x-html="renderMarkdown(recommendation.content)"></div>
