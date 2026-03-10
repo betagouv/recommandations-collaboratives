@@ -1,45 +1,4 @@
-{% comment %}
-Recommendation card for shared contents panel.
-Displays recommendation info with topic, title, description, and consult button.
-Data comes from Alpine: reco object in x-for loop
-{% endcomment %}
-<div class="shared-contents-reco-card">
-    <div class="shared-contents-reco-card__header">
-        <template x-if="reco.topic">
-            <span class="shared-contents-reco-card__topic"
-                  :style="{ backgroundColor: stringToColor(reco.topic) + '20', color: stringToColor(reco.topic) }"
-                  x-text="reco.topic"></span>
-        </template>
-        {% comment %} <template x-if="reco.resource">
-            <span class="shared-contents-reco-card__resource-badge">
-                <span class="fr-icon fr-icon-book-2-line" aria-hidden="true"></span>
-                Fiche ressource
-            </span>
-        </template> {% endcomment %}
-    </div>
-    <h3 class="shared-contents-reco-card__title"
-        x-text="reco.intent || 'Recommandation sans titre'"></h3>
-    <template x-if="reco.content">
-        <p class="shared-contents-reco-card__description" x-text="reco.content"></p>
-    </template>
-    <div class="shared-contents-reco-card__footer">
-        <div class="shared-contents-reco-card__meta">
-            <template x-if="reco.created_by">
-                <div class="shared-contents-reco-card__author">
-                    <img class="shared-contents-reco-card__avatar"
-                         :src="gravatar_url(reco.created_by.email, 20)"
-                         :alt="reco.created_by.first_name + ' ' + reco.created_by.last_name"
-                         loading="lazy">
-                    <span x-text="reco.created_by.first_name + ' ' + reco.created_by.last_name"></span>
-                </div>
-            </template>
-        </div>
-        <button type="button"
-                class="shared-contents-reco-card__consult-btn fr-btn fr-btn--sm fr-btn--secondary"
-                @click="openRecommendationFromPanel(reco)">
-            <span class="fr-icon fr-icon-eye-line fr-icon--sm fr-mr-1v"
-                  aria-hidden="true"></span>
-            Consulter
-        </button>
-    </div>
+<!-- Recommendation title -->
+<div x-data='{recommendation: reco}'>
+    {% include "conversations/messages/fragments/recommendation_card_content.html" %}
 </div>

@@ -1,0 +1,52 @@
+<div class="task-item__resource"
+     :class="{'task-item__resource--bordered': !recommendation.visited}">
+    <template x-if="!recommendation.visited">
+        <span class="badge text-white task-item__resource-badge"
+              x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
+    </template>
+    <template x-if="recommendation.topic">
+        <div class="task-item__topic"
+             :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
+            <span class="task-item__topic-icon"></span>
+            <p class="task-item__topic-name fr-mb-0"
+               x-text="recommendation.topic?.name"></p>
+        </div>
+    </template>
+    <h4 class="fr-link" x-text="recommendation.intent"></h4>
+    <template x-if="!recommendation.resource">
+        <div class="task-item__content task-item__content-ellipsis"
+             x-html="renderMarkdown(recommendation.content)"></div>
+    </template>
+    <template x-if="recommendation.resource?.support_orga">
+        <p class="task-item__resource-orga fr-mt-1v fr-mb-0">
+            <span class="fr-icon fr-icon--xs fr-icon-government-line"></span> <span x-text="recommendation.resource.support_orga"></span>
+        </p>
+    </template>
+    <template x-if="recommendation.resource?.subtitle">
+        <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
+           x-text="recommendation.resource.subtitle"></p>
+    </template>
+    <div class="d-flex justify-content-between fr-mt-1w">
+        <div class="d-flex">
+            {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
+            <template x-if="recommendation.status !== 3 && recommendation.status !== 4 && recommendation.status !== 5 && !{{ project.is_inactive_since|yesno:'true,false' }}">
+                <div class="d-flex align-items-center active-reminder"
+                     x-tooltip="`Le demandeur recevra des rappels email tant que cette recommandation n'est pas traitée`">
+                    <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v"
+                          aria-hidden="true"></span>
+                    <span>Rappels actifs</span>
+                </div>
+            </template>
+            <template x-if="recommendation.status === 3 || recommendation.status === 4 || recommendation.status === 5 || {{ project.is_inactive_since|yesno:'true,false' }}">
+                <div class="d-flex align-items-center non-active-reminder"
+                     x-tooltip="`Pas de rappel envoyé au demandeur sur cette recommandation déjà traitée`">
+                    <span class="fr-icon-notification-off-line fr-icon--sm fr-mr-1v"
+                          aria-hidden="true"></span>
+                    <span>Pas de rappel</span>
+                </div>
+            </template>
+        </div>
+        <button class="fr-btn fr-btn--sm fr-btn--primary"
+                @click.prevent="await openResourcePreviewPanel(recommendation, element)">Consulter</button>
+    </div>
+</div>
