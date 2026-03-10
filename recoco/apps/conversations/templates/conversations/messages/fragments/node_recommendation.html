@@ -24,8 +24,7 @@ Parameter Alpine:
                         <p class="rendered-markdown rendered-markdown--margin-lg"
                            x-html="renderMarkdown(recommendation.content)"></p>
                     </template>
-                    <div class="task-item__resource"
-                         :class="{'task-item__resource--bordered': !recommendation.visited}">
+                    <div class="task-item__resource task-item__resource--bordered">
                         <template x-if="!recommendation.visited">
                             <span class="badge text-white task-item__resource-badge"
                                   x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
