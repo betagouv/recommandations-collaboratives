@@ -137,7 +137,7 @@ async function fetchGeolocationByAddress(address, commune) {
     return;
   }
   const apiEndpoint = `${API_ADRESSE}/search?`;
-  const searchParams = { q: address, limit: 10 }; // TODO
+  const searchParams = { q: address, limit: 10 };
   if (commune) {
     const { name, insee, postal } = commune;
     searchParams['city'] = name ?? undefined;
