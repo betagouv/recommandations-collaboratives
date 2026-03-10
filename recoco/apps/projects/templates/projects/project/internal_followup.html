@@ -48,17 +48,16 @@
                             <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
                             {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                             <div class="d-flex justify-content-end fr-mt-2v">
-                                <button x-data
-                                        data-test-id="submit-message-button-on-advisor-space"
-                                        @click="$store.editor.removeContactCardAndFileCardNodes()"
-                                        :disabled="$store.editor.currentMessage === ''"
+                                <button data-test-id="submit-message-button-on-advisor-space"
+                                        @click="sendNote()"
+                                        :disabled="sendingNote || $store.editor.currentMessage === ''"
                                         class="fr-btn"
-                                        type="submit">Enregistrer</button>
+                                        type="button">
+                                    <span x-show="!sendingNote">Enregistrer</span>
+                                    <span x-show="sendingNote" x-cloak>Envoi en cours...</span>
+                                </button>
                             </div>
-                            <input type="hidden"
-                                   name="{{ private_note_form.contact.name }}"
-                                   :value="message.contact.id">
-                        </form>
+                        </div>
                     {% endif %}
                     {% include "projects/project/fragments/private_conversation.html" with reversed=True %}
                 </div>
