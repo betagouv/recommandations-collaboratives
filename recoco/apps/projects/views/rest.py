@@ -45,6 +45,7 @@ from recoco.utils import (
 from .. import models, signals
 from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
 from ..serializers import (
+    CreateNoteSerializer,
     DocumentSerializer,
     NewDocumentSerializer,
     ProjectForListSerializer,
@@ -607,6 +608,58 @@ class DocumentViewSet(
             site=get_current_site(self.request),
         )
         signals.document_uploaded.send(sender=self.create, instance=instance)
+
+
+########################################################################
+# Note API (Private Notes)
+########################################################################
+
+
+class NoteViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """API endpoint for creating private notes with file attachments"""
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CreateNoteSerializer
+
+    def get_project(self):
+        project_id = int(self.kwargs["project_id"])
+        project = get_object_or_404(models.Project.on_site, pk=project_id)
+        has_perm_or_403(self.request.user, "projects.use_private_notes", project)
+        return project
+
+    def perform_create(self, serializer):
+        project = self.get_project()
+        site = get_current_site(self.request)
+
+        # Extract document_ids before saving
+        document_ids = serializer.validated_data.pop("document_ids", [])
+
+        # Create the note (public=False for private notes)
+        note = serializer.save(
+            project=project,
+            site=site,
+            created_by=self.request.user,
+            public=False,
+        )
+
+        # Attach documents to the note via GenericForeignKey
+        if document_ids:
+            note_content_type = ContentType.objects.get_for_model(note)
+            models.Document.objects.filter(
+                id__in=document_ids,
+                project=project,
+            ).update(
+                content_type=note_content_type,
+                object_id=note.pk,
+            )
+
+        # Emit signal for notifications
+        signals.note_created.send(
+            sender=self.__class__,
+            note=note,
+            project=project,
+            user=self.request.user,
+        )
 
 
 # eof

@@ -325,3 +325,8 @@ export function documentsUrl(projectId) {
 export function documentUrl(projectId, documentId) {
   return `/api/projects/${projectId}/documents/${documentId}/`;
 }
+
+// Notes (Private Notes)
+export function notesUrl(projectId) {
+  return `/api/projects/${projectId}/notes/`;
+}

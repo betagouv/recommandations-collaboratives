@@ -66,6 +66,11 @@ router.register(
     basename="projects-documents",
 )
 router.register(
+    r"projects/(?P<project_id>[^/.]+)/notes",
+    projects_rest.NoteViewSet,
+    basename="projects-notes",
+)
+router.register(
     r"challenges/definitions",
     training_rest.ChallengeDefinitionViewSet,
     basename="challenge-definitions",

@@ -357,4 +357,19 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["name"]
 
 
+class CreateNoteSerializer(serializers.ModelSerializer):
+    """Serializer for creating private notes with optional document attachments"""
+
+    document_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        write_only=True,
+        default=list,
+    )
+
+    class Meta:
+        model = Note
+        fields = ["content", "contact", "document_ids"]
+
+
 # eof
