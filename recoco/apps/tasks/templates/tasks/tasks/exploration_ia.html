@@ -521,13 +521,21 @@
                                             <p class="card-text fr-text--sm text-secondary"
                                                x-text="truncate(citation.content, 100)"></p>
                                         </div>
-                                        <div class="card-footer bg-transparent">
+                                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
                                             <a :href="getCitationUrl(citation)"
                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
                                                target="_blank"
                                                x-show="getCitationUrl(citation)">
                                                 <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
                                                 Voir la fiche
+                                            </a>
+                                            <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '')"
+                                               class="fr-btn fr-btn--primary fr-btn--sm"
+                                               target="_blank"
+                                               x-show="citation.resource_id"
+                                               title="Créer une recommandation à partir de cette ressource">
+                                                <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                                Recommander
                                             </a>
                                         </div>
                                     </div>
@@ -579,13 +587,21 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-footer bg-transparent">
+                                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
                                             <a :href="'/ressource/' + resource.resourceId + '/'"
                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
                                                target="_blank"
                                                x-show="resource.resourceId">
                                                 <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
                                                 Voir la fiche
+                                            </a>
+                                            <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + resource.resourceId"
+                                               class="fr-btn fr-btn--primary fr-btn--sm"
+                                               target="_blank"
+                                               x-show="resource.resourceId"
+                                               title="Créer une recommandation à partir de cette ressource">
+                                                <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                                Recommander
                                             </a>
                                         </div>
                                     </div>
@@ -611,12 +627,20 @@
                                           :key="'step1-' + citation.label">
                                     <li class="exploration-ia-reco-list__item">
                                         <span class="fr-icon-file-text-line fr-mr-1v" aria-hidden="true"></span>
-                                        <span x-text="citation.title"></span>
+                                        <span class="flex-grow-1" x-text="citation.title"></span>
                                         <a :href="getCitationUrl(citation)"
                                            class="fr-link fr-link--sm fr-ml-1w"
                                            target="_blank"
-                                           x-show="getCitationUrl(citation)">
+                                           x-show="getCitationUrl(citation)"
+                                           title="Voir la fiche">
                                             <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
+                                        </a>
+                                        <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '')"
+                                           class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-ml-1v"
+                                           target="_blank"
+                                           x-show="citation.resource_id"
+                                           title="Créer une recommandation">
+                                            <span class="fr-icon-add-circle-line fr-icon--sm" aria-hidden="true"></span>
                                         </a>
                                     </li>
                                 </template>
@@ -624,12 +648,20 @@
                                           :key="'step2-' + resource.id">
                                     <li class="exploration-ia-reco-list__item exploration-ia-reco-list__item--co-reco">
                                         <span class="fr-icon-links-line fr-mr-1v" aria-hidden="true"></span>
-                                        <span x-text="resource.title"></span>
+                                        <span class="flex-grow-1" x-text="resource.title"></span>
                                         <a :href="'/ressource/' + resource.resourceId + '/'"
                                            class="fr-link fr-link--sm fr-ml-1w"
                                            target="_blank"
-                                           x-show="resource.resourceId">
+                                           x-show="resource.resourceId"
+                                           title="Voir la fiche">
                                             <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
+                                        </a>
+                                        <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + resource.resourceId"
+                                           class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-ml-1v"
+                                           target="_blank"
+                                           x-show="resource.resourceId"
+                                           title="Créer une recommandation">
+                                            <span class="fr-icon-add-circle-line fr-icon--sm" aria-hidden="true"></span>
                                         </a>
                                     </li>
                                 </template>
