@@ -17,6 +17,7 @@ import 'tippy.js/dist/tippy.css';
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
 import './utils/tooltipInitialization.js';
+import './utils/alpineStoreDevtools';
 
 //Global Store
 import './store/utils';
