@@ -126,7 +126,7 @@ class ContactForm(forms.ModelForm):
 @login_required
 def contact_list(request):
     """Return the Contact list"""
-    has_perm_or_403(request.user, "change_addressbook", request.site)
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     return render(request, "addressbook/contact_list.html", locals())
 
