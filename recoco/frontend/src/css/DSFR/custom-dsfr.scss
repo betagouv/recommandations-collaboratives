@@ -105,8 +105,6 @@ p {
   }
 }
 
-
-
 .mt-n150px {
   margin-top: 0;
 }
@@ -796,6 +794,17 @@ a {
   }
 }
 
+h4 button.fr-link {
+  text-decoration: underline;
+  color: var(--light-background-action-high-blue-france, #000091);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  &:hover {
+    background-color: transparent;
+  }
+}
+
 // a.fr-btn {
 //   &:hover {
 //     &:not(.fr-btn--primary),
@@ -1048,17 +1057,17 @@ a.fr-text-inverted--grey {
 
 .rendered-markdown {
   margin-bottom: 0.75rem;
-  line-height: 1rem;
+  line-height: 1.5rem;
   &--margin-lg {
     margin-bottom: 1rem;
     p {
       margin-bottom: 0.75rem;
-      line-height: 1rem;
+      line-height: 1.5rem;
     }
   }
   p {
     margin-bottom: 0.75rem;
-    line-height: 1rem;
+    line-height: 1.5rem;
   }
 }
 
@@ -1168,4 +1177,19 @@ a.fr-text-inverted--grey {
   .home-images {
     max-height: 200px;
   }
+}
+
+/* ¯¯¯¯¯¯ *\
+  POSITION
+\* ˍˍˍˍˍˍ */
+
+.top-0-5 {
+  top: 0.5rem;
+}
+
+.top-0-25 {
+  top: 0.25rem;
+}
+.end-0-5 {
+  right: 0.5rem;
 }

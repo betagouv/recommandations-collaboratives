@@ -1,5 +1,4 @@
-<div class="task-item__resource"
-     :class="{'task-item__resource--bordered': !recommendation.visited}">
+<div class="task-item__resource task-item__resource--bordered">
     <template x-if="!recommendation.visited">
         <span class="badge text-white task-item__resource-badge"
               x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
@@ -12,7 +11,12 @@
                x-text="recommendation.topic?.name"></p>
         </div>
     </template>
-    <h4 class="fr-link" x-text="recommendation.intent"></h4>
+    <h4>
+        <button type="button"
+                class="fr-link"
+                x-text="recommendation.intent"
+                @click="await openResourcePreviewPanel(recommendation, element)"></button>
+    </h4>
     <template x-if="!recommendation.resource">
         <div class="task-item__content task-item__content-ellipsis"
              x-html="renderMarkdown(recommendation.content)"></div>

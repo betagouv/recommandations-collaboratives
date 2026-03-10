@@ -21,7 +21,7 @@ Parameter Alpine:
             <div class="position-relative">
                 <div>
                     <template x-if="recommendation.resource">
-                        <p class="rendered-markdown--margin-lg"
+                        <p class="rendered-markdown rendered-markdown--margin-lg"
                            x-html="renderMarkdown(recommendation.content)"></p>
                     </template>
                     {% include "conversations/messages/fragments/recommendation_card_content.html" %}
