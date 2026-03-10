@@ -27,25 +27,24 @@
                         </p>
                     </template>
                 </div>
-                <template x-if="countOf.tasks > 0 || countOf.documents > 0">
+                <template x-if="countOf.tasks > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
-                            @click="$store.sharedContentsPanel.open(countOf.tasks > 0 ? 'recommendations' : 'files')">
-                        <template x-if="countOf.tasks > 0">
-                            <span class="topic-item__shared-item">
-                                <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
-                                <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
-                            </span>
-                        </template>
-                        <template x-if="countOf.tasks > 0 && countOf.documents > 0">
-                            <span class="topic-item__shared-separator"> / </span>
-                        </template>
-                        <template x-if="countOf.documents > 0">
-                            <span class="topic-item__shared-item">
-                                <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
-                                <span x-text="`${countOf.documents} fichier${countOf.documents > 1 ? 's' : ''}`"></span>
-                            </span>
-                        </template>
+                            @click="$store.sharedContentsPanel.open('recommendations')">
+                        <span class="topic-item__shared-item">
+                            <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
+                            <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
+                        </span>
+                    </button>
+                </template>
+                <template x-if="countOf.documents > 0">
+                    <button type="button"
+                            class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            @click="$store.sharedContentsPanel.open('files')">
+                        <span class="topic-item__shared-item">
+                            <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
+                            <span x-text="`${countOf.documents} fichier${countOf.documents > 1 ? 's' : ''}`"></span>
+                        </span>
                     </button>
                 </template>
                 <template x-if="countOf.contacts > 0">
