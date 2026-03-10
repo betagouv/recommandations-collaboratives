@@ -18,8 +18,7 @@ Data comes from Alpine: file object in x-for loop
     <div class="shared-contents-file-card__actions">
         <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
            :href="file.attachment"
-           target="_blank"
-           rel="noopener noreferrer">
+           :download="file.filename || file.attachment?.split('/').pop() || ''">
             <span class="fr-icon fr-icon-download-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
             Télécharger
         </a>

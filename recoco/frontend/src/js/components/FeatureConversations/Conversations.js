@@ -60,14 +60,14 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    this.$store.tasksData._subscribe(() => {
+    this.$store.tasksData._subscribe(async () => {
       this.tasks = this.$store.tasksData.tasks;
       // Re-extract shared contents when tasks are updated
-      this.extractSharedContents();
+      await this.extractSharedContents();
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
-    this.extractSharedContents();
+    await this.extractSharedContents();
     this.loadExternalFiles();
   },
   /**
@@ -93,7 +93,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   /**
    * Extract recommendations and files from feed elements and populate the sharedContentsPanel store
    */
-  extractSharedContents() {
+  async extractSharedContents() {
     if (!this.feed.elements) return;
 
     const recommendations = [];
@@ -124,18 +124,11 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
             });
           }
         } else if (node.type === 'DocumentNode') {
-          const document = this.documents.find((d) => d.id === node.document_id);
+          // Fetch document if not in cache to get filename and other properties
+          const document = await this.getDocumentById(node.document_id);
           if (document) {
             files.push({
               ...document,
-              messageId: message.id,
-              messageCreated: message.created,
-              nodeId: node.id,
-            });
-          } else {
-            // If document not in cache, add a placeholder with basic info
-            files.push({
-              id: node.document_id,
               messageId: message.id,
               messageCreated: message.created,
               nodeId: node.id,
