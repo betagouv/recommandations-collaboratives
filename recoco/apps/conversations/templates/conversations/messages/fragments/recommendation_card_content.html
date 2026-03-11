@@ -33,7 +33,7 @@
     <div class="d-flex justify-content-between fr-mt-1w">
         <div class="d-flex">
             {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
-            <template x-if="recommendation.status !== 3 && recommendation.status !== 4 && recommendation.status !== 5 && !{{ project.is_inactive_since|yesno:'true,false' }}">
+            <template x-if="recommendation.status !== TASK_STATUSES.DONE && recommendation.status !== TASK_STATUSES.NOT_INTERESTED && recommendation.status !== TASK_STATUSES.ALREADY_DONE && !{{ project.is_inactive_since|yesno:'true,false' }}">
                 <div class="d-flex align-items-center active-reminder"
                      x-tooltip="`Le demandeur recevra des rappels email tant que cette recommandation n'est pas traitée`">
                     <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v"
@@ -41,7 +41,7 @@
                     <span>Rappels actifs</span>
                 </div>
             </template>
-            <template x-if="recommendation.status === 3 || recommendation.status === 4 || recommendation.status === 5 || {{ project.is_inactive_since|yesno:'true,false' }}">
+            <template x-if="recommendation.status === TASK_STATUSES.DONE || recommendation.status === TASK_STATUSES.NOT_INTERESTED || recommendation.status === TASK_STATUSES.ALREADY_DONE || {{ project.is_inactive_since|yesno:'true,false' }}">
                 <div class="d-flex align-items-center non-active-reminder"
                      x-tooltip="`Pas de rappel envoyé au demandeur sur cette recommandation déjà traitée`">
                     <span class="fr-icon-notification-off-line fr-icon--sm fr-mr-1v"

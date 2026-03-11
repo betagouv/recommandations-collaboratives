@@ -53,22 +53,20 @@ document.addEventListener('alpine:init', () => {
 
       // Scroll to the original message after panel closes
       if (messageId) {
-        setTimeout(() => {
+        Alpine.nextTick(() => {
           const messageElement = document.getElementById(`message-${messageId}`);
           if (messageElement) {
-            messageElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-            });
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             // Highlight the message briefly
             messageElement.classList.add('highlight-message');
             setTimeout(() => {
               messageElement.classList.remove('highlight-message');
             }, 2000);
           }
-        }, 100);
+        });
       }
     },
+
 
     replyToMessage() {
       window.dispatchEvent(
