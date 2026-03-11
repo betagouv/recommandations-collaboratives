@@ -13,7 +13,7 @@ import { ToastType } from '../models/toastType';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
-Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAlert = false) => {
+Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAlert = false, maxContacts = 0) => {
   let editor;
 
   return {
@@ -227,8 +227,37 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
       this.isSearchContactModalOpen = false;
       this.$store.crisp.isPopupOpen = false;
     },
+    getContactCount() {
+      let count = 0;
+      if (editor) {
+        editor.state.doc.descendants((node) => {
+          if (node.type.name === 'contactCard') {
+            count++;
+          }
+        });
+      }
+      return count;
+    },
+    get canAddContact() {
+      // Dépend de updatedAt pour la réactivité (mis à jour lors des changements de l'éditeur)
+      const _ = this.updatedAt;
+      if (maxContacts <= 0) return true; // Pas de limite
+      return this.getContactCount() < maxContacts;
+    },
     insertContactCard(contact) {
       if (editor && contact) {
+        // Vérifier la limite de contacts
+        if (maxContacts > 0 && this.getContactCount() >= maxContacts) {
+          this.$store.app.notification.message =
+            maxContacts === 1
+              ? "Vous ne pouvez ajouter qu'un seul contact."
+              : `Vous ne pouvez ajouter que ${maxContacts} contacts.`;
+          this.$store.app.notification.timeout = 5000;
+          this.$store.app.notification.isOpen = true;
+          this.$store.app.notification.type = ToastType.warning;
+          return;
+        }
+
         const contactAttributes = {
           id: contact.id,
           firstName: contact.first_name,
