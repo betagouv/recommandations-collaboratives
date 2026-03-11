@@ -13,7 +13,7 @@ import { ToastType } from '../models/toastType';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
-Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAlert = false, maxContacts = 0) => {
+Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAlert = false, maxContacts = 0, maxFiles = 0) => {
   let editor;
 
   return {
@@ -77,9 +77,16 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
               }
             }
             editor.commands.setContent(newContent);
-            if (numberContact > 1) {
+            if (numberContact > 1 || numberFile > 1) {
+              const messages = [];
+              if (numberContact > 1) {
+                messages.push("un seul contact");
+              }
+              if (numberFile > 1) {
+                messages.push("un seul fichier");
+              }
               _this.$store.app.notification.message =
-                "Dans ce formulaire, vous ne pouvez ajouter qu'un seul contact par recommandation.";
+                `Dans ce formulaire, vous ne pouvez ajouter que ${messages.join(" et ")} par recommandation.`;
               _this.$store.app.notification.timeout = 5000;
               _this.$store.app.notification.isOpen = true;
               _this.$store.app.notification.type = ToastType.warning;
@@ -303,6 +310,23 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
     /****************
      * Plugin file
      */
+    getFileCount() {
+      let count = 0;
+      if (editor) {
+        editor.state.doc.descendants((node) => {
+          if (node.type.name === 'fileCard') {
+            count++;
+          }
+        });
+      }
+      return count;
+    },
+    get canAddFile() {
+      // Dépend de updatedAt pour la réactivité (mis à jour lors des changements de l'éditeur)
+      const _ = this.updatedAt;
+      if (maxFiles <= 0) return true; // Pas de limite
+      return this.getFileCount() < maxFiles;
+    },
     selectedFile: null,
     fileName: '',
     currentFile: null,
@@ -310,6 +334,20 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
+        // Vérifier la limite de fichiers
+        if (maxFiles > 0 && this.getFileCount() >= maxFiles) {
+          this.$store.app.notification.message =
+            maxFiles === 1
+              ? "Vous ne pouvez ajouter qu'un seul fichier."
+              : `Vous ne pouvez ajouter que ${maxFiles} fichiers.`;
+          this.$store.app.notification.timeout = 5000;
+          this.$store.app.notification.isOpen = true;
+          this.$store.app.notification.type = ToastType.warning;
+          // Réinitialiser l'input file pour permettre une nouvelle sélection
+          event.target.value = '';
+          return;
+        }
+
         this.selectedFile = file;
         this.fileName = file.name;
 
