@@ -50,7 +50,7 @@
                             <div class="d-flex justify-content-end fr-mt-2v">
                                 <button x-data
                                         data-test-id="submit-message-button-on-advisor-space"
-                                        @click="$store.editor.removeContactCardAndFileCardNodes()"
+                                        @click="$store.editor.removeContactCardAndFileCardNodes(); $store.onLeaveAlert.setDirty(false)"
                                         :disabled="$store.editor.currentMessage === ''"
                                         class="fr-btn"
                                         type="submit">Enregistrer</button>
