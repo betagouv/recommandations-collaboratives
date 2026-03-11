@@ -42,7 +42,7 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 
 from ...conversations.utils import gather_annotations_for_message_notification
-from .. import digests
+from .. import digests, helpers
 
 ########################################################################
 # new reco digests
@@ -381,7 +381,7 @@ def test_send_digests_for_switchtender_does_not_include_new_recos(
 
 @pytest.mark.django_db
 def test_notification_formatter(request, make_project):
-    formatter = digests.NotificationFormatter()
+    formatter = helpers.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     organization = Recipe(addressbook_models.Organization, name="DuckCorp").make()
@@ -400,6 +400,8 @@ def test_notification_formatter(request, make_project):
     private_note = Recipe(
         projects_models.Note, content="my content", public=False
     ).make()
+    file = Recipe(projects_models.Document).make(the_file="toto")
+    link = Recipe(projects_models.Document).make(the_link="toto")
 
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
 
@@ -449,7 +451,15 @@ def test_notification_formatter(request, make_project):
             verbs.Project.SUBMITTED_BY,
             project,
             (
-                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY}: 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY} : 'Nice Project'",
+                "Super description",
+            ),
+        ),
+        (
+            verbs.Project.SUBMITTED_BY_ADVISOR,
+            project,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY_ADVISOR} : 'Nice Project'",
                 "Super description",
             ),
         ),
@@ -462,10 +472,18 @@ def test_notification_formatter(request, make_project):
             ),
         ),
         (
-            verbs.Document.ADDED,  # FIXME replace w/ ADDED_FILE ADDED_LINK
-            project,
+            verbs.Document.ADDED_FILE,
+            file,
             (
-                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED}",
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED_FILE} {file.feed_label()}",
+                None,
+            ),
+        ),
+        (
+            verbs.Document.ADDED_LINK,
+            link,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED_LINK} {link.feed_label()}",
                 None,
             ),
         ),
@@ -498,7 +516,7 @@ def test_notification_formatter(request, make_project):
 
 @pytest.mark.django_db
 def test_notification_formatter_with_bogus_user():
-    formatter = digests.NotificationFormatter()
+    formatter = helpers.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     private_note = baker.make(projects_models.Note)

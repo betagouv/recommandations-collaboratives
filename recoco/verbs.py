@@ -16,9 +16,8 @@ class User:
 
 
 class Document:
-    ADDED = "a ajouté un lien ou un document"
-    ADDED_FILE = "a ajouté un document"
-    ADDED_LINK = "a ajouté un lien"
+    ADDED_FILE = "a ajouté le document"
+    ADDED_LINK = "a ajouté le lien"
 
 
 class CRM:
@@ -44,13 +43,15 @@ class Recommendation:
 
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
+    INVITATION_OWNER = "a invité en tant que référent"
 
-    JOINED = "a rejoint le dossier"
+    JOINED_BY_INVITATION = "a accepté l'invitation"
     JOINED_OWNER = "a rejoint en tant que référent le dossier"
     NEW_OWNER = "est dorénavant référent sur le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a déposé un nouveau dossier, en attente de validation"
+    SUBMITTED_BY = "a déposé une nouvelle demande"
+    SUBMITTED_BY_ADVISOR = "a créé en tant que conseiller le dossier"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"
@@ -73,12 +74,12 @@ class Project:
     SET_INACTIVE = "a mis en pause le dossier"
     SET_ACTIVE = "a réactivé le dossier"
 
-    EDITED = "a modifé les informations du dossier"
+    EDITED = "a modifié les informations du dossier"
     UPDATE_ADVISORS_NOTE = "a modifié la note interne du dossier"
 
 
 class Survey:
-    STARTED = "a démarré l'état des lieux"
+    STARTED = "a commencé à remplir l'état des lieux"
     UPDATED = "a mis à jour l'état des lieux"
 
 
