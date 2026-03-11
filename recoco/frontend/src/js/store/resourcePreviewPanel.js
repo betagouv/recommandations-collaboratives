@@ -33,7 +33,7 @@ Alpine.store('resourcePreviewPanel', {
 
     // Scroll to the original message after panel closes
     if (messageId) {
-      setTimeout(() => {
+      Alpine.nextTick(() => {
         const messageElement = document.getElementById(`message-${messageId}`);
         if (messageElement) {
           messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -43,7 +43,7 @@ Alpine.store('resourcePreviewPanel', {
             messageElement.classList.remove('highlight-message');
           }, 2000);
         }
-      }, 100);
+      });
     }
   },
   replyToMessage() {

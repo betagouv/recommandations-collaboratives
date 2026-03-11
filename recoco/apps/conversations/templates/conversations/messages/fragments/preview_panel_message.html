@@ -6,7 +6,7 @@
             <span class="fw-medium">Commentaire du conseiller</span>
         </div>
         <button class="fr-btn fr-btn--sm fr-icon-link fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1w"
-                @click.prevent="$store.resourcePreviewPanel.scrollToMessage()">Voir dans la conversation</button>
+                @click="$store.resourcePreviewPanel.scrollToMessage()">Voir dans la conversation</button>
     </div>
     <div class="resource-preview-panel__advisor-comment-content">
         <template x-if="$store.resourcePreviewPanel.recommendation?.content">
