@@ -16,6 +16,7 @@ Parameters:
 - placeholder (string)
 - is_action_pusher (boolean)
 - can_compress_editor (boolean)
+- is_notification_alert (boolean)
 {% endcomment %}
 {% load static %}
 {% load django_vite %}
@@ -84,6 +85,11 @@ Parameters:
                     </div>
                 </div>
             </template>
+            {% if is_notification_alert %}
+                <div class="position-absolute top-0-25 end-0-5 z-index-1">
+                    <span class="d-flex align-items-center indicator-text"><span class="fr-icon-attention fr-icon--sm fr-mr-1v"></span>Tous les membres du dossier seront notifiés par email</span>
+                </div>
+            {% endif %}
             <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage == 3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>
@@ -186,6 +192,7 @@ Parameters:
                             :disabled="!isFormValid || sendingMessage"
                             form="{{ form_id|default:'conversation-form' }}"
                             class="fr-btn fr-btn--sm"
+                            :class="{'fr-icon-send-message fr-icon--sm fr-btn--icon-left': !isEditorInEditMode}"
                             type="submit"
                             x-text="isEditorInEditMode ? 'Modifier' : 'Envoyer'"></button>
                 </div>
