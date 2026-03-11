@@ -1,5 +1,6 @@
 import Alpine from '../../utils/globals';
 import { ToastType } from '../../models/toastType';
+import TASK_STATUSES from '../../config/statuses';
 import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
@@ -49,6 +50,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   lastMessageDate: null,
   elementToDelete: null,
   theFiles: [],
+  TASK_STATUSES,
   formatDateFrench,
   editTaskUrl,
   async init() {
@@ -492,7 +494,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
   },
-  async onClickRessourceConsummeNotification(recommendation, message) {
+  async onClickRessourceConsumeNotification(recommendation, message) {
     trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
@@ -514,7 +516,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   async openResourcePreviewPanel(recommendation, message) {
     try {
       // Mark as visited and track analytics
-      await this.onClickRessourceConsummeNotification(recommendation, message);
+      await this.onClickRessourceConsumeNotification(recommendation, message);
       if (this.$store.resourcePreviewPanel) {
         this.$store.resourcePreviewPanel.open(recommendation, message);
       } else {
