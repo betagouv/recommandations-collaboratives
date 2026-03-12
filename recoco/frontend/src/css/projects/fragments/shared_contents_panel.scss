@@ -1,0 +1,332 @@
+// Shared Contents Panel - Overlay panel displaying recommendations and files shared in conversation
+// Used in conversation page, accessible from left panel or above messages
+
+.shared-contents-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 37.5%;
+  background: var(--background-default-grey, #fff);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+
+  // Header
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-default-grey, #e5e5e5);
+    background: #fafafa;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    color: var(--light-neutral-grey-50, #161616);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  &__close-btn {
+    color: var(--light-text-default-grey, #3a3a3a);
+  }
+
+  // Tabs section (uses DSFR segmented control)
+  &__tabs-container {
+    background: #fafafa;
+  }
+  &__tabs {
+    width: fit-content;
+    padding: 1rem;
+    flex-shrink: 0;
+
+    .fr-segmented {
+      width: 100%;
+    }
+
+    .fr-segmented__elements {
+      background: white;
+      width: 100%;
+    }
+
+    .fr-segmented__element {
+      flex: 1;
+    }
+  }
+  &__item-count {
+    margin-left: 0.25rem;
+    font-weight: 400;
+  }
+
+  // Scrollable body
+  &__body {
+    background: #fafafa;
+    border-top: 1px solid var(--border-default-grey, #e5e5e5);
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+
+    // Override task-item__resource width to take full width in panel
+    .task-item__resource {
+      width: 100%;
+    }
+  }
+
+  // Empty state
+  &__empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-mention-grey, #666);
+
+    .fr-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+  }
+
+  // Date group header
+  &__date-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-mention-grey, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  // External files section
+  &__external-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  &__external-title {
+    color: var(--light-text-mention-grey, #666);
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px; /* 150% */
+
+    .fr-icon {
+      margin-right: 0.25rem;
+    }
+  }
+}
+
+// Recommendation card in shared contents panel
+.shared-contents-reco-card {
+  background: var(--background-default-grey, #fff);
+  border: 1px solid var(--border-default-grey, #e5e5e5);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  &__topic {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--background-alt-grey, #f6f6f6);
+    color: var(--text-default-grey, #3a3a3a);
+  }
+
+  &__resource-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--background-contrast-info, #e8edff);
+    color: var(--text-action-high-blue-france, #000091);
+
+    .fr-icon {
+      font-size: 0.75rem;
+    }
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-default-grey, #3a3a3a);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+  }
+
+  &__description {
+    font-size: 0.875rem;
+    color: var(--text-mention-grey, #666);
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-mention-grey, #666);
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+
+  &__consult-btn {
+    font-size: 0.875rem;
+  }
+}
+
+// File card in shared contents panel
+.shared-contents-file-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fff;
+  border: 1px solid #000091;
+  border-radius: 2px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--light-background-action-high-blue-france, #000091);
+
+  &__icon {
+    flex-shrink: 0;
+    color: var(--text-action-high-blue-france, #000091);
+
+    .fr-icon {
+      font-size: 1rem;
+    }
+  }
+
+  &__info {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+    min-width: 0;
+    gap: 0;
+  }
+
+  &__name {
+    color: var(--light-background-action-high-blue-france, #000091);
+    font-family: Marianne;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px;
+    text-decoration-line: underline;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  &__ext {
+    flex-shrink: 0;
+    font-family: Marianne;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--text-mention-grey, #666);
+    margin-left: 0.625rem;
+  }
+
+  &__download-btn {
+    flex-shrink: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .shared-contents-panel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .shared-contents-panel {
+    &__header {
+      padding: 0.75rem 1rem;
+    }
+
+    &__tabs {
+      padding: 0.75rem 1rem;
+    }
+
+    &__body {
+      padding: 1rem;
+    }
+  }
+
+  .shared-contents-reco-card {
+    padding: 0.75rem;
+
+    &__footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__consult-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
