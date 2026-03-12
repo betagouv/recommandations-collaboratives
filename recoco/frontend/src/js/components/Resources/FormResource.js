@@ -33,11 +33,7 @@ Alpine.data('FormResource', (resourceId) => {
       contacts: [],
     },
     init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isDuplicate = urlParams.get('is_duplicate');
-      if (isDuplicate) {
-        this.$store.onLeaveAlert.setDirty(true);
-      }
+      this.$store.onLeaveAlert.setDirty(true);
       Alpine.nextTick(() => {
         this.initFormFields(this.$refs.formResource);
       });
