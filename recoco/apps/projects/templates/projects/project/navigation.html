@@ -189,6 +189,12 @@
     {% endwith %}
     <div class="d-flex">
         <div class="d-flex fr-px-4w align-items-center position-relative">
+            {% if "list_projects" in user_site_perms %}
+                <a class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-search-line justify-content-center fr-mr-2v"
+                   href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                   data-test-id="exploration-ia-link"
+                   title="Exploration IA">Exploration IA</a>
+            {% endif %}
             {% if "use_crm" in user_site_perms and not disable_crm %}
                 <a class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-pulse-line justify-content-center fr-mr-2v"
                    href="{% url 'crm-project-details' project.pk %}">CRM</a>
