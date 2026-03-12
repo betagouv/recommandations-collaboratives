@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load django_vite %}
+{% load guardian_tags %}
 {% load humanize %}
 {% load training %}
 {% load hijack %}
@@ -15,9 +16,15 @@
     {% vite_asset 'js/apps/CRM/resourceListCrm.js' %}
 {% endblock js %}
 {% block content %}
-    {% include "crm/fragments/navigation.html" with resources=True %}
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Ressources' } }"
-         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% if "use_crm" in user_site_perms %}
+        {% include "crm/fragments/navigation.html" with resources=True %}
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Ressources' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    {% else %}
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    {% endif %}
     {{ departments|json_script:"departmentsArray" }}
     {{ categories|json_script:"categoriesArray" }}
     <span x-text="departmentsArray.textContent"></span>
