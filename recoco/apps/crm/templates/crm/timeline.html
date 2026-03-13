@@ -31,6 +31,17 @@
                         <span class="verb">
                             <strong>{{ action.verb }}</strong>
                         </span>
+                        {% if action.action_object.email %}
+                            <a href="{% url 'crm-user-details' action.action_object.pk %}">
+                                {{ action.action_object.first_name|default:action.action_object.email }}
+                                {{ action.action_object.last_name|default:"" }}
+                            </a>
+                        {% endif %}
+                        {% if action.action_object.feed_label %}
+                                    <a href="{{ action.action_object.get_absolute_url }}">
+                                        {{ action.action_object.feed_label }}
+                                    </a>
+                        {% endif %}
                         {% if action.target %}
                             <span class="target">
                                 {% if action.verb != verbs.Project.BECAME_OBSERVER and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.LEFT_OBSERVING and action.verb != verbs.Project.LEFT_ADVISING %}
