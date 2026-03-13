@@ -92,6 +92,8 @@ def site_action_stream(site):
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
             | Q(verb=verbs.User.ADVISOR_REQUEST)
+            | Q(verb=verbs.User.ADVISOR_REJECTED)
+            | Q(verb=verbs.User.ADVISOR_ACCEPTED)
         )
         .order_by("-timestamp")
         # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
