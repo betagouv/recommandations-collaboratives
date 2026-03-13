@@ -105,6 +105,7 @@ def specialize_verbs(apps, schema_editor):
                 action_object=action.actor,
                 target=action.target,
                 site=action.site,
+                timestamp=action.timestamp,
             )
         )
     Action.objects.bulk_create(new_actions)
