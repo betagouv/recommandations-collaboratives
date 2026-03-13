@@ -666,8 +666,11 @@ def user_details(request, user_id):
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
-    actions = crm_user.actor_actions.exclude(
-        verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+    actions = (
+        crm_user.actor_actions.exclude(
+            verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+        )
+        | crm_user.action_object_actions.all()
     )
 
     user_ct = ContentType.objects.get_for_model(User)
