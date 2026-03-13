@@ -84,6 +84,7 @@ class Survey:
 
 
 class Conversation:
+    PUBLIC_MESSAGE = "a envoyé un message dans l'espace conversation"  # deprecated but reflects state in db so should not be deleted
     PRIVATE_MESSAGE = "a envoyé un message dans l'espace conseillers"
     POST_MESSAGE = "a envoyé un message"
 
