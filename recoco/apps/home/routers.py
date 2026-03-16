@@ -20,9 +20,15 @@ class TenantPluginRouter:
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         # Identify if the app is an extension
         if app_label.startswith("plugin_"):
-            # Only allow migrations for this app if we are running
-            # a tenant-specific migration command.
-            return self.is_tenant_operation or hints.get("is_tenant_operation", False)
+            if not (
+                self.is_tenant_operation or hints.get("is_tenant_operation", False)
+            ):
+                raise RuntimeError(
+                    f"App '{app_label}' is a tenant plugin and cannot be migrated "
+                    f"using the standard 'migrate' command. "
+                    f"Use 'manage.py migrate_tenant --schema=<schema_name>' instead."
+                )
+            return True
 
         # Core apps always go to the default (public) schema
         return True
