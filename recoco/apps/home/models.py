@@ -277,6 +277,19 @@ class SiteConfiguration(models.Model):
         verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
 
+    schema_name = models.SlugField(
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Le schema PgSQL pour ce portail.",
+    )
+
+    enabled_plugins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Liste des plugins activés sur ce portail",
+    )
+
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
 
