@@ -4,7 +4,7 @@ import pytest
 from django.core.management import call_command
 from model_bakery import baker
 
-from recoco.apps.home.middlewares import TenantSchemaMiddleware
+from recoco.apps.home.middlewares import TenantPluginSchemaMiddleware
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.home.routers import TenantPluginRouter
 
@@ -16,7 +16,7 @@ def get_response_mock():
 
 @pytest.fixture
 def middleware(get_response_mock):
-    return TenantSchemaMiddleware(get_response=get_response_mock)
+    return TenantPluginSchemaMiddleware(get_response=get_response_mock)
 
 
 @pytest.fixture
@@ -25,8 +25,8 @@ def request_mock():
 
 
 @pytest.mark.django_db
-class TestTenantSchemaMiddleware:
-    """Assure that the Middleware will extends the BD path"""
+class TestTenantPluginSchemaMiddleware:
+    """Ensure the Middleware will extend the DB path based on schema_name presence"""
 
     def test_does_nothing_if_no_site_config(self, middleware, request_mock):
         if hasattr(request_mock, "site_config"):

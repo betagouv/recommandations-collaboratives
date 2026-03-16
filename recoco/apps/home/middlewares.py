@@ -32,7 +32,11 @@ class CurrentSiteConfigurationMiddleware:
         return self.get_response(request)
 
 
-class TenantSchemaMiddleware:
+class TenantPluginSchemaMiddleware:
+    """Extends the database search path based on the current tenant name.
+    This allows using plugins contained for each tenant.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
