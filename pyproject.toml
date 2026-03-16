@@ -68,6 +68,7 @@ dependencies = [
     "mwclient==0.11.0",
     "pandoc==2.4",
     "pillow==12.1.1",
+    "pluggy>=1.6.0",
     "psycopg[c]>=3.2.12",
     "puremagic>=1.30",
     "redis==5.0.4",
