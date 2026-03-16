@@ -4,35 +4,18 @@ Displays file info with icon, name, extension and download button.
 Data comes from Alpine: file object in x-for loop
 {% endcomment %}
 <div class="shared-contents-file-card"
-     x-data="{
-        getFullFilename() {
-            return file.filename || file.name || 'Fichier';
-        },
-        getFilenameWithoutExt() {
-            const filename = this.getFullFilename();
-            const lastDot = filename.lastIndexOf('.');
-            return lastDot > 0 ? filename.substring(0, lastDot) : filename;
-        },
-        getFileExtension() {
-            const filename = this.getFullFilename();
-            const lastDot = filename.lastIndexOf('.');
-            if (lastDot > 0) {
-                return filename.substring(lastDot + 1).toUpperCase();
-            }
-            return '';
-        }
-     }">
+     x-data="SharedContentsFileCard({ isExternal: {{ external|yesno:'true,false' }} })">
     <div class="shared-contents-file-card__icon">
         <span class="fr-icon fr-icon-file-line" aria-hidden="true"></span>
     </div>
     <div class="shared-contents-file-card__info">
         <a class="shared-contents-file-card__name"
-           :href="file.the_file || file.url"
+           :href="getFileUrl()"
            :download="getFullFilename()"
            x-text="getFilenameWithoutExt()"></a>
         <span class="shared-contents-file-card__ext" x-text="getFileExtension()"></span>
     </div>
     <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm"
-       :href="file.the_file || file.url"
+       :href="getFileUrl()"
        :download="getFullFilename()">Télécharger</a>
 </div>

@@ -103,7 +103,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                                     <p class="shared-contents-panel__date-header"
                                                        x-text="formatDateFrench(file.messageCreated)"></p>
                                                 </template>
-                                                {% include "conversations/messages/fragments/shared_contents_file_card.html" %}
+                                                {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=False %}
                                             </div>
                                         </template>
                                     </div>
@@ -114,7 +114,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                         <p class="shared-contents-panel__external-title">Fichiers partagés hors de cette conversation</p>
                                         <template x-for="file in $store.sharedContentsPanel.externalFiles"
                                                   :key="file.id">
-                                            {% include "conversations/messages/fragments/shared_contents_external_file_card.html" %}
+                                            {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
                                         </template>
                                     </div>
                                 </template>

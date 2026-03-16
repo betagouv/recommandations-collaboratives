@@ -16,9 +16,11 @@ import api, {
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
+import { formatFileSize } from '../../utils/file';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
   resourcePreviewUrl,
+  formatFileSize,
   projectId,
   currentUserId,
   feed: {},
@@ -161,15 +163,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       // Open the resource preview panel
       await this.openResourcePreviewPanel(recommendation, message);
     }
-  },
-  /**
-   * Format file size in human-readable format
-   */
-  formatFileSize(bytes) {
-    if (!bytes || bytes === 0) return '';
-    const units = ['o', 'Ko', 'Mo', 'Go'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i)) + ' ' + units[i];
   },
   getMessageById(id) {
     return this.feed.messages.find((message) => message.id === +id);
