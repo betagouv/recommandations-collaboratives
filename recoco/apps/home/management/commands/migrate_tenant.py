@@ -34,6 +34,18 @@ class Command(BaseCommand):
                 cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema}")
                 cursor.execute(f"SET search_path TO {schema}, public")
 
+                # We need a tenant-local django_migrations table so Django's
+                # MigrationRecorder doesn't fall back to public.django_migrations
+                # That would prevent a migration from being applyed to multiple tenants
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS django_migrations (
+                        id SERIAL PRIMARY KEY,
+                        app VARCHAR(255) NOT NULL,
+                        name VARCHAR(255) NOT NULL,
+                        applied TIMESTAMPTZ NOT NULL
+                    )
+                """)
+
             # Now we can call django migrate routine with the added schema
             migrate_args = []
             if app_label:
