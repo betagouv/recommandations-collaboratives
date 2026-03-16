@@ -11,7 +11,6 @@ import django.core.mail
 from actstream import action
 from django.contrib import messages
 from django.contrib.auth import login as log_user
-from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -121,14 +120,9 @@ class StatisticsView(TemplateView):
     template_name = "home/statistics.html"
 
     def get_context_data(self, **kwargs):
-        staff_users = auth.User.objects.filter(is_staff=True)
         the_projects = projects.Project.on_site.exclude(
-            Q(members__in=staff_users)
-            # FIXME ^ replace w/: | Q(status="STANDBY") -> OK
-            | Q(exclude_stats=True)
-        ).exclude(
-            project_sites__site=self.request.site,
-            project_sites__status__in=["DRAFT", "STUCK"],
+            exclude_stats=True,
+            project_sites__status__in=["DRAFT", "STANDBY", "PRE_DRAFT"],
         )
 
         context = super().get_context_data(**kwargs)
@@ -139,12 +133,8 @@ class StatisticsView(TemplateView):
                 Q(status=tasks.Task.NOT_INTERESTED) | Q(status=tasks.Task.ALREADY_DONE)
             )
             .exclude(
-                Q(project__members__in=staff_users)
-                # FIXME ^ replace w/: | Q(project__status="STANDBY")
-                | Q(project__exclude_stats=True)
-            )
-            .exclude(
-                project__project_sites__status__in=["DRAFT", "STUCK"],
+                project__exclude_stats=True,
+                project__project_sites__status__in=["DRAFT", "STANDBY", "PRE_DRAFT"],
                 project__project_sites__site=self.request.site,
             )
             .order_by("project_id")
@@ -152,13 +142,12 @@ class StatisticsView(TemplateView):
             .distinct("project_id")
             .count()
         )
-        numbers = [
-            p.number_tasks
-            for p in the_projects.all().annotate(number_tasks=Count("tasks"))
+        numbers_reco = [
+            p.number_tasks for p in the_projects.annotate(number_tasks=Count("tasks"))
         ]
-        context["total_recommendation"] = sum(numbers)
+        context["total_recommendation"] = sum(numbers_reco)
         context["collectivity_avg_reco"] = (
-            context["total_recommendation"] / len(numbers) if numbers else 0
+            context["total_recommendation"] / len(numbers_reco) if numbers_reco else 0
         )
 
         context["new_col_per_month"] = [
