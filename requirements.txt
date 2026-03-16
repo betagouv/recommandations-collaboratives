@@ -1522,13 +1522,7 @@ pygments==2.19.2 \
     #   sphinx
     #   sphinx-prompt
     #   sphinx-tabs
-pyjwt==2.9.0 ; python_full_version < '3.12' \
-    --hash=sha256:3b02fb0f44517787776cf48f2ae25d8e14f300e6d7545a4315cee571a415e850 \
-    --hash=sha256:7e1e5b56cc735432a7369cbfa0efe50fa113ebecdc04ae6922deba8b84582d0c
-    # via
-    #   django-allauth
-    #   djangorestframework-simplejwt
-pyjwt==2.12.0 ; python_full_version >= '3.12' \
+pyjwt==2.12.0 \
     --hash=sha256:2f62390b667cd8257de560b850bb5a883102a388829274147f1d724453f8fb02 \
     --hash=sha256:9bb459d1bdd0387967d287f5656bf7ec2b9a26645d1961628cda1764e087fd6e
     # via
