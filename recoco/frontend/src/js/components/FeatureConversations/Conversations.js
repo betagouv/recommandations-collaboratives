@@ -107,9 +107,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     const sortedElements = [...this.feed.elements]
       .filter((el) => el.type === 'message' && !el.deleted)
       .sort((a, b) => {
-        const ta = Date.parse(a.created ?? 0);
-        const tb = Date.parse(b.created ?? 0);
-        return tb - ta; // Descending order (most recent first)
+        const dateElementA = Date.parse(a.created ?? 0);
+        const dateElementB = Date.parse(b.created ?? 0);
+        return dateElementB - dateElementA; // Descending order (most recent first)
       });
 
     for (const message of sortedElements) {
