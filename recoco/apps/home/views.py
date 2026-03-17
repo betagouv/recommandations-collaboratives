@@ -121,8 +121,8 @@ class StatisticsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         the_projects = projects.Project.on_site.exclude(
-            exclude_stats=True,
-            project_sites__status__in=["DRAFT", "STANDBY", "PRE_DRAFT"],
+            Q(exclude_stats=True)
+            | Q(project_sites__status__in=["DRAFT", "PRE_DRAFT", "REJECTED"])
         )
 
         context = super().get_context_data(**kwargs)

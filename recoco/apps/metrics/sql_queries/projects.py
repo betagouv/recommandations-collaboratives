@@ -9,9 +9,11 @@ from ..utils import hash_field
 
 def get_queryset() -> QuerySet:
     return (
-        Project.objects.exclude(exclude_stats=True)
+        Project.objects.exclude(
+            Q(exclude_stats=True)
+            | Q(project_sites__status__in=["DRAFT", "PRE_DRAFT", "REJECTED"])
+        )
         .prefetch_related("tasks", "switchtenders")
-        .exclude(project_sites__status="DRAFT")
         .order_by("-created_on")
         .annotate(
             hash=hash_field("id", salt="project"),
