@@ -12,6 +12,6 @@
         }
     }
 }'
-x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
+x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || $store.sharedContentsPanel.draftRecommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
     {% include "conversations/messages/fragments/recommendation_card_content.html" %}
 </div>

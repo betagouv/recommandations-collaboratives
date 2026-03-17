@@ -19,6 +19,9 @@ import { formatDateFrench } from '../../utils/date';
 import { formatFileSize } from '../../utils/file';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
+  TASK_STATUSES,
+  formatDateFrench,
+  editTaskUrl,
   resourcePreviewUrl,
   formatFileSize,
   projectId,
@@ -40,6 +43,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     new_messages: 0,
     tasks: 0,
     unread_recommendations: 0,
+    draft_recommendations: 0,
     contacts: 0,
     documents: 0,
   },
@@ -52,9 +56,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   lastMessageDate: null,
   elementToDelete: null,
   theFiles: [],
-  TASK_STATUSES,
-  formatDateFrench,
-  editTaskUrl,
   async init() {
     this.getMessagesParticipants();
     await this.getActivities();
@@ -102,6 +103,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     const recommendations = [];
     const files = [];
+    const draftRecommendations = this.tasks.filter(task => task.public === false);
 
     // Iterate over feed elements in reverse (most recent first)
     const sortedElements = [...this.feed.elements]
@@ -145,8 +147,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     // Update the store
     if (this.$store.sharedContentsPanel) {
       this.$store.sharedContentsPanel.setRecommendations(recommendations);
+      this.$store.sharedContentsPanel.setDraftRecommendations(draftRecommendations);
       this.$store.sharedContentsPanel.setFiles(files);
     }
+
+    // Update draft count
+    this.countOf.draft_recommendations = draftRecommendations.length;
   },
   /**
    * Open a recommendation from the shared contents panel

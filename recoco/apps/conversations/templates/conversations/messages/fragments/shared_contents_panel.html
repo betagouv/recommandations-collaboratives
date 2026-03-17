@@ -49,6 +49,20 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           x-text="`(${$store.sharedContentsPanel.filesCount})`"></span>
                                 </label>
                             </div>
+                            <div class="fr-segmented__element">
+                                <input type="radio"
+                                       value="draft-recommendations"
+                                       id="shared-contents-tab-draft-recommendations"
+                                       name="shared-contents-tab"
+                                       :checked="$store.sharedContentsPanel.activeTab === 'draft-recommendations'"
+                                       :disabled="$store.sharedContentsPanel.draftRecommendationsCount === 0"
+                                       @click="$store.sharedContentsPanel.switchTab('draft-recommendations')">
+                                <label class="fr-label" for="shared-contents-tab-draft-recommendations">
+                                    Brouillons
+                                    <span class="shared-contents-panel__item-count"
+                                          x-text="`(${$store.sharedContentsPanel.draftRecommendationsCount})`"></span>
+                                </label>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -116,6 +130,32 @@ Managed by Alpine store: $store.sharedContentsPanel
                                                   :key="file.id">
                                             {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
                                         </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <!-- Draft recommendations tab -->
+                <template x-if="$store.sharedContentsPanel.activeTab === 'draft-recommendations'">
+                    <div>
+                        <template x-if="$store.sharedContentsPanel.draftRecommendationsCount === 0">
+                            <div class="shared-contents-panel__empty">
+                                <span class="fr-icon fr-icon-draft-line" aria-hidden="true"></span>
+                                <p>Aucun brouillon de recommandation dans cette conversation.</p>
+                            </div>
+                        </template>
+                        <template x-if="$store.sharedContentsPanel.draftRecommendationsCount > 0">
+                            <div>
+                                <template x-for="(reco, index) in $store.sharedContentsPanel.draftRecommendations"
+                                          :key="reco.id">
+                                    <div class="fr-mb-3v">
+                                        <!-- Date header with grouping -->
+                                        <template x-if="index === 0 || formatDateFrench(reco.messageCreated) !== formatDateFrench($store.sharedContentsPanel.draftRecommendations[index - 1]?.messageCreated)">
+                                            <p class="shared-contents-panel__date-header"
+                                               x-text="formatDateFrench(reco.messageCreated)"></p>
+                                        </template>
+                                        {% include "conversations/messages/fragments/shared_contents_recommendation_card.html" %}
                                     </div>
                                 </template>
                             </div>

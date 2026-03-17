@@ -1,5 +1,8 @@
 <div class="task-item__resource task-item__resource--bordered">
-    <template x-if="!recommendation.visited">
+    <template x-if="recommendation.public === false">
+        <span class="badge bg-warning text-dark task-item__resource-badge">Brouillon</span>
+    </template>
+    <template x-if="!recommendation.visited && recommendation.public !== false">
         <span class="badge text-white task-item__resource-badge"
               x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
     </template>
