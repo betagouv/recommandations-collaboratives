@@ -9,15 +9,12 @@ document.addEventListener('alpine:init', () => {
     _unsubscribe: null,
 
     init() {
-      // Subscribe to tasksData changes to keep recommendation in sync
-      const tasksData = Alpine.store('tasksData');
-      if (tasksData && tasksData._subscribe) {
-        this._unsubscribe = tasksData._subscribe(() => {
+      const tasksDataStore = Alpine.store('tasksData');
+      if (tasksDataStore && tasksDataStore._subscribe) {
+        this._unsubscribe = tasksDataStore._subscribe(() => {
           if (this.isOpen && this.recommendation) {
-            // Find the updated task in tasksData
-            const updatedTask = tasksData.getTaskById(this.recommendation.id);
+            const updatedTask = tasksDataStore.getTaskById(this.recommendation.id);
             if (updatedTask) {
-              // Update the recommendation status while preserving other properties
               this.recommendation.status = updatedTask.status;
               this.recommendation.visited = updatedTask.visited;
             }
@@ -57,7 +54,6 @@ document.addEventListener('alpine:init', () => {
           const messageElement = document.getElementById(`message-${messageId}`);
           if (messageElement) {
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Highlight the message briefly
             messageElement.classList.add('highlight-message');
             setTimeout(() => {
               messageElement.classList.remove('highlight-message');

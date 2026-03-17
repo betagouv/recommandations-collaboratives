@@ -25,15 +25,6 @@ Alpine.store('sharedContentsPanel', {
     document.body.style.overflow = '';
   },
 
-  /**
-   * Close the panel but mark that we want to re-open it when the detail panel closes
-   * Used when navigating from shared contents list to recommendation detail
-   */
-  closeForDetail() {
-    this.shouldReopenOnDetailClose = true;
-    this.close();
-  },
-
   switchTab(tab) {
     this.activeTab = tab;
   },
@@ -49,6 +40,15 @@ Alpine.store('sharedContentsPanel', {
 
   setExternalFiles(externalFiles) {
     this.externalFiles = externalFiles;
+  },
+
+  /**
+   * Close the panel but mark that we want to re-open it when the detail panel closes
+   * Used when navigating from shared contents list to recommendation detail
+   */
+  closeForDetail() {
+    this.shouldReopenOnDetailClose = true;
+    this.close();
   },
 
   /**

@@ -3,7 +3,6 @@ import {
   STATUSES,
   isStatus,
   statusText,
-  isArchivedStatus,
 } from '../utils/taskStatus';
 
 Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
@@ -14,7 +13,6 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
     STATUSES,
     statusText,
 
-    // Get fresh task data from the store
     get task() {
       const storeTask = this.$store.tasksData.getTaskById(this.taskId);
       return storeTask || { id: this.taskId, status: task.status };
@@ -32,12 +30,7 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
       this.isLoading = true;
 
       try {
-        // Use the central tasksData store to issue the followup
-        // This ensures all subscribers (including the tasks panel) are notified
         await this.$store.tasksData.issueFollowup(this.task, status);
-
-        // Update tasksView.displayedTasks to sync the tasks panel
-        // This calls loadTasks() internally and updates the displayed tasks
         await this.$store.tasksView.updateViewWithTask(this.taskId);
       } catch (error) {
         throw new Error('Failed to update task status');
