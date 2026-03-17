@@ -105,8 +105,6 @@ p {
   }
 }
 
-
-
 .mt-n150px {
   margin-top: 0;
 }
@@ -648,23 +646,18 @@ form > p {
   flex-basis: 48.8%;
 }
 
-.font-size-14px {
-  font-size: 14px;
-}
-
+.font-size-14px,
 .font-size-14px p {
   font-size: 14px;
 }
 
-.font-size-12px {
-  font-size: 12px;
-}
-
+.font-size-12px,
 .font-size-12px p {
   font-size: 12px;
 }
 
-.font-size-10px {
+.font-size-10px,
+.font-size-10px p {
   font-size: 10px;
 }
 
@@ -798,6 +791,17 @@ a {
     background-color: var(--light-background-alt-grey-hover, #e6e6e6);
     background: var(--light-background-alt-grey-hover, #e6e6e6);
     color: var(--light-text-default-grey-hover, #3a3a3a);
+  }
+}
+
+h4 button.fr-link {
+  text-decoration: underline;
+  color: var(--light-background-action-high-blue-france, #000091);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  &:hover {
+    background-color: transparent;
   }
 }
 
@@ -1051,6 +1055,22 @@ a.fr-text-inverted--grey {
   text-overflow: ellipsis;
 }
 
+.rendered-markdown {
+  margin-bottom: 0.75rem;
+  line-height: 1.5rem;
+  &--margin-lg {
+    margin-bottom: 1rem;
+    p {
+      margin-bottom: 0.75rem;
+      line-height: 1.5rem;
+    }
+  }
+  p {
+    margin-bottom: 0.75rem;
+    line-height: 1.5rem;
+  }
+}
+
 /* ¯¯¯ *\
   Size
 \* ˍˍˍ */
@@ -1157,4 +1177,19 @@ a.fr-text-inverted--grey {
   .home-images {
     max-height: 200px;
   }
+}
+
+/* ¯¯¯¯¯¯ *\
+  POSITION
+\* ˍˍˍˍˍˍ */
+
+.top-0-5 {
+  top: 0.5rem;
+}
+
+.top-0-25 {
+  top: 0.25rem;
+}
+.end-0-5 {
+  right: 0.5rem;
 }

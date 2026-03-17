@@ -25,6 +25,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.core.cache import cache
@@ -81,6 +82,27 @@ from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
 
+def site_action_stream(site):
+    ctype = ContentType.objects.get_for_model(Project)
+
+    return (
+        Action.objects.filter(site=site)
+        .filter(
+            Q(target_content_type=ctype)
+            | Q(action_object_content_type=ctype)
+            | Q(actor_content_type=ctype)
+            | Q(verb=verbs.User.ADVISOR_REQUEST)
+        )
+        .order_by("-timestamp")
+        # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
+        .prefetch_related(
+            GenericPrefetch("actor", [User.objects.all()]),
+            "action_object",  # todo GenericPrefetch list querysets of relevant ob
+            GenericPrefetch("target", [Project.on_site.all(), Site.objects.all()]),
+        )
+    )
+
+
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "crm/site_dashboard.html"
 
@@ -96,18 +118,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        ctype = ContentType.objects.get_for_model(Project)
-        context["projects_stream"] = (
-            Action.objects.filter(site=self.request.site)
-            .filter(
-                Q(target_content_type=ctype)
-                | Q(action_object_content_type=ctype)
-                | Q(actor_content_type=ctype)
-            )
-            .order_by("-timestamp")
-            # TODO: https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
-            .prefetch_related("actor", "action_object", "target")[:100]
-        )
+        context["site_action_stream"] = site_action_stream(self.request.site)[:100]
 
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
@@ -1456,16 +1467,7 @@ def projects_activity_feed(request):
 
     ctype = ContentType.objects.get_for_model(Project)
 
-    actions = (
-        Action.objects.filter(site=request.site)
-        .filter(
-            Q(target_content_type=ctype)
-            | Q(action_object_content_type=ctype)
-            | Q(actor_content_type=ctype)
-        )
-        .order_by("-timestamp")
-        .prefetch_related("actor", "action_object", "target")[:500]
-    )
+    actions = site_action_stream(request.site)[:500]
 
     search_form = forms.CRMSearchForm()
 

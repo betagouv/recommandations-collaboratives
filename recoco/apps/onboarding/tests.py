@@ -1,11 +1,16 @@
 import pytest
+from actstream.models import Action
 from django.contrib.auth import models as auth
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications.models import Notification
 
+from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.invites import models as invites_models
@@ -53,6 +58,38 @@ def test_performing_onboarding_creates_a_new_project(request, client):
     assert project.project_sites.current().status == "DRAFT"
     assert project.project_sites.current().is_origin is True
     assert len(project.ro_key) == 32
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_creates_notif_and_action(request, client):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+    moderator = baker.make(User)
+    assign_perm("moderate_projects", moderator, site)
+
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
+    with login(client) as submitter:
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+
+    action = Action.objects.filter(verb=verbs.Project.SUBMITTED_BY).first()
+    assert action.action_object == project
+    assert action.actor == submitter
+
+    assert not Action.objects.filter(verb=verbs.Project.INVITATION_OWNER).exists()
+
+    notif = Notification.objects.filter(verb=verbs.Project.SUBMITTED_BY).first()
+    assert notif.action_object == project
+    assert notif.actor == submitter
 
 
 @pytest.mark.django_db
@@ -656,6 +693,58 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_creates_actions_and_notif(request, client):
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+    )
+    moderator = baker.make(User)
+    assign_perm("moderate_projects", moderator, site)
+    baker.make(geomatics.Commune, insee="62044", postal="62170")
+    user_data = {
+        "email": "my@email.com",
+        "first_name": "Camille",
+        "last_name": "Dupont",
+        "phone": "066666666",
+        "org_name": "ACME",
+        "role": "Ouistiti",
+    }
+    project_data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "blah",
+    }
+
+    with login(client, groups=["example_com_advisor"]) as submitter:
+        response = client.post(reverse("onboarding-prefill-set-user"), data=user_data)
+        assert response.status_code == 302
+        response = client.post(
+            reverse("onboarding-prefill"), data=project_data, follow=True
+        )
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        project = projects_models.Project.on_site.all()[0]
+        action = Action.objects.filter(verb=verbs.Project.SUBMITTED_BY_ADVISOR).first()
+        assert action.action_object == project
+        assert action.actor == submitter
+
+        project = projects_models.Project.on_site.all()[0]
+        action = Action.objects.filter(verb=verbs.Project.INVITATION_OWNER).first()
+        assert action.action_object == project.owner
+        assert action.actor == submitter
+
+        notif = Notification.objects.filter(
+            verb=verbs.Project.SUBMITTED_BY_ADVISOR
+        ).first()
+        assert notif.action_object == project
+        assert notif.actor == submitter
 
 
 @pytest.mark.django_db

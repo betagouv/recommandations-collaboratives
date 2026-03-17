@@ -211,6 +211,7 @@ const config = {
           './src/js/components/AjvValidationSchema.js'
         ),
         projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
+        resourcePreviewPanelStyles: resolve('./src/js/styles/resource-preview-panel.css.js'),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
       },
       output: {

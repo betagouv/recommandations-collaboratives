@@ -1,5 +1,6 @@
 import Alpine from '../../utils/globals';
 import { ToastType } from '../../models/toastType';
+import TASK_STATUSES from '../../config/statuses';
 import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
@@ -11,11 +12,13 @@ import api, {
   editTaskUrl,
   markTaskNotificationAsVisited,
   conversationsMessageMarkAsReadUrl,
+  resourcePreviewUrl
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
+  resourcePreviewUrl,
   projectId,
   currentUserId,
   feed: {},
@@ -47,6 +50,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   lastMessageDate: null,
   elementToDelete: null,
   theFiles: [],
+  TASK_STATUSES,
   formatDateFrench,
   editTaskUrl,
   async init() {
@@ -188,9 +192,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       user.data = {
         id: +id,
         place: this.users.length,
-        first_name: 'John',
-        last_name: 'Doe',
-        email: 'john.doe@example.com',
+        first_name: 'Inconnu',
+        last_name: 'Inconnu',
+        email: 'inconnu@example.com',
         phone_no: '0642424242',
         last_login: {
           date: '2021-01-01',
@@ -387,8 +391,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.countOf.messages += change;
     }
   },
-  onClickHandleReply(message) {
-    this.messageIdToReply = message.id;
+  onClickHandleReply(messageId) {
+    this.messageIdToReply = messageId;
     this.isEditorInReplyMode = true;
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
   },
@@ -490,7 +494,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
   },
-  async onClickRessourceConsummeNotification(recommendation, message) {
+  async onClickRessourceConsumeNotification(recommendation, message) {
     trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
@@ -507,6 +511,19 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);
+    }
+  },
+  async openResourcePreviewPanel(recommendation, message) {
+    try {
+      // Mark as visited and track analytics
+      await this.onClickRessourceConsumeNotification(recommendation, message);
+      if (this.$store.resourcePreviewPanel) {
+        this.$store.resourcePreviewPanel.open(recommendation, message);
+      } else {
+        console.error('resourcePreviewPanel store not found!');
+      }
+    } catch (error) {
+      console.error('Error in openResourcePreviewPanel:', error);
     }
   },
   replaceMessage(message, messageIdToEdit) {
@@ -537,6 +554,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
   async goToCreateRecommendation(url) {
     if (this.$store.editor.currentMessageJSON) {
+      this.$store.onLeaveAlert.setDirty(false);
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
       );
