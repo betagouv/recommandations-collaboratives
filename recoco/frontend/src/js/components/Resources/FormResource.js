@@ -33,7 +33,12 @@ Alpine.data('FormResource', (resourceId) => {
       contacts: [],
     },
     init() {
-      this.$store.onLeaveAlert.setDirty(true);
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDuplicate = urlParams.get('is_duplicate');
+      if (isDuplicate) {
+        this.$store.onLeaveAlert.setDirty(true);
+      }
+
       Alpine.nextTick(() => {
         this.initFormFields(this.$refs.formResource);
       });
@@ -185,6 +190,9 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     validateField(field) {
+      if (!this.$store.onLeaveAlert.isDirty) {
+        this.$store.onLeaveAlert.setDirty(true);
+      }
       this.validate();
       if (
         (!this.formFields[field.name].pristine) &&
