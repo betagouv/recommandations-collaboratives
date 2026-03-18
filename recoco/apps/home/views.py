@@ -128,27 +128,19 @@ class StatisticsView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 78
         context["collectivity_supported"] = the_projects.count()
+
+        the_tasks = tasks.Task.on_site.exclude(public=False).filter(
+            project__in=the_projects
+        )
         context["collectivity_with_reco"] = (
-            tasks.Task.on_site.exclude(
-                Q(status=tasks.Task.NOT_INTERESTED) | Q(status=tasks.Task.ALREADY_DONE)
-            )
-            .exclude(
-                project__exclude_stats=True,
-                project__project_sites__status__in=["DRAFT", "STANDBY", "PRE_DRAFT"],
-                project__project_sites__site=self.request.site,
-            )
-            .order_by("project_id")
+            the_tasks.order_by("project_id")
             .values("project_id")
             .distinct("project_id")
             .count()
         )
-        numbers_reco = [
-            p.number_tasks for p in the_projects.annotate(number_tasks=Count("tasks"))
-        ]
-        context["total_recommendation"] = sum(numbers_reco)
-        context["collectivity_avg_reco"] = (
-            context["total_recommendation"] / len(numbers_reco) if numbers_reco else 0
-        )
+        total_recommendation = the_tasks.count()
+        context["total_recommendation"] = total_recommendation
+        context["collectivity_avg_reco"] = total_recommendation / the_projects.count()
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
