@@ -3,21 +3,20 @@ Resource Preview Panel - Overlay panel that displays when clicking a recommendat
 Managed by Alpine store: $store.resourcePreviewPanel
 {% endcomment %}
 <template x-if="$store.resourcePreviewPanel.isOpen">
-    <div>
-        <div class="resource-preview-panel"
-             @keydown.escape.window="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">
+    <div x-data="{ closePanel() { $store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded(); } }">
+        <div class="resource-preview-panel" @keydown.escape.window="closePanel()">
             <!-- Header -->
             <div class="resource-preview-panel__header">
                 <button type="button"
                         class="resource-preview-panel__back-btn"
-                        @click="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">
+                        @click="closePanel()">
                     <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
                     Recommandations
                 </button>
                 <button type="button"
                         class="resource-preview-panel__close-btn fr-btn--close fr-btn"
                         aria-label="Fermer"
-                        @click="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">Fermer</button>
+                        @click="closePanel()">Fermer</button>
             </div>
             <template x-if="$store.resourcePreviewPanel.recommendation?.resource">
                 <!-- Scrollable content area -->
@@ -36,7 +35,8 @@ Managed by Alpine store: $store.resourcePreviewPanel
                         </div>
                     </template>
                     <iframe class="w-100 d-flex flex-column rounded"
-                            style="border: none; overflow: hidden;"
+                            style="border: none;
+                                   overflow: hidden"
                             scrolling="no"
                             @load="$el.style.height = $el.contentDocument.body.scrollHeight + 'px'"
                             :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.messageId)"></iframe>
