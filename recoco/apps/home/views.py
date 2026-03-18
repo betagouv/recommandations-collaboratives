@@ -140,7 +140,9 @@ class StatisticsView(TemplateView):
         )
         total_recommendation = the_tasks.count()
         context["total_recommendation"] = total_recommendation
-        context["collectivity_avg_reco"] = total_recommendation / the_projects.count()
+        context["collectivity_avg_reco"] = (
+            total_recommendation / the_projects.count() if the_projects.exists() else ""
+        )
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
