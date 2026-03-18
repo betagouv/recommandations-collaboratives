@@ -92,6 +92,8 @@ def site_action_stream(site):
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
             | Q(verb=verbs.User.ADVISOR_REQUEST)
+            | Q(verb=verbs.User.ADVISOR_REJECTED)
+            | Q(verb=verbs.User.ADVISOR_ACCEPTED)
         )
         .order_by("-timestamp")
         # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
@@ -666,8 +668,11 @@ def user_details(request, user_id):
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
-    actions = crm_user.actor_actions.exclude(
-        verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+    actions = (
+        crm_user.actor_actions.exclude(
+            verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+        )
+        | crm_user.action_object_actions.all()
     )
 
     user_ct = ContentType.objects.get_for_model(User)

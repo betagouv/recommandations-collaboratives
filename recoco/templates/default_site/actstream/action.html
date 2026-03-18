@@ -4,41 +4,52 @@
 {% load common_tags %}
 {% get_verbs as verbs %}
 <div class="d-flex align-items-center fr-mb-2v">
-    <img class="fr-mt-1v align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
-         width="18px"
-         :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
-         data-gravatar-key="{{ action.actor }}-18"
-         data-bs-toggle="tooltip"
-         data-bs-placement="bottom"
-         tabindex="0">
-    <div class="fr-mt-1v fr-ml-1v font-very-small"
-         data-test-id="project-activity-notification">
+  <img
+    class="fr-mt-1v align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
+    width="18px"
+    :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
+    data-gravatar-key="{{ action.actor }}-18"
+    data-bs-toggle="tooltip"
+    data-bs-placement="bottom"
+    tabindex="0">
+  <div class="fr-mt-1v fr-ml-1v font-very-small"
+       data-test-id="project-activity-notification">
         <span class="text-grey-dark fw-light">
             <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
-            {{ action.actor.last_name|default:"" }}</strong>
-            <span class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization.name|default:'' }}</span>
+              {{ action.actor.last_name|default:"" }}</strong>
+            <span
+              class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization.name|default:'' }}</span>
             <span class="d-inline-block">
                 <span class="d-inline">
                     {% if action.verb == verbs.Project.INVITATION %}
-                        {% if action.action_object.role %}
-                            <span>a invité
-                                <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
+                      {% if action.action_object.role %}
+                        <span>a invité
+                                <strong
+                                  class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                                 <strong class="text-dark">
                                     {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
-                                        conseiller·e
+                                      conseiller·e
                                     {% else %}
-                                        demandeur ou partenaire
+                                      demandeur ou partenaire
                                     {% endif %}
                                 </strong>
                             </span>
-                        {% endif %}
+                      {% endif %}
                     {% else %}
-                        <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
-                           href="{{ action.action_object.get_absolute_url }}">{{ action.verb }} {{ action.action_object.feed_label }}</a>
-                        {% if action.description %}<div class="d-inline-block">{{ action.description }}</div>{% endif %}
+                      <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
+                         href="{{ action.action_object.get_absolute_url }}">{{ action.verb }}</a>
+                      {% if action.action_object.feed_label %}
+                        {{ action.action_object.feed_label }}
+                      {% elif action.action_object.email %}
+                        {{ action.action_object.first_name|default:action.actor.email }} {{ action.action_object.last_name|default:"" }}
+                        <span
+                          class="fw-normal font-italic">{{ action.action_object.profile.organization.name|default:'' }}</span>
+                      {% endif %}
+                      {% if action.description %}
+                        <div class="d-inline-block">{{ action.description }}</div>{% endif %}
                     {% endif %}
                 </span>
             </span>
         </span>
-    </div>
+  </div>
 </div>
