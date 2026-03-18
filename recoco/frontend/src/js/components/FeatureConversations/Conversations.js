@@ -51,7 +51,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messageIdToReply: null,
   lastMessageDate: null,
   elementToDelete: null,
-  extractedSharedContents: false,
   theFiles: [],
   TASK_STATUSES,
   formatDateFrench,
@@ -67,10 +66,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }, 500);
     this.$store.tasksData._subscribe(async () => {
       this.tasks = this.$store.tasksData.tasks;
-      // Re-extract shared contents when tasks are updated
-      if (this.extractedSharedContents) {
-        await this.extractSharedContents();
-      }
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
@@ -100,7 +95,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   async handleOpenPannelSharedContents(tabName) {
     await this.extractSharedContents();
     this.$store.sharedContentsPanel.open(tabName);
-    this.extractedSharedContents = true;
   },
   /**
    * Extract recommendations and files from feed elements and populate the sharedContentsPanel store
