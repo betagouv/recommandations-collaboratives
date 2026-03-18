@@ -1,0 +1,128 @@
+{% comment %}
+Shared Contents Panel - Overlay panel displaying recommendations and files shared in conversation.
+Accessible from left panel or above messages in conversation page.
+Managed by Alpine store: $store.sharedContentsPanel
+{% endcomment %}
+<template x-if="$store.sharedContentsPanel.isOpen">
+    <div>
+        <div class="shared-contents-panel"
+             @keydown.escape.window="$store.sharedContentsPanel.close()">
+            <!-- Header -->
+            <div class="shared-contents-panel__header">
+                <h2 class="shared-contents-panel__title">Contenus partagés</h2>
+                <button type="button"
+                        class="shared-contents-panel__close-btn fr-btn--close fr-btn"
+                        aria-label="Fermer"
+                        @click="$store.sharedContentsPanel.close()">Fermer</button>
+            </div>
+            <!-- Tabs - DSFR Segmented Control -->
+            <div class="shared-contents-panel__tabs-container">
+                <div class="shared-contents-panel__tabs">
+                    <fieldset class="fr-segmented fr-segmented--sm fr-m-0">
+                        <legend class="fr-segmented__legend visually-hidden">Type de contenu</legend>
+                        <div class="fr-segmented__elements">
+                            <div class="fr-segmented__element">
+                                <input type="radio"
+                                       value="recommendations"
+                                       id="shared-contents-tab-recommendations"
+                                       name="shared-contents-tab"
+                                       :checked="$store.sharedContentsPanel.activeTab === 'recommendations'"
+                                       :disabled="$store.sharedContentsPanel.recommendationsCount === 0"
+                                       @click="$store.sharedContentsPanel.switchTab('recommendations')">
+                                <label class="fr-label" for="shared-contents-tab-recommendations">
+                                    Recommandations
+                                    <span class="shared-contents-panel__item-count"
+                                          x-text="`(${$store.sharedContentsPanel.recommendationsCount})`"></span>
+                                </label>
+                            </div>
+                            <div class="fr-segmented__element">
+                                <input type="radio"
+                                       value="files"
+                                       id="shared-contents-tab-files"
+                                       name="shared-contents-tab"
+                                       :checked="$store.sharedContentsPanel.activeTab === 'files'"
+                                       :disabled="$store.sharedContentsPanel.filesCount === 0"
+                                       @click="$store.sharedContentsPanel.switchTab('files')">
+                                <label class="fr-label" for="shared-contents-tab-files">
+                                    Fichiers
+                                    <span class="shared-contents-panel__item-count"
+                                          x-text="`(${$store.sharedContentsPanel.filesCount})`"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="shared-contents-panel__body">
+                <!-- Recommendations tab -->
+                <template x-if="$store.sharedContentsPanel.activeTab === 'recommendations'">
+                    <div>
+                        <template x-if="$store.sharedContentsPanel.recommendationsCount === 0">
+                            <div class="shared-contents-panel__empty">
+                                <span class="fr-icon fr-icon-list-check-line" aria-hidden="true"></span>
+                                <p>Aucune recommandation partagée dans cette conversation.</p>
+                            </div>
+                        </template>
+                        <template x-if="$store.sharedContentsPanel.recommendationsCount > 0">
+                            <div>
+                                <template x-for="(reco, index) in $store.sharedContentsPanel.recommendations"
+                                          :key="reco.id">
+                                    <div class="fr-mb-3v">
+                                        <!-- Date header with grouping -->
+                                        <template x-if="index === 0 || formatDateFrench(reco.messageCreated) !== formatDateFrench($store.sharedContentsPanel.recommendations[index - 1]?.messageCreated)">
+                                            <p class="shared-contents-panel__date-header"
+                                               x-text="formatDateFrench(reco.messageCreated)"></p>
+                                        </template>
+                                        {% include "conversations/messages/fragments/shared_contents_recommendation_card.html" %}
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <!-- Files tab -->
+                <template x-if="$store.sharedContentsPanel.activeTab === 'files'">
+                    <div>
+                        <template x-if="$store.sharedContentsPanel.filesCount === 0">
+                            <div class="shared-contents-panel__empty">
+                                <span class="fr-icon fr-icon-file-download-line" aria-hidden="true"></span>
+                                <p>Aucun fichier partagé dans cette conversation.</p>
+                            </div>
+                        </template>
+                        <template x-if="$store.sharedContentsPanel.filesCount > 0">
+                            <div>
+                                <!-- Files from conversation -->
+                                <template x-if="$store.sharedContentsPanel.files.length > 0">
+                                    <div>
+                                        <template x-for="(file, index) in $store.sharedContentsPanel.files"
+                                                  :key="file.id">
+                                            <div>
+                                                <!-- Date header with grouping -->
+                                                <template x-if="index === 0 || formatDateFrench(file.messageCreated) !== formatDateFrench($store.sharedContentsPanel.files[index - 1]?.messageCreated)">
+                                                    <p class="shared-contents-panel__date-header"
+                                                       x-text="formatDateFrench(file.messageCreated)"></p>
+                                                </template>
+                                                {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=False %}
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <!-- External files from EDL -->
+                                <template x-if="$store.sharedContentsPanel.externalFiles.length > 0">
+                                    <div class="shared-contents-panel__external-section">
+                                        <p class="shared-contents-panel__external-title">Fichiers partagés hors de cette conversation</p>
+                                        <template x-for="file in $store.sharedContentsPanel.externalFiles"
+                                                  :key="file.id">
+                                            {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

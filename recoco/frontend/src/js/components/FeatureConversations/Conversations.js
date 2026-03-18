@@ -16,9 +16,11 @@ import api, {
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
+import { formatFileSize } from '../../utils/file';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
   resourcePreviewUrl,
+  formatFileSize,
   projectId,
   currentUserId,
   feed: {},
@@ -62,17 +64,107 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    this.$store.tasksData._subscribe(() => {
+    this.$store.tasksData._subscribe(async () => {
       this.tasks = this.$store.tasksData.tasks;
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
+    await this.extractSharedContents();
+    this.loadExternalFiles();
+  },
+  /**
+   * Load external files from EDL (État des lieux) into the shared contents panel store
+   */
+  loadExternalFiles() {
+    const edlFilesElement = document.getElementById('djangoEdlFiles');
+    if (edlFilesElement && this.$store.sharedContentsPanel) {
+      try {
+        const edlFiles = JSON.parse(edlFilesElement.textContent);
+        this.$store.sharedContentsPanel.setExternalFiles(edlFiles || []);
+      } catch (error) {
+        console.error('Failed to parse EDL files:', error);
+      }
+    }
   },
   getRecommendationById(id) {
     const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
     return foundRecommendation;
+  },
+  async handleOpenPannelSharedContents(tabName) {
+    await this.extractSharedContents();
+    this.$store.sharedContentsPanel.open(tabName);
+  },
+  /**
+   * Extract recommendations and files from feed elements and populate the sharedContentsPanel store
+   */
+  async extractSharedContents() {
+    if (!this.feed.elements) return;
+
+    const recommendations = [];
+    const files = [];
+
+    // Iterate over feed elements in reverse (most recent first)
+    const sortedElements = [...this.feed.elements]
+      .filter((el) => el.type === 'message' && !el.deleted)
+      .sort((a, b) => {
+        const dateElementA = Date.parse(a.created ?? 0);
+        const dateElementB = Date.parse(b.created ?? 0);
+        return dateElementB - dateElementA; // Descending order (most recent first)
+      });
+
+    for (const message of sortedElements) {
+      if (!message.nodes) continue;
+
+      for (const node of message.nodes) {
+        if (node.type === 'RecommendationNode') {
+          const recommendation = this.getRecommendationById(node.recommendation_id);
+          if (recommendation) {
+            recommendations.push({
+              ...recommendation,
+              messageId: message.id,
+              messageCreated: message.created,
+              messagePostedBy: message.posted_by,
+              nodeId: node.id,
+            });
+          }
+        } else if (node.type === 'DocumentNode') {
+          // Fetch document if not in cache to get filename and other properties
+          const document = await this.getDocumentById(node.document_id);
+          if (document) {
+            files.push({
+              ...document,
+              messageId: message.id,
+              messageCreated: message.created,
+              nodeId: node.id,
+            });
+          }
+        }
+      }
+    }
+
+    // Update the store
+    if (this.$store.sharedContentsPanel) {
+      this.$store.sharedContentsPanel.setRecommendations(recommendations);
+      this.$store.sharedContentsPanel.setFiles(files);
+    }
+  },
+  /**
+   * Open a recommendation from the shared contents panel
+   * Closes the panel list and opens the resource detail panel
+   */
+  async openRecommendationFromPanel(recommendation) {
+    // Close the shared contents panel but mark for re-open
+    this.$store.sharedContentsPanel.closeForDetail();
+
+    // Find the corresponding message
+    const message = this.getMessageById(recommendation.messageId);
+
+    if (message && recommendation) {
+      // Open the resource preview panel
+      await this.openResourcePreviewPanel(recommendation, message);
+    }
   },
   getMessageById(id) {
     return this.feed.messages.find((message) => message.id === +id);

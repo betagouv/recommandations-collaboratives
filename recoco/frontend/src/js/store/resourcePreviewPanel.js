@@ -1,55 +1,76 @@
 import Alpine from 'alpinejs';
 
-Alpine.store('resourcePreviewPanel', {
-  isOpen: false,
-  recommendation: null,
-  message: null,
-  messageId: null,
+document.addEventListener('alpine:init', () => {
+  Alpine.store('resourcePreviewPanel', {
+    isOpen: false,
+    recommendation: null,
+    message: null,
+    messageId: null,
+    _unsubscribe: null,
 
-  open(recommendation, message) {
-    this.recommendation = recommendation;
-    this.recommendation.created_by.id = message.posted_by;
-    this.message = message;
-    this.messageId = message?.id;
-    this.isOpen = true;
+    init() {
+      const tasksDataStore = Alpine.store('tasksData');
+      if (tasksDataStore && tasksDataStore._subscribe) {
+        this._unsubscribe = tasksDataStore._subscribe(() => {
+          if (this.isOpen && this.recommendation) {
+            const updatedTask = tasksDataStore.getTaskById(this.recommendation.id);
+            if (updatedTask) {
+              this.recommendation.status = updatedTask.status;
+              this.recommendation.visited = updatedTask.visited;
+            }
+          }
+        });
+      }
+    },
 
-    // Prevent body scroll when panel is open
-    document.body.style.overflow = 'hidden';
-  },
+    open(recommendation, message) {
+      this.recommendation = recommendation;
+      this.recommendation.created_by.id = message.posted_by;
+      this.message = message;
+      this.messageId = message?.id;
+      this.isOpen = true;
 
-  close() {
-    this.isOpen = false;
-    this.recommendation = null;
-    this.message = null;
-    this.messageId = null;
+      // Prevent body scroll when panel is open
+      document.body.style.overflow = 'hidden';
+    },
 
-    // Restore body scroll
-    document.body.style.overflow = '';
-  },
+    close() {
+      this.isOpen = false;
+      this.recommendation = null;
+      this.message = null;
+      this.messageId = null;
 
-  scrollToMessage() {
-    const messageId = this.messageId;
-    this.close();
+      // Restore body scroll
+      document.body.style.overflow = '';
+    },
 
-    // Scroll to the original message after panel closes
-    if (messageId) {
-      Alpine.nextTick(() => {
-        const messageElement = document.getElementById(`message-${messageId}`);
-        if (messageElement) {
-          messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Highlight the message briefly
-          messageElement.classList.add('highlight-message');
-          setTimeout(() => {
-            messageElement.classList.remove('highlight-message');
-          }, 2000);
-        }
-      });
-    }
-  },
-  replyToMessage() {
-    window.dispatchEvent(new CustomEvent('on-click-handle-reply', { detail: this.messageId }));
-    this.scrollToMessage();
-  },
+    scrollToMessage() {
+      const messageId = this.messageId;
+      this.close();
+
+      // Scroll to the original message after panel closes
+      if (messageId) {
+        Alpine.nextTick(() => {
+          const messageElement = document.getElementById(`message-${messageId}`);
+          if (messageElement) {
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            messageElement.classList.add('highlight-message');
+            setTimeout(() => {
+              messageElement.classList.remove('highlight-message');
+            }, 2000);
+          }
+        });
+      }
+    },
+
+
+    replyToMessage() {
+      window.dispatchEvent(
+        new CustomEvent('on-click-handle-reply', { detail: this.messageId })
+      );
+      this.scrollToMessage();
+    },
+  });
 });
 
 export default Alpine.store('resourcePreviewPanel');
