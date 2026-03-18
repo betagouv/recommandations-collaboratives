@@ -1,0 +1,464 @@
+.exploration-ia {
+  &__header {
+    margin-bottom: 1.5rem;
+  }
+
+  &__stepper {
+    margin-bottom: 2rem;
+  }
+}
+
+.exploration-ia-card {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+  background-color: #ffffff;
+
+  &:hover {
+    border-color: var(--light-accent-blue-france, #000091);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &--selected {
+    border-color: var(--light-accent-green-emeraude, #00a95f);
+    background-color: var(
+      --light-background-action-low-green-emeraude,
+      #e3fdeb
+    );
+
+    &:hover {
+      border-color: var(--light-accent-green-emeraude, #00a95f);
+    }
+  }
+
+  .card-body {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+  }
+
+  .card-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.85rem;
+    flex-grow: 1;
+  }
+
+  .card-footer {
+    font-size: 0.8rem;
+  }
+}
+
+.exploration-ia-history {
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.exploration-ia-synthesis {
+  &__section {
+    margin-bottom: 2rem;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  &__empty {
+    color: var(--light-text-mention-grey, #666);
+    font-style: italic;
+    padding: 1rem;
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+    border-radius: 4px;
+  }
+}
+
+// Animation pour le chargement
+.exploration-ia-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+// Badge de score
+.exploration-ia-score {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border-radius: 4px;
+}
+
+// Chunks de reponse IA
+.exploration-ia-chunk {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &--with-source {
+    padding-left: 1rem;
+    border-left: 3px solid var(--light-accent-blue-france, #000091);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+
+    &:hover {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+    }
+  }
+
+  &--selected {
+    background-color: var(
+      --light-background-action-low-blue-france,
+      #e3e3fd
+    ) !important;
+    border-color: var(--light-accent-blue-france, #000091);
+  }
+
+  &__checkbox {
+    padding-top: 0.25rem;
+
+    input[type='checkbox'] {
+      width: 1.25rem;
+      height: 1.25rem;
+      cursor: pointer;
+      accent-color: var(--light-accent-blue-france, #000091);
+    }
+  }
+
+  &__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--light-text-default-grey, #3a3a3a);
+
+    strong {
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+    }
+
+    ul,
+    ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+
+    a {
+      color: var(--light-accent-blue-france, #000091);
+      text-decoration: underline;
+    }
+  }
+
+  &__sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+}
+
+// Bibliographie
+.exploration-ia-bibliography {
+  position: sticky;
+  top: 1rem;
+
+  .card-header {
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+
+    h3 {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.exploration-ia-citation {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border-radius: 4px;
+  border: 2px solid var(--light-border-default-grey, #e5e5e5);
+  transition: all 0.2s ease-in-out;
+
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  // Etat surligne au survol d'un chunk
+  &--highlighted {
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
+    border-color: var(--light-accent-blue-france, #000091);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 145, 0.15);
+
+    .fr-badge--blue-cumulus {
+      background-color: var(--light-accent-blue-france, #000091);
+      color: #fff;
+    }
+  }
+
+  // Etat selectionne (chunk coche)
+  &--selected {
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
+    border-color: var(--light-accent-blue-france, #000091);
+    box-shadow: 0 2px 8px rgba(0, 0, 145, 0.1);
+
+    .fr-badge--blue-cumulus {
+      background-color: var(--light-accent-blue-france, #000091);
+      color: #fff;
+    }
+  }
+}
+.fr-search-bar {
+  margin-top: 0.5rem;
+}
+
+.fr-callout {
+  padding: 1.5rem;
+  .fr-btn {
+    margin-top: 0;
+  }
+  &__text {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+// Sources sélectionnées (Etape 2 - petites cartes en ligne)
+.exploration-ia-selected-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.exploration-ia-source-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  border-left: 3px solid var(--light-accent-blue-france, #000091);
+  border-radius: 4px;
+  min-width: 200px;
+  max-width: 280px;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--light-background-contrast-grey, #eeeeee);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+    margin: 0.25rem 0;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+// Co-recommandations (Etape 2)
+.exploration-ia-co-reco {
+  transition: all 0.2s ease-in-out;
+  border: 2px solid var(--light-border-default-grey, #e5e5e5);
+
+  &:hover {
+    border-color: var(--light-accent-green-emeraude, #00a95f);
+    box-shadow: 0 4px 12px rgba(0, 169, 95, 0.15);
+  }
+
+  &--selected {
+    border-color: var(--light-accent-green-emeraude, #00a95f);
+    background-color: var(
+      --light-background-action-low-green-emeraude,
+      #e3fdeb
+    );
+
+    &:hover {
+      border-color: var(--light-accent-green-emeraude, #00a95f);
+    }
+  }
+
+  .card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+  }
+
+  .card-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.85rem;
+  }
+
+  .card-footer {
+    font-size: 0.8rem;
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+  }
+
+  input[type='checkbox'] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--light-accent-green-emeraude, #00a95f);
+  }
+}
+
+// Cartes de synthèse (Étape 3)
+.exploration-ia-synthesis-card {
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: var(--light-accent-blue-france, #000091);
+    box-shadow: 0 4px 12px rgba(0, 0, 145, 0.1);
+  }
+
+  &--co-reco {
+    border-left: 3px solid var(--light-accent-green-emeraude, #00a95f);
+
+    &:hover {
+      border-color: var(--light-accent-green-emeraude, #00a95f);
+      border-left-color: var(--light-accent-green-emeraude, #00a95f);
+    }
+  }
+
+  .card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+  }
+
+  .card-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.85rem;
+  }
+
+  .card-footer {
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+  }
+}
+
+// Récapitulatif pour la recommandation
+.exploration-ia-reco-summary {
+  border: 2px solid var(--light-accent-blue-france, #000091);
+  background-color: var(--light-background-alt-blue-france, #f5f5fe);
+
+  .card-header {
+    background-color: var(--light-accent-blue-france, #000091);
+    color: #fff;
+
+    h3 {
+      color: #fff;
+    }
+  }
+}
+
+.exploration-ia-reco-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+    font-size: 0.9rem;
+    gap: 0.5rem;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+    }
+
+    &--co-reco {
+      background-color: var(
+        --light-background-action-low-green-emeraude,
+        #e3fdeb
+      );
+
+      &:hover {
+        background-color: var(--light-background-contrast-green-emeraude, #c3fad5);
+      }
+    }
+
+    // Icône de type
+    > span:first-of-type {
+      color: var(--light-accent-blue-france, #000091);
+      flex-shrink: 0;
+    }
+
+    // Titre de la ressource
+    .flex-grow-1 {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    // Boutons d'action
+    > a {
+      flex-shrink: 0;
+    }
+  }
+}
