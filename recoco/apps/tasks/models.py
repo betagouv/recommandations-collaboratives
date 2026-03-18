@@ -147,7 +147,7 @@ class Task(OrderedModel):
     project = models.ForeignKey(
         projects_models.Project, on_delete=models.CASCADE, related_name="tasks"
     )
-    public = models.BooleanField(default=False, blank=True)
+    public = models.BooleanField(default=False, blank=True)  # public=False means draft
     priority = models.PositiveIntegerField(
         default=1000,
         blank=True,
