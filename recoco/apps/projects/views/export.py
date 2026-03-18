@@ -140,10 +140,8 @@ def project_list_export_csv(request):
             switchtenders_txt,
             project.project_sites.current().status,
             first_reco.created_on.date() if first_reco else "",  # First reco date
-            published_tasks.exclude(status=task_models.Task.NOT_INTERESTED).count(),
-            published_tasks.exclude(status=task_models.Task.NOT_INTERESTED)
-            .exclude(created_by__is_staff=True)
-            .count(),
+            published_tasks.count(),
+            published_tasks.exclude(created_by__is_staff=True).count(),
             published_tasks.filter(
                 status__in=(
                     task_models.Task.INPROGRESS,
