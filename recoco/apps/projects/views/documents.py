@@ -45,10 +45,10 @@ def document_list(request, project_id=None):
         request.user, project
     )
 
-    all_files = models.Document.objects.filter(project_id=project.pk).exclude(
+    public_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]
     )
-    pinned_files = all_files.filter(pinned=True)
+    pinned_files = public_files.filter(pinned=True)
     links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
 
     # Fetch Answers from Surveys if they have attachments
@@ -71,7 +71,7 @@ def document_list(request, project_id=None):
         "projects/project/documents.html",
         context={
             "project": project,
-            "all_files": all_files,
+            "public_files": public_files,
             "pinned_files": pinned_files,
             "links": links,
             "is_regional_actor": is_regional_actor,
