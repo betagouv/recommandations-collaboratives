@@ -593,6 +593,7 @@ class Project(models.Model):
             ("manage_tasks", "Can manage tasks"),
             # Documents
             ("manage_documents", "Can manage the documents"),
+            ("manage_private_documents", "Can manage advisor space documents"),
             # Invitation/sharing/members
             ("invite_collaborators", "Can invite collaborators"),
             ("invite_advisors", "Can invite advisors"),
@@ -978,6 +979,8 @@ class Document(models.Model):
     attached_object = GenericForeignKey("content_type", "object_id")
 
     description = models.CharField(max_length=256, default="", blank=True)
+
+    private = models.BooleanField(default=True)  # for advisors only
 
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)
