@@ -49,20 +49,22 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           x-text="`(${$store.sharedContentsPanel.filesCount})`"></span>
                                 </label>
                             </div>
-                            <div class="fr-segmented__element">
-                                <input type="radio"
-                                       value="draft-recommendations"
-                                       id="shared-contents-tab-draft-recommendations"
-                                       name="shared-contents-tab"
-                                       :checked="$store.sharedContentsPanel.activeTab === 'draft-recommendations'"
-                                       :disabled="$store.sharedContentsPanel.draftRecommendationsCount === 0"
-                                       @click="$store.sharedContentsPanel.switchTab('draft-recommendations')">
-                                <label class="fr-label" for="shared-contents-tab-draft-recommendations">
-                                    Brouillons
-                                    <span class="shared-contents-panel__item-count"
-                                          x-text="`(${$store.sharedContentsPanel.draftRecommendationsCount})`"></span>
-                                </label>
-                            </div>
+                            <template x-if="isSwitchtender">
+                                <div class="fr-segmented__element">
+                                    <input type="radio"
+                                           value="draft-recommendations"
+                                           id="shared-contents-tab-draft-recommendations"
+                                           name="shared-contents-tab"
+                                           :checked="$store.sharedContentsPanel.activeTab === 'draft-recommendations'"
+                                           :disabled="$store.sharedContentsPanel.draftRecommendationsCount === 0"
+                                           @click="$store.sharedContentsPanel.switchTab('draft-recommendations')">
+                                    <label class="fr-label" for="shared-contents-tab-draft-recommendations">
+                                        Brouillons
+                                        <span class="shared-contents-panel__item-count"
+                                              x-text="`(${$store.sharedContentsPanel.draftRecommendationsCount})`"></span>
+                                    </label>
+                                </div>
+                            </template>
                         </div>
                     </fieldset>
                 </div>
@@ -137,7 +139,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                     </div>
                 </template>
                 <!-- Draft recommendations tab -->
-                <template x-if="$store.sharedContentsPanel.activeTab === 'draft-recommendations'">
+                <template x-if="isSwitchtender && $store.sharedContentsPanel.activeTab === 'draft-recommendations'">
                     <div>
                         <template x-if="$store.sharedContentsPanel.draftRecommendationsCount === 0">
                             <div class="shared-contents-panel__empty">

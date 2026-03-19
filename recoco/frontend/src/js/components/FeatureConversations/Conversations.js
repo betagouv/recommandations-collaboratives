@@ -56,6 +56,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   lastMessageDate: null,
   elementToDelete: null,
   theFiles: [],
+  isSwitchtender: JSON.parse(document.getElementById('isSwitchtender').textContent),
   async init() {
     this.getMessagesParticipants();
     await this.getActivities();

@@ -53,7 +53,7 @@
                         <span x-text="`${countOf.contacts} contact${countOf.contacts > 1 ? 's' : ''}`"></span>
                     </p>
                 </template>
-                <template x-if="countOf.draft_recommendations > 0">
+                <template x-if="isSwitchtender && countOf.draft_recommendations > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
                             @click="$store.sharedContentsPanel.open('draft-recommendations')">
