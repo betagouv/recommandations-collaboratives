@@ -110,8 +110,9 @@ document.addEventListener('alpine:init', () => {
       await this.moveTaskFast(task.id, { direction: 'bottom' });
     },
     async patchTask(taskId, patch) {
-      await api.patch(taskUrl(this.projectId, taskId), patch);
+      const response = await api.patch(taskUrl(this.projectId, taskId), patch);
       await this.loadTasks();
+      return response.data;
     },
 
     // TODO : To remove ?

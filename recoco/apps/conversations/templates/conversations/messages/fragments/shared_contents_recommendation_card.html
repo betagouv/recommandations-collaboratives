@@ -1,17 +1,19 @@
 <!-- Recommendation card in shared contents panel -->
+<!-- djlint:off -->
 <div x-data='{
-    recommendation: null,
-    element: null,
-    async openResourcePreviewPanel(recommendation, element) {
-        // Close the shared contents panel but mark for re-open when returning
-        $store.sharedContentsPanel.closeForDetail();
+        recommendation: null,
+        element: null,
+        async openResourcePreviewPanel(recommendation, element) {
+            // Close the shared contents panel but mark for re-open when returning
+            $store.sharedContentsPanel.closeForDetail();
 
-        // Open the resource preview panel
-        if ($store.resourcePreviewPanel) {
-            $store.resourcePreviewPanel.open(recommendation, element);
+            // Open the resource preview panel
+            if ($store.resourcePreviewPanel) {
+                $store.resourcePreviewPanel.open(recommendation, element);
+            }
         }
-    }
-}'
-x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || $store.sharedContentsPanel.draftRecommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
+    }'
+    x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || $store.sharedContentsPanel.draftRecommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
+    <!-- djlint:on -->
     {% include "conversations/messages/fragments/recommendation_card_content.html" %}
 </div>

@@ -341,6 +341,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
+  async publishDraftRecommendation(recommendation) {
+    recommendation.isLoading = true;
+    const messageResponse = await this.$store.tasksData.patchTask(recommendation.id, { public: true });
+    // TODO Insert message into the conversation feed
+    this.feed.elements.push({
+      ...messageResponse.data,
+      type: 'message',
+    });
+    // extract shared contents
+    await this.extractSharedContents();
+    recommendation.isLoading = false;
+  },
   async sendFormMessage() {
     this.sendingMessage = true;
     if (this.isEditorInEditMode) {
