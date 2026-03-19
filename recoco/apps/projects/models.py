@@ -85,6 +85,7 @@ ADVISOR_PERMISSIONS = [
     "projects.change_project",
     "projects.change_location",
     "projects.use_project_tags",
+    "projects.manage_private_documents",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS

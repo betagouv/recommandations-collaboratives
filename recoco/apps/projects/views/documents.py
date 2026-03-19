@@ -17,7 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from recoco.apps.survey.models import Answer
-from recoco.utils import has_perm_or_403
+from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
@@ -36,6 +36,7 @@ def document_list(request, project_id=None):
     )
 
     has_perm_or_403(request.user, "manage_documents", project)
+    with_advisor_files = has_perm(request.user, "manage_documents", project)
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -45,8 +46,15 @@ def document_list(request, project_id=None):
         request.user, project
     )
 
-    public_files = models.Document.objects.filter(project_id=project.pk).exclude(
+    public_files = models.Document.objects.filter(
+        project_id=project.pk, private=False
+    ).exclude(the_file__in=["", None])
+    private_files = models.Document.objects.filter(
+        project_id=project.pk, private=True
+    ).exclude(
         the_file__in=["", None]
+        if with_advisor_files
+        else models.Document.objects.none()
     )
     pinned_files = public_files.filter(pinned=True)
     links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
@@ -72,6 +80,7 @@ def document_list(request, project_id=None):
         context={
             "project": project,
             "public_files": public_files,
+            "private_files": private_files,
             "pinned_files": pinned_files,
             "links": links,
             "is_regional_actor": is_regional_actor,
