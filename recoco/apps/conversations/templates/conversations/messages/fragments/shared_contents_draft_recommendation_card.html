@@ -43,9 +43,9 @@
         <div class="shared-contents-draft-reco-card__footer fr-pt-3v fr-pl-3v">
             <div class="d-flex gap-2">
                 <a class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
-                   :href="'{% url 'projects-task-recommendation-update' 0 %}'.replace('0', recommendation.id)">Editer</a>
-                <a class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
-                   :href="'{% url 'projects-task-recommendation-delete' 0 %}'.replace('0', recommendation.id)">Supprimer</a>
+                   :href="editTaskUrl(recommendation.id, '{{ request.path }}')">Editer</a>
+                <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
+                        @click="$dispatch('open-delete-modal', recommendation)">Supprimer</button>
             </div>
             <button class="fr-btn fr-btn--sm fr-icon-send-plane-fill fr-btn--icon-left fr-btn--primary justify-content-end"
                     @click="publishDraftRecommendation(recommendation)">Publier</button>
