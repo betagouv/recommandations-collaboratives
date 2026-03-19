@@ -22,18 +22,6 @@ Managed by Alpine store: $store.resourcePreviewPanel
                 <!-- Scrollable content area -->
                 <div class="resource-preview-panel__body">
                     {% include "conversations/messages/fragments/preview_panel_message.html" %}
-                    <!-- Attention banner for expiring resources -->
-                    <template x-if="$store.resourcePreviewPanel.recommendation?.resource?.expires_on && !$store.resourcePreviewPanel.recommendation?.resource?.expired">
-                        <div class="fr-callout fr-callout--blue-ecume fr-my-3w">
-                            <p class="fr-callout__title">
-                                <span class="text-uppercase fw-bold text-info">Attention</span>
-                            </p>
-                            <p class="fr-callout__text">
-                                Cet appel à projet a une date de limite de dépôt fixée au
-                                <strong x-text="formatDate($store.resourcePreviewPanel.recommendation.resource.expires_on, { day: 'numeric', month: 'long', year: 'numeric' })"></strong>
-                            </p>
-                        </div>
-                    </template>
                     <iframe class="w-100 d-flex flex-column rounded"
                             style="border: none;
                                    overflow: hidden"
