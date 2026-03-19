@@ -1,19 +1,19 @@
 <!-- Recommendation card in shared contents panel -->
 <!-- djlint:off -->
 <div x-data='{
-                                                                                                recommendation: null,
-                                                                                                element: null,
-                                                                                                async openResourcePreviewPanel(recommendation, element) {
-                                                                                                    // Close the shared contents panel but mark for re-open when returning
-                                                                                                    $store.sharedContentsPanel.closeForDetail();
+                recommendation: null,
+                element: null,
+                async openResourcePreviewPanel(recommendation, element) {
+                    // Close the shared contents panel but mark for re-open when returning
+                    $store.sharedContentsPanel.closeForDetail();
 
-                                                                                                    // Open the resource preview panel
-                                                                                                    if ($store.resourcePreviewPanel) {
-                                                                                                        $store.resourcePreviewPanel.open(recommendation, element);
-                                                                                                    }
-                                                                                                }
-                                                                                            }'
-                                                                                            x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || $store.sharedContentsPanel.draftRecommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
+                    // Open the resource preview panel
+                    if ($store.resourcePreviewPanel) {
+                        $store.resourcePreviewPanel.open(recommendation, element);
+                    }
+                }
+            }'
+            x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || $store.sharedContentsPanel.draftRecommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
     <!-- djlint:on -->
     <!-- Container for the draft recommendation card -->
     <div class="shared-contents-draft-reco-card__container">
@@ -31,12 +31,12 @@
                 {% include "conversations/messages/fragments/recommendation_card_content.html" with draft_recommendation=True %}
                 <!-- User that posted the draft recommendation -->
                 <div class="d-flex align-items-center shared-contents-draft-reco-card__user fr-mt-2w"
-                     x-data="{user: null}"
-                     x-init="user = getUserById(recommendation.created_by.id);">
+                     x-data="{user: recommendation.created_by}">
                     {% include "user/user_card_js.html" with class_name="font-size-14px" %}
                     <!-- Date of the draft recommendation -->
-                    <p class="shared-contents-draft-reco-card__date"
-                       x-text="recommendation.messageCreated"></p>
+                    <p class="shared-contents-draft-reco-card__date fr-ml-1v fr-mb-0">
+                        le <span x-text="formatDate(recommendation.created_on, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
+                    </p>
                 </div>
             </div>
         </div>

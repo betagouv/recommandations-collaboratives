@@ -323,12 +323,13 @@
     font-weight: 400;
     line-height: 150%; /* 21px */
   }
-  &__user {
-  }
+
   &__date {
-    color: var(--light-neutral-grey-200, #3a3a3a);
-    font-size: 12px;
+    color: var(--light-neutral-grey-625, #929292);
+    font-size: 14px;
+    font-style: italic;
     font-weight: 400;
+    line-height: 24px; /* 171.429% */
   }
   &__footer {
     display: flex;
