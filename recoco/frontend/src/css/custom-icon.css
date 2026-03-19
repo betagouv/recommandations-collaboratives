@@ -68,6 +68,36 @@
   mask-image: url(../assets/calendar.svg);
 }
 
+.fr-icon-answer-arrow-line::after,
+.fr-icon-answer-arrow-line::before {
+  mask-image: url(../assets/answer-arrows.svg);
+}
+
+.fr-icon-answer-delete::after,
+.fr-icon-answer-delete::before {
+  mask-image: url(../assets/delete.svg);
+}
+
+.fr-icon-send-message::after,
+.fr-icon-send-message::before {
+  mask-image: url(../assets/send-message-paper-plan.svg);
+}
+
+.fr-icon-attention::after,
+.fr-icon-attention::before {
+  mask-image: url(../assets/attention-indicator.svg);
+}
+
+.fr-icon-chat-1-line::after,
+.fr-icon-chat-1-line::before {
+  mask-image: url(../assets/chat-1-line.svg);
+}
+
+.fr-icon-reply-line::after,
+.fr-icon-reply-line::before {
+  mask-image: url(../assets/reply-line.svg);
+}
+
 .fr-icon-target-line::after,
 .fr-icon-target-line::before {
   mask-image: url(../assets/target.svg);

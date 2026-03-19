@@ -11,6 +11,7 @@ import csv
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponse
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -35,7 +36,10 @@ def project_list_export_csv(request):
 
     projects = (
         models.Project.on_site.for_user(request.user)
-        .exclude(project_sites__status="DRAFT")
+        .exclude(
+            Q(project_sites__status__in=["DRAFT", "PRE_DRAFT", "REJECTED"])
+            | Q(exclude_stats=True)
+        )
         .order_by("-created_on")
         .select_related("submitted_by")
         .prefetch_related("notes", "tasks", "project_creation_requests")
@@ -136,10 +140,8 @@ def project_list_export_csv(request):
             switchtenders_txt,
             project.project_sites.current().status,
             first_reco.created_on.date() if first_reco else "",  # First reco date
-            published_tasks.exclude(status=task_models.Task.NOT_INTERESTED).count(),
-            published_tasks.exclude(status=task_models.Task.NOT_INTERESTED)
-            .exclude(created_by__is_staff=True)
-            .count(),
+            published_tasks.count(),
+            published_tasks.exclude(created_by__is_staff=True).count(),
             published_tasks.filter(
                 status__in=(
                     task_models.Task.INPROGRESS,

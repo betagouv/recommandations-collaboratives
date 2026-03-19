@@ -38,6 +38,7 @@ Alpine.data('FormResource', (resourceId) => {
       if (isDuplicate) {
         this.$store.onLeaveAlert.setDirty(true);
       }
+
       Alpine.nextTick(() => {
         this.initFormFields(this.$refs.formResource);
       });
@@ -189,6 +190,9 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     validateField(field) {
+      if (!this.$store.onLeaveAlert.isDirty) {
+        this.$store.onLeaveAlert.setDirty(true);
+      }
       this.validate();
       if (
         (!this.formFields[field.name].pristine) &&

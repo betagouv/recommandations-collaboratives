@@ -64,7 +64,7 @@ def test_low_reach_as_csv_available_for_staff_users(request, client, make_projec
 
 
 @pytest.mark.django_db
-def test_site_dashboard__shows_project_actions_to_staff(request, client):
+def test_site_dashboard_shows_project_actions_to_staff(request, client):
     site = get_current_site(request)
     project = baker.make(projects_models.Project, sites=[site])
     action.send(project, verb="Was here", target=project)
@@ -82,6 +82,20 @@ def test_site_dashboard__shows_project_actions_to_staff(request, client):
 
     assertContains(response, "Was here")
     assertNotContains(response, "Was not here")
+
+
+@pytest.mark.django_db
+def test_site_dashboard_shows_advisor_request_actions_to_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
+    action.send(project, verb=verbs.User.ADVISOR_REQUEST, target=project)
+
+    url = reverse("crm-site-dashboard")
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, verbs.User.ADVISOR_REQUEST)
 
 
 @pytest.mark.django_db

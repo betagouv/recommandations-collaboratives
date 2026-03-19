@@ -25,6 +25,7 @@ Alpine.data('PrivateNotes', (projectId) => ({
    * Send the private note with attached files and contacts
    */
   async sendNote() {
+
     if (!this.$store.editor.currentMessageJSON) return;
     if (this.sendingNote) return;
 
@@ -94,7 +95,9 @@ Alpine.data('PrivateNotes', (projectId) => ({
       }
 
       // Send the note
-      await api.post(notesUrl(this.projectId), payload);
+      await api.post(notesUrl(this.projectId), payload)
+
+      this.$store.onLeaveAlert.setDirty(false);
 
       // Clear editor and reload page
       this.$store.editor.clearEditorContent();

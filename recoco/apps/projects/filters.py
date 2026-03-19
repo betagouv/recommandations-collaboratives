@@ -31,6 +31,7 @@ class ProjectActivityFilter(BaseFilterBackend):
                 queryset.annotate(
                     recent_actions_count=Subquery(
                         Action.objects.filter(
+                            site=request.site,
                             target_content_type_id=project_ct.pk,
                             target_object_id=Cast(OuterRef("pk"), CharField()),
                             timestamp__gte=from_ts,

@@ -157,7 +157,7 @@
             <ul class="bg-white fr-pt-2w fr-px-3w border rounded crm-activity">
                 <div class="fr-p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
                     <article class="overflow-hidden">
-                        {% for action in projects_stream|slice:":30" %}
+                        {% for action in site_action_stream|slice:":30" %}
                             {% include "crm/fragments/activity_action.html" %}
                         {% empty %}
                             -- Pas encore d'activité de la part du staff --

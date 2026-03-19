@@ -1,18 +1,23 @@
 import Alpine from 'alpinejs';
-import api, { followupsUrl } from '../utils/api';
 import {
   STATUSES,
   isStatus,
   statusText,
-  isArchivedStatus,
 } from '../utils/taskStatus';
 
 Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
   return {
-    task: task,
+    taskId: task.id,
     projectId: projectId,
+    isLoading: false,
     STATUSES,
     statusText,
+
+    get task() {
+      const storeTask = this.$store.tasksData.getTaskById(this.taskId);
+      return storeTask || { id: this.taskId, status: task.status };
+    },
+
     handleStatusWrapper() {
       return (this.openStatusWrapper = !this.openStatusWrapper);
     },
@@ -20,20 +25,18 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
       return isStatus(this.task, status) ? 'active' : undefined;
     },
     async handleStatusClick(status) {
-      this.task.isLoading = true;
+      if (status === this.task.status) return;
 
-      if (status === task.status) return;
+      this.isLoading = true;
+
       try {
-        await api.post(followupsUrl(this.projectId, task.id), {
-          status,
-          comment: '',
-        });
-        this.task.status = status;
+        await this.$store.tasksData.issueFollowup(this.task, status);
+        await this.$store.tasksView.updateViewWithTask(this.taskId);
       } catch (error) {
         throw new Error('Failed to update task status');
       }
 
-      this.task.isLoading = false;
+      this.isLoading = false;
     },
   };
 });

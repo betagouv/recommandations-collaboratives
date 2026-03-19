@@ -334,7 +334,12 @@ def test_accept_invite_as_team_member_triggers_action_trace(request, client, pro
         response = client.post(url)
 
     assert response.status_code == 302
-    assert action_models.Action.objects.filter(verb=verbs.Project.JOINED).count() == 1
+    assert (
+        action_models.Action.objects.filter(
+            verb=verbs.Project.JOINED_BY_INVITATION
+        ).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
