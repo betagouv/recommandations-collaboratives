@@ -77,6 +77,7 @@ def test_upload_file_available_for_project_collaborators(
     assert document.project == project
     assert document.description == data["description"]
     assert document.uploaded_by == user
+    assert not document.private
     assert document.the_file is not None
 
 

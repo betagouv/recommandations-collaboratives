@@ -1236,6 +1236,8 @@ def test_doc_upload(project_ready, project_editor, client, good_file):
     assert res.status_code == 201
     assert res.data["id"] is not None
     assert Document.objects.filter(pk=res.data["id"]).exists()
+    doc = Document.objects.get(pk=res.data["id"])
+    assert not doc.private
     # send signal..?
 
 

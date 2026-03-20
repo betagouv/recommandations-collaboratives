@@ -106,6 +106,7 @@ def document_upload(request, project_id):
             instance.project = project
             instance.site = request.site
             instance.uploaded_by = request.user
+            instance.private = False
 
             try:
                 instance.save()

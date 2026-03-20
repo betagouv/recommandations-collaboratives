@@ -602,11 +602,15 @@ class DocumentViewSet(
         return DocumentSerializer
 
     def perform_create(self, serializer):
-        instance = serializer.save(
-            project_id=int(self.kwargs["project_id"]),
-            uploaded_by=self.request.user,
-            site=get_current_site(self.request),
-        )
+        kwargs = {
+            "uploaded_by": self.request.user,
+            "site": get_current_site(self.request),
+            "project_id": int(self.kwargs["project_id"]),
+        }
+        project = models.Project.objects.get(pk=self.kwargs["project_id"])
+        if has_perm(self.request.user, "manage_private_documents", project):
+            kwargs["private"] = False
+        instance = serializer.save(**kwargs)
         signals.document_uploaded.send(sender=self.create, instance=instance)
 
 
