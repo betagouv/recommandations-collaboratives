@@ -1,13 +1,18 @@
 from unittest.mock import Mock, patch
 
+import pluggy
 import pytest
 from django.core.management import call_command
 from model_bakery import baker
 
 from recoco.apps.home.models import SiteConfiguration
 
+from .hooks import ProjectSpec
+from .manager import get_tenant_hook
 from .middlewares import TenantPluginSchemaMiddleware
 from .routers import TenantPluginRouter
+
+# --- Fixtures & helpers for get_tenant_hook ---
 
 
 @pytest.fixture
@@ -21,8 +26,110 @@ def middleware(get_response_mock):
 
 
 @pytest.fixture
-def request_mock():
+def request_mock(enabled_plugins=None):
     return Mock()
+
+
+hookimpl = pluggy.HookimplMarker("recoco")
+
+
+class PluginA:
+    @hookimpl
+    def get_tab_views(self):
+        return [{"name": "plugin_a"}]
+
+
+class PluginB:
+    @hookimpl
+    def get_tab_views(self):
+        return [{"name": "plugin_b"}]
+
+
+def make_plugin_manager(*named_plugins):
+    """Build a real PluginManager pre-loaded with the given (name, instance) pairs."""
+    pm = pluggy.PluginManager("recoco")
+    pm.add_hookspecs(ProjectSpec)
+    for name, plugin in named_plugins:
+        pm.register(plugin, name=name)
+    return pm
+
+
+def make_request(enabled_plugins):
+    request = Mock()
+    request.site_config.enabled_plugins = enabled_plugins
+    return request
+
+
+# --- Tests ---
+
+
+class TestGetTenantHook:
+    def test_returns_only_enabled_plugins(self):
+        global_pm = make_plugin_manager(
+            ("plugin_a", PluginA()), ("plugin_b", PluginB())
+        )
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            request = make_request(["plugin_a"])
+            scoped = get_tenant_hook(request)
+
+        names = [name for name, _ in scoped.list_name_plugin()]
+        assert "plugin_a" in names
+        assert "plugin_b" not in names
+
+    def test_returns_all_enabled_plugins(self):
+        global_pm = make_plugin_manager(
+            ("plugin_a", PluginA()), ("plugin_b", PluginB())
+        )
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            request = make_request(["plugin_a", "plugin_b"])
+            scoped = get_tenant_hook(request)
+
+        names = [name for name, _ in scoped.list_name_plugin()]
+        assert "plugin_a" in names
+        assert "plugin_b" in names
+
+    def test_returns_empty_manager_when_no_plugins_enabled(self):
+        global_pm = make_plugin_manager(("plugin_a", PluginA()))
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            request = make_request([])
+            scoped = get_tenant_hook(request)
+
+        assert scoped.list_name_plugin() == []
+
+    def test_ignores_unknown_plugin_names(self):
+        global_pm = make_plugin_manager(("plugin_a", PluginA()))
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            request = make_request(["plugin_unknown"])
+            scoped = get_tenant_hook(request)
+
+        assert scoped.list_name_plugin() == []
+
+    def test_hook_call_returns_results_from_enabled_plugins_only(self):
+        global_pm = make_plugin_manager(
+            ("plugin_a", PluginA()), ("plugin_b", PluginB())
+        )
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            request = make_request(["plugin_a"])
+            scoped = get_tenant_hook(request)
+
+        results = [item for sublist in scoped.hook.get_tab_views() for item in sublist]
+        assert {"name": "plugin_a"} in results
+        assert {"name": "plugin_b"} not in results
 
 
 @pytest.mark.django_db
