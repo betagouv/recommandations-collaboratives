@@ -15,7 +15,11 @@ class TenantPluginSchemaMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest):
-        if hasattr(request, "site_config") and request.site_config.schema_name:
+        if (
+            hasattr(request, "site_config")
+            and request.site_config
+            and request.site_config.schema_name
+        ):
             # Publish enabled plugins to thread-local for the URL resolver
             set_enabled_plugins(request.site_config.enabled_plugins or [])
 
