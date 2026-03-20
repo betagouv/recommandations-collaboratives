@@ -46,18 +46,20 @@ def document_list(request, project_id=None):
         request.user, project
     )
 
-    public_files = models.Document.objects.filter(
-        project_id=project.pk, private=False
-    ).exclude(the_file__in=["", None])
-    private_files = models.Document.objects.filter(
-        project_id=project.pk, private=True
-    ).exclude(
+    all_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]
+    )
+
+    public_files = all_files.filter(private=False)
+    private_files = (
+        all_files.filter(private=True)
         if with_advisor_files
         else models.Document.objects.none()
     )
     pinned_files = public_files.filter(pinned=True)
-    links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
+    links = models.Document.objects.filter(project_id=project.pk).exclude(
+        the_link=None, private=False
+    )
 
     # Fetch Answers from Surveys if they have attachments
     answers_with_files = Answer.objects.filter(session__project_id=project_id).exclude(

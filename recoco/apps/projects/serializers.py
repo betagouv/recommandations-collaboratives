@@ -25,6 +25,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "uploaded_by",
             "created_on",
             "pinned",
+            "private",
         ]
 
     uploaded_by = UserSerializer(read_only=True)

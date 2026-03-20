@@ -18,6 +18,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
@@ -579,22 +580,43 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
 ########################################################################
 
 
+class PrivateDocumentFilter(DjangoFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        queryset = super().filter_queryset(request, queryset, view)
+
+        filter_private = request.query_params.get("private", None)
+        if filter_private is not None:
+            filter_private = filter_private == "true"
+            queryset = queryset.filter(private=filter_private)
+
+        return queryset
+
+
 class DocumentViewSet(
-    mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
 ):
     """API endpoint that allows manipulating Documents"""
 
     permission_classes = [permissions.IsAuthenticated, BaseConversationPermission]
-    queryset = models.Document.objects
     parsers = (
         JSONParser,
         MultiPartParser,
         FormParser,
     )
+    filter_backends = (PrivateDocumentFilter,)
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        return self.queryset.filter(project_id=project_id)
+        base_qs = models.Document.objects.filter(project_id=project_id)
+        project = models.Project.objects.get(pk=project_id)
+        return (
+            base_qs
+            if has_perm(self.request.user, "manage_private_documents", project)
+            else base_qs.filter(private=False)
+        )
 
     def get_serializer_class(self):
         if self.action == "create":
