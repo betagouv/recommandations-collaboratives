@@ -16,6 +16,7 @@ class User:
 
 
 class Document:
+    ADDED_ADVISOR_FILE = "a ajouté dans l'espace conseiller le document"
     ADDED_FILE = "a ajouté le document"
     ADDED_LINK = "a ajouté le lien"
 
