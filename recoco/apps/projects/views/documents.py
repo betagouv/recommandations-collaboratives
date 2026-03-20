@@ -36,7 +36,7 @@ def document_list(request, project_id=None):
     )
 
     has_perm_or_403(request.user, "manage_documents", project)
-    with_advisor_files = has_perm(request.user, "manage_documents", project)
+    with_advisor_files = has_perm(request.user, "manage_private_documents", project)
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
