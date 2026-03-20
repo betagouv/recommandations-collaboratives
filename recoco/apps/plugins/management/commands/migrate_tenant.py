@@ -2,7 +2,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-from recoco.apps.home.routers import TenantPluginRouter
+from recoco.apps.plugins.routers import TenantPluginRouter
 
 
 class Command(BaseCommand):

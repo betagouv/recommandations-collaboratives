@@ -150,6 +150,8 @@ def mark_notifications_as_seen(user, project):
 def project_knowledge(request, project_id=None):
     """Return the survey results for a given project"""
 
+    from recoco.apps.home.plugins import get_tenant_hook
+
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
@@ -176,6 +178,10 @@ def project_knowledge(request, project_id=None):
     )
 
     site_config = request.site_config
+
+    # Fetch plugins
+    pm = get_tenant_hook(request)
+    plugin_views = pm.hook.get_tab_views()
 
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey

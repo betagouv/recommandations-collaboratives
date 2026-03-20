@@ -2,7 +2,6 @@ from datetime import timedelta
 
 import sentry_sdk
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection
 from django.http import HttpRequest
 from django.utils import timezone
 
@@ -28,28 +27,6 @@ class CurrentSiteConfigurationMiddleware:
             .select_related("project_survey")
             .first()
         )
-
-        return self.get_response(request)
-
-
-class TenantPluginSchemaMiddleware:
-    """Extends the database search path based on the current tenant name.
-    This allows using plugins contained for each tenant.
-    """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request: HttpRequest):
-        if (
-            hasattr(request, "site_config")
-            and request.site_config
-            and request.site_config.schema_name
-        ):
-            schema = request.site_config.schema_name
-            with connection.cursor() as cursor:
-                # Security: schema_name is a SlugField, so it's safe from injection
-                cursor.execute(f"SET search_path TO {schema}, public")
 
         return self.get_response(request)
 
