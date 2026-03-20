@@ -630,7 +630,7 @@ class DocumentViewSet(
             "project_id": int(self.kwargs["project_id"]),
         }
         project = models.Project.objects.get(pk=self.kwargs["project_id"])
-        if has_perm(self.request.user, "manage_private_documents", project):
+        if not has_perm(self.request.user, "manage_private_documents", project):
             kwargs["private"] = False
         instance = serializer.save(**kwargs)
         signals.document_uploaded.send(sender=self.create, instance=instance)
