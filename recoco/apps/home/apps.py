@@ -13,4 +13,5 @@ class HomeConfig(AppConfig):
         from recoco.apps.home.models import AdvisorAccessRequest
 
         registry.register(AdvisorAccessRequest)
+        registry.register(User)
         watson.register(User)
