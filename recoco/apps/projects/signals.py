@@ -404,6 +404,16 @@ def project_document_uploaded(sender, instance, **kwargs):
         target=project,
     )
 
+    if instance.private:
+        notification = {
+            "sender": instance.uploaded_by,
+            "verb": verbs.Document.ADDED_ADVISOR_FILE,
+            "action_object": instance,
+            "target": project,
+        }
+
+        notify_advisors_of_project(project, notification, exclude=instance.uploaded_by)
+
 
 ################################################################
 # Project Survey events
