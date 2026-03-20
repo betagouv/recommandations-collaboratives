@@ -4,9 +4,10 @@ import pytest
 from django.core.management import call_command
 from model_bakery import baker
 
-from recoco.apps.home.middlewares import TenantPluginSchemaMiddleware
 from recoco.apps.home.models import SiteConfiguration
-from recoco.apps.home.routers import TenantPluginRouter
+
+from .middlewares import TenantPluginSchemaMiddleware
+from .routers import TenantPluginRouter
 
 
 @pytest.fixture
@@ -96,7 +97,7 @@ def test_create_tenant_schema_signal_no_schema_name(current_site):
 def test_migrate_tenant_command_logic():
     # We mock migrate call_command and connection.cursor
     with patch(
-        "recoco.apps.home.management.commands.migrate_tenant.call_command"
+        "recoco.apps.plugins.management.commands.migrate_tenant.call_command"
     ) as mock_migrate:
         with patch("django.db.connection.cursor") as mock_cursor:
             cursor_instance = mock_cursor.return_value.__enter__.return_value

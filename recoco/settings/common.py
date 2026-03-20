@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     "recoco.apps.metrics",
     "recoco.apps.demarches_simplifiees",
     "recoco.apps.social_account",
+    "recoco.apps.plugins",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -113,7 +114,7 @@ INSTALLED_APPS = [
 
 SITE_ID = SiteID(default=1)
 
-DATABASE_ROUTERS = ["recoco.apps.home.routers.TenantPluginRouter"]
+DATABASE_ROUTERS = ["recoco.apps.plugins.routers.TenantPluginRouter"]
 
 SILENCED_SYSTEM_CHECKS = [
     "sites.E101"  # Check to ensure SITE_ID is an int - ours is an object
@@ -126,7 +127,7 @@ MIDDLEWARE = [
     "multisite.middleware.DynamicSiteMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
-    "recoco.apps.home.middlewares.TenantPluginSchemaMiddleware",
+    "recoco.apps.plugins.middlewares.TenantPluginSchemaMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "sesame.middleware.AuthenticationMiddleware",
