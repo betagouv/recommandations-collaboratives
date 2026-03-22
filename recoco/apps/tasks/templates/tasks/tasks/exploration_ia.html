@@ -17,9 +17,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                    <div class="col-10 fr-p-3w"
-                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                            data-test-id="exploration-ia-container">
+                                                    <div class="col-10 fr-p-3w"
+                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                                                            data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -168,10 +168,7 @@
                                    class="fr-link fr-link--xs"
                                    target="_blank"
                                    x-show="getCitationUrl(citation)"
-                                   @click.stop>
-                                    Voir
-                                    <span class="fr-icon-external-link-line fr-icon--xs" aria-hidden="true"></span>
-                                </a>
+                                   @click.stop>Voir</a>
                             </div>
                         </template>
                     </div>
@@ -399,10 +396,7 @@
                                         <a :href="getCitationUrl(citation)"
                                            class="fr-link fr-link--sm"
                                            target="_blank"
-                                           x-show="getCitationUrl(citation)">
-                                            Consulter la fiche
-                                            <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
-                                        </a>
+                                           x-show="getCitationUrl(citation)">Consulter la fiche</a>
                                     </div>
                                 </template>
                             </div>
@@ -525,10 +519,7 @@
                                             <a :href="getCitationUrl(citation)"
                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
                                                target="_blank"
-                                               x-show="getCitationUrl(citation)">
-                                                <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
-                                                Voir la fiche
-                                            </a>
+                                               x-show="getCitationUrl(citation)">Voir la fiche</a>
                                             <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '')"
                                                class="fr-btn fr-btn--primary fr-btn--sm"
                                                target="_blank"
@@ -632,9 +623,7 @@
                                            class="fr-link fr-link--sm fr-ml-1w"
                                            target="_blank"
                                            x-show="getCitationUrl(citation)"
-                                           title="Voir la fiche">
-                                            <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
-                                        </a>
+                                           title="Voir la fiche"></a>
                                         <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '')"
                                            class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-ml-1v"
                                            target="_blank"
