@@ -892,7 +892,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   getPhaseDescription(phase) {
     const descriptions = {
-      1: 'Formulez votre besoin sur ce projet et découvrez des ressources pertinentes',
+      1: 'Sélectionner les passages qui vous semble pertinent avant de continuer',
       2: 'Continuez à explorer ou lancez la synthèse',
       3: 'Analyse des résultats sélectionnés',
     };

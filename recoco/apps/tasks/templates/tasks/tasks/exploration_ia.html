@@ -17,9 +17,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                                                    <div class="col-10 fr-p-3w"
-                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                                                            data-test-id="exploration-ia-container">
+                                                                                                                                                                                            <div class="col-10 fr-p-3w"
+                                                                                                                                                                                                    x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                                                                                                                                                                                                    data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -311,26 +311,6 @@
                                         </button>
                                     </template>
                                 </div>
-                                <div class="d-flex gap-2">
-                                    <button @click="fetchCoRecommendations()"
-                                            :disabled="!hasSelectedResources() || isLoadingCoRecos"
-                                            class="fr-btn fr-btn--primary fr-btn--sm fr-btn--icon-left"
-                                            data-test-id="exploration-ia-co-recos-btn">
-                                        <span x-show="!isLoadingCoRecos"
-                                              class="fr-icon-lightbulb-line"
-                                              aria-hidden="true"></span>
-                                        <span x-show="isLoadingCoRecos"
-                                              class="spinner-border spinner-border-sm"
-                                              aria-hidden="true"></span>
-                                        Co-recommandations
-                                    </button>
-                                    <button @click="searchRelatedRecommendations()"
-                                            :disabled="selectedChunks.length === 0"
-                                            class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left">
-                                        <span class="fr-icon-search-line" aria-hidden="true"></span>
-                                        Nouvelle recherche liée
-                                    </button>
-                                </div>
                             </div>
                             <div class="card-body">
                                 <!-- Liste des chunks de reponse -->
@@ -426,37 +406,49 @@
                     </div>
                 </template>
                 <!-- Actions de phase -->
-                <div class="d-flex justify-content-between align-items-center fr-py-3w border-top"
-                     data-test-id="exploration-ia-phase-actions">
-                    <p class="fr-mb-0 text-secondary"
-                       x-text="getPhaseDescription(currentPhase)"></p>
-                    <div class="d-flex gap-2">
-                        <button x-show="currentPhase === 2"
-                                @click="continueExploration()"
-                                class="fr-btn fr-btn--secondary"
-                                data-test-id="exploration-ia-continue-btn">
-                            <span class="fr-icon-search-line fr-mr-1v"></span>
-                            Nouvelle recherche
-                        </button>
-                        <button @click="proceedToNextPhase()"
-                                :disabled="!canProceedToNextPhase()"
-                                class="fr-btn fr-btn--primary"
-                                data-test-id="exploration-ia-next-phase-btn">
+                <template x-if="currentPhase > 0 && searchQuery.length > 0 && foundAnswer">
+                    <div class="footer-actions d-flex align-items-center fr-py-3w border-top"
+                         :class="{ 'justify-content-between': selectedChunks.length == 0, 'justify-content-end': selectedChunks.length > 0 }"
+                         data-test-id="exploration-ia-phase-actions">
+                        <p class="fr-mb-0 text-secondary"
+                           x-show="selectedChunks.length == 0"
+                           x-text="getPhaseDescription(currentPhase)"></p>
+                        <div class="d-flex gap-2">
+                            <button x-show="currentPhase === 2"
+                                    @click="continueExploration()"
+                                    class="fr-btn fr-btn--secondary"
+                                    data-test-id="exploration-ia-continue-btn">
+                                <span class="fr-icon-search-line fr-mr-1v"></span>
+                                Nouvelle recherche
+                            </button>
                             <template x-if="currentPhase === 1">
-                                <span>
-                                    <span class="fr-icon-arrow-right-line fr-mr-1v"></span>
+                                <button @click="fetchCoRecommendations()"
+                                        :disabled="!hasSelectedResources() || isLoadingCoRecos"
+                                        class="fr-btn fr-btn--primary fr-btn--sm fr-btn--icon-left"
+                                        data-test-id="exploration-ia-co-recos-btn">
+                                    <span x-show="!isLoadingCoRecos"
+                                          class="fr-icon-lightbulb-line"
+                                          aria-hidden="true"></span>
+                                    <span x-show="isLoadingCoRecos"
+                                          class="spinner-border spinner-border-sm"
+                                          aria-hidden="true"></span>
                                     Continuer l'exploration
-                                </span>
+                                </button>
                             </template>
                             <template x-if="currentPhase === 2">
-                                <span>
-                                    <span class="fr-icon-draft-line fr-mr-1v"></span>
-                                    Lancer la synthese
-                                </span>
+                                <button @click="proceedToNextPhase()"
+                                        :disabled="!canProceedToNextPhase()"
+                                        class="fr-btn fr-btn--primary"
+                                        data-test-id="exploration-ia-next-phase-btn">
+                                    <span>
+                                        <span class="fr-icon-draft-line fr-mr-1v"></span>
+                                        Lancer la synthese
+                                    </span>
+                                </button>
                             </template>
-                        </button>
+                        </div>
                     </div>
-                </div>
+                </template>
             </div>
         </template>
         <!-- Phase 3 : Synthese et création de recommandation -->

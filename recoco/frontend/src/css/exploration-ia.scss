@@ -437,7 +437,10 @@
       );
 
       &:hover {
-        background-color: var(--light-background-contrast-green-emeraude, #c3fad5);
+        background-color: var(
+          --light-background-contrast-green-emeraude,
+          #c3fad5
+        );
       }
     }
 
@@ -461,4 +464,10 @@
       flex-shrink: 0;
     }
   }
+}
+
+.footer-actions {
+  position: sticky;
+  background: white;
+  bottom: 0;
 }
