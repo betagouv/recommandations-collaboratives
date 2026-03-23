@@ -4,6 +4,13 @@
 <!-- Card -->
 <div class="card-resource card h-100">
     <div class="card-resource__body fr-p-3v">
+        {% if not resource.public %}
+            <div class="left-0">
+                <span data-test-id="task-draft-status"
+                        :class="`bg${getTaskColor(currentTask)}`"
+                        class="text-dark">Brouillon</span>
+            </div>
+        {% endif %}
         <div class="card-resource__category rounded-top">
             <span class="card-resource__category--badge bg-color-{{ resource.category.color|default:"darkgrey" }} fr-mr-1v"></span>
             <span class="card-resource__category--name">
