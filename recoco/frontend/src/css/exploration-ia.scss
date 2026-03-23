@@ -471,3 +471,248 @@
   background: white;
   bottom: 0;
 }
+
+// === MODALE RESSOURCE ===
+.exploration-ia-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.exploration-ia-modal {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    min-height: 200px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+  }
+
+  // Zone du passage cité
+  &__citation {
+    background: linear-gradient(
+      135deg,
+      var(--light-background-action-low-blue-france, #e3e3fd) 0%,
+      var(--light-background-alt-blue-france, #f5f5fe) 100%
+    );
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--light-accent-blue-france, #000091);
+  }
+
+  &__blockquote {
+    margin: 0;
+    padding: 0;
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--light-text-default-grey, #3a3a3a);
+    position: relative;
+
+    &::before {
+      content: '"';
+      font-size: 2rem;
+      color: var(--light-accent-blue-france, #000091);
+      opacity: 0.3;
+      position: absolute;
+      left: -1rem;
+      top: -1rem;
+    }
+  }
+
+  // Métadonnées (catégorie, tags)
+  &__meta {
+    padding: 0.75rem 0;
+  }
+
+  // Contenu de la ressource
+  &__content {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--light-text-default-grey, #3a3a3a);
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--light-text-title-grey, #161616);
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+    h2 {
+      font-size: 1.3rem;
+    }
+    h3 {
+      font-size: 1.15rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    ul,
+    ol {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    a {
+      color: var(--light-accent-blue-france, #000091);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+    }
+
+    blockquote {
+      margin: 1rem 0;
+      padding: 0.75rem 1rem;
+      border-left: 3px solid var(--light-accent-blue-france, #000091);
+      background-color: var(--light-background-alt-grey, #f6f6f6);
+      font-style: italic;
+    }
+
+    pre,
+    code {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+
+    code {
+      padding: 0.15rem 0.3rem;
+    }
+
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+
+      code {
+        padding: 0;
+        background: none;
+      }
+    }
+  }
+}
+
+// === MISE EN SURBRILLANCE DU PASSAGE CITÉ ===
+.exploration-ia-highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 230, 0, 0.4) 0%,
+    rgba(255, 200, 0, 0.3) 100%
+  );
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  border-bottom: 2px solid var(--light-accent-yellow-tournesol, #ffd100);
+  box-shadow: 0 1px 3px rgba(255, 209, 0, 0.3);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 230, 0, 0.6) 0%,
+      rgba(255, 200, 0, 0.5) 100%
+    );
+  }
+}
+
+// Animation de scroll vers le passage surligné
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(255, 230, 0, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 230, 0, 0.7);
+  }
+  100% {
+    background-color: rgba(255, 230, 0, 0.4);
+  }
+}
+
+.exploration-ia-highlight--animated {
+  animation: highlight-pulse 1s ease-in-out 2;
+}
+
+// Responsive pour la modale
+@media (max-width: 768px) {
+  .exploration-ia-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .exploration-ia-modal {
+    max-height: 95vh;
+    border-radius: 4px;
+
+    &__header,
+    &__body,
+    &__footer {
+      padding: 1rem;
+    }
+
+    &__header h2 {
+      font-size: 1.1rem;
+    }
+  }
+}

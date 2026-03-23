@@ -17,9 +17,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-            <div class="col-10 fr-p-3w"
-                    x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                    data-test-id="exploration-ia-container">
+                    <div class="col-10 fr-p-3w"
+                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                            data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -373,10 +373,13 @@
                                                   x-text="getSourceTypeLabel(citation.source_type)"></span>
                                         </div>
                                         <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
-                                        <a :href="getCitationUrl(citation)"
-                                           class="fr-link fr-link--sm"
-                                           target="_blank"
-                                           x-show="getCitationUrl(citation)">Consulter la fiche</a>
+                                        <button @click.stop="openResourceModal(citation)"
+                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                                x-show="getCitationUrl(citation)"
+                                                data-test-id="exploration-ia-view-resource-btn">
+                                            <span class="fr-icon-eye-line fr-mr-1v" aria-hidden="true"></span>
+                                            Consulter
+                                        </button>
                                     </div>
                                 </template>
                             </div>
@@ -672,6 +675,135 @@
                 </div>
             </div>
         </template>
+        <!-- Modale de détail ressource -->
+        <div x-show="resourceModal.isOpen"
+             class="exploration-ia-modal-overlay"
+             @click.self="closeResourceModal()"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             data-test-id="exploration-ia-resource-modal">
+            <div class="exploration-ia-modal"
+                 @click.stop
+                 role="dialog"
+                 aria-modal="true"
+                 :aria-labelledby="resourceModal.resource ? 'modal-resource-title' : ''">
+                <!-- Header de la modale -->
+                <div class="exploration-ia-modal__header">
+                    <div class="d-flex justify-content-between align-items-start w-100">
+                        <div class="flex-grow-1 fr-pr-2w">
+                            <div class="d-flex align-items-center gap-2 fr-mb-1w">
+                                <span class="fr-badge fr-badge--sm"
+                                      :class="{ 'fr-badge--green-emeraude': resourceModal.citation?.source_type === 'Resource', 'fr-badge--purple-glycine': resourceModal.citation?.source_type === 'Recommendation' }"
+                                      x-text="resourceModal.citation?.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
+                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                      x-show="resourceModal.citation"
+                                      x-text="'Source ' + (resourceModal.citation?.label || '')"></span>
+                            </div>
+                            <h2 id="modal-resource-title"
+                                class="fr-text--lg fr-mb-0"
+                                x-text="resourceModal.resource?.title || resourceModal.citation?.title || 'Détail de la ressource'">
+                            </h2>
+                        </div>
+                        <button @click="closeResourceModal()"
+                                class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm"
+                                aria-label="Fermer la modale"
+                                data-test-id="exploration-ia-modal-close-btn">
+                            <span class="fr-icon-close-line" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Corps de la modale -->
+                <div class="exploration-ia-modal__body">
+                    <!-- Chargement -->
+                    <div x-show="resourceModal.isLoading" class="text-center fr-py-4w">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <p class="text-secondary fr-mt-2w">Chargement de la ressource...</p>
+                    </div>
+                    <!-- Erreur -->
+                    <div x-show="resourceModal.error && !resourceModal.isLoading"
+                         class="fr-alert fr-alert--warning">
+                        <p class="fr-alert__title">Information</p>
+                        <p x-text="resourceModal.error"></p>
+                        <template x-if="resourceModal.citation?.reco_id && resourceModal.citation?.project_id">
+                            <div class="fr-mt-2w">
+                                <p class="fr-text--sm">Vous pouvez consulter la recommandation originale :</p>
+                                <a :href="getCitationUrl(resourceModal.citation)"
+                                   class="fr-btn fr-btn--secondary fr-btn--sm fr-mt-1w"
+                                   target="_blank">
+                                    <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                    Voir la recommandation
+                                </a>
+                            </div>
+                        </template>
+                    </div>
+                    <!-- Contenu de la ressource -->
+                    <div x-show="resourceModal.resource && !resourceModal.isLoading && !resourceModal.error">
+                        <!-- Passage cité (mis en avant) -->
+                        <div class="exploration-ia-modal__citation fr-mb-3w"
+                             x-show="resourceModal.citation?.content">
+                            <p class="fr-text--sm fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-quote-line fr-mr-1v" aria-hidden="true"></span>
+                                Passage pertinent identifié
+                            </p>
+                            <blockquote class="exploration-ia-modal__blockquote"
+                                        x-text="resourceModal.citation?.content">
+                            </blockquote>
+                        </div>
+                        <!-- Métadonnées -->
+                        <div class="exploration-ia-modal__meta fr-mb-3w"
+                             x-show="resourceModal.resource?.category || (resourceModal.resource?.tags && resourceModal.resource.tags.length > 0)">
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                      x-show="resourceModal.resource?.category?.name"
+                                      x-text="resourceModal.resource?.category?.name"></span>
+                                <template x-for="(tag, idx) in (resourceModal.resource?.tags || []).slice(0, 5)"
+                                          :key="idx">
+                                    <span class="fr-badge fr-badge--sm fr-badge--grey" x-text="tag.name || tag"></span>
+                                </template>
+                                <span x-show="(resourceModal.resource?.tags || []).length > 5"
+                                      class="fr-badge fr-badge--sm fr-badge--grey"
+                                      x-text="'+' + ((resourceModal.resource?.tags || []).length - 5)"></span>
+                            </div>
+                        </div>
+                        <!-- Contenu complet avec passage surligné -->
+                        <div class="exploration-ia-modal__content"
+                             x-html="getResourceContentWithHighlight()"></div>
+                        <!-- URL source -->
+                        <div class="fr-mt-3w" x-show="resourceModal.resource?.url">
+                            <a :href="resourceModal.resource?.url"
+                               class="fr-link fr-link--sm"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                Source originale
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer de la modale -->
+                <div class="exploration-ia-modal__footer">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <a :href="getCitationUrl(resourceModal.citation)"
+                           class="fr-btn fr-btn--secondary fr-btn--sm"
+                           target="_blank"
+                           x-show="resourceModal.citation && getCitationUrl(resourceModal.citation)"
+                           data-test-id="exploration-ia-modal-view-full-btn">
+                            <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                            Ouvrir la fiche complète
+                        </a>
+                        <button @click="closeResourceModal()"
+                                class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                data-test-id="exploration-ia-modal-close-footer-btn">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}

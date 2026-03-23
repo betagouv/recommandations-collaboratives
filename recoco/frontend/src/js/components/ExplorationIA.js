@@ -52,6 +52,15 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   },
   isSynthesizing: false,
 
+  // === MODALE RESSOURCE ===
+  resourceModal: {
+    isOpen: false,
+    isLoading: false,
+    citation: null, // La citation qui a déclenché l'ouverture
+    resource: null, // Les détails complets de la ressource
+    error: null,
+  },
+
   // === LIFECYCLE ===
   init() {
     // Initialisation du composant
@@ -422,6 +431,13 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       resources: [],
       projects: [],
       recommendations: [],
+    };
+    this.resourceModal = {
+      isOpen: false,
+      isLoading: false,
+      citation: null,
+      resource: null,
+      error: null,
     };
     this.error = null;
   },
@@ -852,6 +868,114 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       return `/project/${citation.project_id}/actions/#action-${citation.reco_id}`;
     }
     return null;
+  },
+
+  // === MODALE RESSOURCE ===
+  async openResourceModal(citation) {
+    if (!citation) return;
+
+    this.resourceModal = {
+      isOpen: true,
+      isLoading: true,
+      citation: citation,
+      resource: null,
+      error: null,
+    };
+
+    try {
+      let resourceId = citation.resource_id;
+
+      // Si pas de resource_id direct mais c'est une recommandation, essayer de récupérer la ressource liée
+      if (!resourceId && citation.reco_id && citation.project_id) {
+        console.log('Récupération de la ressource depuis la recommandation...', citation);
+        resourceId = await this.fetchResourceIdFromRecommendation(citation.project_id, citation.reco_id);
+
+        // Mettre à jour la citation avec le resource_id trouvé pour les futures utilisations
+        if (resourceId) {
+          citation.resource_id = resourceId;
+        }
+      }
+
+      // Si toujours pas de resourceId, afficher un message d'erreur avec lien vers la recommandation
+      if (!resourceId) {
+        this.resourceModal.error = 'Aucune ressource associée à cette recommandation.';
+        this.resourceModal.isLoading = false;
+        return;
+      }
+
+      const resource = await this.fetchResourceFromApi(resourceId);
+      if (resource) {
+        this.resourceModal.resource = resource;
+      } else {
+        this.resourceModal.error = 'Impossible de charger les détails de la ressource.';
+      }
+    } catch (err) {
+      console.error('Erreur lors du chargement de la ressource:', err);
+      this.resourceModal.error = 'Erreur lors du chargement de la ressource.';
+    } finally {
+      this.resourceModal.isLoading = false;
+    }
+  },
+
+  closeResourceModal() {
+    this.resourceModal = {
+      isOpen: false,
+      isLoading: false,
+      citation: null,
+      resource: null,
+      error: null,
+    };
+  },
+
+  highlightCitationInContent(content, citationContent) {
+    if (!content || !citationContent) return content;
+
+    // Nettoyer et normaliser le passage cité pour la recherche
+    const normalizedCitation = citationContent.trim();
+    if (normalizedCitation.length < 10) return content;
+
+    // Échapper les caractères spéciaux pour l'expression régulière
+    const escapedCitation = normalizedCitation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // Créer une regex pour trouver le passage (insensible à la casse, avec tolérance aux espaces)
+    const flexiblePattern = escapedCitation.replace(/\s+/g, '\\s+');
+
+    try {
+      const regex = new RegExp(`(${flexiblePattern})`, 'gi');
+      const highlighted = content.replace(
+        regex,
+        '<mark class="exploration-ia-highlight">$1</mark>'
+      );
+      return highlighted;
+    } catch (e) {
+      // Si la regex échoue, essayer une recherche simple
+      const index = content.toLowerCase().indexOf(normalizedCitation.toLowerCase());
+      if (index !== -1) {
+        const before = content.substring(0, index);
+        const match = content.substring(index, index + normalizedCitation.length);
+        const after = content.substring(index + normalizedCitation.length);
+        return `${before}<mark class="exploration-ia-highlight">${match}</mark>${after}`;
+      }
+      return content;
+    }
+  },
+
+  getResourceContentWithHighlight() {
+    if (!this.resourceModal.resource || !this.resourceModal.citation) {
+      return '';
+    }
+
+    const resource = this.resourceModal.resource;
+    const citationContent = this.resourceModal.citation.content;
+
+    // Construire le contenu complet de la ressource
+    let fullContent = resource.content || resource.text || resource.summary || '';
+
+    // Appliquer la mise en surbrillance
+    const highlightedContent = this.highlightCitationInContent(fullContent, citationContent);
+
+    // Parser le markdown et sanitize
+    return this.parseMarkdown(highlightedContent);
   },
 
   getSourceTypeLabel(sourceType) {
