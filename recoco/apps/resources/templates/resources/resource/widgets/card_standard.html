@@ -18,15 +18,15 @@
         <div class="card-resource__text">
             {{ resource.subtitle }}
         </div>
-        <div class="card-resource__date">
-            <span class="card-resource__footer--label fr-icon-calendar-line fr-icon--sm fr-btn--icon-left">Mise à jour le : {{ resource.updated_on|date:"d/m/Y" }}</span>
-        </div>
         <div class="card-resource__orga-related">
             {% if resource.support_orga %}
                 <span class="card-resource__footer--label fr-icon-building-line fr-icon--sm fr-btn--icon-left">
-                    {{ resource.support_orga.name }}
+                    {{ resource.support_orga }}
                 </span>
             {% endif %}
+        </div>
+        <div class="card-resource__date">
+            <span class="card-resource__footer--label fr-icon-calendar-line fr-icon--sm fr-btn--icon-left">Mise à jour le : {{ resource.updated_on|date:"d/m/Y" }}</span>
         </div>
         <div class="card-resource__departments">
             {% if resource.departments.all %}
