@@ -17,9 +17,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                    <div class="col-10 fr-p-3w"
-                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                            data-test-id="exploration-ia-container">
+                                                                    <div class="col-10 fr-p-3w"
+                                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                                                                            data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -183,7 +183,7 @@
                             <div class="d-flex justify-content-between align-items-center fr-mb-2w">
                                 <h3 class="fr-text--md fr-mb-0">
                                     <span class="fr-icon-file-text-line fr-mr-1v" aria-hidden="true"></span>
-                                    Ressources co-recommandées (<span x-text="coRecommendations.length"></span>)
+                                    Ces recommandations ont souvent été recommandées en même temps que celles sélectionnées
                                 </h3>
                                 <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Étape 2</span>
                             </div>
@@ -264,14 +264,12 @@
                                                 </div>
                                             </div>
                                             <div class="card-footer bg-transparent">
-                                                <a :href="'/ressource/' + resource.resourceId + '/'"
-                                                   class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                                   target="_blank"
-                                                   x-show="resource.resourceId"
-                                                   @click.stop>
-                                                    <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                                <button @click.stop="openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'Resource', label: 'co-reco' })"
+                                                        class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                                        x-show="resource.resourceId">
+                                                    <span class="fr-icon-eye-line fr-mr-1v" aria-hidden="true"></span>
                                                     Voir la fiche
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -419,11 +417,11 @@
                            x-text="getPhaseDescription(currentPhase)"></p>
                         <div class="d-flex gap-2">
                             <button x-show="currentPhase === 2"
-                                    @click="continueExploration()"
+                                    @click="resetExploration()"
                                     class="fr-btn fr-btn--secondary"
                                     data-test-id="exploration-ia-continue-btn">
-                                <span class="fr-icon-search-line fr-mr-1v"></span>
-                                Nouvelle recherche
+                                <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
+                                Recommencer
                             </button>
                             <template x-if="currentPhase === 1">
                                 <button @click="fetchCoRecommendations()"
@@ -522,7 +520,7 @@
                                                x-show="citation.resource_id"
                                                title="Créer une recommandation à partir de cette ressource">
                                                 <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
-                                                Recommander
+                                                Créer une recommandation
                                             </a>
                                         </div>
                                     </div>
@@ -588,7 +586,7 @@
                                                x-show="resource.resourceId"
                                                title="Créer une recommandation à partir de cette ressource">
                                                 <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
-                                                Recommander
+                                                Créer une recommandation
                                             </a>
                                         </div>
                                     </div>
@@ -626,6 +624,7 @@
                                            x-show="citation.resource_id"
                                            title="Créer une recommandation">
                                             <span class="fr-icon-add-circle-line fr-icon--sm" aria-hidden="true"></span>
+                                            Créer une recommandation
                                         </a>
                                     </li>
                                 </template>
@@ -643,7 +642,7 @@
                                            class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-ml-1v"
                                            target="_blank"
                                            x-show="resource.resourceId"
-                                           title="Créer une recommandation"></a>
+                                           title="Créer une recommandation">Créer une recommandation</a>
                                     </li>
                                 </template>
                             </ul>
@@ -799,9 +798,7 @@
                                         <span class="fr-icon-info-line fr-mr-1v" aria-hidden="true"></span>
                                         Cette recommandation n'a pas de fiche ressource associée
                                     </p>
-                                    <p class="fr-callout__text fr-text--sm">
-                                        Le contenu ci-dessous est le commentaire initial de la recommandation.
-                                    </p>
+                                    <p class="fr-callout__text fr-text--sm">Le contenu ci-dessous est le commentaire initial de la recommandation.</p>
                                 </div>
                                 <!-- Métadonnées recommandation -->
                                 <div class="exploration-ia-modal__meta fr-mb-3w"
