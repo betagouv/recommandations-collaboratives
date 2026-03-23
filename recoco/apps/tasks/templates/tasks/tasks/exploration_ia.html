@@ -164,11 +164,12 @@
                                 </div>
                                 <p class="exploration-ia-source-card__title"
                                    x-text="truncate(citation.title, 50)"></p>
-                                <a :href="getCitationUrl(citation)"
-                                   class="fr-link fr-link--xs"
-                                   target="_blank"
-                                   x-show="getCitationUrl(citation)"
-                                   @click.stop>Voir</a>
+                                <button @click.stop="openResourceModal(citation)"
+                                        class="fr-btn fr-btn--tertiary fr-btn--sm exploration-ia-source-card__btn"
+                                        x-show="getCitationUrl(citation)">
+                                    <span class="fr-icon-eye-line fr-icon--sm" aria-hidden="true"></span>
+                                    Voir
+                                </button>
                             </div>
                         </template>
                     </div>
@@ -742,8 +743,8 @@
                             </div>
                         </template>
                     </div>
-                    <!-- Contenu de la ressource -->
-                    <div x-show="resourceModal.resource && !resourceModal.isLoading && !resourceModal.error">
+                    <!-- Contenu (ressource OU recommandation) -->
+                    <div x-show="hasModalContent() && !resourceModal.isLoading && !resourceModal.error">
                         <!-- Passage cité (mis en avant) -->
                         <div class="exploration-ia-modal__citation fr-mb-3w"
                              x-show="resourceModal.citation?.content">
@@ -755,35 +756,67 @@
                                         x-text="resourceModal.citation?.content">
                             </blockquote>
                         </div>
-                        <!-- Métadonnées -->
-                        <div class="exploration-ia-modal__meta fr-mb-3w"
-                             x-show="resourceModal.resource?.category || (resourceModal.resource?.tags && resourceModal.resource.tags.length > 0)">
-                            <div class="d-flex flex-wrap gap-2 align-items-center">
-                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
-                                      x-show="resourceModal.resource?.category?.name"
-                                      x-text="resourceModal.resource?.category?.name"></span>
-                                <template x-for="(tag, idx) in (resourceModal.resource?.tags || []).slice(0, 5)"
-                                          :key="idx">
-                                    <span class="fr-badge fr-badge--sm fr-badge--grey" x-text="tag.name || tag"></span>
-                                </template>
-                                <span x-show="(resourceModal.resource?.tags || []).length > 5"
-                                      class="fr-badge fr-badge--sm fr-badge--grey"
-                                      x-text="'+' + ((resourceModal.resource?.tags || []).length - 5)"></span>
+                        <!-- CAS 1 : Contenu de la RESSOURCE -->
+                        <template x-if="resourceModal.resource">
+                            <div>
+                                <!-- Métadonnées ressource -->
+                                <div class="exploration-ia-modal__meta fr-mb-3w"
+                                     x-show="resourceModal.resource?.category || (resourceModal.resource?.tags && resourceModal.resource.tags.length > 0)">
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                              x-show="resourceModal.resource?.category?.name"
+                                              x-text="resourceModal.resource?.category?.name"></span>
+                                        <template x-for="(tag, idx) in (resourceModal.resource?.tags || []).slice(0, 5)"
+                                                  :key="idx">
+                                            <span class="fr-badge fr-badge--sm fr-badge--grey" x-text="tag.name || tag"></span>
+                                        </template>
+                                        <span x-show="(resourceModal.resource?.tags || []).length > 5"
+                                              class="fr-badge fr-badge--sm fr-badge--grey"
+                                              x-text="'+' + ((resourceModal.resource?.tags || []).length - 5)"></span>
+                                    </div>
+                                </div>
+                                <!-- Contenu complet avec passage surligné -->
+                                <div class="exploration-ia-modal__content"
+                                     x-html="getResourceContentWithHighlight()"></div>
+                                <!-- URL source -->
+                                <div class="fr-mt-3w" x-show="resourceModal.resource?.url">
+                                    <a :href="resourceModal.resource?.url"
+                                       class="fr-link fr-link--sm"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
+                                        Source originale
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Contenu complet avec passage surligné -->
-                        <div class="exploration-ia-modal__content"
-                             x-html="getResourceContentWithHighlight()"></div>
-                        <!-- URL source -->
-                        <div class="fr-mt-3w" x-show="resourceModal.resource?.url">
-                            <a :href="resourceModal.resource?.url"
-                               class="fr-link fr-link--sm"
-                               target="_blank"
-                               rel="noopener noreferrer">
-                                <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
-                                Source originale
-                            </a>
-                        </div>
+                        </template>
+                        <!-- CAS 2 : Contenu de la RECOMMANDATION (sans ressource) -->
+                        <template x-if="!resourceModal.resource && resourceModal.recommendation">
+                            <div>
+                                <!-- Info recommandation -->
+                                <div class="fr-callout fr-callout--purple-glycine fr-mb-3w">
+                                    <p class="fr-callout__title fr-text--sm">
+                                        <span class="fr-icon-info-line fr-mr-1v" aria-hidden="true"></span>
+                                        Cette recommandation n'a pas de fiche ressource associée
+                                    </p>
+                                    <p class="fr-callout__text fr-text--sm">
+                                        Le contenu ci-dessous est le commentaire initial de la recommandation.
+                                    </p>
+                                </div>
+                                <!-- Métadonnées recommandation -->
+                                <div class="exploration-ia-modal__meta fr-mb-3w"
+                                     x-show="resourceModal.recommendation?.topic">
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        <span class="fr-badge fr-badge--sm fr-badge--purple-glycine"
+                                              x-show="resourceModal.recommendation?.topic?.name"
+                                              x-text="resourceModal.recommendation?.topic?.name"></span>
+                                    </div>
+                                </div>
+                                <!-- Contenu de la recommandation avec passage surligné -->
+                                <div class="exploration-ia-modal__content"
+                                     x-html="getRecommendationContentWithHighlight()"></div>
+                            </div>
+                        </template>
                     </div>
                 </div>
                 <!-- Footer de la modale -->

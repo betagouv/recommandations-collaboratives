@@ -58,6 +58,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     isLoading: false,
     citation: null, // La citation qui a déclenché l'ouverture
     resource: null, // Les détails complets de la ressource
+    recommendation: null, // Les détails de la recommandation (si pas de ressource)
     error: null,
   },
 
@@ -437,6 +438,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       isLoading: false,
       citation: null,
       resource: null,
+      recommendation: null,
       error: null,
     };
     this.error = null;
@@ -879,6 +881,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       isLoading: true,
       citation: citation,
       resource: null,
+      recommendation: null,
       error: null,
     };
 
@@ -887,33 +890,65 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
       // Si pas de resource_id direct mais c'est une recommandation, essayer de récupérer la ressource liée
       if (!resourceId && citation.reco_id && citation.project_id) {
-        console.log('Récupération de la ressource depuis la recommandation...', citation);
-        resourceId = await this.fetchResourceIdFromRecommendation(citation.project_id, citation.reco_id);
+        console.log('Récupération de la recommandation...', citation);
+        const recommendation = await this.fetchRecommendationDetails(citation.project_id, citation.reco_id);
 
-        // Mettre à jour la citation avec le resource_id trouvé pour les futures utilisations
-        if (resourceId) {
-          citation.resource_id = resourceId;
+        if (recommendation) {
+          this.resourceModal.recommendation = recommendation;
+
+          // Extraire le resource_id depuis la recommandation
+          if (recommendation.resource?.id) {
+            resourceId = recommendation.resource.id;
+          } else if (recommendation.resource_id) {
+            resourceId = recommendation.resource_id;
+          }
+
+          // Mettre à jour la citation avec le resource_id trouvé
+          if (resourceId) {
+            citation.resource_id = resourceId;
+          }
         }
       }
 
-      // Si toujours pas de resourceId, afficher un message d'erreur avec lien vers la recommandation
-      if (!resourceId) {
-        this.resourceModal.error = 'Aucune ressource associée à cette recommandation.';
-        this.resourceModal.isLoading = false;
-        return;
+      // Si on a un resourceId, charger la ressource
+      if (resourceId) {
+        const resource = await this.fetchResourceFromApi(resourceId);
+        if (resource) {
+          this.resourceModal.resource = resource;
+        }
       }
 
-      const resource = await this.fetchResourceFromApi(resourceId);
-      if (resource) {
-        this.resourceModal.resource = resource;
-      } else {
-        this.resourceModal.error = 'Impossible de charger les détails de la ressource.';
+      // Si pas de ressource mais on a une recommandation, c'est OK (on affichera le contenu de la reco)
+      if (!this.resourceModal.resource && !this.resourceModal.recommendation) {
+        this.resourceModal.error = 'Impossible de charger les détails.';
       }
     } catch (err) {
-      console.error('Erreur lors du chargement de la ressource:', err);
-      this.resourceModal.error = 'Erreur lors du chargement de la ressource.';
+      console.error('Erreur lors du chargement:', err);
+      this.resourceModal.error = 'Erreur lors du chargement.';
     } finally {
       this.resourceModal.isLoading = false;
+    }
+  },
+
+  async fetchRecommendationDetails(projectId, recoId) {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/tasks/${recoId}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+      });
+
+      if (!response.ok) {
+        console.warn(`Impossible de récupérer la recommandation ${recoId}:`, response.status);
+        return null;
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error('Erreur lors de la récupération de la recommandation:', err);
+      return null;
     }
   },
 
@@ -923,6 +958,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       isLoading: false,
       citation: null,
       resource: null,
+      recommendation: null,
       error: null,
     };
   },
@@ -976,6 +1012,29 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
     // Parser le markdown et sanitize
     return this.parseMarkdown(highlightedContent);
+  },
+
+  getRecommendationContentWithHighlight() {
+    if (!this.resourceModal.recommendation || !this.resourceModal.citation) {
+      return '';
+    }
+
+    const recommendation = this.resourceModal.recommendation;
+    const citationContent = this.resourceModal.citation.content;
+
+    // Le contenu de la recommandation peut être dans différents champs
+    let fullContent = recommendation.content || recommendation.comment || recommendation.intent || '';
+
+    // Appliquer la mise en surbrillance
+    const highlightedContent = this.highlightCitationInContent(fullContent, citationContent);
+
+    // Parser le markdown et sanitize
+    return this.parseMarkdown(highlightedContent);
+  },
+
+  // Vérifie si on a du contenu à afficher (ressource ou recommandation)
+  hasModalContent() {
+    return this.resourceModal.resource || this.resourceModal.recommendation;
   },
 
   getSourceTypeLabel(sourceType) {

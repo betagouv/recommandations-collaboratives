@@ -295,6 +295,13 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
   }
+
+  &__btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    min-height: auto !important;
+    margin-top: 0.5rem;
+  }
 }
 
 // Co-recommandations (Etape 2)
