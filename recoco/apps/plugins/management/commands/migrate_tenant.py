@@ -1,6 +1,7 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.migrations.recorder import MigrationRecorder
 
 from recoco.apps.plugins.routers import TenantPluginRouter
 
@@ -37,14 +38,7 @@ class Command(BaseCommand):
                 # We need a tenant-local django_migrations table so Django's
                 # MigrationRecorder doesn't fall back to public.django_migrations
                 # That would prevent a migration from being applyed to multiple tenants
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS django_migrations (
-                        id SERIAL PRIMARY KEY,
-                        app VARCHAR(255) NOT NULL,
-                        name VARCHAR(255) NOT NULL,
-                        applied TIMESTAMPTZ NOT NULL
-                    )
-                """)
+                MigrationRecorder(connection).ensure_schema()
 
             # Now we can call django migrate routine with the added schema
             migrate_args = []
