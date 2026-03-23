@@ -17,9 +17,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                                                                                                                                                                                            <div class="col-10 fr-p-3w"
-                                                                                                                                                                                                    x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                                                                                                                                                                                                    data-test-id="exploration-ia-container">
+            <div class="col-10 fr-p-3w"
+                    x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
+                    data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -97,36 +97,36 @@
                         <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA a mieux comprendre votre projet.</p>
                     </div>
                 </div>
-                <!-- Barre de recherche -->
-                <label class="fr-label" for="exploration-search">Commencez par formuler votre besoin sur ce projet</label>
-                <div class="fr-search-bar fr-search-bar--lg fr-mb-3w"
-                     role="search"
-                     data-test-id="exploration-ia-searchbar">
-                    <input class="fr-input"
-                           type="search"
-                           id="exploration-search"
-                           x-model="searchQuery"
-                           @keydown.enter.prevent="performSearch()"
-                           placeholder="Formulez votre besoin sur ce projet. Ex: Quelles aides puis-je avoir pour mettre en place un jardin partagé ?"
-                           :disabled="isLoading"
-                           data-test-id="exploration-ia-search-input">
-                    <button class="fr-btn"
-                            @click="performSearch()"
-                            :disabled="isLoading || !searchQuery.trim()"
-                            data-test-id="exploration-ia-search-btn">
-                        <span x-show="!isLoading">Rechercher</span>
-                        <span x-show="isLoading" class="spinner-border spinner-border-sm"></span>
-                    </button>
-                </div>
-                <!-- Bouton de test (a supprimer en production) -->
-                <div class="fr-mb-3w">
-                    <button class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left"
-                            @click="loadMockData()"
-                            data-test-id="exploration-ia-mock-btn">
-                        <span class="fr-icon-test-tube-line" aria-hidden="true"></span>
-                        Tester avec données mockées
-                    </button>
-                </div>
+                <template x-if="currentPhase < 2">
+                    <!-- Barre de recherche -->
+                    <div>
+                        <label class="fr-label" for="exploration-search">Commencez par formuler votre besoin sur ce projet</label>
+                        <div class="fr-search-bar fr-search-bar--lg fr-mb-3w"
+                             role="search"
+                             data-test-id="exploration-ia-searchbar">
+                            <input class="fr-input"
+                                   type="search"
+                                   id="exploration-search"
+                                   x-model="searchQuery"
+                                   @keydown.enter.prevent="performSearch()"
+                                   placeholder="Formulez votre besoin sur ce projet. Ex: Quelles aides puis-je avoir pour mettre en place un jardin partagé ?"
+                                   :disabled="isLoading"
+                                   data-test-id="exploration-ia-search-input">
+                            <button class="fr-btn"
+                                    @click="performSearch()"
+                                    :disabled="isLoading || !searchQuery.trim()"
+                                    data-test-id="exploration-ia-search-btn">
+                                <span x-show="!isLoading">Rechercher</span>
+                                <span x-show="isLoading" class="spinner-border spinner-border-sm"></span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="currentPhase > 1">
+                    <p class="fr-text--sm text-secondary fr-mb-3w">
+                        Recherche initiale : <span x-text="searchQuery"></span>
+                    </p>
+                </template>
                 <!-- Message d'erreur -->
                 <div x-show="error"
                      class="fr-alert fr-alert--error fr-mb-3w"
@@ -634,16 +634,12 @@
                                            class="fr-link fr-link--sm fr-ml-1w"
                                            target="_blank"
                                            x-show="resource.resourceId"
-                                           title="Voir la fiche">
-                                            <span class="fr-icon-external-link-line fr-icon--sm" aria-hidden="true"></span>
-                                        </a>
+                                           title="Voir la fiche"></a>
                                         <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + resource.resourceId"
                                            class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-ml-1v"
                                            target="_blank"
                                            x-show="resource.resourceId"
-                                           title="Créer une recommandation">
-                                            <span class="fr-icon-add-circle-line fr-icon--sm" aria-hidden="true"></span>
-                                        </a>
+                                           title="Créer une recommandation"></a>
                                     </li>
                                 </template>
                             </ul>
