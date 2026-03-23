@@ -39,7 +39,7 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex custom-input-border bg-white {% if extra_classes %}{{ extra_classes }}{% endif %}"
+                    <div class="{% if no_inside_border %}d-flex specific-border-solid1pxE5E5E5 rounded-pill{% else %}multi-select__container d-flex custom-input-border bg-white{% endif %} {% if extra_classes %}{{ extra_classes }}{% endif %}"
                          :class="isOpen() ? 'multi-select--open' : ''"
                          data-test-id="multi-select-container">
                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
@@ -69,7 +69,7 @@
                             </div>
                         </div>
                         <!-- Drop down toogle with icons-->
-                        <div class="multi-select__dropdown-icon">
+                        <div {% if no_inside_border %}{% else %}class="multi-select__dropdown-icon"{% endif %}>
                             <button type="button"
                                     x-show="!isOpen()"
                                     x-on:click="open()"
