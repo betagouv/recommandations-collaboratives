@@ -101,6 +101,107 @@ Django can resolve migrations and models correctly.
         name = "plugin_giphy"
 
 
+Defining a Hook Specification
+==============================
+
+Hook specifications live in ``recoco/apps/plugins/hooks.py``.  They declare
+the *contract* — name, parameters, and return-value semantics — that every
+plugin implementation must follow.
+
+Each spec class is registered with the global plugin manager once in
+``manager.py`` via ``pm.add_hookspecs()``.
+
+The existing ``ProjectSpec`` class is the canonical home for project-related
+hooks:
+
+.. code-block:: python
+
+    # recoco/apps/plugins/hooks.py
+    import pluggy
+
+    hookspec = pluggy.HookspecMarker("recoco")
+
+
+    class ProjectSpec:
+        @hookspec
+        def tab_entries(self):
+            """Return a list of (url_name, label) tuples to add as project tabs.
+
+            Each plugin that implements this hook contributes one or more
+            entries.  The core collects all results with::
+
+                pm.hook.tab_entries()
+
+            which returns a list of lists (one per registered plugin).
+            """
+
+Anatomy of a hookspec decorator
+---------------------------------
+
+``@hookspec`` supports several keyword arguments that change call semantics:
+
+``firstresult=True``
+    Stop calling further plugins as soon as one returns a non-``None`` value.
+    Useful for hooks that should be *overridden* rather than *aggregated*
+    (e.g. a single renderer or a permission gate).
+
+``historic=True``
+    Replay the hook call for late-registered plugins (plugins added after the
+    hook was already called).  Useful during app initialisation.
+
+``warn_on_impl``
+    Emit a warning whenever a plugin implements this hook.  Handy for
+    deprecating a hook without removing it.
+
+Example — adding a new hookspec
+---------------------------------
+
+Suppose you want every enabled plugin to be able to inject extra context into
+the project-detail view.  Add the spec to ``ProjectSpec``:
+
+.. code-block:: python
+
+    # recoco/apps/plugins/hooks.py
+    class ProjectSpec:
+        @hookspec
+        def tab_entries(self):
+            """Return a list of (url_name, label) tuples to add as project tabs."""
+
+        @hookspec
+        def project_detail_extra_context(self, request, project):
+            """Return a dict of extra template context for the project-detail view.
+
+            Each plugin returns a dict; the core merges all dicts together::
+
+                extra = {}
+                for ctx in pm.hook.project_detail_extra_context(
+                    request=request, project=project
+                ):
+                    extra.update(ctx)
+            """
+
+Then call it in the core view:
+
+.. code-block:: python
+
+    # recoco/apps/projects/views.py
+    from recoco.apps.plugins.manager import get_tenant_hook
+
+    def project_detail(request, pk):
+        project = get_object_or_404(Project, pk=pk)
+        pm = get_tenant_hook(request)
+
+        extra_context = {}
+        for ctx in pm.hook.project_detail_extra_context(
+            request=request, project=project
+        ):
+            extra_context.update(ctx)
+
+        return render(request, "projects/detail.html", {
+            "project": project,
+            **extra_context,
+        })
+
 Hook Implementation (``plugin.py``)
 ------------------------------------
 
@@ -108,14 +209,23 @@ Plugins implement hooks defined by the core using ``pluggy``.
 
 .. code-block:: python
 
+    # plugin_giphy/plugin.py
     import pluggy
 
     hookimpl = pluggy.HookimplMarker("recoco")
 
     class GiphyPlugin:
+        urls_module = "plugin_giphy.urls"
+
         @hookimpl
-        def get_dashboard_widgets(self, request, project):
-            return ["plugin_giphy/widgets/preview.html"]
+        def tab_entries(self):
+            """Inject a "Giphy" tab on every project page."""
+            return ("plugin_giphy:search", "Giphy")
+
+        @hookimpl
+        def project_detail_extra_context(self, request, project):
+            """Add trending GIFs to the project-detail context."""
+            return {"trending_gifs": ["https://example.com/1.gif"]}
 
 
 Database Isolation
