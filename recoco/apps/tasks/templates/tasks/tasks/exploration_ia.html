@@ -10,6 +10,7 @@
 {% endblock og_title %}
 {% block css %}
     {% vite_asset 'js/styles/exploration-ia.css.js' %}
+    {% vite_asset 'js/styles/resource-card.css.js' %}
 {% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/explorationIA.js' %}
@@ -17,9 +18,9 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                                                                    <div class="col-10 fr-p-3w"
-                                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: '{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}' })"
-                                                                            data-test-id="exploration-ia-container">
+                                <div class="col-10 fr-p-3w"
+                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}` })"
+                                            data-test-id="exploration-ia-container">
         <!-- djlint:on -->
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-start fr-mb-3w">
@@ -219,25 +220,24 @@
                                 <template x-for="(resource, idx) in coRecommendations"
                                           :key="resource.id || idx">
                                     <div class="col">
-                                        <div class="card h-100 exploration-ia-co-reco"
+                                        <div class="card-resource card h-100 exploration-ia-co-reco"
                                              :class="{ 'exploration-ia-co-reco--selected': isCoRecoSelected(resource.id) }"
                                              @click="toggleCoRecoSelection(resource.id)"
                                              style="cursor: pointer"
                                              :data-test-id="'exploration-ia-co-reco-' + idx">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start fr-mb-2w">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <!-- Checkbox de sélection -->
+                                            <div class="card-resource__body fr-p-3v">
+                                                <!-- Checkbox de sélection + Catégorie -->
+                                                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
+                                                    <div class="card-resource__category rounded-top d-flex align-items-center">
                                                         <input type="checkbox"
-                                                               class="fr-checkbox"
+                                                               class="fr-checkbox fr-mr-2v"
                                                                :id="'co-reco-select-' + resource.id"
                                                                :checked="isCoRecoSelected(resource.id)"
                                                                @click.stop
                                                                @change="toggleCoRecoSelection(resource.id)">
-                                                        <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Ressource</span>
-                                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
-                                                              x-show="resource.category"
-                                                              x-text="resource.category"></span>
+                                                        <span class="card-resource__category--badge bg-color-green fr-mr-1v"></span>
+                                                        <span class="card-resource__category--name"
+                                                              x-text="resource.category || 'Ressource'"></span>
                                                     </div>
                                                     <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
                                                           x-show="resource.coOccurrenceScore"
@@ -246,30 +246,27 @@
                                                         <span x-text="resource.coOccurrenceScore"></span>
                                                     </span>
                                                 </div>
-                                                <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 80)"></h4>
-                                                <p class="card-text fr-text--sm text-secondary"
-                                                   x-html="parseMarkdown(truncate(resource.content, 120))"></p>
+                                                <!-- Titre -->
+                                                <div class="card-resource__title">
+                                                    <a href="#"
+                                                       @click.prevent.stop="openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'Resource', label: 'co-reco' })"
+                                                       x-text="truncate(resource.title, 80)"></a>
+                                                </div>
+                                                <!-- Description -->
+                                                <div class="card-resource__text"
+                                                     x-html="parseMarkdown(truncate(resource.content, 120))"></div>
                                                 <!-- Tags -->
-                                                <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
-                                                    <div class="d-flex flex-wrap gap-1">
+                                                <div class="card-resource__departments"
+                                                     x-show="resource.tags && resource.tags.length > 0">
+                                                    <span class="card-resource__footer--label fr-icon-tag-line fr-icon--sm fr-btn--icon-left">
                                                         <template x-for="(tag, tagIdx) in (resource.tags || []).slice(0, 3)"
                                                                   :key="tagIdx">
-                                                            <span class="fr-badge fr-badge--sm fr-badge--grey"
-                                                                  x-text="truncate(tag.name || tag, 20)"></span>
+                                                            <span x-text="(tagIdx > 0 ? ', ' : '') + truncate(tag.name || tag, 15)"></span>
                                                         </template>
                                                         <span x-show="(resource.tags || []).length > 3"
-                                                              class="fr-badge fr-badge--sm fr-badge--grey"
-                                                              x-text="'+' + ((resource.tags || []).length - 3)"></span>
-                                                    </div>
+                                                              x-text="' +' + ((resource.tags || []).length - 3)"></span>
+                                                    </span>
                                                 </div>
-                                            </div>
-                                            <div class="card-footer bg-transparent">
-                                                <button @click.stop="openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'Resource', label: 'co-reco' })"
-                                                        class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                                        x-show="resource.resourceId">
-                                                    <span class="fr-icon-eye-line fr-mr-1v" aria-hidden="true"></span>
-                                                    Voir la fiche
-                                                </button>
                                             </div>
                                         </div>
                                     </div>

@@ -21,14 +21,11 @@
   }
 
   &--selected {
-    border-color: var(--light-accent-green-emeraude, #00a95f);
-    background-color: var(
-      --light-background-action-low-green-emeraude,
-      #e3fdeb
-    );
+    border-color: var(--light-accent-blue-france, #000091);
+    background-color: var(--background-alt-blue-france);
 
     &:hover {
-      border-color: var(--light-accent-green-emeraude, #00a95f);
+      border-color: var(--light-accent-blue-france, #000091);
     }
   }
 
@@ -304,57 +301,65 @@
   }
 }
 
-// Co-recommandations (Etape 2)
+// Co-recommandations (Etape 2) - utilise le style card-resource
 .exploration-ia-co-reco {
   transition: all 0.2s ease-in-out;
   border: 2px solid var(--light-border-default-grey, #e5e5e5);
+  max-height: none; // Override card-resource max-height
 
   &:hover {
-    border-color: var(--light-accent-green-emeraude, #00a95f);
+    border-color: var(--light-accent-blue-france, #000091);
     box-shadow: 0 4px 12px rgba(0, 169, 95, 0.15);
+    transform: translateY(-2px);
   }
 
   &--selected {
-    border-color: var(--light-accent-green-emeraude, #00a95f);
-    background-color: var(
-      --light-background-action-low-green-emeraude,
-      #e3fdeb
-    );
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
+    border-color: var(--light-accent-blue-france, #000091);
 
     &:hover {
-      border-color: var(--light-accent-green-emeraude, #00a95f);
+      border-color: var(--light-accent-blue-france, #000091);
+    }
+
+    .card-resource__body {
+      background-color: transparent;
     }
   }
 
-  .card-title {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--light-text-title-grey, #161616);
+  // Styles spécifiques pour card-resource dans ce contexte
+  .card-resource__category {
+    padding-bottom: 0;
   }
 
-  .card-text {
-    overflow: hidden;
-    display: -webkit-box;
+  .card-resource__title {
+    margin-bottom: 8px;
+
+    a {
+      color: var(--light-text-action-high-blue-france, #000091);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .card-resource__text {
     -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    color: var(--light-text-mention-grey, #666);
-    font-size: 0.85rem;
+    line-clamp: 3;
+    padding-bottom: 8px;
   }
 
-  .card-footer {
-    font-size: 0.8rem;
-    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+  .card-resource__departments {
+    margin-top: auto;
   }
 
   input[type='checkbox'] {
     width: 1.25rem;
     height: 1.25rem;
     cursor: pointer;
-    accent-color: var(--light-accent-green-emeraude, #00a95f);
+    accent-color: var(--light-accent-blue-france, #000091);
+    flex-shrink: 0;
   }
 }
 
@@ -369,11 +374,11 @@
   }
 
   &--co-reco {
-    border-left: 3px solid var(--light-accent-green-emeraude, #00a95f);
+    border-left: 3px solid var(--light-accent-blue-france, #000091);
 
     &:hover {
-      border-color: var(--light-accent-green-emeraude, #00a95f);
-      border-left-color: var(--light-accent-green-emeraude, #00a95f);
+      border-color: var(--light-accent-blue-france, #000091);
+      border-left-color: var(--light-accent-blue-france, #000091);
     }
   }
 
