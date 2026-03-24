@@ -15,7 +15,7 @@ from django.http import HttpRequest
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
-from recoco.apps.communication.digests import normalize_user_name
+from recoco.apps.communication.helpers import normalize_user_name
 from recoco.apps.invites import models as invites
 from recoco.apps.projects import models as projects
 from recoco.apps.projects import signals as projects_signals
@@ -25,9 +25,7 @@ from recoco.utils import build_absolute_url
 def notify_new_project(
     site: sites.Site, project: projects.Project, owner: auth.User
 ) -> None:
-    """Create notification of new project"""
-
-    # notify project submission
+    """Create notification and log of new project"""
     projects_signals.project_submitted.send(
         sender=projects.Project,
         site=site,

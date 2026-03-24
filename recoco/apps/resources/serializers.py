@@ -77,6 +77,8 @@ class ResourceDetailSerializer(ResourceSerializer):
             "updated_on",
             "nb_uses",
             "contacts",
+            "expires_on",
+            "expired",
         ]
         read_only_fields = ResourceSerializer.Meta.read_only_fields + [
             "created_on",

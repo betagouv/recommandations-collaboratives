@@ -4,6 +4,19 @@
     {% if not topic_list %}
         {% regroup feed by topic as topic_list %}
     {% endif %}
+    <!-- Shared contents header -->
+    <template x-if="countOf.isLoaded && (countOf.tasks > 0 || countOf.documents > 0)">
+        <div class="shared-contents-header fr-mb-2w fr-pb-2w" style="border-bottom: 1px solid var(--border-default-grey, #e5e5e5);">
+            <button type="button"
+                    class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                    @click="$store.sharedContentsPanel.open()">
+                <span class="fr-icon fr-icon-file-text-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`" x-show="countOf.tasks > 0"></span>
+                <span x-show="countOf.tasks > 0 && countOf.documents > 0"> / </span>
+                <span x-text="`${countOf.documents} fichier${countOf.documents > 1 ? 's' : ''}`" x-show="countOf.documents > 0"></span>
+            </button>
+        </div>
+    </template>
     <!-- Loop through all messages -->
     <div class="conversation-new__container-topic">
         <template x-for="(element, index) in feed.elements">
@@ -22,8 +35,11 @@
                         <div class="notification-limit__line"></div>
                     </div>
                 </template>
-                <template x-if="element.type == 'message'">
-                    {% include "conversations/messages/message_item.html" %}
+                <template x-if="element.type == 'message' && element.in_reply_to">
+                    {% include "conversations/messages/message_item.html" with in_reply_to=True %}
+                </template>
+                <template x-if="element.type == 'message' && !element.in_reply_to">
+                    {% include "conversations/messages/message_item.html" with in_reply_to=False %}
                 </template>
                 <template x-if="element.type == 'activity'">
                     {% include "conversations/messages/fragments/type_followup_item.html" with element="node" %}

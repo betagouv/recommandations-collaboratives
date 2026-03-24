@@ -18,14 +18,13 @@
                             {{ action.actor.last_name|default:"" }}
                         </a>
                         <span class="text-dark fw-normal font-italic font-small">{{ action.actor.profile.organization.name|default:'' }}</span>
-                        <span class="d-inline-block">
                             <span class="d-inline">
                                 {% if action.verb == verbs.Project.INVITATION %}
                                     {% if action.action_object.role %}
                                         <span>a invité
-                                            <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
+                                            <strong class="fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                                             {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
-                                                <strong class="text-dark">conseiller·e</strong> sur le project
+                                                <strong class="text-dark">conseiller·e</strong> sur le dossier
                                             {% else %}
                                                 <strong class="text-dark">demandeur</strong>
                                             {% endif %}
@@ -39,60 +38,52 @@
                                         </span>
                                     {% endif %}
                                 {% else %}
-                                    {% if action.verb == verbs.Document.ADDED %}
-                                        a ajouté
-                                        {% if action.action_object.the_link %}un lien{% endif %}
-                                        {% if action.action_object.the_file %}un document{% endif %}
-                                        <a class="d-inline hover-underline"
-                                           href="{{ action.action_object.get_absolute_url }}">
-                                            {% if action.action_object %}"{{ action.action_object }}"{% endif %}
-                                        </a>
-                                        sur le dossier
+                                    {{ action.verb }}
+                                    {% if action.action_object.feed_label %}
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {{ action.action_object.feed_label }}
                                         </a>
-                                    {% else %}
-                                        {% if action.action_object.feed_label %}
-                                            {% if action.verb != verbs.Document.ADDED %}{{ action.verb }}{% endif %}
-                                            <a class="d-inline hover-underline"
-                                               href="{{ action.action_object.get_absolute_url }}">
-                                                {{ action.action_object.feed_label }}
-                                            </a>
-                                        {% else %}
-                                            <span>{{ action.verb }}</span>
-                                            {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
-                                                <a class="d-inline hover-underline"
-                                                   href="{{ action.action_object.get_absolute_url }}">
-                                                    {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
-                                                        ici
-                                                    {% else %}
-                                                        {% if action.action_object %}"{{ action.action_object }}"{% endif %}
-                                                    {% endif %}
-                                                </a>
+                                    {% elif action.verb == verbs.User.ADVISOR_REQUEST %}
+                                        {% for department in action.action_object.departments.all %}
+                                           {% with count=action.action_object.departments.count %}
+                                              {% if forloop.first %}sur le{{ count|pluralize }} département{{ count|pluralize }}{% endif %}
+                                              {{ department.name }} ({{ department.code }})
+                                              {% if not forloop.last %}, {% endif %}
+                                           {% endwith %}
+                                       {% empty %}
+                                           sur la France entière,
+                                       {% endfor %}
+                                        avec le commentaire : "{{ action.action_object.comment }}".
+                                    {% elif action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED and action.verb != verbs.Survey.STARTED %}
+                                        <a class="d-inline hover-underline"
+                                           href="{{ action.action_object.get_absolute_url }}">
+                                            {% if action.verb == verbs.Conversation.POST_MESSAGE or action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                ici
+                                            {% else %}
+                                                {% if action.action_object %}"{{ action.action_object }}"{% endif %}
                                             {% endif %}
-                                        {% endif %}
+                                        </a>
                                     {% endif %}
-                                    {% if action.target %}
-                                        {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
-                                            <div class="d-inline-block fr-ml-1v">
-                                                {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
-                                                    <span>à propos de</span>
-                                                {% else %}
-                                                    <span>sur le dossier</span>
-                                                {% endif %}
-                                                {% if action.target.get_absolute_url %}
-                                                    <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                                                {% else %}
-                                                    <strong class="fw-normal">{{ action.target }}</strong>
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
+                                {% endif %}
+                                {% if action.target %}
+                                    {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
+                                        <span class="fr-ml-1v">
+                                            {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                <span>à propos de</span>
+                                            {% else %}
+                                                <span>sur le dossier</span>
+                                            {% endif %}
+                                            {% if action.target.get_absolute_url %}
+                                                <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                            {% else %}
+                                                <strong class="fw-normal">{{ action.target }}</strong>
+                                            {% endif %}
+                                        </span>
                                     {% endif %}
                                 {% endif %}
                             </span>
                         </span>
-                    </span>
                 </div>
             </div>
         </div>

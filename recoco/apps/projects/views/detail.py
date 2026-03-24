@@ -120,16 +120,16 @@ def mark_notifications_as_seen(user, project):
     project_ct = ContentType.objects.get_for_model(project)
     notif_verbs = [
         # verbs.Conversation.PUBLIC_MESSAGE,
-        # verbs.Document.ADDED,  # FIXME to remove
         # verbs.Document.ADDED_FILE,
         # verbs.Document.ADDED_LINK,
         verbs.Project.BECAME_SWITCHTENDER,
         verbs.Project.BECAME_ADVISOR,
         verbs.Project.BECAME_OBSERVER,
-        verbs.Project.JOINED,
+        verbs.Project.JOINED_BY_INVITATION,
         verbs.Project.JOINED_OWNER,
         verbs.Project.NEW_OWNER,
         verbs.Project.SUBMITTED_BY,
+        verbs.Project.SUBMITTED_BY_ADVISOR,
         verbs.Project.VALIDATED,
         verbs.Project.VALIDATED_BY,
         verbs.Project.SET_INACTIVE,
@@ -311,6 +311,14 @@ def project_conversations_new(request, project_id=None):
         )
     )
 
+    # Get files from EDL (État des lieux) surveys
+    edl_files = list(
+        survey_models.Answer.objects.filter(session__project=project)
+        .exclude(attachment="")
+        .exclude(attachment__isnull=True)
+        .values("id", "attachment", "updated_on")
+    )
+
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -320,6 +328,7 @@ def project_conversations_new(request, project_id=None):
             "advising": advising,
             "advising_position": advising_position,
             "recipients": recipients_data,
+            "edl_files": edl_files,
         },
     )
 

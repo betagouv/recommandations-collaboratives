@@ -159,17 +159,19 @@ class ActivityUserSerializer(serializers.ModelSerializer):
 class ActivityProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ("model", "id", "name")
+        fields = ("model", "id", "name", "feed_label")
 
     model = serializers.ReadOnlyField(default="Project")
+    feed_label = serializers.ReadOnlyField()
 
 
 class ActivityTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ("model", "id", "intent")
+        fields = ("model", "id", "intent", "feed_label")
 
     model = serializers.ReadOnlyField(default="Task")
+    feed_label = serializers.ReadOnlyField()
 
 
 class GenericRelatedField(serializers.Field):

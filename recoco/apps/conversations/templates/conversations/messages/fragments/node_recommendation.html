@@ -14,79 +14,18 @@ Parameter Alpine:
     - recommendation : recommendation object
 {% endcomment %}
 <template x-if="tasks.length > 0">
-    <div x-data='{recommendation: null}'
-         x-init="recommendation = getRecommendationById(node.recommendation_id)"
+    <div x-data='{ recommendation: null }'
+         x-effect="recommendation = getRecommendationById(node.recommendation_id)"
          class="task-item rounded-3 fr-my-2v">
         <template x-if="recommendation">
-            <div>
-                <template x-if="recommendation.resource">
-                    <a :href="recommendation?.resource?.web_url"
-                       class="stretched-link"
-                       target="_blank"
-                       :title="`ouvrir la fiche ressource - nouvel onglet`"
-                       @click="await onClickRessourceConsummeNotification(recommendation, element)">
-                        <div>
-                            <p x-html="renderMarkdown(recommendation.content)"></p>
-                            <div class="task-item__resource"
-                                 :class="{'task-item__resource--bordered': !recommendation.visited}">
-                                <template x-if="!recommendation.visited">
-                                    <span class="badge text-white task-item__resource-badge"
-                                          x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
-                                </template>
-                                <template x-if="recommendation.topic">
-                                    <div class="task-item__topic"
-                                         :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
-                                        <span class="task-item__topic-icon"></span>
-                                        <p class="task-item__topic-name fr-mb-0"
-                                           x-text="recommendation.topic?.name"></p>
-                                    </div>
-                                </template>
-                                <template x-if="recommendation.resource">
-                                    <h4 class="fr-link" x-text="recommendation.intent"></h4>
-                                </template>
-                                <template x-if="!recommendation.resource">
-                                    <h4 x-text="recommendation.intent"></h4>
-                                </template>
-                                <template x-if="recommendation.resource">
-                                    <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
-                                       x-text="recommendation.resource.subtitle"></p>
-                                </template>
-                                <div class="d-flex justify-content-between">
-                                    {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
-                                    <template x-if="recommendation.resource">
-                                        <button class="fr-btn fr-btn--sm fr-btn--primary fr-mt-1w">Consulter</button>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </template>
-                <template x-if="!recommendation.resource">
-                    <div>
-                        <p x-html="renderMarkdown(recommendation.content)"></p>
-                        <div class="task-item__resource">
-                            <template x-if="recommendation.topic">
-                                <div class="task-item__topic"
-                                     :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
-                                    <span class="task-item__topic-icon"></span>
-                                    <p class="task-item__topic-name fr-mb-0"
-                                       x-text="recommendation.topic?.name"></p>
-                                </div>
-                            </template>
-                            <template x-if="recommendation.resource">
-                                <h4 class="fr-link" x-text="recommendation.intent"></h4>
-                            </template>
-                            <template x-if="!recommendation.resource">
-                                <h4 x-text="recommendation.intent"></h4>
-                            </template>
-                            <template x-if="recommendation.resource">
-                                <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
-                                   x-text="recommendation.resource.subtitle"></p>
-                            </template>
-                            {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
-                        </div>
-                    </div>
-                </template>
+            <div class="position-relative">
+                <div>
+                    <template x-if="recommendation.resource">
+                        <p class="rendered-markdown rendered-markdown--margin-lg"
+                           x-html="renderMarkdown(recommendation.content)"></p>
+                    </template>
+                    {% include "conversations/messages/fragments/recommendation_card_content.html" %}
+                </div>
             </div>
         </template>
     </div>

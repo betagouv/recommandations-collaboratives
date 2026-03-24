@@ -54,6 +54,7 @@ SITE_GROUP_PERMISSIONS = {
     "advisor": (
         "sites.list_projects",
         "sites.use_addressbook",
+        "sites.change_addressbook",
         "sites.manage_resources",
     ),
 }
