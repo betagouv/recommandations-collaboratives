@@ -64,7 +64,7 @@
                         <template x-for="code in selectedCodes" :key="code">
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
-                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Territoire :" extra_classes="inline-chevron" %}
+                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
                 </div>
             </div>
