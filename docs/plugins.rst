@@ -124,13 +124,13 @@ hooks:
 
     class ProjectSpec:
         @hookspec
-        def tab_entries(self):
+        def project_tab_entries(self):
             """Return a list of (url_name, label) tuples to add as project tabs.
 
             Each plugin that implements this hook contributes one or more
             entries.  The core collects all results with::
 
-                pm.hook.tab_entries()
+                pm.hook.project_tab_entries()
 
             which returns a list of lists (one per registered plugin).
             """
@@ -164,7 +164,7 @@ the project-detail view.  Add the spec to ``ProjectSpec``:
     # recoco/apps/plugins/hooks.py
     class ProjectSpec:
         @hookspec
-        def tab_entries(self):
+        def project_tab_entries(self):
             """Return a list of (url_name, label) tuples to add as project tabs."""
 
         @hookspec
@@ -218,7 +218,7 @@ Plugins implement hooks defined by the core using ``pluggy``.
         urls_module = "plugin_giphy.urls"
 
         @hookimpl
-        def tab_entries(self):
+        def project_tab_entries(self):
             """Inject a "Giphy" tab on every project page."""
             return ("plugin_giphy:search", "Giphy")
 
