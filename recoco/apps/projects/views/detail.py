@@ -23,6 +23,7 @@ from django.views.generic import DetailView
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
+from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -95,6 +96,7 @@ class ProjectDetailBaseView(LoginRequiredMixin, DetailView):
         advising, advising_position = get_advising_context_for_project(
             self.request.user, self.object
         )
+
         context["advising"] = advising
         context["advising_position"] = advising_position
 
@@ -133,6 +135,10 @@ class ProjectDetailBaseView(LoginRequiredMixin, DetailView):
                 )
 
         context["invite_form"] = InviteForm()
+
+        # load plugin hook for adding tab entries
+        pm = get_tenant_hook(self.request)
+        context["plugin_tabs"] = pm.hook.project_tab_entries()
 
         return context
 
