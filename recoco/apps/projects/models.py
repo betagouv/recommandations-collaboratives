@@ -884,6 +884,11 @@ class Note(models.Model):
     def __str__(self):  # pragma: nocover
         return f"Note: #{self.id}"
 
+    def save(self, **kwargs):
+        if self.pk:
+            self.updated_on = timezone.now()
+        super().save(**kwargs)
+
 
 class DocumentManager(models.Manager):
     """Manager for active document"""
