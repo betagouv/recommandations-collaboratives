@@ -6,6 +6,12 @@
   &__stepper {
     margin-bottom: 2rem;
   }
+
+  &__context {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--light-text-title-grey, #161616);
+  }
 }
 
 .exploration-ia-card {
