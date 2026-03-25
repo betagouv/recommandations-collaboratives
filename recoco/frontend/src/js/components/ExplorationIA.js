@@ -860,6 +860,44 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     return this.coRecommendations.filter((r) => this.selectedCoRecoIds.includes(r.id));
   },
 
+  // Combine toutes les ressources sélectionnées (étape 1 + étape 2) pour la synthèse
+  getAllSelectedResources() {
+    const allResources = [];
+
+    // Ajouter les citations de l'étape 1
+    this.selectedCitationsForStep2.forEach((citation) => {
+      allResources.push({
+        id: citation.label,
+        title: citation.title,
+        content: citation.content,
+        source_type: citation.source_type,
+        resource_id: citation.resource_id,
+        reco_id: citation.reco_id,
+        project_id: citation.project_id,
+        label: citation.label,
+        chunkTexts: citation.chunkTexts || [],
+        fromStep: 1,
+      });
+    });
+
+    // Ajouter les co-recommandations de l'étape 2
+    this.getSelectedCoRecommendations().forEach((resource) => {
+      allResources.push({
+        id: resource.id,
+        title: resource.title,
+        content: resource.content,
+        source_type: 'Resource',
+        resource_id: resource.resourceId || resource.id,
+        category: resource.category,
+        tags: resource.tags,
+        coOccurrenceScore: resource.coOccurrenceScore,
+        fromStep: 2,
+      });
+    });
+
+    return allResources;
+  },
+
   getCitationByLabel(label) {
     return this.citations.find((c) => c.label === label);
   },

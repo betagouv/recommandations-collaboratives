@@ -447,87 +447,47 @@
                                 Ressources sélectionnées pour votre recommandation
                             </p>
                             <p class="fr-callout__text">
-                                Vous avez sélectionné <strong x-text="selectedCitationsForStep2.length + getSelectedCoRecommendations().length"></strong> ressource(s)
+                                Vous avez sélectionné <strong x-text="getAllSelectedResources().length"></strong> ressource(s)
                                 au cours de votre exploration. Utilisez-les pour créer une nouvelle recommandation.
                             </p>
                         </div>
-                        <!-- Section 1 : Ressources de l'étape 1 (sources de la recherche initiale) -->
+                        <!-- Ressources sélectionnées (étapes 1 et 2 combinées) -->
                         <div class="exploration-ia-synthesis__section fr-mb-4w"
-                             x-show="selectedCitationsForStep2.length > 0"
-                             data-test-id="exploration-ia-step1-resources">
+                             x-show="getAllSelectedResources().length > 0"
+                             data-test-id="exploration-ia-all-resources">
                             <h3 class="d-flex align-items-center gap-2 fr-mb-2w">
-                                <span class="fr-icon-search-line" aria-hidden="true"></span>
-                                Ressources de la recherche initiale
+                                <span class="fr-icon-file-text-line" aria-hidden="true"></span>
+                                Ressources sélectionnées
                                 <span class="fr-badge fr-badge--sm fr-badge--blue-france"
-                                      x-text="selectedCitationsForStep2.length"></span>
+                                      x-text="getAllSelectedResources().length"></span>
                             </h3>
-                            <p class="fr-text--sm text-secondary fr-mb-3w">Sources sélectionnées lors de l'étape 1 de votre exploration.</p>
+                            <p class="fr-text--sm text-secondary fr-mb-3w">Toutes les ressources sélectionnées au cours de votre exploration.</p>
                             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-                                <template x-for="citation in selectedCitationsForStep2" :key="citation.label">
+                                <template x-for="resource in getAllSelectedResources()" :key="resource.id">
                                     <div class="col">
-                                        <div class="card h-100 exploration-ia-synthesis-card">
+                                        <div class="card h-100 exploration-ia-synthesis-card"
+                                             :class="{ 'exploration-ia-synthesis-card--co-reco': resource.fromStep === 2 }">
                                             <div class="card-body">
                                                 <div class="d-flex justify-content-between align-items-start fr-mb-2w">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <span class="fr-badge fr-badge--sm"
-                                                              :class="{ 'fr-badge--green-emeraude': citation.source_type === 'Resource', 'fr-badge--purple-glycine': citation.source_type === 'Recommendation' }"
-                                                              x-text="citation.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
-                                                    </div>
-                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
-                                                          x-text="'#' + citation.label"></span>
-                                                </div>
-                                                <h4 class="card-title fr-text--md" x-text="truncate(citation.title, 60)"></h4>
-                                                <p class="card-text fr-text--sm text-secondary"
-                                                   x-text="truncate(citation.content, 100)"></p>
-                                            </div>
-                                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                                                <a :href="getCitationUrl(citation)"
-                                                   class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                                   target="_blank"
-                                                   x-show="getCitationUrl(citation)">Voir la fiche</a>
-                                                <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '') + '&content=' + encodeURIComponent((citation.chunkTexts || []).join('\n\n'))"
-                                                   class="fr-btn fr-btn--primary fr-btn--sm"
-                                                   target="_blank"
-                                                   x-show="citation.resource_id"
-                                                   title="Créer une recommandation à partir de cette ressource">
-                                                    <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
-                                                    Créer une recommandation
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                        <!-- Section 2 : Ressources de l'étape 2 (co-recommandations) -->
-                        <div class="exploration-ia-synthesis__section fr-mb-4w"
-                             x-show="getSelectedCoRecommendations().length > 0"
-                             data-test-id="exploration-ia-step2-resources">
-                            <h3 class="d-flex align-items-center gap-2 fr-mb-2w">
-                                <span class="fr-icon-links-line" aria-hidden="true"></span>
-                                Ressources co-recommandées
-                                <span class="fr-badge fr-badge--sm fr-badge--green-emeraude"
-                                      x-text="getSelectedCoRecommendations().length"></span>
-                            </h3>
-                            <p class="fr-text--sm text-secondary fr-mb-3w">Ressources fréquemment associées, sélectionnées lors de l'étape 2.</p>
-                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-                                <template x-for="resource in getSelectedCoRecommendations()" :key="resource.id">
-                                    <div class="col">
-                                        <div class="card h-100 exploration-ia-synthesis-card exploration-ia-synthesis-card--co-reco">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start fr-mb-2w">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">Ressource</span>
+                                                              :class="{ 'fr-badge--green-emeraude': resource.source_type === 'Resource', 'fr-badge--purple-glycine': resource.source_type === 'Recommendation' }"
+                                                              x-text="resource.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
                                                         <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                                               x-show="resource.category"
                                                               x-text="resource.category"></span>
                                                     </div>
-                                                    <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
-                                                          x-show="resource.coOccurrenceScore"
-                                                          :title="'Score de co-occurrence'">
-                                                        <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-                                                        <span x-text="resource.coOccurrenceScore"></span>
-                                                    </span>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
+                                                              x-show="resource.coOccurrenceScore"
+                                                              :title="'Score de co-occurrence'">
+                                                            <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                            <span x-text="resource.coOccurrenceScore"></span>
+                                                        </span>
+                                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                              x-show="resource.label"
+                                                              x-text="'#' + resource.label"></span>
+                                                    </div>
                                                 </div>
                                                 <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 60)"></h4>
                                                 <p class="card-text fr-text--sm text-secondary"
@@ -544,17 +504,17 @@
                                                 </div>
                                             </div>
                                             <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                                                <a :href="'/ressource/' + resource.resourceId + '/'"
+                                                <a :href="resource.resource_id ? '/ressource/' + resource.resource_id + '/' : (resource.reco_id && resource.project_id ? '/project/' + resource.project_id + '/actions/#action-' + resource.reco_id : '')"
                                                    class="fr-btn fr-btn--tertiary fr-btn--sm"
                                                    target="_blank"
-                                                   x-show="resource.resourceId">
+                                                   x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
                                                     <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
                                                     Voir la fiche
                                                 </a>
-                                                <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + resource.resourceId"
+                                                <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
                                                    class="fr-btn fr-btn--primary fr-btn--sm"
                                                    target="_blank"
-                                                   x-show="resource.resourceId"
+                                                   x-show="resource.resource_id"
                                                    title="Créer une recommandation à partir de cette ressource">
                                                     <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
                                                     Créer une recommandation
