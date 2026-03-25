@@ -789,18 +789,41 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   getSelectedCitations() {
     // Récupérer les citations uniques liées aux chunks sélectionnés
+    // avec les textes des chunks associés (reformulations IA)
     const citations = [];
+
+    console.log('getSelectedCitations - selectedChunks:', this.selectedChunks);
+    console.log('getSelectedCitations - answerChunks:', this.answerChunks);
+    console.log('getSelectedCitations - this.citations:', this.citations);
+
     this.selectedChunks.forEach((index) => {
       const chunk = this.answerChunks[index];
+      console.log('getSelectedCitations - processing chunk at index', index, ':', chunk);
+
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
           const citation = this.getCitationByLabel(label);
-          if (citation && !citations.find((c) => c.label === citation.label)) {
-            citations.push({ ...citation });
+          console.log('getSelectedCitations - label:', label, 'citation found:', citation);
+
+          if (citation) {
+            const existingCitation = citations.find((c) => c.label === citation.label);
+            if (existingCitation) {
+              // Ajouter le texte du chunk s'il n'est pas déjà présent
+              if (chunk.text && !existingCitation.chunkTexts.includes(chunk.text)) {
+                existingCitation.chunkTexts.push(chunk.text);
+              }
+            } else {
+              citations.push({
+                ...citation,
+                chunkTexts: chunk.text ? [chunk.text] : [],
+              });
+            }
           }
         });
       }
     });
+
+    console.log('getSelectedCitations - final citations:', citations);
     return citations;
   },
 

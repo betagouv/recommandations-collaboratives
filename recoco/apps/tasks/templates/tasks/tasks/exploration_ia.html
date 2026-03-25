@@ -18,37 +18,10 @@
 {% block content %}
     <div class="row justify-content-center">
         <!-- djlint:off -->
-                                <div class="col-10 fr-p-3w"
-                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}` })"
-                                            data-test-id="exploration-ia-container">
+                                                <div class="col-10 fr-p-3w"
+                                                            x-data="ExplorationIA({ projectId: {{ project.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}{% if project.commune %} - {{ project.commune.name }}{% endif %}{% if project.description %}. {{ project.description|escapejs }}{% endif %}` })"
+                                                            data-test-id="exploration-ia-container">
         <!-- djlint:on -->
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-start fr-mb-3w">
-            <div>
-                <h1 class="fr-mb-1w" data-test-id="exploration-ia-title">Exploration assistée des ressources</h1>
-                <p class="text-secondary fr-mb-0" data-test-id="exploration-ia-subtitle">
-                    Découvrez des ressources pertinentes pour votre projet grâce à l'intelligence artificielle
-                </p>
-            </div>
-            <!-- Token API -->
-            <div class="fr-input-group fr-mb-3w"
-                 data-test-id="exploration-ia-token-group">
-                <label class="fr-label" for="exploration-api-token">Token API</label>
-                <input class="fr-input"
-                       type="password"
-                       id="exploration-api-token"
-                       x-model="apiToken"
-                       placeholder="Saisissez votre token..."
-                       data-test-id="exploration-ia-token-input">
-            </div>
-            <button @click="resetExploration()"
-                    class="fr-btn fr-btn--secondary fr-btn--sm"
-                    x-show="currentPhase > 1 || results.length > 0"
-                    data-test-id="exploration-ia-reset-btn">
-                <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
-                Recommencer
-            </button>
-        </div>
         <!-- Stepper DSFR -->
         <div class="fr-stepper fr-mb-3w" data-test-id="exploration-ia-stepper">
             <h2 class="fr-stepper__title">
@@ -511,7 +484,7 @@
                                                class="fr-btn fr-btn--tertiary fr-btn--sm"
                                                target="_blank"
                                                x-show="getCitationUrl(citation)">Voir la fiche</a>
-                                            <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '')"
+                                            <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '') + '&content=' + encodeURIComponent((citation.chunkTexts || []).join('\n\n'))"
                                                class="fr-btn fr-btn--primary fr-btn--sm"
                                                target="_blank"
                                                x-show="citation.resource_id"
@@ -615,7 +588,7 @@
                                            target="_blank"
                                            x-show="getCitationUrl(citation)"
                                            title="Voir la fiche"></a>
-                                        <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '')"
+                                        <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (citation.resource_id || '') + '&content=' + encodeURIComponent((citation.chunkTexts || []).join('\n\n'))"
                                            class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-ml-1v"
                                            target="_blank"
                                            x-show="citation.resource_id"
@@ -741,17 +714,6 @@
                     </div>
                     <!-- Contenu (ressource OU recommandation) -->
                     <div x-show="hasModalContent() && !resourceModal.isLoading && !resourceModal.error">
-                        <!-- Passage cité (mis en avant) -->
-                        <div class="exploration-ia-modal__citation fr-mb-3w"
-                             x-show="resourceModal.citation?.content">
-                            <p class="fr-text--sm fr-text--bold fr-mb-1w">
-                                <span class="fr-icon-quote-line fr-mr-1v" aria-hidden="true"></span>
-                                Passage pertinent identifié
-                            </p>
-                            <blockquote class="exploration-ia-modal__blockquote"
-                                        x-text="resourceModal.citation?.content">
-                            </blockquote>
-                        </div>
                         <!-- CAS 1 : Contenu de la RESSOURCE -->
                         <template x-if="resourceModal.resource">
                             <div>
