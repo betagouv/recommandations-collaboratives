@@ -41,6 +41,7 @@
                         <hr />
                         <form class="form d-flex align-items-end flex-column"
                               method="post"
+                              enctype="multipart/form-data"
                               x-data="{message: {text: '', contact: ''}}"
                               action="{% url 'projects-create-note' project.pk %}">
                             {% csrf_token %}
