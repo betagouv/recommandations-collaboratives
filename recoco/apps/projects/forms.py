@@ -8,6 +8,7 @@ created : 2021-12-14 10:36:20 CEST
 """
 
 from django import forms
+from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
@@ -28,26 +29,40 @@ class NoteForm(forms.ModelForm):
         model = models.Note
         fields = ["content", "contact"]
 
-    content = MarkdownxFormField()
+    content = MarkdownxFormField(required=False)
+    the_file = forms.FileField(required=False)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.project = kwargs["project"]
-        self.sender = kwargs["sender"]
-        self.site = kwargs["site"]
+    def __init__(self, data=None, **kwargs):
+        self.project = kwargs.pop("project")
+        self.sender = kwargs.pop("sender")
+        self.site = kwargs.pop("site")
+        super().__init__(data, **kwargs)
         self.fields["contact"].queryset = Contact.objects.filter(site_id=self.site.id)
 
     def save(self, **kwargs):
         instance = super().save(commit=False)
-        if self.created:
+        if not self.instance.pk:  # creation state
             instance.project = self.project
             instance.created_by = self.sender
             instance.site = self.site
         else:
             instance.updated_on = timezone.now()
+        doc = None
 
-        if kwargs.get("commit", True):
+        if self.cleaned_data.get("the_file", None):
+            doc = models.Document(
+                the_file=self.cleaned_data["the_file"],
+                project=self.project,
+                uploaded_by=self.sender,
+                attached_object=instance,
+                private=True,
+            )
+
+        with transaction.atomic():
             instance.save()
+            if doc:
+                doc.save()
+
         return instance
 
 
