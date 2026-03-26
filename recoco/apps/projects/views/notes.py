@@ -32,7 +32,11 @@ def create_private_note(request, project_id=None):
 
     if request.method == "POST":
         form = NoteForm(
-            request.POST, sender=request.user, project=project, site=request.site
+            request.POST,
+            files=request.FILES,
+            sender=request.user,
+            project=project,
+            site=request.site,
         )
 
         if form.is_valid():

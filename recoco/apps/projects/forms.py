@@ -55,6 +55,7 @@ class NoteForm(forms.ModelForm):
                 project=self.project,
                 uploaded_by=self.sender,
                 attached_object=instance,
+                site=self.site,
                 private=True,
             )
 
