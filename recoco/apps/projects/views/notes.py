@@ -18,7 +18,7 @@ from django.utils import timezone
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
-from ..forms import NoteForm, StaffNoteForm
+from ..forms import NoteForm
 from ..utils import can_administrate_project
 from .documents import document_upload
 
@@ -79,7 +79,7 @@ def update_private_note(request, note_id=None):
 
     if request.method == "POST":
         if is_advisor:
-            form = StaffNoteForm(
+            form = NoteForm(
                 request.POST,
                 instance=note,
                 sender=request.user,
@@ -108,7 +108,7 @@ def update_private_note(request, note_id=None):
             )
     else:
         if is_advisor:
-            form = StaffNoteForm(
+            form = NoteForm(
                 instance=note, sender=request.user, project=project, site=request.site
             )
         else:

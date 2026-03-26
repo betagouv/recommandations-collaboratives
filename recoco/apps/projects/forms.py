@@ -67,12 +67,6 @@ class NoteForm(forms.ModelForm):
         return instance
 
 
-class StaffNoteForm(NoteForm):
-    class Meta:
-        model = models.Note
-        fields = ["content", "contact"]
-
-
 class PrivateNoteForm(forms.ModelForm):
     """Private Note creation"""
 
