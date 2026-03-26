@@ -54,13 +54,13 @@ class NoteForm(forms.ModelForm):
                 the_file=self.cleaned_data["the_file"],
                 project=self.project,
                 uploaded_by=self.sender,
-                attached_object=instance,
                 site=self.site,
                 private=True,
             )
 
         with transaction.atomic():
             instance.save()
+            doc.attached_object = instance
             if doc:
                 doc.save()
 
