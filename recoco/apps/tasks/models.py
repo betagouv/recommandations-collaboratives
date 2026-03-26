@@ -236,7 +236,7 @@ class Task(OrderedModel):
 
     def get_absolute_url(self):
         return (
-            reverse("projects-project-detail-actions", args=[self.project.id])
+            reverse("projects-project-detail-conversations", args=[self.project.id])
             + f"#action-{self.pk}"
         )
 
@@ -303,11 +303,7 @@ class TaskFollowup(models.Model):
         return self.task.feed_label()
 
     def get_absolute_url(self):
-        task = self.task
-        return (
-            reverse("projects-project-detail-actions", args=[task.project.id])
-            + f"#action-{task.pk}"
-        )
+        return self.task.get_absolute_url()
 
 
 class TaskFollowupRsvp(models.Model):

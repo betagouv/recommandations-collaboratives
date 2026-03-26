@@ -376,8 +376,7 @@ def make_action_digest(action, user):
         return
 
     action_link = utils.build_absolute_url(
-        reverse("projects-project-detail-actions", args=[action.project_id])
-        + f"#action-{action.id}",
+        action.get_absolute_url(),
         auto_login_user=user,
     )
     return {
