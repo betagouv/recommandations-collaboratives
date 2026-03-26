@@ -20,6 +20,7 @@ from recoco.utils import has_perm, has_perm_or_403
 from .. import models, signals
 from ..forms import NoteForm, StaffNoteForm
 from ..utils import can_administrate_project
+from .documents import document_upload
 
 
 @login_required
@@ -48,6 +49,11 @@ def create_private_note(request, project_id=None):
                 project=project,
                 user=request.user,
             )
+
+            if instance.document.exists():
+                signals.document_uploaded.send(
+                    sender=document_upload, instance=instance.document.first()
+                )
 
             return redirect(
                 reverse("projects-project-detail-internal-followup", args=[project_id])
