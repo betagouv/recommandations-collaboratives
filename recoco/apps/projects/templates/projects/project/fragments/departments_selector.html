@@ -35,7 +35,8 @@
              type="button"
              :class="{'input-active':open}">
             <button class="input-field bg-transparent fr-px-2w fw-normal text-gray-800 appearance-none no-wrap"
-                    data-cy="check-display-project">{{ label |default:"Dossiers de mon territoire" }}</button>
+                    data-cy="check-display-project"
+                    x-text="label"></button>
             {% if "inline-chevron" in extra_classes %}
             <svg xmlns="http://www.w3.org/2000/svg"
                  class="departments-selector__chevron"
