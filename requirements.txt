@@ -1801,9 +1801,9 @@ regex==2024.11.6 \
     --hash=sha256:f9d1e379028e0fc2ae3654bac3cbbef81bf3fd571272a42d56c24007979bafb6 \
     --hash=sha256:fdd6028445d2460f33136c55eeb1f601ab06d74cb3347132e1c24250187500d9
     # via parsimonious
-requests==2.32.4 \
-    --hash=sha256:27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c \
-    --hash=sha256:27d0316682c8a29834d3264820024b62a36942083d52caf2f14c0591336d3422
+requests==2.33.0 \
+    --hash=sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b \
+    --hash=sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652
     # via
     #   apeye
     #   cachecontrol
@@ -2076,9 +2076,9 @@ sphinx-jinja2-compat==0.3.0 \
 sphinx-js==4.0.0 \
     --hash=sha256:a467fdf3b114951251166043127edced6c99940d1221516a539f08158cee36de \
     --hash=sha256:f943536a5592d0f7e05115dda9b608d3949ada8b4a6b6c91b6eb3739c5cb30bf
-sphinx-prompt==1.10.0 \
-    --hash=sha256:23dca4c07ade840c9e87089d79d3499040fa524b3c422941427454e215fdd111 \
-    --hash=sha256:d62f7a1aa346225d30222a271dc78997031204a5f199ce5006c14ece0d94b217
+sphinx-prompt==1.10.2 \
+    --hash=sha256:47b592ba75caebd044b0eddf7a5a1b6e0aef6df587b034377cd101a999b686ba \
+    --hash=sha256:6594337962c4b1498602e6984634bed4a0dc7955852e3cfc255eb0af766ed859
     # via sphinx-toolbox
 sphinx-tabs==3.4.5 \
     --hash=sha256:92cc9473e2ecf1828ca3f6617d0efc0aa8acb06b08c56ba29d1413f2f0f6cf09 \
