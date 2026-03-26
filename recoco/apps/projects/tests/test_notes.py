@@ -9,6 +9,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import pytest
 from actstream.models import action_object_stream
+from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -59,6 +60,9 @@ def test_create_private_note_can_attach_document(request, client, project_ready)
         content_type="text/plain",
     )
 
+    other_advisor = baker.make(auth_models.User)
+    assign_advisor(other_advisor, project_ready)
+
     with login(client) as user:
         assign_advisor(user, project_ready)
 
@@ -81,6 +85,11 @@ def test_create_private_note_can_attach_document(request, client, project_ready)
     actions = action_object_stream(document)
     assert actions.count() == 1
     assert actions[0].verb == verbs.Document.ADDED_ADVISOR_FILE
+
+    # the notification should have been sent to another advisor
+    assert models.Notification.on_site.filter(
+        recipient=other_advisor, verb=verbs.Document.ADDED_ADVISOR_FILE
+    ).exists()
 
 
 @pytest.mark.django_db
