@@ -10,6 +10,7 @@ created: 2021-06-01 10:11:56 CEST
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -48,6 +49,38 @@ def test_create_private_note_available_for_advisor(request, client):
 
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-note"')
+
+
+@pytest.mark.django_db
+def test_create_private_note_can_attach_document(request, client, project_ready):
+    uploaded_file = SimpleUploadedFile(
+        "private-note-attachment.txt",
+        b"hello from a private note",
+        content_type="text/plain",
+    )
+
+    with login(client) as user:
+        assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-note", args=[project_ready.id]),
+            data={"content": "note with document", "the_file": uploaded_file},
+        )
+
+    assert response.status_code == 302
+
+    note = models.Note.on_site.get(project=project_ready)
+    assert note.document.count() == 1
+
+    document = note.document.first()
+    assert document.private
+    assert document.project == project_ready
+    assert document.uploaded_by == user
+    assert document.attached_object == note
+
+    actions = action_object_stream(document)
+    assert actions.count() == 1
+    assert actions[0].verb == verbs.Document.ADDED_ADVISOR_FILE
 
 
 @pytest.mark.django_db
