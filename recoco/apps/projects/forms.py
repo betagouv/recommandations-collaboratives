@@ -60,8 +60,8 @@ class NoteForm(forms.ModelForm):
 
         with transaction.atomic():
             instance.save()
-            doc.attached_object = instance
             if doc:
+                doc.attached_object = instance
                 doc.save()
 
         return instance

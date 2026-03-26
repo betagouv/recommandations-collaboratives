@@ -73,7 +73,13 @@ def update_private_note(request, note_id=None):
 
     if request.method == "POST":
         if is_advisor:
-            form = StaffNoteForm(request.POST, instance=note)
+            form = StaffNoteForm(
+                request.POST,
+                instance=note,
+                sender=request.user,
+                project=project,
+                site=request.site,
+            )
 
         else:
             form = NoteForm(
