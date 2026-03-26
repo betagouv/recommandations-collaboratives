@@ -45,7 +45,7 @@
                     {% endif %}
                 </div>
                 <!-- Fichiers partagés -->
-                {% include "projects/project/fragments/files_links/file_list.html" with files=public_files files_from_edl=answers_with_files.all %}
+                {% include "projects/project/fragments/files_links/file_list.html" with files=public_files files_from_edl=answers_with_files.all is_activate_pinning_action=True %}
                 <!-- Fichiers récupérés de l'état des lieux -->
                 {% for answer in answers_with_files.all %}
                     {% if answer.attachment %}
@@ -90,7 +90,7 @@
                     <hr />
                     <div data-test-id="private-files-section">
                         <h6 class="text-uppercase small fr-mb-0">Fichiers partagés dans l'espace conseiller</h6>
-                        {% include "projects/project/fragments/files_links/file_list.html" with files=private_files %}
+                        {% include "projects/project/fragments/files_links/file_list.html" with files=private_files is_activate_pinning_action=False %}
                     </div>
                 {% endif %}
             </div>
@@ -108,7 +108,7 @@
                 <div class="d-flex align-items-center justify-content-between fr-mb-2v fr-mt-3w fr-pt-2v">
                     <h6 class="text-uppercase small fr-mb-0">Fichiers épinglés</h6>
                 </div>
-                {% include "projects/project/fragments/files_links/file_list.html" with search=False files=pinned_files is_pinned=True %}
+                {% include "projects/project/fragments/files_links/file_list.html" with search=False files=pinned_files is_pinned=True is_activate_pinning_action=True %}
             </div>
         </div>
     </div>
