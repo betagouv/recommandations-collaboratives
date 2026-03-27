@@ -84,6 +84,10 @@
 .multi-select {
   &__container {
     border: 1px solid var(--light-border-default-grey, #e5e5e5);
+
+    &.multi-select--open {
+      outline: #0d6efd auto 1px;
+    }
   }
 
   &__input {
@@ -99,6 +103,12 @@
     color: var(--text-mention-grey, #666666);
     display: flex;
     flex-wrap: wrap;
+
+    &:focus,
+    &:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
   }
 
   &__selected-item {

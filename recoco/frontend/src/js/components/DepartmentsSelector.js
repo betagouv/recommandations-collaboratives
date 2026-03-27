@@ -16,10 +16,12 @@ Alpine.data(
   ) => {
     return {
       open: false,
+      allDepartments: [],
       territorySelectAll: true,
       myDepartmentsActive: false,
       userDepartments: userDepartments || [],
       regions: listZone,
+      label: 'Sélectionner les départements',
       async init() {
         try {
           if (!listZone && filterByRegions) {
@@ -36,6 +38,7 @@ Alpine.data(
           if (selectedDepartments) {
             this.initSelectedDepartments();
           }
+          this.allDepartments = await api.get(departmentsUrl()).then((response) => response.data);
         } catch (error) {
           throw new Error('Error fetching regions or departments', error);
         }
@@ -43,6 +46,8 @@ Alpine.data(
         if (selectAll) {
           this.handleTerritorySelectAll(selectAll, { init: true });
         }
+
+        this.handleSelectorPlaceholder(selectedDepartments);
 
         this.updateMyDepartmentsActive();
       },
@@ -120,6 +125,9 @@ Alpine.data(
             'selected-departments',
             this.extractDepartmentFromSelectedRegions(this.regions)
           );
+          this.handleSelectorPlaceholder(
+            this.extractDepartmentFromSelectedRegions(this.regions)
+          );
         } else if (this.departments) {
           this.departments = this.departments.map((department) => ({
             ...department,
@@ -129,6 +137,7 @@ Alpine.data(
           }));
           this.territorySelectAll = this.departments.every((d) => d.active);
           this.$dispatch('selected-departments', this.departments);
+          this.handleSelectorPlaceholder(this.departments);
         }
 
         this.myDepartmentsActive = willActivate;
@@ -153,6 +162,9 @@ Alpine.data(
             'selected-departments',
             this.extractDepartmentFromSelectedRegions(this.regions)
           );
+          this.handleSelectorPlaceholder(
+            this.extractDepartmentFromSelectedRegions(this.regions)
+          );
         }
         this.updateMyDepartmentsActive();
       },
@@ -174,6 +186,9 @@ Alpine.data(
           this.regions.length;
         this.$dispatch(
           'selected-departments',
+          this.extractDepartmentFromSelectedRegions(this.regions)
+        );
+        this.handleSelectorPlaceholder(
           this.extractDepartmentFromSelectedRegions(this.regions)
         );
         this.updateMyDepartmentsActive();
@@ -201,6 +216,9 @@ Alpine.data(
           'selected-departments',
           this.extractDepartmentFromSelectedRegions(this.regions)
         );
+        this.handleSelectorPlaceholder(
+          this.extractDepartmentFromSelectedRegions(this.regions)
+        );
         this.updateMyDepartmentsActive();
       },
       extractDepartmentFromSelectedRegions(regions) {
@@ -221,6 +239,7 @@ Alpine.data(
           active: this.territorySelectAll,
         }));
         this.$dispatch('selected-departments', this.departments);
+        this.handleSelectorPlaceholder(this.departments);
         this.updateMyDepartmentsActive();
       },
       handleTerritoryFilter(selectedDepartment, isInit = false) {
@@ -237,7 +256,27 @@ Alpine.data(
           this.departments.length;
 
         this.$dispatch('selected-departments', this.departments);
+        this.handleSelectorPlaceholder(this.departments);
         this.updateMyDepartmentsActive();
+      },
+      handleSelectorPlaceholder(checkedDepartments = []) {
+        if (checkedDepartments) {
+          if (checkedDepartments.length === 0) {
+            this.label = 'Aucun département sélectionné';
+          } else if (checkedDepartments.length === 1) {
+            this.label = `${checkedDepartments[0]}`;
+          } else if (checkedDepartments.length === this.allDepartments.length) {
+            this.label = 'Tous les départements';
+          } else if (checkedDepartments.length > 1) {
+            this.label = `${checkedDepartments.length} départements sélectionnés`;
+          } else {
+            this.label = `Mes départements`;
+          }
+        }
+        else {
+          this.label = 'Tous les départements';
+        }
+
       },
     };
   }
