@@ -25,6 +25,7 @@ from ..serializers import (
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
+    TaskWithMessageSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -94,7 +95,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         updated_object = serializer.save()
 
-        if original_object.public is False and updated_object.public is True:
+        if not original_object.public and updated_object.public:
             signals.action_created.send(
                 sender=self,
                 task=updated_object,
@@ -167,6 +168,47 @@ class TaskViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_304_NOT_MODIFIED)
+
+    @action(
+        methods=["post"],
+        detail=True,
+    )
+    def publish(self, request, project_id, pk):
+        task = self.get_object()
+
+        has_perm_or_403(self.request.user, "projects.manage_tasks", task.project)
+
+        instance = self.get_object()
+
+        if task.public:
+            return Response(
+                data="Recommendation has already been published",
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        instance.public = True
+        instance.save()
+
+        signals.action_created.send(
+            sender=self,
+            task=instance,
+            project=instance.project,
+            user=self.request.user,
+        )
+
+        message = (
+            instance.recommendationnode_set.filter(message__project=project_id)
+            .order_by("-message__created")
+            .first()
+            .message
+        )
+        instance.message = message
+        serializer = TaskWithMessageSerializer(
+            instance, context={"request": request, "message": message}
+        )
+        data = serializer.data
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 ########################################################################

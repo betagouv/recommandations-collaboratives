@@ -20,6 +20,7 @@ from recoco.apps.resources.serializers import (
 )
 from recoco.rest_api.serializers import BaseSerializerMixin
 
+from ..conversations.serializers import MessageSerializer
 from .models import Task, TaskFollowup
 
 
@@ -184,6 +185,43 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
                 f"Invalid resource ID {value} for site {self.current_site}."
             )
         return value
+
+
+class TaskWithMessageSerializer(TaskSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "status",
+            "visited",
+            "public",
+            "priority",
+            "order",
+            "intent",
+            "content",
+            "contact",
+            "contact_id",
+            "created_on",
+            "updated_on",
+            "created_by",
+            "document",
+            "resource",
+            "resource_id",
+            "topic",
+            "ds_folder",
+            "notifications",
+            "followups_count",
+            "comments_count",
+            "site",
+            "message",
+        ]
+        read_only_fields = [
+            "created_on",
+            "updated_on",
+            "created_by",
+        ]
+
+    message = MessageSerializer(read_only=True)
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
