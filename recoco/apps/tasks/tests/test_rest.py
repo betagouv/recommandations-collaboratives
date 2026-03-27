@@ -22,6 +22,7 @@ from recoco.apps.projects import utils
 from recoco.apps.resources.models import Resource
 from recoco.utils import login
 
+from ...conversations.models import Message
 from .. import models
 
 ########################################################################
@@ -704,6 +705,77 @@ def test_last_members_activity_is_updated_by_member_followup_via_rest(
     project.refresh_from_db()
 
     assert project.last_members_activity_at > before_update
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_publish_project_task_for_site(
+    request, client, project_ready, current_site
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(
+        models.Task, project=project_ready, site=current_site, public=False
+    )
+    utils.assign_collaborator(user, project_ready)
+
+    url = reverse("project-tasks-publish", args=[project_ready.id, task.id])
+    with login(client, user=user):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+    task.refresh_from_db()
+    assert task.public is False
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_publish_project_task_for_site(
+    request, client, project_ready, current_site
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(
+        models.Task, project=project_ready, site=current_site, public=False
+    )
+
+    utils.assign_advisor(user, project_ready)
+    assert not Message.objects.filter(
+        nodes__recommendationnode__recommendation_id=task.id
+    ).exists()
+
+    url = reverse("project-tasks-publish", args=[project_ready.id, task.id])
+    with login(client, user=user):
+        response = client.post(url)
+
+    assert response.status_code == 200
+    assert response.data["public"] is True
+    assert response.data["message"] is not None
+    assert Message.objects.filter(
+        nodes__recommendationnode__recommendation_id=task.id
+    ).exists()
+
+    task.refresh_from_db()
+    assert task.public is True
+
+
+@pytest.mark.django_db
+def test_project_user_cannot_publish_already_published_task(
+    request, client, project_ready, current_site
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(
+        models.Task, project=project_ready, site=current_site, public=True
+    )
+
+    utils.assign_advisor(user, project_ready)
+
+    url = reverse("project-tasks-publish", args=[project_ready.id, task.id])
+    with login(client, user=user):
+        response = client.post(url)
+
+    assert response.status_code == 422
+    assert response.data == "Recommendation has already been published"
+
+    task.refresh_from_db()
+    assert task.public is True
 
 
 @pytest.mark.django_db
