@@ -46,6 +46,10 @@ Alpine.store('sharedContentsPanel', {
     this.draftRecommendations = draftRecommendations;
   },
 
+  removeDraftRecommendation(recommendationId) {
+    this.draftRecommendations = this.draftRecommendations.filter((draft) => draft.id !== recommendationId);
+  },
+
   /**
    * Close the panel but mark that we want to re-open it when the detail panel closes
    * Used when navigating from shared contents list to recommendation detail

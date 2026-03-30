@@ -12,7 +12,8 @@ import api, {
   editTaskUrl,
   markTaskNotificationAsVisited,
   conversationsMessageMarkAsReadUrl,
-  resourcePreviewUrl
+  resourcePreviewUrl,
+  publishTaskUrl
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
@@ -346,15 +347,27 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   async publishDraftRecommendation(recommendation) {
     recommendation.isLoading = true;
-    const messageResponse = await this.$store.tasksData.patchTask(recommendation.id, { public: true });
-    // TODO Insert message into the conversation feed
-    this.feed.elements.push({
-      ...messageResponse.data,
-      type: 'message',
-    });
-    // extract shared contents
-    await this.extractSharedContents();
-    recommendation.isLoading = false;
+    try {
+      const messageResponse = await api.post(publishTaskUrl(this.projectId, recommendation.id));
+
+      this.feed.elements.push({
+        ...messageResponse.data.message,
+        type: 'message',
+      });
+      // extract shared contents
+      await this.extractSharedContents();
+      this.scrollToNewMessage();
+      // Update counts
+      this.countOf.tasks += 1;
+      this.countOf.draft_recommendations -= 1;
+      // Delete the draft recommendation from the tasks list
+      this.$store.sharedContentsPanel.removeDraftRecommendation(recommendation.id);
+
+    } catch (error) {
+      throw new Error('Failed to publish draft recommendation', error);
+    } finally {
+      recommendation.isLoading = false;
+    }
   },
   async sendFormMessage() {
     this.sendingMessage = true;
