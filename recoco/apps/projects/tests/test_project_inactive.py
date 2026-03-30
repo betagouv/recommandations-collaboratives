@@ -62,6 +62,12 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client, project)
         args=[project.id],
     )
 
+    for a in Action.objects.all():
+        print(a.verb)
+
+    # Action traces
+    assert Action.objects.count() == 0
+
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
         assign_collaborator(collab, project, is_owner=False)
@@ -81,6 +87,9 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client, project)
     assert notif.verb == verbs.Project.SET_INACTIVE
     assert notif.action_object == project
     assert notif.target == project
+
+    for a in Action.objects.all():
+        print(a.verb)
 
     # Action traces
     assert Action.objects.count() == 1
@@ -177,13 +186,16 @@ def test_owner_can_set_project_active(request, client, make_project):
 
 @pytest.mark.django_db
 def test_trace_when_project_is_set_active(request, client, make_project):
+    assert Action.objects.count() == 0
     site = get_current_site(request)
+    assert Action.objects.count() == 0
 
     project = make_project(
         site=site,
         status="READY",
         inactive_since=timezone.now(),
     )
+    assert Action.objects.count() == 0
 
     collab = baker.make(auth_models.User, username="collab@project.info")
     advisor = baker.make(auth_models.User, username="advisor@project.info")
@@ -192,6 +204,10 @@ def test_trace_when_project_is_set_active(request, client, make_project):
         "projects-project-set-active",
         args=[project.id],
     )
+
+    assert Action.objects.count() == 0
+    for a in Action.objects.all():
+        print(a.verb)
 
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
@@ -205,6 +221,9 @@ def test_trace_when_project_is_set_active(request, client, make_project):
     assert user.notifications.count() == 0
     assert collab.notifications.count() == 0
     assert advisor.notifications.count() == 0
+
+    for a in Action.objects.all():
+        print(a.verb)
 
     # Action traces
     assert Action.objects.count() == 1

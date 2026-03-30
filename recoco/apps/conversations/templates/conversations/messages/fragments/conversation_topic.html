@@ -30,7 +30,7 @@
                 <template x-if="countOf.tasks > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
-                            @click="$store.sharedContentsPanel.open('recommendations')">
+                            @click="trackClickOnRecoLink(); handleOpenPannelSharedContents('recommendations')">
                         <span class="topic-item__shared-item">
                             <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
                             <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
@@ -40,7 +40,7 @@
                 <template x-if="countOf.documents > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
-                            @click="$store.sharedContentsPanel.open('files')">
+                            @click="trackClickOnFileLink(); handleOpenPannelSharedContents('files')">
                         <span class="topic-item__shared-item">
                             <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
                             <span x-text="`${countOf.documents} fichier${countOf.documents > 1 ? 's' : ''}`"></span>

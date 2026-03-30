@@ -3,40 +3,28 @@ Resource Preview Panel - Overlay panel that displays when clicking a recommendat
 Managed by Alpine store: $store.resourcePreviewPanel
 {% endcomment %}
 <template x-if="$store.resourcePreviewPanel.isOpen">
-    <div>
-        <div class="resource-preview-panel"
-             @keydown.escape.window="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">
+    <div x-data="{ closePanel() { $store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded(); } }">
+        <div class="resource-preview-panel" @keydown.escape.window="closePanel()">
             <!-- Header -->
             <div class="resource-preview-panel__header">
                 <button type="button"
                         class="resource-preview-panel__back-btn"
-                        @click="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">
+                        @click="closePanel()">
                     <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
                     Recommandations
                 </button>
                 <button type="button"
                         class="resource-preview-panel__close-btn fr-btn--close fr-btn"
                         aria-label="Fermer"
-                        @click="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">Fermer</button>
+                        @click="closePanel()">Fermer</button>
             </div>
             <template x-if="$store.resourcePreviewPanel.recommendation?.resource">
                 <!-- Scrollable content area -->
                 <div class="resource-preview-panel__body">
                     {% include "conversations/messages/fragments/preview_panel_message.html" %}
-                    <!-- Attention banner for expiring resources -->
-                    <template x-if="$store.resourcePreviewPanel.recommendation?.resource?.expires_on && !$store.resourcePreviewPanel.recommendation?.resource?.expired">
-                        <div class="fr-callout fr-callout--blue-ecume fr-my-3w">
-                            <p class="fr-callout__title">
-                                <span class="text-uppercase fw-bold text-info">Attention</span>
-                            </p>
-                            <p class="fr-callout__text">
-                                Cet appel à projet a une date de limite de dépôt fixée au
-                                <strong x-text="formatDate($store.resourcePreviewPanel.recommendation.resource.expires_on, { day: 'numeric', month: 'long', year: 'numeric' })"></strong>
-                            </p>
-                        </div>
-                    </template>
                     <iframe class="w-100 d-flex flex-column rounded"
-                            style="border: none; overflow: hidden;"
+                            style="border: none;
+                                   overflow: hidden"
                             scrolling="no"
                             @load="$el.style.height = $el.contentDocument.body.scrollHeight + 'px'"
                             :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.messageId)"></iframe>

@@ -74,7 +74,7 @@ def organization_update(request, organization_id=None):
 def organization_list(request):
     """Return the Organization list"""
 
-    has_perm_or_403(request.user, "change_addressbook", request.site)
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     organizations = (
         models.Organization.on_site.with_contacts_only()
@@ -94,7 +94,7 @@ def organization_list(request):
 @login_required
 def organization_details(request, organization_id):
     """Return the details for a given Organization"""
-    has_perm_or_403(request.user, "change_addressbook", request.site)
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     organization = get_object_or_404(
         models.Organization, sites=request.site, pk=organization_id
@@ -126,7 +126,7 @@ class ContactForm(forms.ModelForm):
 @login_required
 def contact_list(request):
     """Return the Contact list"""
-    has_perm_or_403(request.user, "change_addressbook", request.site)
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     return render(request, "addressbook/contact_list.html", locals())
 

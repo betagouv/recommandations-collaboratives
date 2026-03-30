@@ -68,8 +68,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }, 500);
     this.$store.tasksData._subscribe(async () => {
       this.tasks = this.$store.tasksData.tasks;
-      // Re-extract shared contents when tasks are updated
-      await this.extractSharedContents();
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
@@ -95,6 +93,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       (recommendation) => recommendation.id == id
     );
     return foundRecommendation;
+  },
+  async handleOpenPannelSharedContents(tabName) {
+    await this.extractSharedContents();
+    this.$store.sharedContentsPanel.open(tabName);
   },
   /**
    * Extract recommendations and files from feed elements and populate the sharedContentsPanel store

@@ -1294,6 +1294,9 @@ def test_task_status_change_is_traced_when_a_followup_issued(
 
     assert response.status_code == 200
 
+    for a in Action.objects.all():
+        print(a)
+
     assert Action.objects.count() == 1
     action = Action.objects.first()
 

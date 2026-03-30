@@ -21,7 +21,7 @@ document.addEventListener('alpine:init', () => {
         [this.parcels, this.commune, this.location] = await Promise.all([
           null, // geolocUtils.fetchParcelsIgn(insee),
           geolocUtils.fetchCommuneIgn(insee),
-          geolocUtils.fetchGeolocationByAddress(`${this.project.location}`),
+          geolocUtils.fetchGeolocationByAddress(this.project.location, this.project.commune),
         ]);
 
         [this.latitude, this.longitude] = await mapUtils.getDefaultLatLngForMap(

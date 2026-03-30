@@ -18,7 +18,7 @@ dependencies = [
     "django>=5.1.15,<5.2",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
-    "django-allauth[mfa,openid,socialaccount]==65.13.0",
+    "django-allauth[mfa,openid,socialaccount]==65.14.1",
     "django-autoslug==1.9.9",
     "django-celery-results==2.5.1",
     "django-clone==5.3.3",
