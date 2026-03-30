@@ -6,7 +6,12 @@ Managed by Alpine store: $store.resourcePreviewPanel
     <div x-data="{ closePanel() { $store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded(); } }">
         <div class="resource-preview-panel__backdrop"
              @click="closePanel()"></div>
-        <div class="resource-preview-panel" @keydown.escape.window="closePanel()">
+        <div class="resource-preview-panel"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Détail de la recommandation"
+             x-trap.inert="$store.resourcePreviewPanel.isOpen"
+             @keydown.escape.window="closePanel()">
             <!-- Header -->
             <div class="resource-preview-panel__header">
                 <button type="button"

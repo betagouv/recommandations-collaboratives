@@ -8,10 +8,14 @@ Managed by Alpine store: $store.sharedContentsPanel
         <div class="shared-contents-panel__backdrop"
              @click="$store.sharedContentsPanel.close()"></div>
         <div class="shared-contents-panel"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="shared-contents-panel-title"
+             x-trap.inert="$store.sharedContentsPanel.isOpen"
              @keydown.escape.window="$store.sharedContentsPanel.close()">
             <!-- Header -->
             <div class="shared-contents-panel__header">
-                <h2 class="shared-contents-panel__title">Contenus partagés</h2>
+                <h2 id="shared-contents-panel-title" class="shared-contents-panel__title">Contenus partagés</h2>
                 <button type="button"
                         class="shared-contents-panel__close-btn fr-btn--close fr-btn"
                         aria-label="Fermer"
