@@ -6,6 +6,7 @@ Alpine.store('sharedContentsPanel', {
   recommendations: [],
   files: [],
   externalFiles: [], // Files from EDL (État des lieux)
+  privateFiles: [], // Files from private notes
   shouldReopenOnDetailClose: false, // Track if we should re-open when detail panel closes
 
   open(tab = null) {
@@ -39,6 +40,10 @@ Alpine.store('sharedContentsPanel', {
 
   setExternalFiles(externalFiles) {
     this.externalFiles = externalFiles;
+  },
+
+  setPrivateFiles(privateFiles) {
+    this.privateFiles = privateFiles;
   },
 
   /**
