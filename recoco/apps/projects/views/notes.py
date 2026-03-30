@@ -18,8 +18,9 @@ from django.utils import timezone
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
-from ..forms import NoteForm, StaffNoteForm
+from ..forms import NoteForm
 from ..utils import can_administrate_project
+from .documents import document_upload
 
 
 @login_required
@@ -49,6 +50,11 @@ def create_private_note(request, project_id=None):
                 user=request.user,
             )
 
+            if instance.document.exists():
+                signals.document_uploaded.send(
+                    sender=document_upload, instance=instance.document.first()
+                )
+
             return redirect(
                 reverse("projects-project-detail-internal-followup", args=[project_id])
             )
@@ -73,7 +79,13 @@ def update_private_note(request, note_id=None):
 
     if request.method == "POST":
         if is_advisor:
-            form = StaffNoteForm(request.POST, instance=note)
+            form = NoteForm(
+                request.POST,
+                instance=note,
+                sender=request.user,
+                project=project,
+                site=request.site,
+            )
 
         else:
             form = NoteForm(
@@ -96,7 +108,7 @@ def update_private_note(request, note_id=None):
             )
     else:
         if is_advisor:
-            form = StaffNoteForm(
+            form = NoteForm(
                 instance=note, sender=request.user, project=project, site=request.site
             )
         else:

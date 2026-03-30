@@ -54,7 +54,6 @@ class NoteForm(forms.ModelForm):
                 the_file=self.cleaned_data["the_file"],
                 project=self.project,
                 uploaded_by=self.sender,
-                attached_object=instance,
                 site=self.site,
                 private=True,
             )
@@ -62,15 +61,10 @@ class NoteForm(forms.ModelForm):
         with transaction.atomic():
             instance.save()
             if doc:
+                doc.attached_object = instance
                 doc.save()
 
         return instance
-
-
-class StaffNoteForm(NoteForm):
-    class Meta:
-        model = models.Note
-        fields = ["content", "contact"]
 
 
 class PrivateNoteForm(forms.ModelForm):

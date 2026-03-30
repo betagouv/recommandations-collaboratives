@@ -393,7 +393,7 @@ def project_document_uploaded(sender, instance, **kwargs):
         if instance.private
         else verbs.Document.ADDED_FILE
         if instance.the_file
-        else instance.the_link,
+        else verbs.Document.ADDED_LINK
     )
 
     # Add a trace
