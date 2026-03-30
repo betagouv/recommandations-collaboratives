@@ -4,6 +4,8 @@ Managed by Alpine store: $store.resourcePreviewPanel
 {% endcomment %}
 <template x-if="$store.resourcePreviewPanel.isOpen">
     <div x-data="{ closePanel() { $store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded(); } }">
+        <div class="resource-preview-panel__backdrop"
+             @click="closePanel()"></div>
         <div class="resource-preview-panel" @keydown.escape.window="closePanel()">
             <!-- Header -->
             <div class="resource-preview-panel__header">

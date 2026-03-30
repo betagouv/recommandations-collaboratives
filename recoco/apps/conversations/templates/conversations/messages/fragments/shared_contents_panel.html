@@ -5,6 +5,8 @@ Managed by Alpine store: $store.sharedContentsPanel
 {% endcomment %}
 <template x-if="$store.sharedContentsPanel.isOpen">
     <div>
+        <div class="shared-contents-panel__backdrop"
+             @click="$store.sharedContentsPanel.close()"></div>
         <div class="shared-contents-panel"
              @keydown.escape.window="$store.sharedContentsPanel.close()">
             <!-- Header -->

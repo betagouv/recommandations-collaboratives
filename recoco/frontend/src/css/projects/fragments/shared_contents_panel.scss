@@ -1,6 +1,18 @@
 // Shared Contents Panel - Overlay panel displaying recommendations and files shared in conversation
 // Used in conversation page, accessible from left panel or above messages
 
+// Backdrop overlay for click-outside-to-close
+.shared-contents-panel__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
+  cursor: pointer;
+}
+
 .shared-contents-panel {
   position: fixed;
   top: 0;
