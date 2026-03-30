@@ -14,7 +14,7 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
     statusText,
 
     get task() {
-      const storeTask = this.$store.tasksData.getTaskById(this.taskId);
+      const storeTask = Alpine.store('tasksData').getTaskById(this.taskId);
       return storeTask || { id: this.taskId, status: task.status };
     },
 
