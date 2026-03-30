@@ -1,6 +1,6 @@
-<div x-data="{document: null}"
+<div x-data="{ document: null, currentDocumentId: null, }"
      x-show="document"
-     x-init="document = await getDocumentById(node.document_id)"
+     x-effect="if (node.document_id !== currentDocumentId) { currentDocumentId = node.document_id; document = await getDocumentById(node.document_id); }"
      class="document-item">
     <template x-if="document">
         <div class="document-item__content">

@@ -312,10 +312,19 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return `${this.countOf.new_messages} élément${this.countOf.new_messages > 1 ? 's' : ''} non lu${this.countOf.new_messages > 1 ? 's' : ''}`;
   },
-  async getDocumentById(id) {
-    const foundDocument = this.documents.find(
+  async getDocumentById(id, forceRefresh = false) {
+    const foundDocumentIndex = this.documents.findIndex(
       (document) => document.id === +id
     );
+
+    if (forceRefresh && foundDocumentIndex !== -1) {
+      // Remove from cache to force refresh
+      this.documents.splice(foundDocumentIndex, 1);
+    }
+
+    const foundDocument =
+      foundDocumentIndex !== -1 ? this.documents[foundDocumentIndex] : null;
+
     if (!foundDocument) {
       try {
         const document = await api.get(documentUrl(this.projectId, id));
@@ -620,9 +629,25 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(
-      (message) => message.id === messageIdToEdit
+      (m) => m.id === messageIdToEdit
     );
-    this.feed.elements[messageIndex] = { ...message, type: 'message' };
+
+    // Invalidate document cache for documents in this message
+    if (message.nodes) {
+      for (const node of message.nodes) {
+        if (node.type === 'DocumentNode' && node.document_id) {
+          const docIndex = this.documents.findIndex(
+            (doc) => doc.id === +node.document_id
+          );
+          if (docIndex !== -1) {
+            this.documents.splice(docIndex, 1);
+          }
+        }
+      }
+    }
+
+    // Replace the message in the feed using splice to force Alpine.js reactivity
+    this.feed.elements.splice(messageIndex, 1, { ...message, type: 'message' });
   },
   // Simple ifchanged implementation
   shouldShowDate(element) {
