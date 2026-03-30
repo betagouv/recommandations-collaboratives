@@ -319,10 +319,14 @@ def project_conversations_new(request, project_id=None):
         .values("id", "attachment", "updated_on")
     )
 
-    private_files = list(
-        models.Document.objects.filter(project_id=project_id, private=True).values(
-            "id", "created_on", "the_file"
+    private_files = (
+        list(
+            models.Document.objects.filter(project_id=project_id, private=True).values(
+                "id", "created_on", "the_file"
+            )
         )
+        if has_perm(request.user, "manage_private_documents", project)
+        else []
     )
 
     return render(

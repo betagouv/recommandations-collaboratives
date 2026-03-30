@@ -150,6 +150,7 @@ def test_private_document_is_not_given_for_conversations_panel_for_collaborators
         b"private document content",
         content_type="text/plain",
     )
+    # an advisor uploads doc
     advisor = baker.make(auth_models.User)
     assign_advisor(advisor, project_ready)
     models.Document.objects.create(
@@ -160,6 +161,7 @@ def test_private_document_is_not_given_for_conversations_panel_for_collaborators
         private=True,
     )
 
+    # a collaborator displays the docs
     member = baker.make(auth_models.User)
     assign_collaborator(member, project_ready)
     with login(client, user=member):
