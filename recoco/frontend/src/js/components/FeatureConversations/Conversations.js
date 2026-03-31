@@ -24,12 +24,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   projectId,
   currentUserId,
   feed: {},
-  messages: [],
   messagesLoaded: false,
   showMessages: false,
   sendingMessage: false,
   tasks: [],
-  users: [],
   messagesParticipants: [],
   documents: [],
   contacts: [],
@@ -64,23 +62,64 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    this.$store.tasksData._subscribe(async () => {
-      this.tasks = this.$store.tasksData.tasks;
+    Alpine.store('tasksData')._subscribe(async () => {
+      this.tasks = Alpine.store('tasksData').tasks;
     });
-    this.$store.tasksData._notify();
+    Alpine.store('tasksData')._notify();
     this.countElementsInDiscussion();
     await this.extractSharedContents();
     this.loadExternalFiles();
+    window.addEventListener('hashchange', async () => {
+      await this.detectTaskOpenFromHash();
+      this.detectTasksOpenFromHash();
+      this.detectFilesOpenFromHash();
+    });
+    await this.detectTaskOpenFromHash();
+    this.detectTasksOpenFromHash();
+    this.detectFilesOpenFromHash();
+  },
+  async detectTaskOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#action-(\d+)/);
+    if (urlFromHash) {
+      const taskId = parseInt(urlFromHash[1], 10);
+      const recommendation = this.feed.recommendations.find(recommendation => recommendation.id === taskId);
+      if (!recommendation) {
+        return;
+      }
+      const message = this.getMessageById(recommendation.messageId);
+      if (Alpine.store('sharedContentsPanel').isOpen) {
+        Alpine.store('sharedContentsPanel').close();
+      }
+      await this.openResourcePreviewPanel(recommendation, message);
+    }
+  },
+  detectTasksOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#actions/);
+    if (urlFromHash) {
+      if (Alpine.store('resourcePreviewPanel').isOpen) {
+        Alpine.store('resourcePreviewPanel').close();
+      }
+      Alpine.store('sharedContentsPanel').open('recommendations');
+    }
+  },
+  detectFilesOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#files/);
+    if (urlFromHash) {
+      if (Alpine.store('resourcePreviewPanel').isOpen) {
+        Alpine.store('resourcePreviewPanel').close();
+      }
+      Alpine.store('sharedContentsPanel').open('files');
+    }
   },
   /**
    * Load external files from EDL (État des lieux) into the shared contents panel store
    */
   loadExternalFiles() {
     const edlFilesElement = document.getElementById('djangoEdlFiles');
-    if (edlFilesElement && this.$store.sharedContentsPanel) {
+    if (edlFilesElement && Alpine.store('sharedContentsPanel')) {
       try {
         const edlFiles = JSON.parse(edlFilesElement.textContent);
-        this.$store.sharedContentsPanel.setExternalFiles(edlFiles || []);
+        Alpine.store('sharedContentsPanel').setExternalFiles(edlFiles || []);
       } catch (error) {
         console.error('Failed to parse EDL files:', error);
       }
@@ -94,7 +133,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   async handleOpenPannelSharedContents(tabName) {
     await this.extractSharedContents();
-    this.$store.sharedContentsPanel.open(tabName);
+    Alpine.store('sharedContentsPanel').open(tabName);
   },
   /**
    * Extract recommendations and files from feed elements and populate the sharedContentsPanel store
@@ -143,11 +182,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         }
       }
     }
+    this.feed.recommendations = recommendations;
 
     // Update the store
-    if (this.$store.sharedContentsPanel) {
-      this.$store.sharedContentsPanel.setRecommendations(recommendations);
-      this.$store.sharedContentsPanel.setFiles(files);
+    if (Alpine.store('sharedContentsPanel')) {
+      Alpine.store('sharedContentsPanel').setRecommendations(recommendations);
+      Alpine.store('sharedContentsPanel').setFiles(files);
     }
   },
   /**
@@ -156,7 +196,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
    */
   async openRecommendationFromPanel(recommendation) {
     // Close the shared contents panel but mark for re-open
-    this.$store.sharedContentsPanel.closeForDetail();
+    Alpine.store('sharedContentsPanel').closeForDetail();
 
     // Find the corresponding message
     const message = this.getMessageById(recommendation.messageId);
@@ -217,7 +257,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       );
       this.messagesParticipants = [
         ...participants.data,
-        ...this.$store.djangoData.recipients.map((recipient) => ({
+        ...Alpine.store('djangoData').recipients.map((recipient) => ({
           id: +recipient.id,
           first_name: recipient.first_name,
           last_name: recipient.last_name,
@@ -275,7 +315,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   getUserById(id) {
     if (id === this.currentUserId) {
-      return this.$store.djangoData.currentUser;
+      return Alpine.store('djangoData').currentUser;
     }
     const foundUser = this.messagesParticipants.find((user) => user.id === +id);
     if (!foundUser) {
@@ -351,7 +391,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } else {
       await this.sendMessage();
     }
-    this.$store.onLeaveAlert.setDirty(false);
+    Alpine.store('onLeaveAlert').setDirty(false);
   },
   uploadFile(file) {
     const formData = new FormData();
@@ -363,10 +403,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     });
   },
   async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
-    if (!this.$store.editor.currentMessageJSON) return;
+    if (!Alpine.store('editor').currentMessageJSON) return;
 
-    const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-      this.$store.editor.currentMessageJSON
+    const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
+      Alpine.store('editor').currentMessageJSON
     );
 
     // Only upload files for *new* documents
@@ -384,7 +424,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         const errorMessage =
           error.response?.data?.the_file?.[0] ||
           "Contactez nous via le chat pour obtenir de l'aide.";
-        this.$store.app.displayToastMessage({
+        Alpine.store('app').displayToastMessage({
           message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
           timeout: 5000,
           type: ToastType.error,
@@ -432,13 +472,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.scrollToNewMessage();
       }
 
-      this.$store.editor.clearEditorContent();
+      Alpine.store('editor').clearEditorContent();
       this.updateCountOfElementsInDiscussion(messageResponse.data);
       this.messageIdToReply = null;
       this.sendingMessage = false;
     } catch (error) {
       this.sendingMessage = false;
-      this.$store.app.displayToastMessage({
+      Alpine.store('app').displayToastMessage({
         message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
         timeout: 5000,
         type: ToastType.error,
@@ -490,7 +530,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   onClickHandleReply(messageId) {
     this.messageIdToReply = messageId;
     this.isEditorInReplyMode = true;
-    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+    Alpine.raw(Alpine.store('editor').editorInstance).commands.focus();
   },
   onClickCancelReply() {
     this.messageIdToReply = null;
@@ -536,18 +576,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         };
       }
     });
-    const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
+    const tiptapJson = Alpine.store('editor').convertNodesToTipTapJson(
       message.nodes
     );
 
-    Alpine.raw(this.$store.editor.editorInstance).commands.setContent(
+    Alpine.raw(Alpine.store('editor').editorInstance).commands.setContent(
       tiptapJson
     );
-    this.$store.editor.currentMessageJSON = tiptapJson;
+    Alpine.store('editor').currentMessageJSON = tiptapJson;
 
-    const { to } = Alpine.raw(this.$store.editor.editorInstance).state
+    const { to } = Alpine.raw(Alpine.store('editor').editorInstance).state
       .selection;
-    Alpine.raw(this.$store.editor.editorInstance)
+    Alpine.raw(Alpine.store('editor').editorInstance)
       .chain()
       .focus()
       .setTextSelection(to)
@@ -587,7 +627,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.isEditorInEditMode = activateEditMode;
 
     if (!activateEditMode) {
-      Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
+      Alpine.raw(Alpine.store('editor').editorInstance).commands.clearContent();
     }
   },
   async onClickRessourceConsumeNotification(recommendation, message) {
@@ -613,8 +653,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       // Mark as visited and track analytics
       await this.onClickRessourceConsumeNotification(recommendation, message);
-      if (this.$store.resourcePreviewPanel) {
-        this.$store.resourcePreviewPanel.open(recommendation, message);
+      if (Alpine.store('resourcePreviewPanel')) {
+        Alpine.store('resourcePreviewPanel').open(recommendation, message);
       } else {
         console.error('resourcePreviewPanel store not found!');
       }
@@ -665,18 +705,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
 
   async goToCreateRecommendation(url) {
-    if (this.$store.editor.currentMessageJSON) {
-      this.$store.onLeaveAlert.setDirty(false);
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
+    if (Alpine.store('editor').currentMessageJSON) {
+      Alpine.store('onLeaveAlert').setDirty(false);
+      const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
+        Alpine.store('editor').currentMessageJSON
       );
       if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
         const documentNode = parsedNodesFromEditor.find(
           (node) => node.type === 'DocumentNode'
         );
         // connect to the database
-        await this.$store.idbObjectStoreMgmt.init();
-        const value = await this.$store.idbObjectStoreMgmt.add({
+        await Alpine.store('idbObjectStoreMgmt').init();
+        const value = await Alpine.store('idbObjectStoreMgmt').add({
           file: documentNode.file,
         });
       }

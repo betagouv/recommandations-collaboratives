@@ -376,8 +376,7 @@ def make_action_digest(action, user):
         return
 
     action_link = utils.build_absolute_url(
-        reverse("projects-project-detail-actions", args=[action.project_id])
-        + f"#action-{action.id}",
+        action.get_absolute_url(),
         auto_login_user=user,
     )
     return {
@@ -550,6 +549,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
             if single_type == "recommandation"
             else easy_plural("nouveau", msg_count, "x")
         )
+
     pretty_title_count = (
         f"{format_nb(msg_count)} {adjective} {easy_plural(single_type, msg_count)}"
     )
@@ -655,6 +655,13 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         > 1
     )
 
+    button_url = notifications_qs.first().action_object.get_absolute_url()
+    match single_type:
+        case "recommandation":
+            button_url += "#actions"
+        case "document":
+            button_url += "#files"
+
     return {
         "project": project_digest,
         "title_count": pretty_title_count,
@@ -676,10 +683,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         "first_object": (
             first_object_node.get_digest_recap() if first_object_node else None
         ),
-        "message_url": utils.build_absolute_url(
-            notifications_qs.first().action_object.get_absolute_url(),
-            auto_login_user=user,
-        ),
+        "message_url": utils.build_absolute_url(button_url, auto_login_user=user),
     }
     # https://docs.google.com/document/d/1atR08eb2H2DyvUGg5VkMrbA7VvMO-ZNFYVqAgjjgZ_c/edit?tab=t.0
 
