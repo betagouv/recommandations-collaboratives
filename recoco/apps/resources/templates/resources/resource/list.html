@@ -28,8 +28,7 @@
              class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
         <div class="d-flex justify-content-between align-items-center fr-mb-2w">
             <h1 class=" align-items-center fr-mb-2w">
-                {% if resources_count %}{{ resources_count }}{% endif %}
-                Ressources
+                {{ resources_count }} ressource{{ resources_count|pluralize }} {% if query or categories or limit_areas %}<span class="fw-400">trouvée{{ resources_count|pluralize }} pour {% if query %}"<em>{{ query }}</em>"{% if categories or limit_areas %},{% endif %}{% endif %}{% if categories %} {% if categories|length == 1 %}la catégorie{% else %}les catégories{% endif%} <em>{{ categories|join:', ' }}</em> {% if limit_areas %}et {% endif %}{% endif %}{% if limit_areas %}{% if limit_areas|length == 1 %}le département {{ limit_areas }}{% else %}{{ limit_areas|length }} départements{% endif %}{% endif %}.</span>{% endif %}
             </h1>
             {% if "manage_resources" in user_site_perms %}
                 <a class="fr-btn fr-btn--sm fr-btn--primary fr-mr-1w"
@@ -83,12 +82,6 @@
                         <span class="text-secondary">Essayez de supprimer des mots-clés ou d'ajouter des catégories.</span>
                         <br />
                         <span class="small">Vous pouvez aussi <a href="{% url 'resources-resource-search' %}">réinitialiser</a> vos critères de recherche ou <a href="?searching=on">élargir la zone géographique</a>.</span>
-                    </div>
-                {% else %}
-                    <div class="col-12">
-                        <span class="text-secondary">
-                            {{ resources_count }} résultat{{ resources_count|pluralize }} trouvé{{ resources_count|pluralize }} pour "<em>{{ query }}</em>".
-                        </span>
                     </div>
                 {% endif %}
             </div>
