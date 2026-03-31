@@ -97,7 +97,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                     <div>
                                         <template x-for="(file, index) in $store.sharedContentsPanel.files"
                                                   :key="file.id">
-                                            <div>
+                                            <div class="shared-contents-panel__file-section">
                                                 <!-- Date header with grouping -->
                                                 <template x-if="index === 0 || formatDateFrench(file.messageCreated) !== formatDateFrench($store.sharedContentsPanel.files[index - 1]?.messageCreated)">
                                                     <p class="shared-contents-panel__date-header"
@@ -118,11 +118,30 @@ Managed by Alpine store: $store.sharedContentsPanel
                                         </template>
                                     </div>
                                 </template>
-                            </div>
-                        </template>
-                    </div>
-                </template>
-            </div>
+                                <!-- Private files from project -->
+                                <template x-if="$store.sharedContentsPanel.privateFiles.length > 0">
+                                    <div>
+                                        <p class="shared-contents-panel__external-title fr-mt-8w">Fichiers privés partagés entre conseillers</p>
+                                        <template x-for="(file, index) in $store.sharedContentsPanel.privateFiles"
+                                                  :key="file.id">
+                                            <div x-data="{file: {...file, attachment: file.the_file}}"
+                                                 class="shared-contents-panel__file-section">
+                                                <!-- Date header with grouping -->
+                                                <template x-if="index === 0 || formatDateFrench(file.created_on) !== formatDateFrench($store.sharedContentsPanel.privateFiles[index - 1]?.created_on)">
+                                                    <p class="shared-contents-panel__date-header"
+                                                       x-text="formatDateFrench(file.created_on)"></p>
+                                                </template>
+                                                {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
         </div>
     </div>
+</div>
 </template>

@@ -15,12 +15,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from recoco.apps.addressbook.models import Contact
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
-from ..forms import NoteForm, StaffNoteForm
+from ..forms import NoteForm
 from ..utils import can_administrate_project
+from .documents import document_upload
 
 
 @login_required
@@ -29,23 +29,19 @@ def create_private_note(request, project_id=None):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
-
     is_advisor = can_administrate_project(project, request.user)
 
     if request.method == "POST":
-        form = NoteForm(request.POST)
-
-        form.set_contact_queryset(
-            Contact.objects.filter(site_id=request.site.id),
+        form = NoteForm(
+            request.POST,
+            files=request.FILES,
+            sender=request.user,
+            project=project,
+            site=request.site,
         )
 
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.project = project
-            instance.created_by = request.user
-            instance.site = request.site
-
-            instance.save()
+            instance = form.save()
 
             signals.note_created.send(
                 sender=create_private_note,
@@ -54,11 +50,16 @@ def create_private_note(request, project_id=None):
                 user=request.user,
             )
 
+            if instance.document.exists():
+                signals.document_uploaded.send(
+                    sender=document_upload, instance=instance.document.first()
+                )
+
             return redirect(
                 reverse("projects-project-detail-internal-followup", args=[project_id])
             )
     else:
-        form = NoteForm()
+        form = NoteForm(sender=request.user, project=project, site=request.site)
     return render(request, "projects/project/note_create.html", locals())
 
 
@@ -78,18 +79,25 @@ def update_private_note(request, note_id=None):
 
     if request.method == "POST":
         if is_advisor:
-            form = StaffNoteForm(request.POST, instance=note)
+            form = NoteForm(
+                request.POST,
+                instance=note,
+                sender=request.user,
+                project=project,
+                site=request.site,
+            )
 
         else:
-            form = NoteForm(request.POST, instance=note)
+            form = NoteForm(
+                request.POST,
+                instance=note,
+                sender=request.user,
+                project=project,
+                site=request.site,
+            )
 
-        form.set_contact_queryset(
-            Contact.objects.filter(site_id=request.site.id),
-        )
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.updated_on = timezone.now()
-            instance.save()
+            instance = form.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
 
@@ -100,9 +108,13 @@ def update_private_note(request, note_id=None):
             )
     else:
         if is_advisor:
-            form = StaffNoteForm(instance=note)
+            form = NoteForm(
+                instance=note, sender=request.user, project=project, site=request.site
+            )
         else:
-            form = NoteForm(instance=note)
+            form = NoteForm(
+                instance=note, sender=request.user, project=project, site=request.site
+            )
     return render(request, "projects/project/note_update.html", locals())
 
 

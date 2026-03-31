@@ -71,6 +71,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countElementsInDiscussion();
     await this.extractSharedContents();
     this.loadExternalFiles();
+    this.loadPrivateFiles();
   },
   /**
    * Load external files from EDL (État des lieux) into the shared contents panel store
@@ -83,6 +84,20 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.$store.sharedContentsPanel.setExternalFiles(edlFiles || []);
       } catch (error) {
         console.error('Failed to parse EDL files:', error);
+      }
+    }
+  },
+  /**
+   * Load private files from project into the shared contents panel store
+   */
+  loadPrivateFiles() {
+    const privateFilesElement = document.getElementById('djangoPrivateFiles');
+    if (privateFilesElement && this.$store.sharedContentsPanel) {
+      try {
+        const privateFiles = JSON.parse(privateFilesElement.textContent);
+        this.$store.sharedContentsPanel.setPrivateFiles(privateFiles || []);
+      } catch (error) {
+        console.error('Failed to parse private files:', error);
       }
     }
   },
