@@ -14,7 +14,7 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
     statusText,
 
     get task() {
-      const storeTask = this.$store.tasksData.getTaskById(this.taskId);
+      const storeTask = Alpine.store('tasksData').getTaskById(this.taskId);
       return storeTask || { id: this.taskId, status: task.status };
     },
 
@@ -30,7 +30,7 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
       this.isLoading = true;
 
       try {
-        await this.$store.tasksData.issueFollowup(this.task, status);
+        await Alpine.store('tasksData').issueFollowup(this.task, status);
         await this.$store.tasksView.updateViewWithTask(this.taskId);
       } catch (error) {
         throw new Error('Failed to update task status');

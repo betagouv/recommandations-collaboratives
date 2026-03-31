@@ -24,12 +24,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   projectId,
   currentUserId,
   feed: {},
-  messages: [],
   messagesLoaded: false,
   showMessages: false,
   sendingMessage: false,
   tasks: [],
-  users: [],
   messagesParticipants: [],
   documents: [],
   contacts: [],
@@ -64,13 +62,51 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    this.$store.tasksData._subscribe(async () => {
-      this.tasks = this.$store.tasksData.tasks;
+    Alpine.store('tasksData')._subscribe(async () => {
+      this.tasks = Alpine.store('tasksData').tasks;
     });
-    this.$store.tasksData._notify();
+    Alpine.store('tasksData')._notify();
     this.countElementsInDiscussion();
     await this.extractSharedContents();
     this.loadExternalFiles();
+    window.addEventListener('hashchange', async () => {
+      await this.detectTaskOpenFromHash();
+      this.detectTasksOpenFromHash();
+      this.detectFilesOpenFromHash();
+    });
+    await this.detectTaskOpenFromHash();
+    this.detectTasksOpenFromHash();
+    this.detectFilesOpenFromHash();
+  },
+  async detectTaskOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#action-(\d+)/);
+    if (urlFromHash) {
+      const taskId = parseInt(urlFromHash[1], 10);
+      const recommendation = this.feed.recommendations.find(recommendation => recommendation.id === taskId);
+      const message = this.getMessageById(recommendation.messageId);
+      if (this.$store.sharedContentsPanel.isOpen) {
+        this.$store.sharedContentsPanel.close();
+      }
+      await this.openResourcePreviewPanel(recommendation, message);
+    }
+  },
+  detectTasksOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#actions/);
+    if (urlFromHash) {
+      if (this.$store.resourcePreviewPanel.isOpen) {
+        this.$store.resourcePreviewPanel.close();
+      }
+      this.$store.sharedContentsPanel.open('recommendations');
+    }
+  },
+  detectFilesOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#files/);
+    if (urlFromHash) {
+      if (this.$store.resourcePreviewPanel.isOpen) {
+        this.$store.resourcePreviewPanel.close();
+      }
+      this.$store.sharedContentsPanel.open('files');
+    }
   },
   /**
    * Load external files from EDL (État des lieux) into the shared contents panel store
@@ -143,6 +179,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         }
       }
     }
+    this.feed.recommendations = recommendations;
 
     // Update the store
     if (this.$store.sharedContentsPanel) {
