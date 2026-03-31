@@ -31,7 +31,7 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
 
       try {
         await Alpine.store('tasksData').issueFollowup(this.task, status);
-        await this.$store.tasksView.updateViewWithTask(this.taskId);
+        await Alpine.store('tasksView').updateViewWithTask(this.taskId);
       } catch (error) {
         throw new Error('Failed to update task status');
       }
