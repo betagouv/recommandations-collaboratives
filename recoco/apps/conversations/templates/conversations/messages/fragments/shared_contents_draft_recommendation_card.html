@@ -13,7 +13,7 @@
                     }
                 }
             }'
-            x-effect="recommendation = $store.sharedContentsPanel.recommendations.find(r => r.id === reco.id) || $store.sharedContentsPanel.draftRecommendations.find(r => r.id === reco.id) || reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
+            x-effect="recommendation = reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
     <!-- djlint:on -->
     <!-- Container for the draft recommendation card -->
     <div class="shared-contents-draft-reco-card__container">

@@ -86,9 +86,10 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           :key="reco.id">
                                     <div class="fr-mb-3v">
                                         <!-- Date header with grouping -->
-                                        <template x-if="index === 0 || formatDateFrench(reco.messageCreated) !== formatDateFrench($store.sharedContentsPanel.recommendations[index - 1]?.messageCreated)">
+                                        <template x-if="index === 0 || formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                             <p class="shared-contents-panel__date-header"
-                                               x-text="formatDateFrench(reco.messageCreated)"></p>
+                                               x-text="formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                            </p>
                                         </template>
                                         {% include "conversations/messages/fragments/shared_contents_recommendation_card.html" %}
                                     </div>
@@ -115,9 +116,10 @@ Managed by Alpine store: $store.sharedContentsPanel
                                                   :key="file.id">
                                             <div>
                                                 <!-- Date header with grouping -->
-                                                <template x-if="index === 0 || formatDateFrench(file.messageCreated) !== formatDateFrench($store.sharedContentsPanel.files[index - 1]?.messageCreated)">
+                                                <template x-if="index === 0 || formatDate(file.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.files[index - 1]?.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                                     <p class="shared-contents-panel__date-header"
-                                                       x-text="formatDateFrench(file.messageCreated)"></p>
+                                                       x-text="formatDate(file.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                                    </p>
                                                 </template>
                                                 {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=False %}
                                             </div>
@@ -153,9 +155,10 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           :key="reco.id">
                                     <div class="fr-mb-3v">
                                         <!-- Date header with grouping -->
-                                        <template x-if="index === 0 || formatDateFrench(reco.messageCreated) !== formatDateFrench($store.sharedContentsPanel.draftRecommendations[index - 1]?.messageCreated)">
+                                        <template x-if="index === 0 || formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.draftRecommendations[index - 1]?.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                             <p class="shared-contents-panel__date-header"
-                                               x-text="formatDateFrench(reco.messageCreated)"></p>
+                                               x-text="formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                            </p>
                                         </template>
                                         {% include "conversations/messages/fragments/shared_contents_draft_recommendation_card.html" %}
                                     </div>

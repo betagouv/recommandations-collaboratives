@@ -16,12 +16,12 @@ import api, {
   publishTaskUrl
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
-import { formatDateFrench } from '../../utils/date';
+import { formatDate } from '../../utils/date';
 import { formatFileSize } from '../../utils/file';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
   TASK_STATUSES,
-  formatDateFrench,
+  formatDate,
   editTaskUrl,
   resourcePreviewUrl,
   formatFileSize,
@@ -660,7 +660,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   shouldShowDate(element) {
     const dateString =
       element.type === 'message' ? element.created : element.timestamp;
-    const dateToCompare = this.formatDateFrench(dateString);
+    const dateToCompare = this.formatDate(dateString, { year: 'numeric', month: 'long', day: 'numeric' });
     if (dateToCompare !== this.lastMessageDate) {
       this.lastMessageDate = dateToCompare;
       return true;
