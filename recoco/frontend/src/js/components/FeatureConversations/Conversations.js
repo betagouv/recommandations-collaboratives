@@ -312,15 +312,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return `${this.countOf.new_messages} élément${this.countOf.new_messages > 1 ? 's' : ''} non lu${this.countOf.new_messages > 1 ? 's' : ''}`;
   },
-  async getDocumentById(id, forceRefresh = false) {
+  async getDocumentById(id) {
     const foundDocumentIndex = this.documents.findIndex(
       (document) => document.id === +id
     );
-
-    if (forceRefresh && foundDocumentIndex !== -1) {
-      // Remove from cache to force refresh
-      this.documents.splice(foundDocumentIndex, 1);
-    }
 
     const foundDocument =
       foundDocumentIndex !== -1 ? this.documents[foundDocumentIndex] : null;
