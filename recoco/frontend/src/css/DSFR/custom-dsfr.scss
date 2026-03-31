@@ -879,6 +879,13 @@ a.fr-text-inverted--grey {
   &-dark-background {
     background: var(--light-background-default-grey, #fff);
   }
+  &-white-background {
+    border-radius: 1px;
+    background: #e5e5e5;
+    color: var(--light-text-title-grey, #161616);
+    border: none;
+    box-shadow: none;
+  }
   &:not(:disabled):hover {
     background-color: var(--light-background-alt-grey-hover, #e6e6e6);
     background: var(--light-background-alt-grey-hover, #e6e6e6);

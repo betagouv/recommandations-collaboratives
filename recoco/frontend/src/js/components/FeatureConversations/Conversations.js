@@ -12,13 +12,17 @@ import api, {
   editTaskUrl,
   markTaskNotificationAsVisited,
   conversationsMessageMarkAsReadUrl,
-  resourcePreviewUrl
+  resourcePreviewUrl,
+  publishTaskUrl
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
-import { formatDateFrench } from '../../utils/date';
+import { formatDate } from '../../utils/date';
 import { formatFileSize } from '../../utils/file';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
+  TASK_STATUSES,
+  formatDate,
+  editTaskUrl,
   resourcePreviewUrl,
   formatFileSize,
   projectId,
@@ -38,6 +42,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     new_messages: 0,
     tasks: 0,
     unread_recommendations: 0,
+    draft_recommendations: 0,
     contacts: 0,
     documents: 0,
   },
@@ -50,9 +55,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   lastMessageDate: null,
   elementToDelete: null,
   theFiles: [],
-  TASK_STATUSES,
-  formatDateFrench,
-  editTaskUrl,
+  isSwitchtender: JSON.parse(document.getElementById('isSwitchtender').textContent),
   async init() {
     this.getMessagesParticipants();
     await this.getActivities();
@@ -143,6 +146,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     const recommendations = [];
     const files = [];
+    const draftRecommendations = this.tasks.filter(task => task.public === false);
 
     // Iterate over feed elements in reverse (most recent first)
     const sortedElements = [...this.feed.elements]
@@ -187,8 +191,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     // Update the store
     if (Alpine.store('sharedContentsPanel')) {
       Alpine.store('sharedContentsPanel').setRecommendations(recommendations);
+      Alpine.store('sharedContentsPanel').setDraftRecommendations(draftRecommendations);
       Alpine.store('sharedContentsPanel').setFiles(files);
     }
+
+    // Update draft count
+    this.countOf.draft_recommendations = draftRecommendations.length;
   },
   /**
    * Open a recommendation from the shared contents panel
@@ -380,6 +388,30 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       return contact.data;
     }
     return foundContact;
+  },
+  async publishDraftRecommendation(recommendation) {
+    recommendation.isLoading = true;
+    try {
+      const messageResponse = await api.post(publishTaskUrl(this.projectId, recommendation.id));
+
+      this.feed.elements.push({
+        ...messageResponse.data.message,
+        type: 'message',
+      });
+      // extract shared contents
+      await this.extractSharedContents();
+      this.scrollToNewMessage();
+      // Update counts
+      this.countOf.tasks += 1;
+      this.countOf.draft_recommendations -= 1;
+      // Delete the draft recommendation from the tasks list
+      this.$store.sharedContentsPanel.removeDraftRecommendation(recommendation.id);
+
+    } catch (error) {
+      throw new Error('Failed to publish draft recommendation', error);
+    } finally {
+      recommendation.isLoading = false;
+    }
   },
   async sendFormMessage() {
     this.sendingMessage = true;
@@ -688,7 +720,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   shouldShowDate(element) {
     const dateString =
       element.type === 'message' ? element.created : element.timestamp;
-    const dateToCompare = this.formatDateFrench(dateString);
+    const dateToCompare = this.formatDate(dateString, { year: 'numeric', month: 'long', day: 'numeric' });
     if (dateToCompare !== this.lastMessageDate) {
       this.lastMessageDate = dateToCompare;
       return true;

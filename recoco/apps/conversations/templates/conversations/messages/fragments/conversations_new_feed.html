@@ -11,7 +11,8 @@
                 <!-- Date separator using simple Alpine.js approach -->
                 <template x-if="shouldShowDate(element)">
                     <p class="conversation-new__date"
-                       x-text="formatDateFrench(element.type == 'message' ? element.created : element.timestamp)"></p>
+                       x-text="formatDate(element.type == 'message' ? element.created : element.timestamp, { year: 'numeric', month: 'long', day: 'numeric', })">
+                    </p>
                 </template>
                 <template x-if="element.firstUnread">
                     <div class="notification-limit" x-ref="scrollLine_general">

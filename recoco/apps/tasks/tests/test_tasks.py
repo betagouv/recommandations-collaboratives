@@ -627,6 +627,30 @@ def test_delete_task_from_project_and_redirect(request, client, project_ready):
     assert response.status_code == 302
 
 
+@pytest.mark.django_db
+def test_delete_task_from_project_and_redirect_from_referer_url(
+    request, client, project_ready
+):
+    current_site = get_current_site(request)
+
+    task = Recipe(models.Task, project=project_ready, site=current_site).make()
+    conv_url = reverse("projects-project-detail-conversations", args=[project_ready.pk])
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project, current_site)
+        response = client.post(
+            reverse(
+                "projects-delete-task",
+                args=[task.id],
+            ),
+            headers={"REFERER": conv_url},
+        )
+    task = models.Task.deleted_on_site.get(id=task.id)
+    assert task.deleted
+    assert response.status_code == 302
+    assert response.url == conv_url
+
+
 ########################################################################
 # Push Actions
 ########################################################################
