@@ -5,10 +5,12 @@
 <div class="card-resource card h-100">
     <div class="card-resource__body fr-p-3v">
         {% if not resource.public %}
-            <div class="left-0">
-                <span data-test-id="task-draft-status"
-                        :class="`bg${getTaskColor(currentTask)}`"
-                        class="text-dark">Brouillon</span>
+            <div data-test-id="badge-new-task"
+                class="card-top-information d-flex align-items-center">
+                <div class="left-0">
+                    <span data-test-id="task-draft-status"
+                            class="bg-yellow text-dark">Brouillon</span>
+                </div>
             </div>
         {% endif %}
         <div class="card-resource__category rounded-top">
