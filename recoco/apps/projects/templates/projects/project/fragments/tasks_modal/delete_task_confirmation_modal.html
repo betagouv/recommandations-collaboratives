@@ -38,7 +38,6 @@
                           :action="deleteTaskUrl(currentDeletingTask.id)"
                           class="form fr-mt-2v">
                         {% csrf_token %}
-                        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
                         <button data-test-id="delete-task-modal-button"
                                 type="submit"
                                 class="button filled red">Supprimer</button>
