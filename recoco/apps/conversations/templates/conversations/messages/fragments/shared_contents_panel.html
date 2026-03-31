@@ -5,7 +5,7 @@ Managed by Alpine store: $store.sharedContentsPanel
 {% endcomment %}
 <template x-if="$store.sharedContentsPanel.isOpen">
     <div>
-        <div class="shared-contents-panel__backdrop"
+        <div class="shared-contents-panel__backdrop backdrop-overlay"
              @click="$store.sharedContentsPanel.close()"></div>
         <div class="shared-contents-panel"
              role="dialog"
