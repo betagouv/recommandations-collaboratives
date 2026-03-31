@@ -28,12 +28,6 @@ Alpine.data(
             this.regions = (await api.get(regionsUrl())).data.map((region) => {
               return { ...region, active: false };
             });
-          } else if (!listZone && !filterByRegions) {
-            this.departments = (await api.get(departmentsUrl())).data.map(
-              (department) => {
-                return { ...department, active: false };
-              }
-            );
           }
           if (selectedDepartments) {
             this.initSelectedDepartments();
