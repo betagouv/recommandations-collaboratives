@@ -46,6 +46,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <p class="fr-callout__title fr-mb-0">Contexte du projet</p>
                             <button @click="toggleEditContext()"
+                                    x-show="currentPhase === 1"
                                     class="fr-btn fr-btn--tertiary fr-btn--sm"
                                     :aria-label="isEditingContext ? 'Terminer la modification' : 'Modifier le contexte'"
                                     data-test-id="exploration-ia-edit-context-btn">
