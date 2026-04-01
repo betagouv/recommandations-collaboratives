@@ -463,55 +463,30 @@
                                       x-text="getAllSelectedResources().length"></span>
                             </h3>
                             <p class="fr-text--sm text-secondary fr-mb-3w">Toutes les ressources sélectionnées au cours de votre exploration.</p>
-                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                            <div class="d-flex flex-column gap-3">
                                 <template x-for="resource in getAllSelectedResources()" :key="resource.id">
-                                    <div class="col">
-                                        <div class="card h-100 exploration-ia-synthesis-card"
-                                             :class="{ 'exploration-ia-synthesis-card--co-reco': resource.fromStep === 2 }">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start fr-mb-2w">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <span class="fr-badge fr-badge--sm"
-                                                              :class="{ 'fr-badge--green-emeraude': resource.source_type === 'Resource', 'fr-badge--purple-glycine': resource.source_type === 'Recommendation' }"
-                                                              x-text="resource.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
-                                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
-                                                              x-show="resource.category"
-                                                              x-text="resource.category"></span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center gap-1">
-                                                        <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
-                                                              x-show="resource.coOccurrenceScore"
-                                                              :title="'Score de co-occurrence'">
-                                                            <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-                                                            <span x-text="resource.coOccurrenceScore"></span>
-                                                        </span>
-                                                        <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
-                                                              x-show="resource.label"
-                                                              x-text="'#' + resource.label"></span>
-                                                    </div>
+                                    <div class="card exploration-ia-synthesis-card"
+                                         :class="{ 'exploration-ia-synthesis-card--co-reco': resource.fromStep === 2 }">
+                                        <div class="card-body">
+                                            <!-- Header avec bouton créer en haut à droite -->
+                                            <div class="d-flex justify-content-between align-items-start fr-mb-3w">
+                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                    <span class="fr-badge fr-badge--sm"
+                                                          :class="{ 'fr-badge--green-emeraude': resource.source_type === 'Resource', 'fr-badge--purple-glycine': resource.source_type === 'Recommendation' }"
+                                                          x-text="resource.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
+                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                          x-show="resource.category"
+                                                          x-text="resource.category"></span>
+                                                    <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
+                                                          x-show="resource.coOccurrenceScore"
+                                                          :title="'Score de co-occurrence'">
+                                                        <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                        <span x-text="resource.coOccurrenceScore"></span>
+                                                    </span>
+                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                                          x-show="resource.label"
+                                                          x-text="'#' + resource.label"></span>
                                                 </div>
-                                                <h4 class="card-title fr-text--md" x-text="truncate(resource.title, 60)"></h4>
-                                                <p class="card-text fr-text--sm text-secondary"
-                                                   x-html="parseMarkdown(truncate(resource.content, 100))"></p>
-                                                <!-- Tags -->
-                                                <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
-                                                    <div class="d-flex flex-wrap gap-1">
-                                                        <template x-for="(tag, tagIdx) in (resource.tags || []).slice(0, 2)"
-                                                                  :key="tagIdx">
-                                                            <span class="fr-badge fr-badge--sm fr-badge--grey"
-                                                                  x-text="truncate(tag.name || tag, 15)"></span>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                                                <a :href="resource.resource_id ? '/ressource/' + resource.resource_id + '/' : (resource.reco_id && resource.project_id ? '/project/' + resource.project_id + '/actions/#action-' + resource.reco_id : '')"
-                                                   class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                                   target="_blank"
-                                                   x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
-                                                    <span class="fr-icon-external-link-line fr-mr-1v" aria-hidden="true"></span>
-                                                    Voir la fiche
-                                                </a>
                                                 <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
                                                    class="fr-btn fr-btn--primary fr-btn--sm"
                                                    target="_blank"
@@ -520,6 +495,51 @@
                                                     <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
                                                     Créer une recommandation
                                                 </a>
+                                            </div>
+                                            <!-- Contenu en deux colonnes -->
+                                            <div class="row">
+                                                <!-- Colonne gauche : Ressource -->
+                                                <div class="col-12 col-lg-5">
+                                                    <h4 class="card-title fr-text--md fr-mb-2w" x-text="resource.title"></h4>
+                                                    <p class="card-text fr-text--sm text-secondary"
+                                                       x-html="parseMarkdown(truncate(resource.content, 200))"></p>
+                                                    <!-- Tags -->
+                                                    <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
+                                                        <div class="d-flex flex-wrap gap-1">
+                                                            <template x-for="(tag, tagIdx) in (resource.tags || []).slice(0, 4)"
+                                                                      :key="tagIdx">
+                                                                <span class="fr-badge fr-badge--sm fr-badge--grey" x-text="tag.name || tag"></span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Lien vers la fiche -->
+                                                    <div class="fr-mt-2w">
+                                                        <a :href="resource.resource_id ? '/ressource/' + resource.resource_id + '/' : (resource.reco_id && resource.project_id ? '/project/' + resource.project_id + '/actions/#action-' + resource.reco_id : '')"
+                                                           class="fr-link fr-link--sm"
+                                                           target="_blank"
+                                                           x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
+                                                            <span class="fr-icon-external-link-line fr-icon--sm fr-mr-1v"
+                                                                  aria-hidden="true"></span>
+                                                            Voir la fiche complète
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <!-- Colonne droite : Texte généré par l'IA -->
+                                                <div class="col-12 col-lg-7 fr-mt-3w fr-mt-lg-0"
+                                                     x-show="resource.chunkTexts && resource.chunkTexts.length > 0">
+                                                    <div class="exploration-ia-synthesis-card__ai-content fr-p-3w rounded">
+                                                        <p class="fr-text--sm fr-text--bold fr-mb-2w">
+                                                            <span class="fr-icon-lightbulb-line fr-mr-1v" aria-hidden="true"></span>
+                                                            Suggestion de contenu pour votre recommandation
+                                                        </p>
+                                                        <template x-for="(chunkText, idx) in resource.chunkTexts" :key="idx">
+                                                            <div class="fr-mb-2w"
+                                                                 :class="{ 'fr-pb-2w border-bottom': idx < resource.chunkTexts.length - 1 }">
+                                                                <div class="fr-text--sm" x-html="parseMarkdown(chunkText)"></div>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
