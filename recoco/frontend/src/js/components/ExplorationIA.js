@@ -428,7 +428,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.allSelectedItems = [];
     this.answerChunks = [];
     this.citations = [];
-    this.foundAnswer = false;
+    this.foundAnswer = null;
     this.selectedChunks = [];
     this.hoveredSources = [];
     this.coRecommendations = [];

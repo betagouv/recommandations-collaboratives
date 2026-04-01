@@ -512,16 +512,16 @@
                                                             </template>
                                                         </div>
                                                     </div>
-                                                    <!-- Lien vers la fiche -->
+                                                    <!-- Lien vers la fiche (ouvre la modale) -->
                                                     <div class="fr-mt-2w">
-                                                        <a :href="resource.resource_id ? '/ressource/' + resource.resource_id + '/' : (resource.reco_id && resource.project_id ? '/project/' + resource.project_id + '/actions/#action-' + resource.reco_id : '')"
-                                                           class="fr-link fr-link--sm"
-                                                           target="_blank"
-                                                           x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
-                                                            <span class="fr-icon-external-link-line fr-icon--sm fr-mr-1v"
+                                                        <button @click="openResourceModal({ resource_id: resource.resource_id, reco_id: resource.reco_id, project_id: resource.project_id, source_type: resource.source_type, title: resource.title, content: resource.content, label: resource.label })"
+                                                                class="fr-link fr-link--sm"
+                                                                type="button"
+                                                                x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
+                                                            <span class="fr-icon-eye-line fr-icon--sm fr-mr-1v"
                                                                   aria-hidden="true"></span>
                                                             Voir la fiche complète
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <!-- Colonne droite : Texte généré par l'IA -->
