@@ -27,3 +27,16 @@ class InviteAcceptForm(forms.Form):
     last_name = forms.CharField(required=True)
     organization = forms.CharField(required=True)
     position = forms.CharField(required=True)
+    phone_no = forms.CharField(required=False)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    password_confirm = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        password_confirm = cleaned_data.get("password_confirm")
+        if password and password_confirm and password != password_confirm:
+            self.add_error(
+                "password_confirm", "Les mots de passe ne correspondent pas."
+            )
+        return cleaned_data
