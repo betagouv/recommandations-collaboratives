@@ -64,7 +64,14 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   // === LIFECYCLE ===
   init() {
-    // Initialisation du composant
+    // Scroll vers le haut lors des changements de phase
+    this.$watch('currentPhase', () => {
+      this.scrollToTop();
+    });
+  },
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   // === MODE TEST ===
