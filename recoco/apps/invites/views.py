@@ -122,6 +122,11 @@ def invite_accept(request, invite_id):
 
             return redirect(project.get_absolute_url())
 
+        # Form invalid for new account: re-render with errors
+        if not existing_account and not form.is_valid():
+            site_config = SiteConfiguration.objects.get(site=request.site)
+            return render(request, "invites/invite_details.html", locals())
+
     return redirect(reverse("invites-invite-details", args=(invite.pk,)))
 
 
