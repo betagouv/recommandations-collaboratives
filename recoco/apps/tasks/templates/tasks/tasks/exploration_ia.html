@@ -445,12 +445,12 @@
                              data-test-id="exploration-ia-summary">
                             <p class="fr-callout__title">
                                 <span class="fr-icon-checkbox-circle-fill fr-mr-1v" aria-hidden="true"></span>
-                                Ressources sélectionnées pour votre recommandation
+                                Vos <strong x-text="getAllSelectedResources().length"></strong> ressources sont prêtes pour créer vos recommandations.
                             </p>
+                            {% comment %}
                             <p class="fr-callout__text">
-                                Vous avez sélectionné <strong x-text="getAllSelectedResources().length"></strong> ressource(s)
-                                au cours de votre exploration. Utilisez-les pour créer une nouvelle recommandation.
                             </p>
+                            {% endcomment %}
                         </div>
                         <!-- Ressources sélectionnées (étapes 1 et 2 combinées) -->
                         <div class="exploration-ia-synthesis__section fr-mb-4w"
@@ -527,14 +527,8 @@
                             </div>
                         </div>
                         <!-- Actions finales -->
-                        <div class="d-flex justify-content-between align-items-center fr-py-3w border-top"
+                        <div class="d-flex justify-content-end align-items-center fr-py-3w border-top"
                              data-test-id="exploration-ia-final-actions">
-                            <button @click="resetExploration()"
-                                    class="fr-btn fr-btn--secondary"
-                                    data-test-id="exploration-ia-new-exploration-btn">
-                                <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
-                                Nouvelle exploration
-                            </button>
                             <div class="d-flex gap-2">
                                 <button @click="currentPhase = 2"
                                         class="fr-btn fr-btn--tertiary"
@@ -542,12 +536,12 @@
                                     <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
                                     Modifier la sélection
                                 </button>
-                                <a href="{% url 'projects-create-task' %}?project_id={{ project.pk }}&action=create&from=exploration"
-                                   class="fr-btn fr-btn--primary fr-btn--icon-left"
-                                   data-test-id="exploration-ia-create-recommendation-btn">
-                                    <span class="fr-icon-add-line" aria-hidden="true"></span>
-                                    Créer une recommandation
-                                </a>
+                                <button @click="resetExploration()"
+                                        class="fr-btn fr-btn--primary"
+                                        data-test-id="exploration-ia-new-exploration-btn">
+                                    <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
+                                    Nouvelle exploration
+                                </button>
                             </div>
                         </div>
                     </div>
