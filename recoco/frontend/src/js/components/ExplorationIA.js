@@ -1031,36 +1031,35 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     };
   },
 
-  highlightCitationInContent(content, citationContent) {
-    if (!content || !citationContent) return content;
+  /**
+   * Surligne une citation dans du contenu HTML.
+   * Approche : on cherche le texte brut de la citation dans le HTML,
+   * en autorisant des balises HTML entre les mots.
+   */
+  highlightCitationInHtml(html, citationMarkdown) {
+    if (!html || !citationMarkdown) return html;
 
-    // Nettoyer et normaliser le passage cité pour la recherche
-    const normalizedCitation = citationContent.trim();
-    if (normalizedCitation.length < 10) return content;
+    // 1. Nettoyer la citation (enlever guillemets JSON)
+    const cleanCitation = citationMarkdown.trim().replace(/^["']|["']$/g, '').trim();
+    if (cleanCitation.length < 10) return html;
 
-    // Échapper les caractères spéciaux pour l'expression régulière
-    const escapedCitation = normalizedCitation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // 2. Convertir la citation markdown en texte brut
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = marked.parse(cleanCitation, { breaks: true });
+    const plainText = (tempDiv.textContent || '').trim();
+    if (plainText.length < 10) return html;
 
-    // Créer une regex pour trouver le passage (insensible à la casse, avec tolérance aux espaces)
-    const flexiblePattern = escapedCitation.replace(/\s+/g, '\\s+');
+    // 3. Créer un pattern regex qui tolère les balises HTML entre les mots
+    const escaped = plainText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Remplacer chaque espace par un pattern qui accepte : espaces OU balises HTML
+    const pattern = escaped.replace(/\s+/g, '(?:\\s|<[^>]*>)+');
 
     try {
-      const regex = new RegExp(`(${flexiblePattern})`, 'gi');
-      const highlighted = content.replace(
-        regex,
-        '<mark class="exploration-ia-highlight">$1</mark>'
-      );
-      return highlighted;
+      const regex = new RegExp(`(${pattern})`, 'gis');
+      return html.replace(regex, '<mark class="exploration-ia-highlight">$1</mark>');
     } catch (e) {
-      // Si la regex échoue, essayer une recherche simple
-      const index = content.toLowerCase().indexOf(normalizedCitation.toLowerCase());
-      if (index !== -1) {
-        const before = content.substring(0, index);
-        const match = content.substring(index, index + normalizedCitation.length);
-        const after = content.substring(index + normalizedCitation.length);
-        return `${before}<mark class="exploration-ia-highlight">${match}</mark>${after}`;
-      }
-      return content;
+      console.warn('Erreur regex highlight:', e);
+      return html;
     }
   },
 
@@ -1075,11 +1074,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     // Construire le contenu complet de la ressource
     let fullContent = resource.content || resource.text || resource.summary || '';
 
-    // Appliquer la mise en surbrillance
-    const highlightedContent = this.highlightCitationInContent(fullContent, citationContent);
-
-    // Parser le markdown et sanitize
-    return this.parseMarkdown(highlightedContent);
+    // Parser le markdown en HTML, puis surligner la citation
+    const htmlContent = this.parseMarkdown(fullContent);
+    return this.highlightCitationInHtml(htmlContent, citationContent);
   },
 
   getRecommendationContentWithHighlight() {
@@ -1089,15 +1086,11 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
     const recommendation = this.resourceModal.recommendation;
     const citationContent = this.resourceModal.citation.content;
-
-    // Le contenu de la recommandation peut être dans différents champs
     let fullContent = recommendation.content || recommendation.comment || recommendation.intent || '';
 
-    // Appliquer la mise en surbrillance
-    const highlightedContent = this.highlightCitationInContent(fullContent, citationContent);
-
-    // Parser le markdown et sanitize
-    return this.parseMarkdown(highlightedContent);
+    // Parser le markdown en HTML, puis surligner la citation
+    const htmlContent = this.parseMarkdown(fullContent);
+    return this.highlightCitationInHtml(htmlContent, citationContent);
   },
 
   // Vérifie si on a du contenu à afficher (ressource ou recommandation)
