@@ -9,6 +9,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 
 from actstream import action
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
@@ -17,10 +18,12 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import DetailView
 
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
+from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -48,59 +51,143 @@ def project_detail(request, project_id=None):
     return redirect(reverse("projects-project-detail-overview", args=[project_id]))
 
 
-@login_required
-def project_overview(request, project_id=None):
-    """Return the details of given project for switchtender"""
+class ProjectDetailBaseView(LoginRequiredMixin, DetailView):
+    """Base view to share common data/computation required by the project page templates"""
 
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site)
-        .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department")
-        .prefetch_related("project_creation_requests"),
-        pk=project_id,
-    )
+    http_method_names = ["get", "head", "options"]
 
-    project_creation_request = project.project_creation_requests.first()
+    pk_url_kwarg = "project_id"
+    model = models.Project
+    context_object_name = "project"
 
-    site_config = request.site_config
+    def check_permissions(self):
+        return has_perm(
+            self.request.user, "list_projects", self.request.site
+        ) or has_perm_or_403(self.request.user, "view_project", self.object)
 
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
 
-    users_to_display = list(
-        HitCount.on_site.for_context_object(project)
-        .for_user(request.user)
-        .filter(
-            content_object_ct=ContentType.objects.get_for_model(User),
+        # we cannot use "UserPassesMixin" since we need more context than possible,
+        # so call this method between the object and the context creation
+        self.check_permissions()
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def get_object(self):
+        self.pk = self.kwargs.get(self.pk_url_kwarg)
+
+        return get_object_or_404(
+            models.Project.objects.filter(sites=self.request.site)
+            .with_unread_notifications(user_id=self.request.user.id)
+            .select_related("commune__department")
+            .prefetch_related("project_creation_requests"),
+            pk=self.pk,
         )
-        .distinct()
-        .values_list("content_object_id", flat=True)
-    )
 
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_project", project
-    )
+        is_regional_actor = is_regional_actor_for_project(
+            self.request.site, self.object, self.request.user, allow_national=True
+        )
 
-    try:
-        onboarding_response = dict(project.onboarding.response)
-    except models.Project.onboarding.RelatedObjectDoesNotExist:
-        onboarding_response = None
+        advising, advising_position = get_advising_context_for_project(
+            self.request.user, self.object
+        )
 
-    # Make sure we track record of user's interest for this project
-    if not request.user.is_hijacked:
-        mark_notifications_as_seen(request.user, project)
+        context["advising"] = advising
+        context["advising_position"] = advising_position
 
-        if is_regional_actor or is_advisor_for_project(request.user, project):
-            update_user_project_status(request.site, request.user, project)
+        context["project_creation_request"] = (
+            self.object.project_creation_requests.first()
+        )
 
-    invite_form = InviteForm()
+        context["site_config"] = self.request.site_config
 
-    return render(request, "projects/project/overview.html", locals())
+        context["users_to_display"] = list(
+            HitCount.on_site.for_context_object(self.object)
+            .for_user(self.request.user)
+            .filter(
+                content_object_ct=ContentType.objects.get_for_model(User),
+            )
+            .distinct()
+            .values_list("content_object_id", flat=True)
+        )
+
+        try:
+            onboarding_response = dict(self.object.onboarding.response)
+        except models.Project.onboarding.RelatedObjectDoesNotExist:
+            onboarding_response = None
+
+        context["onboarding_response"] = onboarding_response
+
+        # Make sure we track record of user's interest for this project
+        if not self.request.user.is_hijacked:
+            mark_notifications_as_seen(self.request.user, self.object)
+
+            if is_regional_actor or is_advisor_for_project(
+                self.request.user, self.object
+            ):
+                update_user_project_status(
+                    self.request.site, self.request.user, self.object
+                )
+
+        context["invite_form"] = InviteForm()
+
+        # load plugin hook for adding tab entries
+        pm = get_tenant_hook(self.request)
+        context["plugin_tabs"] = pm.hook.project_tab_entries()
+
+        return context
+
+
+class ProjectOverviewView(ProjectDetailBaseView):
+    """Display main info of projects (first tab in nav)"""
+
+    template_name = "projects/project/overview.html"
+
+
+class ProjectKnowledgeView(ProjectDetailBaseView):
+    """Show the survey results for a given project"""
+
+    template_name = "projects/project/knowledge.html"
+
+    def check_permissions(self):
+        return has_perm(
+            self.request.user, "list_projects", self.request.site
+        ) or has_perm_or_403(self.request.user, "view_surveys", self.object)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["can_view_updated_answers"] = (
+            context["advising"]
+            or is_member(self.request.user, self.object, allow_draft=True)
+            or is_staff_for_site(self.request.user, self.request.site)
+        )
+
+        session, created = survey_models.Session.objects.get_or_create(
+            project=self.object, survey=self.request.site_config.project_survey
+        )
+
+        context["sorted_sessions"] = sorted(
+            self.object.survey_session.select_related("survey__site"),
+            key=lambda session: session.survey.site != self.request.site,
+        )
+
+        # Mark this project survey notifications as read
+        if not self.request.user.is_hijacked:
+            project_ct = ContentType.objects.get_for_model(self.object)
+            survey_ct = ContentType.objects.get_for_model(survey_models.Session)
+            self.request.user.notifications.unread().filter(
+                action_object_content_type=survey_ct,
+                target_content_type=project_ct.pk,
+                target_object_id=self.object.pk,
+            ).mark_all_as_read()
+
+        return context
 
 
 def update_user_project_status(site, user, project):
@@ -146,93 +233,15 @@ def mark_notifications_as_seen(user, project):
     notifications.mark_all_as_read()
 
 
-@login_required
-def project_knowledge(request, project_id=None):
-    """Return the survey results for a given project"""
-
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site)
-        .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
-        pk=project_id,
-    )
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    can_view_updated_answers = (
-        advising
-        or is_member(request.user, project, allow_draft=True)
-        or is_staff_for_site(request.user, request.site)
-    )
-
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_surveys", project
-    )
-
-    site_config = request.site_config
-
-    session, created = survey_models.Session.objects.get_or_create(
-        project=project, survey=site_config.project_survey
-    )
-
-    sorted_sessions = sorted(
-        project.survey_session.select_related("survey__site"),
-        key=lambda session: session.survey.site != request.site,
-    )
-
-    # Mark this project survey notifications as read
-    if not request.user.is_hijacked:
-        project_ct = ContentType.objects.get_for_model(project)
-        survey_ct = ContentType.objects.get_for_model(survey_models.Session)
-        request.user.notifications.unread().filter(
-            action_object_content_type=survey_ct,
-            target_content_type=project_ct.pk,
-            target_object_id=project.pk,
-        ).mark_all_as_read()
-
-    return render(request, "projects/project/knowledge.html", locals())
-
-
-@login_required
-def project_actions(request, project_id=None):
+class ProjectRecommandationsView(ProjectDetailBaseView):
     """Action page for given project"""
 
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site)
-        .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
-        pk=project_id,
-    )
+    template_name = "projects/project/actions.html"
 
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_tasks", project
-    )
-
-    # FIXME check this really been deleted from develop
-    # Mark this project action notifications as read
-    # project_ct = ContentType.objects.get_for_model(project)
-    # task_ct = ContentType.objects.get_for_model(task_models.Task)
-    # task_notifications = request.user.notifications.unread().filter(
-    #     action_object_content_type=task_ct,
-    #     target_content_type=project_ct.pk,
-    #     target_object_id=project.pk,
-    # )  # XXX Bug?
-
-    return render(request, "projects/project/actions.html", locals())
+    def check_permissions(self):
+        return has_perm(
+            self.request.user, "list_projects", self.request.site
+        ) or has_perm_or_403(self.request.user, "view_tasks", self.object)
 
 
 @xframe_options_exempt
@@ -275,95 +284,76 @@ def project_actions_inline(request, project_id=None):
     return render(request, "projects/project/actions_inline.html", locals())
 
 
-@login_required
-def project_conversations_new(request, project_id=None):
-    """New Conversation page for project"""
+class ProjectConversationView(ProjectDetailBaseView):
+    """Conversation page for project"""
 
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site)
-        .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
-        pk=project_id,
-    )
+    template_name = "projects/project/conversations_new.html"
 
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    recipients = get_notification_recipients_for_project(project)
-
-    # Convert QuerySet to list of dicts for JSON serialization
-    recipients_data = list(
-        recipients.values(
-            "id",
-            "email",
-            "first_name",
-            "last_name",
-            "profile__organization__name",
-            "profile__organization_position",
-            "is_active",
+    def check_permissions(self):
+        is_regional_actor = is_regional_actor_for_project(
+            self.request.site, self.object, self.request.user, allow_national=True
         )
-    )
 
-    # Get files from EDL (État des lieux) surveys
-    edl_files = list(
-        survey_models.Answer.objects.filter(session__project=project)
-        .exclude(attachment="")
-        .exclude(attachment__isnull=True)
-        .values("id", "attachment", "updated_on")
-    )
+        return is_regional_actor or has_perm_or_403(
+            self.request.user, "view_public_notes", self.object
+        )
 
-    return render(
-        request,
-        "projects/project/conversations_new.html",
-        context={
-            "project": project,
-            "is_regional_actor": is_regional_actor,
-            "advising": advising,
-            "advising_position": advising_position,
-            "recipients": recipients_data,
-            "edl_files": edl_files,
-        },
-    )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        recipients = get_notification_recipients_for_project(self.object)
+
+        # Convert QuerySet to list of dicts for JSON serialization
+        context["recipients"] = list(
+            recipients.values(
+                "id",
+                "email",
+                "first_name",
+                "last_name",
+                "profile__organization__name",
+                "profile__organization_position",
+                "is_active",
+            )
+        )
+
+        # Get files from EDL (État des lieux) surveys
+        context["edl_files"] = list(
+            survey_models.Answer.objects.filter(session__project=self.object)
+            .exclude(attachment="")
+            .exclude(attachment__isnull=True)
+            .values("id", "attachment", "updated_on")
+        )
+
+        return context
 
 
-@login_required
-def project_internal_followup(request, project_id=None):
+class ProjectAdvisorConversationView(ProjectDetailBaseView):
     """Advisors chat for given project"""
 
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ),
-        pk=project_id,
-    )
+    template_name = "projects/project/internal_followup.html"
 
-    has_perm_or_403(request.user, "projects.use_private_notes", project)
+    def check_permissions(self):
+        return has_perm_or_403(
+            self.request.user, "projects.use_private_notes", self.object
+        )
 
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    # Mark this project notifications as read
-    if not request.user.is_hijacked:
-        project_ct = ContentType.objects.get_for_model(project)
-        note_ct = ContentType.objects.get_for_model(models.Note)
-        request.user.notifications.unread().filter(
-            action_object_content_type=note_ct,
-            action_notes__public=False,
-            target_content_type=project_ct.pk,
-            target_object_id=project.pk,
-        ).mark_all_as_read()
+        context["private_note_form"] = PrivateNoteForm()
 
-    private_note_form = PrivateNoteForm()
+        # Mark this project notifications as read
+        if not self.request.user.is_hijacked:
+            project_ct = ContentType.objects.get_for_model(self.object)
+            note_ct = ContentType.objects.get_for_model(models.Note)
+            self.request.user.notifications.unread().filter(
+                action_object_content_type=note_ct,
+                action_notes__public=False,
+                target_content_type=project_ct.pk,
+                target_object_id=self.object.pk,
+            ).mark_all_as_read()
 
-    return render(request, "projects/project/internal_followup.html", locals())
+        return context
 
 
 @login_required
