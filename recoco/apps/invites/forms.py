@@ -8,8 +8,15 @@ created : 2022-04-19 14:16:20 CEST
 """
 
 from django import forms
+from django.contrib.auth.password_validation import validate_password
+from django.core.validators import RegexValidator
 
 from . import models
+
+phone_validator = RegexValidator(
+    regex=r"^(\+33|0)[0-9]{9}$",
+    message="Format attendu : 0102030405 ou +33102030405.",
+)
 
 
 class InviteForm(forms.ModelForm):
@@ -27,9 +34,23 @@ class InviteAcceptForm(forms.Form):
     last_name = forms.CharField(required=True)
     organization = forms.CharField(required=True)
     position = forms.CharField(required=True)
-    phone_no = forms.CharField(required=False)
-    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    phone_no = forms.CharField(
+        required=True,
+        max_length=16,
+        validators=[phone_validator],
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput,
+        required=True,
+        help_text="10 caractères minimum, au moins 1 majuscule et 1 chiffre.",
+    )
     password_confirm = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+        if password:
+            validate_password(password)
+        return password
 
     def clean(self):
         cleaned_data = super().clean()

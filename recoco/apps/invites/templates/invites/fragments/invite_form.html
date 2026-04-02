@@ -133,6 +133,7 @@
                         <div class="fr-input-group">
                             <label class="fr-label" for="input-password">
                                 Mot de passe
+                                <span class="fr-hint-text">{{ form.password.help_text }}</span>
                             </label>
                             <input type="password"
                                    class="fr-input {% if form.password.errors %}is-invalid{% endif %}"
