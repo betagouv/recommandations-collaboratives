@@ -140,7 +140,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   // === RECHERCHE API ML ===
   async performSearch() {
     if (!this.searchQuery.trim()) {
-      this.error = 'Veuillez saisir des mots-cles';
+      this.error = 'Veuillez saisir des mots-clés';
       return;
     }
     this.isLoading = true;
@@ -184,7 +184,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       }
       console.log('ExplorationIA mapped results:', this.answerChunks, this.citations);
     } catch (err) {
-      this.error = 'Erreur lors de la recherche. Veuillez reessayer.';
+      this.error = 'Erreur lors de la recherche. Veuillez réessayer.';
       console.error('ExplorationIA search error:', err);
       this.$store.app.displayToastMessage({
         message: 'Erreur lors de la recherche',
@@ -555,7 +555,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         this.selectedChunks = [];
       }
     } catch (err) {
-      this.error = 'Erreur lors de la recherche. Veuillez reessayer.';
+      this.error = 'Erreur lors de la recherche. Veuillez réessayer.';
       console.error('ExplorationIA related search error:', err);
     } finally {
       this.isLoading = false;
@@ -1147,15 +1147,15 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   getPhaseTitle(phase) {
     const titles = {
       1: 'Recherche initiale',
-      2: 'Exploration iterative',
-      3: 'Synthese des resultats',
+      2: 'Exploration itérative',
+      3: 'Synthèse des résultats',
     };
     return titles[phase] || '';
   },
 
   getPhaseDescription(phase) {
     const descriptions = {
-      1: 'Sélectionner les passages qui vous semble pertinent avant de continuer',
+      1: 'Sélectionnez les passages qui vous semblent pertinents avant de continuer',
       2: 'Continuez à explorer ou lancez la synthèse',
       3: 'Analyse des résultats sélectionnés',
     };

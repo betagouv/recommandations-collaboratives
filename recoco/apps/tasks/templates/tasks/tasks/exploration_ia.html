@@ -69,7 +69,7 @@
                                       rows="4"
                                       placeholder="Décrivez le contexte de votre projet..."
                                       data-test-id="exploration-ia-context-input"></textarea>
-                            <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA a mieux comprendre votre projet.</p>
+                            <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA à mieux comprendre votre projet.</p>
                         </div>
                     </div>
                     <template x-if="currentPhase < 2">
@@ -272,12 +272,12 @@
                                      x-show="getSelectableChunksCount() > 0">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="fr-text--sm text-secondary">
-                                            <span x-text="selectedChunks.length"></span> / <span x-text="getSelectableChunksCount()"></span> passage(s) selectionne(s)
+                                            <span x-text="selectedChunks.length"></span> / <span x-text="getSelectableChunksCount()"></span> passage(s) sélectionné(s)
                                         </span>
                                         <template x-if="selectedChunks.length > 0">
                                             <button @click="clearChunkSelection()"
                                                     class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                                    title="Deselectionner tout">
+                                                    title="Désélectionner tout">
                                                 <span class="fr-icon-close-line" aria-hidden="true"></span>
                                             </button>
                                         </template>
@@ -328,7 +328,7 @@
                                 <div class="card-header bg-transparent">
                                     <h3 class="fr-text--md fr-mb-0">
                                         <span class="fr-icon-book-2-line fr-mr-1v" aria-hidden="true"></span>
-                                        Bibliographie de la reponse
+                                        Bibliographie de la réponse
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -361,8 +361,8 @@
                     <div x-show="!hasAnswerResults() && !isLoading && searchQuery.length > 0 && foundAnswer === false"
                          class="fr-callout fr-callout--blue-ecume fr-mb-3w"
                          data-test-id="exploration-ia-no-results">
-                        <p class="fr-callout__title">Aucun resultat trouvé</p>
-                        <p class="fr-callout__text">Essayez d'autres mots-cles ou simplifiez votre recherche.</p>
+                        <p class="fr-callout__title">Aucun résultat trouvé</p>
+                        <p class="fr-callout__text">Essayez d'autres mots-clés ou simplifiez votre recherche.</p>
                     </div>
                     <!-- Historique des selections (Phase 2) -->
                     <template x-if="currentPhase === 2 && allSelectedItems.length > 0">
@@ -370,7 +370,7 @@
                              data-test-id="exploration-ia-history">
                             <h3 class="fr-text--md fr-mb-2w">
                                 <span class="fr-icon-history-line fr-mr-1v"></span>
-                                Elements deja selectionnes (<span x-text="allSelectedItems.length"></span>)
+                                Éléments déjà sélectionnés (<span x-text="allSelectedItems.length"></span>)
                             </h3>
                             <div class="exploration-ia-history__tags">
                                 <template x-for="item in allSelectedItems" :key="item.id">
