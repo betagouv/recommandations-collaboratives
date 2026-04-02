@@ -9,7 +9,6 @@ from rest_framework import serializers
 
 from recoco.apps.addressbook.models import Contact
 from recoco.apps.addressbook.serializers import NestedContactSerializer
-from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import reactivate_if_necessary
@@ -100,7 +99,6 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
             "resource",
             "resource_id",
             "topic",
-            "ds_folder",
             "notifications",
             "followups_count",
             "comments_count",
@@ -121,7 +119,6 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
     created_by = UserSerializer(read_only=True)
     document = DocumentSerializer(read_only=True, many=True)
     topic = TopicSerializer(read_only=True)
-    ds_folder = DSFolderSerializer(read_only=True)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
@@ -208,7 +205,7 @@ class TaskWithMessageSerializer(TaskSerializer):
             "resource",
             "resource_id",
             "topic",
-            "ds_folder",
+            # todo display possibility for ds_folder
             "notifications",
             "followups_count",
             "comments_count",
