@@ -45,10 +45,15 @@ def get_tenant_hook(request):
     recoco_pm.add_hookspecs(ProjectSpec)
 
     # Feed the scoped plugin manager with enabled plugins
-    enabled = set(request.site_config.enabled_plugins)
+    if (
+        hasattr(request, "site_config")
+        and request.site_config
+        and request.site_config.enabled_plugins
+    ):
+        enabled = set(request.site_config.enabled_plugins)
 
-    for name, plugin in pm.list_name_plugin():
-        if name in enabled:
-            recoco_pm.register(plugin, name=name)
+        for name, plugin in pm.list_name_plugin():
+            if name in enabled:
+                recoco_pm.register(plugin, name=name)
 
     return recoco_pm
