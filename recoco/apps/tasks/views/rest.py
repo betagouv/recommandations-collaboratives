@@ -71,9 +71,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                     "followups", filter=~Q(followups__comment="")
                 ),
             )
-            .select_related(
-                "ds_folder", "topic", "created_by__profile", "site", "project"
-            )
+            .select_related("topic", "created_by__profile", "site", "project")
             .prefetch_related("followups")
             .order_by("-created_on", "-updated_on")
         )
