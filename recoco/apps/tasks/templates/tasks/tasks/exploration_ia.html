@@ -384,9 +384,11 @@
                         <div class="footer-actions d-flex align-items-center fr-py-3w border-top"
                              :class="{ 'justify-content-between': selectedChunks.length == 0, 'justify-content-end': selectedChunks.length > 0 }"
                              data-test-id="exploration-ia-phase-actions">
-                            <p class="fr-mb-0 text-secondary"
-                               x-show="selectedChunks.length == 0"
-                               x-text="getPhaseDescription(currentPhase)"></p>
+                            <div class="exploration-ia-phase-hint"
+                                 x-show="selectedChunks.length == 0">
+                                <span class="fr-icon-arrow-right-s-line" aria-hidden="true"></span>
+                                <span x-text="getPhaseDescription(currentPhase)"></span>
+                            </div>
                             <div class="d-flex gap-2">
                                 <button x-show="currentPhase === 2"
                                         @click="resetExploration()"
