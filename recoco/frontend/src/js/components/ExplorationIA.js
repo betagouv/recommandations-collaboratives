@@ -931,6 +931,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   },
 
   getCitationUrl(citation) {
+    if (!citation) return null;
     if (citation.resource_id) {
       return `/ressource/${citation.resource_id}/`;
     }
@@ -995,6 +996,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       this.resourceModal.error = 'Erreur lors du chargement.';
     } finally {
       this.resourceModal.isLoading = false;
+      // Attendre le rendu du DOM puis scroller vers le passage surligné
+      this.$nextTick(() => {
+        this.scrollToHighlight();
+      });
     }
   },
 
@@ -1029,6 +1034,20 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       recommendation: null,
       error: null,
     };
+  },
+
+  /**
+   * Scroll vers le passage surligné dans la modale après ouverture.
+   */
+  scrollToHighlight() {
+    const modalBody = document.querySelector('.exploration-ia-modal__body');
+    const highlight = modalBody?.querySelector('.exploration-ia-highlight');
+    if (highlight && modalBody) {
+      // Petit délai pour s'assurer que le contenu est bien rendu
+      setTimeout(() => {
+        highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
   },
 
   /**
