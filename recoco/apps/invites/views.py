@@ -76,7 +76,6 @@ def invite_accept(request, invite_id):
                     last_name=form.cleaned_data.get("last_name"),
                 )
                 user.set_password(form.cleaned_data.get("password"))
-                user.save()
 
                 org_name = form.cleaned_data.get("organization")
                 organization = addressbook_models.Organization.get_or_create(org_name)
@@ -84,7 +83,7 @@ def invite_accept(request, invite_id):
 
                 user.profile.organization = organization
                 user.profile.organization_position = form.cleaned_data.get("position")
-                user.profile.phone_no = form.cleaned_data.get("phone_no") or ""
+                user.profile.phone_no = form.cleaned_data.get("phone_no")
 
                 user.profile.save()
 
@@ -124,7 +123,6 @@ def invite_accept(request, invite_id):
 
         # Form invalid for new account: re-render with errors
         if not existing_account and not form.is_valid():
-            site_config = SiteConfiguration.objects.get(site=request.site)
             return render(request, "invites/invite_details.html", locals())
 
     return redirect(reverse("invites-invite-details", args=(invite.pk,)))

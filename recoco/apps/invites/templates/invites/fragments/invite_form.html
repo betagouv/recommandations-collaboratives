@@ -123,8 +123,9 @@
                            class="fr-input {% if form.phone_no.errors %}is-invalid{% endif %}"
                            id="input-phone-no"
                            name="{{ form.phone_no.name }}"
-                           placeholder="+33 6 00 00 00 00"
-                           value="{{ form.phone_no.value|default:'' }}">
+                           placeholder="06 00 00 00 00"
+                           value="{{ form.phone_no.value|default:'' }}"
+                           required>
                     {% for error in form.phone_no.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w">
@@ -132,7 +133,6 @@
                         <div class="fr-input-group">
                             <label class="fr-label" for="input-password">
                                 Mot de passe
-                                <span class="fr-hint-text">Choisissez un mot de passe sécurisé</span>
                             </label>
                             <input type="password"
                                    class="fr-input {% if form.password.errors %}is-invalid{% endif %}"
