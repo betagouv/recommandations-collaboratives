@@ -128,7 +128,7 @@
                            required>
                     {% for error in form.phone_no.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                 </div>
-                <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w">
+                <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w fr-grid-row--bottom">
                     <div class="fr-col-6">
                         <div class="fr-input-group">
                             <label class="fr-label" for="input-password">
@@ -145,9 +145,7 @@
                     </div>
                     <div class="fr-col-6">
                         <div class="fr-input-group">
-                            <label class="fr-label" for="input-password-confirm">
-                                Confirmation du mot de passe
-                            </label>
+                            <label class="fr-label" for="input-password-confirm">Confirmation du mot de passe</label>
                             <input type="password"
                                    class="fr-input {% if form.password_confirm.errors %}is-invalid{% endif %}"
                                    id="input-password-confirm"
