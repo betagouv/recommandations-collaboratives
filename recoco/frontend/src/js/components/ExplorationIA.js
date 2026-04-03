@@ -3,8 +3,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { ToastType } from '../models/toastType';
 
-// const ML_API_BASE_URL = 'https://ml.recoconseil.fr';
-const ML_API_BASE_URL = 'http://localhost:9080';
+const ML_API_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL;
 
 Alpine.data('ExplorationIA', (config = {}) => ({
   // === CONFIGURATION ===
@@ -65,6 +64,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   // === LIFECYCLE ===
   init() {
+    console.log('ExplorationIA init', ML_API_BASE_URL);
     // Scroll vers le haut lors des changements de phase
     this.$watch('currentPhase', () => {
       this.scrollToTop();

@@ -3,6 +3,7 @@ import { resolve } from 'path';
 const config = {
   plugins: [],
   root: resolve('./src'),
+  envDir: resolve('./'),
   base: '/static/',
   server: {
     origin: 'http://localhost:3000',
