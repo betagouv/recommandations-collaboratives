@@ -133,8 +133,8 @@
                                      :data-test-id="'exploration-ia-source-card-' + citation.label">
                                     <div class="d-flex align-items-center gap-2 fr-mb-1v">
                                         <span class="fr-badge fr-badge--sm"
-                                              :class="{ 'fr-badge--green-emeraude': citation.source_type === 'Resource', 'fr-badge--purple-glycine': citation.source_type === 'Recommendation' }"
-                                              x-text="citation.source_type === 'Resource' ? 'Ressource' : 'Reco'"></span>
+                                              :class="{ 'fr-badge--green-emeraude': citation.source_type === 'resource', 'fr-badge--purple-glycine': citation.source_type === 'recommendation' }"
+                                              x-text="citation.source_type === 'resource' ? 'Ressource' : 'Reco'"></span>
                                         <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                               x-text="'#' + citation.label"></span>
                                     </div>
@@ -224,7 +224,7 @@
                                                     <!-- Titre -->
                                                     <div class="card-resource__title">
                                                         <a href="#"
-                                                           @click.prevent.stop="openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'Resource', label: 'co-reco' })"
+                                                           @click.prevent.stop="openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'resource', label: 'co-reco' })"
                                                            x-text="truncate(resource.title, 80)"></a>
                                                     </div>
                                                     <!-- Description -->
@@ -340,7 +340,7 @@
                                                 <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                                       x-text="'Source ' + citation.label"></span>
                                                 <span class="fr-badge fr-badge--sm fr-badge--no-icon"
-                                                      :class="{ 'fr-badge--green-emeraude': citation.source_type === 'Resource', 'fr-badge--purple-glycine': citation.source_type === 'Recommendation' }"
+                                                      :class="{ 'fr-badge--green-emeraude': citation.source_type === 'resource', 'fr-badge--purple-glycine': citation.source_type === 'recommendation' }"
                                                       x-text="getSourceTypeLabel(citation.source_type)"></span>
                                             </div>
                                             <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
@@ -473,8 +473,8 @@
                                             <div class="d-flex justify-content-between align-items-start fr-mb-3w">
                                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                                     <span class="fr-badge fr-badge--sm"
-                                                          :class="{ 'fr-badge--green-emeraude': resource.source_type === 'Resource', 'fr-badge--purple-glycine': resource.source_type === 'Recommendation' }"
-                                                          x-text="resource.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
+                                                          :class="{ 'fr-badge--green-emeraude': resource.source_type === 'resource', 'fr-badge--purple-glycine': resource.source_type === 'recommendation' }"
+                                                          x-text="resource.source_type === 'resource' ? 'Ressource' : 'Recommandation'"></span>
                                                     <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                                           x-show="resource.category"
                                                           x-text="resource.category"></span>
@@ -589,8 +589,8 @@
                             <div class="flex-grow-1 fr-pr-2w">
                                 <div class="d-flex align-items-center gap-2 fr-mb-1w">
                                     <span class="fr-badge fr-badge--sm"
-                                          :class="{ 'fr-badge--green-emeraude': resourceModal.citation?.source_type === 'Resource', 'fr-badge--purple-glycine': resourceModal.citation?.source_type === 'Recommendation' }"
-                                          x-text="resourceModal.citation?.source_type === 'Resource' ? 'Ressource' : 'Recommandation'"></span>
+                                          :class="{ 'fr-badge--green-emeraude': resourceModal.citation?.source_type === 'resource', 'fr-badge--purple-glycine': resourceModal.citation?.source_type === 'recommendation' }"
+                                          x-text="resourceModal.citation?.source_type === 'resource' ? 'Ressource' : 'Recommandation'"></span>
                                     <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                           x-show="resourceModal.citation"
                                           x-text="'Source ' + (resourceModal.citation?.label || '')"></span>

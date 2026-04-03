@@ -112,7 +112,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         resource_id: 120,
         reco_id: null,
         project_id: null,
-        source_type: "Resource"
+        source_type: "resource"
       },
       {
         label: "2.1",
@@ -121,7 +121,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         resource_id: null,
         reco_id: 5623,
         project_id: 2557,
-        source_type: "Recommendation"
+        source_type: "recommendation"
       },
       {
         label: "3.1",
@@ -130,7 +130,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         resource_id: null,
         reco_id: 4521,
         project_id: 778,
-        source_type: "Recommendation"
+        source_type: "recommendation"
       }
     ];
 
@@ -369,9 +369,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       const grouped = this.groupByType(this.allSelectedItems);
 
       this.synthesis = {
-        resources: grouped.resource || grouped.Resource || grouped.Document || [],
-        projects: grouped.project || grouped.Project || [],
-        recommendations: grouped.recommendation || grouped.Recommendation || [],
+        resources: grouped.resource || grouped.document || [],
+        projects: grouped.project || [],
+        recommendations: grouped.recommendation || [],
       };
 
       // Ajouter les co-recommandations SÉLECTIONNÉES aux ressources de la synthèse
@@ -381,7 +381,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
           id: resource.id || resource.resourceId,
           title: resource.title,
           content: resource.content || '',
-          type: 'Resource',
+          type: 'resource',
           resourceId: resource.resourceId || resource.id,
           category: resource.category,
           tags: resource.tags,
@@ -601,7 +601,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
           const citation = this.getCitationByLabel(label);
-          if (citation && citation.source_type === 'Recommendation' && !citation.resource_id && citation.reco_id) {
+          if (citation && citation.source_type === 'recommendation' && !citation.resource_id && citation.reco_id) {
             if (!recoCitations.find((c) => c.reco_id === citation.reco_id)) {
               recoCitations.push(citation);
             }
@@ -909,7 +909,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         id: resource.id,
         title: resource.title,
         content: resource.content,
-        source_type: 'Resource',
+        source_type: 'resource',
         resource_id: resource.resourceId || resource.id,
         category: resource.category,
         tags: resource.tags,
@@ -1135,9 +1135,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   getSourceTypeLabel(sourceType) {
     const labels = {
-      Resource: 'Ressource',
-      Recommendation: 'Recommandation',
-      Project: 'Projet',
+      resource: 'Ressource',
+      recommendation: 'Recommandation',
+      project: 'Projet',
+      document: 'Document',
     };
     return labels[sourceType] || sourceType;
   },
