@@ -70,16 +70,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     });
     Alpine.store('tasksData')._notify();
     this.countElementsInDiscussion();
-    await this.extractSharedContents();
-    this.loadExternalFiles();
+    this.extractSharedContents().then(async () => {
+      this.loadExternalFiles();
+      await this.detectTaskOpenFromHash();
+      this.detectTasksOpenFromHash();
+      this.detectFilesOpenFromHash();
+
+    });
     window.addEventListener('hashchange', async () => {
       await this.detectTaskOpenFromHash();
       this.detectTasksOpenFromHash();
       this.detectFilesOpenFromHash();
     });
-    await this.detectTaskOpenFromHash();
-    this.detectTasksOpenFromHash();
-    this.detectFilesOpenFromHash();
   },
   async detectTaskOpenFromHash() {
     const urlFromHash = location.hash.match(/^#action-(\d+)/);
