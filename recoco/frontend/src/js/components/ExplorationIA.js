@@ -10,6 +10,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   // === CONFIGURATION ===
   projectId: config.projectId || null,
   apiToken: config.apiToken || 'blahblah',
+  siteId: config.siteId || null,
 
   // === CONTEXTE DU PROJET ===
   projectContext: config.projectContext || '',
@@ -156,7 +157,13 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         headers['Authorization'] = `Bearer ${this.apiToken}`;
       }
 
-      const response = await fetch(`${ML_API_BASE_URL}/ask`, {
+      const askParams = new URLSearchParams();
+      if (this.siteId) {
+        askParams.append('site_id', this.siteId);
+      }
+      const askUrl = `${ML_API_BASE_URL}/ask${askParams.toString() ? '?' + askParams.toString() : ''}`;
+
+      const response = await fetch(askUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -532,7 +539,13 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         headers['Authorization'] = `Bearer ${this.apiToken}`;
       }
 
-      const response = await fetch(`${ML_API_BASE_URL}/ask`, {
+      const relatedParams = new URLSearchParams();
+      if (this.siteId) {
+        relatedParams.append('site_id', this.siteId);
+      }
+      const relatedUrl = `${ML_API_BASE_URL}/ask${relatedParams.toString() ? '?' + relatedParams.toString() : ''}`;
+
+      const response = await fetch(relatedUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -719,6 +732,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       // Construire l'URL avec les resource_ids
       const params = new URLSearchParams();
       resourceIds.forEach((id) => params.append('resource_ids', id));
+      if (this.siteId) {
+        params.append('site_id', this.siteId);
+      }
       const url = `${ML_API_BASE_URL}/co-recommendations?${params.toString()}`;
 
       const response = await fetch(url, {
