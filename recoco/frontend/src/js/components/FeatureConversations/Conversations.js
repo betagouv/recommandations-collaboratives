@@ -340,7 +340,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const user = {};
       user.data = {
         id: +id,
-        place: this.users.length,
         first_name: 'Inconnu',
         last_name: 'Inconnu',
         email: 'inconnu@example.com',
