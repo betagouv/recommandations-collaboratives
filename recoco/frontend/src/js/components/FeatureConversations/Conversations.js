@@ -72,16 +72,17 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countElementsInDiscussion();
     this.extractSharedContents().then(async () => {
       this.loadExternalFiles();
-      await this.detectTaskOpenFromHash();
-      this.detectTasksOpenFromHash();
-      this.detectFilesOpenFromHash();
-
+      await this.detectOpenActionsFromHash();
     });
     window.addEventListener('hashchange', async () => {
-      await this.detectTaskOpenFromHash();
-      this.detectTasksOpenFromHash();
-      this.detectFilesOpenFromHash();
+      await this.detectOpenActionsFromHash();
     });
+  },
+  async detectOpenActionsFromHash() {
+    await this.detectTaskOpenFromHash();
+    this.detectTasksOpenFromHash();
+    this.detectFilesOpenFromHash();
+    this.detectDraftsOpenFromHash();
   },
   async detectTaskOpenFromHash() {
     const urlFromHash = location.hash.match(/^#action-(\d+)/);
@@ -114,6 +115,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         Alpine.store('resourcePreviewPanel').close();
       }
       Alpine.store('sharedContentsPanel').open('files');
+    }
+  },
+  detectDraftsOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#drafts/);
+    if (urlFromHash) {
+      Alpine.store('sharedContentsPanel').open('draft-recommendations');
     }
   },
   /**
