@@ -13,28 +13,31 @@ Alpine.data('NotificationEater', (projectId) => {
       const messageMap = new Map();
 
       requestAnimationFrame(() => {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              const elementId = entry.target.getAttribute('data-element-id');
-              if (entry.isIntersecting) {
-                const messageData = JSON.parse(
-                  entry.target.getAttribute('data-notifications')
-                );
-                if (messageData.unread === 0) return;
-                const timerId = setTimeout(() => {
-                  this.consumeNotification(messageData, entry.target);
-                }, this.getTimeToReadMessage(messageData.charNum));
-                messageMap.set(elementId, timerId);
-              } else {
-                clearTimeout(messageMap.get(elementId));
-              }
-            });
-          },
-          { rootMargin: '-150px' }
-        );
-        const observedElements = document.querySelectorAll('.observed-element');
-        observedElements.forEach((el) => observer.observe(el));
+        setTimeout(() => {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                const elementId = entry.target.getAttribute('data-element-id');
+                if (entry.isIntersecting) {
+                  const messageData = JSON.parse(
+                    entry.target.getAttribute('data-notifications')
+                  );
+                  if (messageData.unread === 0) return;
+                  const timerId = setTimeout(() => {
+                    this.consumeNotification(messageData, entry.target);
+                  }, this.getTimeToReadMessage(messageData.charNum));
+                  messageMap.set(elementId, timerId);
+                } else {
+                  clearTimeout(messageMap.get(elementId));
+                }
+              });
+            },
+            { rootMargin: '-150px' }
+          );
+          const observedElements =
+            document.querySelectorAll('.observed-element');
+          observedElements.forEach((el) => observer.observe(el));
+        }, 5000);
         setTimeout(() => {
           this.hideScrollLine();
           const params = new URLSearchParams(document.location.search);
