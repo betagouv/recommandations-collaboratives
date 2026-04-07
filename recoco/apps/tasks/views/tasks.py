@@ -454,6 +454,7 @@ def presuggest_task(request, project_id):
 @login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
+
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
@@ -462,6 +463,7 @@ def delete_task(request, task_id=None):
         task.save()
 
     next_url = reverse("projects-project-detail-actions", args=[task.project_id])
+    next_url = request.headers.get("referer", next_url)
     return redirect(next_url)
 
 

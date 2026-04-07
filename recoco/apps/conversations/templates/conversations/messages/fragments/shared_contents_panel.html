@@ -5,11 +5,17 @@ Managed by Alpine store: $store.sharedContentsPanel
 {% endcomment %}
 <template x-if="$store.sharedContentsPanel.isOpen">
     <div>
+        <div class="shared-contents-panel__backdrop backdrop-overlay"
+             @click="$store.sharedContentsPanel.close()"></div>
         <div class="shared-contents-panel"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="shared-contents-panel-title"
+             x-trap.inert="$store.sharedContentsPanel.isOpen"
              @keydown.escape.window="$store.sharedContentsPanel.close()">
             <!-- Header -->
             <div class="shared-contents-panel__header">
-                <h2 class="shared-contents-panel__title">Contenus partagés</h2>
+                <h2 id="shared-contents-panel-title" class="shared-contents-panel__title">Contenus partagés</h2>
                 <button type="button"
                         class="shared-contents-panel__close-btn fr-btn--close fr-btn"
                         aria-label="Fermer"
@@ -49,6 +55,22 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           x-text="`(${$store.sharedContentsPanel.filesCount})`"></span>
                                 </label>
                             </div>
+                            <template x-if="isSwitchtender">
+                                <div class="fr-segmented__element">
+                                    <input type="radio"
+                                           value="draft-recommendations"
+                                           id="shared-contents-tab-draft-recommendations"
+                                           name="shared-contents-tab"
+                                           :checked="$store.sharedContentsPanel.activeTab === 'draft-recommendations'"
+                                           :disabled="$store.sharedContentsPanel.draftRecommendationsCount === 0"
+                                           @click="$store.sharedContentsPanel.switchTab('draft-recommendations')">
+                                    <label class="fr-label" for="shared-contents-tab-draft-recommendations">
+                                        Brouillons
+                                        <span class="shared-contents-panel__item-count"
+                                              x-text="`(${$store.sharedContentsPanel.draftRecommendationsCount})`"></span>
+                                    </label>
+                                </div>
+                            </template>
                         </div>
                     </fieldset>
                 </div>
@@ -70,9 +92,10 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           :key="reco.id">
                                     <div class="fr-mb-3v">
                                         <!-- Date header with grouping -->
-                                        <template x-if="index === 0 || formatDateFrench(reco.messageCreated) !== formatDateFrench($store.sharedContentsPanel.recommendations[index - 1]?.messageCreated)">
+                                        <template x-if="index === 0 || formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                             <p class="shared-contents-panel__date-header"
-                                               x-text="formatDateFrench(reco.messageCreated)"></p>
+                                               x-text="formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                            </p>
                                         </template>
                                         {% include "conversations/messages/fragments/shared_contents_recommendation_card.html" %}
                                     </div>
@@ -99,9 +122,10 @@ Managed by Alpine store: $store.sharedContentsPanel
                                                   :key="file.id">
                                             <div class="shared-contents-panel__file-section">
                                                 <!-- Date header with grouping -->
-                                                <template x-if="index === 0 || formatDateFrench(file.messageCreated) !== formatDateFrench($store.sharedContentsPanel.files[index - 1]?.messageCreated)">
+                                                <template x-if="index === 0 || formatDate(file.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.files[index - 1]?.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                                     <p class="shared-contents-panel__date-header"
-                                                       x-text="formatDateFrench(file.messageCreated)"></p>
+                                                       x-text="formatDate(file.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                                    </p>
                                                 </template>
                                                 {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=False %}
                                             </div>
@@ -135,13 +159,40 @@ Managed by Alpine store: $store.sharedContentsPanel
                                             </div>
                                         </template>
                                     </div>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-            </template>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <!-- Draft recommendations tab -->
+                <template x-if="isSwitchtender && $store.sharedContentsPanel.activeTab === 'draft-recommendations'">
+                    <div>
+                        <template x-if="$store.sharedContentsPanel.draftRecommendationsCount === 0">
+                            <div class="shared-contents-panel__empty">
+                                <span class="fr-icon fr-icon-draft-line" aria-hidden="true"></span>
+                                <p>Aucun brouillon de recommandation dans cette conversation.</p>
+                            </div>
+                        </template>
+                        <template x-if="$store.sharedContentsPanel.draftRecommendationsCount > 0">
+                            <div>
+                                <template x-for="(reco, index) in $store.sharedContentsPanel.draftRecommendations"
+                                          :key="reco.id">
+                                    <div class="fr-mb-3v">
+                                        <!-- Date header with grouping -->
+                                        <template x-if="index === 0 || formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.draftRecommendations[index - 1]?.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                            <p class="shared-contents-panel__date-header"
+                                               x-text="formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                            </p>
+                                        </template>
+                                        {% include "conversations/messages/fragments/shared_contents_draft_recommendation_card.html" %}
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
         </div>
+        {% include "projects/project/fragments/tasks_modal/delete_task_confirmation_modal.html" %}
     </div>
-</div>
 </template>

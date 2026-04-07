@@ -2,9 +2,10 @@ import Alpine from 'alpinejs';
 
 Alpine.store('sharedContentsPanel', {
   isOpen: false,
-  activeTab: 'recommendations', // 'recommendations' | 'files'
+  activeTab: 'recommendations', // 'recommendations' | 'files' | 'draft-recommendations'
   recommendations: [],
   files: [],
+  draftRecommendations: [],
   externalFiles: [], // Files from EDL (État des lieux)
   privateFiles: [], // Files from private notes
   shouldReopenOnDetailClose: false, // Track if we should re-open when detail panel closes
@@ -46,6 +47,16 @@ Alpine.store('sharedContentsPanel', {
     this.privateFiles = privateFiles;
   },
 
+  setDraftRecommendations(draftRecommendations) {
+    this.draftRecommendations = draftRecommendations;
+  },
+
+  removeDraftRecommendation(recommendationId) {
+    this.draftRecommendations = this.draftRecommendations.filter(
+      (draft) => draft.id !== recommendationId
+    );
+  },
+
   /**
    * Close the panel but mark that we want to re-open it when the detail panel closes
    * Used when navigating from shared contents list to recommendation detail
@@ -81,10 +92,20 @@ Alpine.store('sharedContentsPanel', {
   },
 
   /**
+   * Get total count of draft recommendations
+   */
+  get draftRecommendationsCount() {
+    return this.draftRecommendations.length;
+  },
+  /**
    * Get total count of all shared contents
    */
   get totalCount() {
-    return this.recommendationsCount + this.filesCount;
+    return (
+      this.recommendationsCount +
+      this.draftRecommendationsCount +
+      this.filesCount
+    );
   },
 });
 

@@ -541,6 +541,20 @@ form > p {
   display: inline;
 }
 
+/* ¯¯¯¯¯ *\
+  BACKDROP
+\* ˍˍˍˍˍˍ */
+
+.backdrop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
 /* ¯¯¯ *\
   UTILS
 \* ˍˍˍ */
@@ -878,6 +892,13 @@ a.fr-text-inverted--grey {
   background: var(--light-background-alt-grey, #eee);
   &-dark-background {
     background: var(--light-background-default-grey, #fff);
+  }
+  &-white-background {
+    border-radius: 1px;
+    background: #e5e5e5;
+    color: var(--light-text-title-grey, #161616);
+    border: none;
+    box-shadow: none;
   }
   &:not(:disabled):hover {
     background-color: var(--light-background-alt-grey-hover, #e6e6e6);

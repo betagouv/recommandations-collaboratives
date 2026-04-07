@@ -1,6 +1,11 @@
 // Resource Preview Panel - Overlay panel for recommendation resource display
 // Used in conversation page when clicking a recommendation with resource
 
+// Backdrop overlay for click-outside-to-close
+.resource-preview-panel__backdrop {
+  z-index: 2099;
+}
+
 .resource-preview-panel {
   position: fixed;
   top: 0;
@@ -8,7 +13,7 @@
   bottom: 0;
   width: 75%;
   background: var(--background-default-grey, #fff);
-  z-index: 9999;
+  z-index: 2100;
   display: flex;
   flex-direction: column;
   overflow: hidden;
