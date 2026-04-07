@@ -485,8 +485,7 @@ def delete_task(request, task_id=None):
         task.deleted = timezone.now()
         task.save()
 
-    next_url = reverse("projects-project-detail-actions", args=[task.project_id])
-    next_url = request.headers.get("referer", next_url)
+    next_url = reverse("projects-project-detail-conversations", args=[task.project_id])
     return redirect(next_url)
 
 
