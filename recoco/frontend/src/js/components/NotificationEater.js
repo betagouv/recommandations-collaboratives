@@ -13,6 +13,7 @@ Alpine.data('NotificationEater', (projectId) => {
       const messageMap = new Map();
 
       requestAnimationFrame(() => {
+        // Consumption logic run after 5sec on the page
         setTimeout(() => {
           const observer = new IntersectionObserver(
             (entries) => {
@@ -22,12 +23,17 @@ Alpine.data('NotificationEater', (projectId) => {
                   const messageData = JSON.parse(
                     entry.target.getAttribute('data-notifications')
                   );
+
                   if (messageData.unread === 0) return;
+
+                  // Run a timer to consume notification based on the message length
                   const timerId = setTimeout(() => {
                     this.consumeNotification(messageData, entry.target);
                   }, this.getTimeToReadMessage(messageData.charNum));
+
                   messageMap.set(elementId, timerId);
                 } else {
+                  // If the message go out of screen before the consumption clear the timer
                   clearTimeout(messageMap.get(elementId));
                 }
               });
@@ -38,6 +44,7 @@ Alpine.data('NotificationEater', (projectId) => {
             document.querySelectorAll('.observed-element');
           observedElements.forEach((el) => observer.observe(el));
         }, 5000);
+
         setTimeout(() => {
           this.hideScrollLine();
           const params = new URLSearchParams(document.location.search);
