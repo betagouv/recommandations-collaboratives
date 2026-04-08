@@ -76,6 +76,7 @@ def invite_accept(request, invite_id):
                     last_name=form.cleaned_data.get("last_name"),
                 )
                 user.set_password(form.cleaned_data.get("password"))
+                user.save()
 
                 org_name = form.cleaned_data.get("organization")
                 organization = addressbook_models.Organization.get_or_create(org_name)
@@ -90,6 +91,9 @@ def invite_accept(request, invite_id):
                 login(
                     request, user, backend="django.contrib.auth.backends.ModelBackend"
                 )
+            else:
+                # Form invalid for new account: re-render with errors
+                return render(request, "invites/invite_details.html", locals())
 
         if user:
             # user now has access to site
@@ -120,10 +124,6 @@ def invite_accept(request, invite_id):
             invite.save()
 
             return redirect(project.get_absolute_url())
-
-        # Form invalid for new account: re-render with errors
-        if not existing_account and not form.is_valid():
-            return render(request, "invites/invite_details.html", locals())
 
     return redirect(reverse("invites-invite-details", args=(invite.pk,)))
 
