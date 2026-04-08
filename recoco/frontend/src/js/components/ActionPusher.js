@@ -4,7 +4,7 @@ import api, { postExternalRessourceUrl, resourcesUrl } from '../utils/api';
 
 import { ToastType } from '../models/toastType';
 
-Alpine.data('ActionPusher', ({ next } = { next: null }) => {
+Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
     isBusyExternalResource: false,
@@ -44,7 +44,6 @@ Alpine.data('ActionPusher', ({ next } = { next: null }) => {
     selected_resources: [],
     public: true,
     draft: false,
-    next: next,
     async init() {
       await this.$store.idbObjectStoreMgmt.init();
       const getAllvalue = await this.$store.idbObjectStoreMgmt.getAll();
@@ -204,9 +203,6 @@ Alpine.data('ActionPusher', ({ next } = { next: null }) => {
       this.message.contact = { id: contactId };
     },
     handleSendRecommendation({ isDraft = false }) {
-      if (isDraft) {
-        this.next += '#drafts';
-      }
       this.set_draft(isDraft);
       this.$store.editor.currentMessageJSON.content =
         this.$store.editor.currentMessageJSON.content.filter(

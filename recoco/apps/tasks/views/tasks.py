@@ -137,11 +137,19 @@ def create_task(request):
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
-            if (
-                type_form.cleaned_data["next"]
-                and type_form.cleaned_data["next"] != "None"
-            ):
-                return redirect(type_form.cleaned_data["next"])
+            # TODO remove this next logic when recommendation tab will be removed
+            next_url = type_form.cleaned_data["next"]
+            if next_url and next_url != "None":
+                conversation_url = reverse(
+                    "projects-project-detail-conversations", args=[project.id]
+                )
+                if (
+                    form.cleaned_data["public"] is False
+                    and next_url == conversation_url
+                ):
+                    next_url += "#drafts"
+
+                return redirect(next_url)
 
             next_url = reverse("projects-project-detail-actions", args=[project.id])
             return redirect(next_url)
@@ -312,6 +320,7 @@ def update_task(request, task_id=None):
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
+            # TODO remove this next logic when recommendation tab will be removed
             if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
                 return redirect(form.cleaned_data["next"])
 

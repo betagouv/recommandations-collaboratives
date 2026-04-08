@@ -19,7 +19,7 @@
 {% block content %}
     <div class="col-10 fr-py-6w fr-mx-auto push-reco">
         <h2 class="push-reco__main-title">Créer une recommandation</h2>
-        <div x-data="ActionPusher({ next: '{{ type_form.next.value }}' })"
+        <div x-data="ActionPusher()"
              x-init="create_recommendation()"
              x-cloak
              @set-contact="handleSetContact($event.detail)">
@@ -29,7 +29,8 @@
                 {% include "projects/project/fragments/action_pusher/type.html" %}
                 {% include "projects/project/fragments/action_pusher/resource_search.html" %}
                 {% include "projects/project/fragments/action_pusher/details_form.html" with form=type_form %}
-                <input type="hidden" name="next" :value="next">
+                {% comment %} TODO remove this next field when recommendation tab will be removed {% endcomment %}
+                <input type="hidden" name="next" value="{{ type_form.next.value }}">
                 <input type="hidden" name="public" x-model="public">
             </form>
         </div>
