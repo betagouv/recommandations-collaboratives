@@ -332,7 +332,7 @@
                                     </h3>
                                 </div>
                                 <div class="card-body">
-                                    <template x-for="citation in citations" :key="citation.label">
+                                    <template x-for="citation in orderedCitations" :key="citation.label">
                                         <div class="exploration-ia-citation fr-mb-2w fr-p-2w"
                                              :class="{ 'exploration-ia-citation--highlighted': isSourceHighlighted(citation.label), 'exploration-ia-citation--selected': isSourceSelected(citation.label) }"
                                              :data-test-id="'exploration-ia-citation-' + citation.label">

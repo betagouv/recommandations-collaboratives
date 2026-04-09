@@ -921,6 +921,27 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     return allResources;
   },
 
+  get orderedCitations() {
+    // Trier les citations selon l'ordre de première apparition dans les answer_chunks
+    const labelOrder = [];
+    this.answerChunks.forEach((chunk) => {
+      (chunk.sources || []).forEach((label) => {
+        if (!labelOrder.includes(label)) {
+          labelOrder.push(label);
+        }
+      });
+    });
+
+    return [...this.citations].sort((a, b) => {
+      const indexA = labelOrder.indexOf(a.label);
+      const indexB = labelOrder.indexOf(b.label);
+      // Citations non référencées dans les chunks vont à la fin
+      const orderA = indexA === -1 ? Infinity : indexA;
+      const orderB = indexB === -1 ? Infinity : indexB;
+      return orderA - orderB;
+    });
+  },
+
   getCitationByLabel(label) {
     return this.citations.find((c) => c.label === label);
   },
