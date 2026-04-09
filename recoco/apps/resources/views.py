@@ -221,6 +221,7 @@ class BaseResourceDetailView(DetailView):
     """Return the details of given resource"""
 
     model = models.Resource
+    queryset = models.Resource.objects.with_ds_annotations()
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
@@ -340,14 +341,13 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
 
 class EmbededResourceDetailView(BaseResourceDetailView):
-    model = models.Resource
     template_name = "resources/resource/details_embeded.html"
-    pk_url_kwarg = "resource_id"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if task_id := self.request.GET.get("task_id"):
+        if task_id_str := self.request.GET.get("task_id"):
+            task_id = int(task_id_str)
             context["task"] = self.object.recommandations.filter(pk=task_id).first()
 
         return context

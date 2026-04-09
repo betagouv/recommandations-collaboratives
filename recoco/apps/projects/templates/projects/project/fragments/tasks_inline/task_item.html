@@ -75,9 +75,8 @@
         {% endif %}
         <template x-if="task.resource">
             <article class="fr-mb-2v w-100 h-100">{% include "projects/project/fragments/task/task_comment.html" with content="tiny" height="100" %}</article>
-        </template>
-        <!-- DS integration -->
-        <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
+            <!-- DS integration -->
+            <template x-if="task.resource.has_dsresource">
             <hr class="fr-mt-3w">
             <div>
                 <h4 class="fw-bolder">
@@ -96,7 +95,9 @@
                    @click.stop=""
                    x-bind:href="task.ds_folder.dossier_url"
                    target="_blank">Aller sur Demarches-simplifiees.fr</a>
+              {# todo set url but based on js data : {% url 'projects-task-ds-prefill' task.id %} instead of task.ds_folder.dossier_url #}
             </div>
+        </template>
         </template>
         <footer class="fr-mt-auto">
             <div class="d-flex justify-content-between align-items-center">
