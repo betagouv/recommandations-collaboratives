@@ -68,6 +68,7 @@ dependencies = [
     "mwclient==0.11.0",
     "pandoc==2.4",
     "pillow==12.1.1",
+    "pluggy>=1.6.0",
     "psycopg[c]>=3.2.12",
     "puremagic>=1.30",
     "redis==5.0.4",
@@ -203,6 +204,8 @@ django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git
 django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "master" }
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
+
+
 
 [tool.uv-secure.vulnerability_criteria]
 ignore_vulnerabilities = [] # to set if packages have unfixed acceptable vulnerabilities
