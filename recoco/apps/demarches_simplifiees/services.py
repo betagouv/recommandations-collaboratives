@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 
+import requests
+from django.conf import settings
 from django.contrib.sites.models import Site
 
 from recoco.apps.home.models import SiteConfiguration
@@ -8,6 +10,8 @@ from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
 
+from ..tasks.models import Task
+from .exceptions import DSAPIError
 from .models import DSMapping, DSResource
 from .utils import MappingField
 
@@ -159,3 +163,66 @@ def resolve_edl_lookup(
             return None
 
     return answer.comment if _take_comment else answer.formatted_value
+
+
+def load_ds_resource_schema(ds_resource_id: int):
+    try:
+        ds_resource = DSResource.objects.get(id=ds_resource_id)
+    except DSResource.DoesNotExist:
+        return
+
+    if ds_resource.schema and len(ds_resource.schema) > 0:
+        return
+
+    resp = requests.get(
+        url=f"{ds_resource.preremplir_url}/schema",
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        raise DSAPIError(
+            f"Failed to load schema for the DS resource {ds_resource.name}",
+            status_code=resp.status_code,
+        )
+
+    ds_resource.schema = resp.json()
+    ds_resource.save()
+
+
+def create_ds_prefill_link(recommendation_id: int):
+    try:
+        recommendation = Task.objects.select_related(
+            "project__commune__department"
+        ).get(id=recommendation_id)
+    except Task.DoesNotExist:
+        return
+
+    if recommendation.resource is None:
+        return
+
+    ds_resource: DSResource = find_ds_resource_for_project(
+        project=recommendation.project,
+        resource=recommendation.resource,
+    )
+    if ds_resource is None:
+        return
+
+    content = make_ds_data_from_project(
+        site=recommendation.site,
+        project=recommendation.project,
+        ds_resource=ds_resource,
+    )
+    if not len(content):
+        return
+
+    resp = requests.post(
+        url=f"{settings.DS_API_BASE_URL}/demarches/{ds_resource.number}/dossiers",
+        json=content,
+        timeout=30,
+    )
+    if resp.status_code != 201:
+        raise DSAPIError(
+            f"Failed to create a DS folder for the DS resource {ds_resource.name}",
+            status_code=resp.status_code,
+        )
+
+    return resp.json()["dossier_url"]

@@ -38,14 +38,14 @@
                     {% endif %}
                 {% endwith %}
             {% endfor %}
-            {% if task and task.ds_folder %}
+            {% if task and resource.has_dsresource %}
                 <a class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1w"
-                   href="{{ task.ds_folder.dossier_url }}"
+                   href="{% url 'projects-task-ds-prefill' task.id %}"
                    target="blank">
                     <img height="25px"
                          width="26px"
                          src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
-                         alt="Pictogramme Démarches Simpliffiées"
+                         alt="Pictogramme Démarches Simplifiées"
                          class="fr-mr-1w">
                     Voir mon dossier
                 </a>
