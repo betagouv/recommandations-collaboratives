@@ -10,13 +10,14 @@ created : 2021-05-26 15:56:20 CEST
 import logging
 
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import is_member
+from recoco.apps.resources import models as resource_models
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
@@ -73,6 +74,12 @@ class TaskViewSet(viewsets.ModelViewSet):
             )
             .select_related("topic", "created_by__profile", "site", "project")
             .prefetch_related("followups")
+            .prefetch_related(
+                Prefetch(
+                    "resource",
+                    queryset=resource_models.Resource.objects.with_ds_annotations(),
+                )
+            )
             .order_by("-created_on", "-updated_on")
         )
 
