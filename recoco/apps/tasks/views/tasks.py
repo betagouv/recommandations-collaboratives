@@ -143,13 +143,10 @@ def create_task(request):
                 "projects-project-detail-conversations", args=[project.id]
             )
             if not next_url or next_url == "None":
-                next_url = conversations_url
-            
-            if (
-                not action.public
-                and next_url == conversation_url
-               ):
-               next_url += "#drafts"
+                next_url = conversation_url
+
+            if not action.public and next_url == conversation_url:
+                next_url += "#drafts"
             return redirect(next_url)
 
     else:
