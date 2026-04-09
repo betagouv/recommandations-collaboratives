@@ -1170,8 +1170,20 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   parseMarkdown(text) {
     if (!text) return '';
-    const html = marked.parse(text, { breaks: true });
-    return DOMPurify.sanitize(html);
+    let html = marked.parse(text, { breaks: true });
+
+    // Préserver la numérotation des listes ordonnées :
+    // Si le texte commence par "N. " (ex: "3. **Titre**"), marked génère
+    // un <ol> qui redémarre à 1. On ajoute l'attribut start="N" pour corriger.
+    const listStartMatch = text.match(/^(\d+)\.\s/);
+    if (listStartMatch) {
+      const startNum = parseInt(listStartMatch[1], 10);
+      if (startNum > 1) {
+        html = html.replace(/^<ol>/, `<ol start="${startNum}">`);
+      }
+    }
+
+    return DOMPurify.sanitize(html, { ADD_ATTR: ['start'] });
   },
 
   // === UTILITAIRES ===
