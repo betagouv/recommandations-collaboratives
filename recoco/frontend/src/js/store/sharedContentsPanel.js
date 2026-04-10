@@ -7,6 +7,7 @@ Alpine.store('sharedContentsPanel', {
   files: [],
   draftRecommendations: [],
   externalFiles: [], // Files from EDL (État des lieux)
+  privateFiles: [], // Files from private notes
   shouldReopenOnDetailClose: false, // Track if we should re-open when detail panel closes
 
   open(tab = null) {
@@ -42,12 +43,18 @@ Alpine.store('sharedContentsPanel', {
     this.externalFiles = externalFiles;
   },
 
+  setPrivateFiles(privateFiles) {
+    this.privateFiles = privateFiles;
+  },
+
   setDraftRecommendations(draftRecommendations) {
     this.draftRecommendations = draftRecommendations;
   },
 
   removeDraftRecommendation(recommendationId) {
-    this.draftRecommendations = this.draftRecommendations.filter((draft) => draft.id !== recommendationId);
+    this.draftRecommendations = this.draftRecommendations.filter(
+      (draft) => draft.id !== recommendationId
+    );
   },
 
   /**
@@ -84,7 +91,6 @@ Alpine.store('sharedContentsPanel', {
     return this.files.length + this.externalFiles.length;
   },
 
-
   /**
    * Get total count of draft recommendations
    */
@@ -95,7 +101,11 @@ Alpine.store('sharedContentsPanel', {
    * Get total count of all shared contents
    */
   get totalCount() {
-    return this.recommendationsCount + this.draftRecommendationsCount + this.filesCount;
+    return (
+      this.recommendationsCount +
+      this.draftRecommendationsCount +
+      this.filesCount
+    );
   },
 });
 

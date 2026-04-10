@@ -120,7 +120,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                     <div>
                                         <template x-for="(file, index) in $store.sharedContentsPanel.files"
                                                   :key="file.id">
-                                            <div>
+                                            <div class="shared-contents-panel__file-section">
                                                 <!-- Date header with grouping -->
                                                 <template x-if="index === 0 || formatDate(file.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.files[index - 1]?.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                                     <p class="shared-contents-panel__date-header"
@@ -139,6 +139,24 @@ Managed by Alpine store: $store.sharedContentsPanel
                                         <template x-for="file in $store.sharedContentsPanel.externalFiles"
                                                   :key="file.id">
                                             {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
+                                        </template>
+                                    </div>
+                                </template>
+                                <!-- Private files from project -->
+                                <template x-if="$store.sharedContentsPanel.privateFiles.length > 0">
+                                    <div>
+                                        <p class="shared-contents-panel__external-title fr-mt-8w">Fichiers privés partagés entre conseillers</p>
+                                        <template x-for="(file, index) in $store.sharedContentsPanel.privateFiles"
+                                                  :key="file.id">
+                                            <div x-data="{file: {...file, attachment: file.the_file}}"
+                                                 class="shared-contents-panel__file-section">
+                                                <!-- Date header with grouping -->
+                                                <template x-if="index === 0 || formatDateFrench(file.created_on) !== formatDateFrench($store.sharedContentsPanel.privateFiles[index - 1]?.created_on)">
+                                                    <p class="shared-contents-panel__date-header"
+                                                       x-text="formatDateFrench(file.created_on)"></p>
+                                                </template>
+                                                {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
+                                            </div>
                                         </template>
                                     </div>
                                 </template>

@@ -319,6 +319,16 @@ def project_conversations_new(request, project_id=None):
         .values("id", "attachment", "updated_on")
     )
 
+    private_files = (
+        list(
+            models.Document.objects.filter(project_id=project_id, private=True).values(
+                "id", "created_on", "the_file"
+            )
+        )
+        if has_perm(request.user, "manage_private_documents", project)
+        else []
+    )
+
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -329,6 +339,7 @@ def project_conversations_new(request, project_id=None):
             "advising_position": advising_position,
             "recipients": recipients_data,
             "edl_files": edl_files,
+            "private_files": private_files,
         },
     )
 
