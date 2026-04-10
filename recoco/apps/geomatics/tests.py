@@ -33,21 +33,41 @@ def test_load_empty_file_do_not_create_anything():
 @pytest.mark.django_db
 def test_load_file_create_region_department_and_commune():
     with patch("builtins.open", mock_open(read_data=CSV)):
-        call_command("loadcommunes", "empty.csv")
+        call_command("loadcommunes", "communes.csv")
     region = models.Region.objects.all()[0]
     assert region.name == "Auvergne-Rhône-Alpes"
     assert region.code == "84"
     department = models.Department.objects.all()[0]
     assert department.name == "Ain"
-    assert department.code == "1"
+    assert department.code == "01"
     commune = models.Commune.objects.all()[0]
-    assert commune.name == "L ABERGEMENT CLEMENCIAT"
-    assert commune.insee == "1001"
-    assert commune.postal == "1400"
+    assert commune.name == "L'Abergement-Clémenciat"
+    assert commune.insee == "01001"
+    assert commune.postal == "01400"
+    assert commune.latitude == 46.153
+    assert commune.longitude == 4.926
 
 
-CSV = """code_commune_INSEE,nom_commune_postal,code_postal,libelle_acheminement,ligne_5,latitude,longitude,code_commune,article,nom_commune,nom_commune_complet,code_departement,nom_departement,code_region,nom_region
-1001,L ABERGEMENT CLEMENCIAT,1400,L ABERGEMENT CLEMENCIAT,,46.1534255214,4.92611354223,1,L',Abergement-Clémenciat,L'Abergement-Clémenciat,1,Ain,84,Auvergne-Rhône-Alpes
+@pytest.mark.django_db
+def test_load_file_reports_stats(capsys):
+    with patch("builtins.open", mock_open(read_data=CSV)):
+        call_command("loadcommunes", "communes.csv")
+    captured = capsys.readouterr()
+    assert "Newly created:    1" in captured.out
+    assert "Already existing: 0" in captured.out
+    assert "Only in DB:       0" in captured.out
+
+
+@pytest.mark.django_db
+def test_load_file_existing_commune_not_duplicated():
+    with patch("builtins.open", mock_open(read_data=CSV)):
+        call_command("loadcommunes", "communes.csv")
+        call_command("loadcommunes", "communes.csv")
+    assert models.Commune.objects.count() == 1
+
+
+CSV = """,code_insee,nom_standard,code_postal,dep_code,dep_nom,reg_code,reg_nom,latitude_centre,longitude_centre
+0,01001,L'Abergement-Clémenciat,01400,01,Ain,84,Auvergne-Rhône-Alpes,46.153,4.926
 """
 
 # eof
