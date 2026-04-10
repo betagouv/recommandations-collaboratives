@@ -15,6 +15,7 @@ created: 2021-07-13 09:08:25 CEST
 """
 
 import csv
+from functools import lru_cache
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -79,28 +80,16 @@ def load_commune(row):
     return commune, created
 
 
-def memoize(function):
-    """Memoize departments and regions to reduce db queries"""
-    memory = {}
-
-    def wrapper(*args, **kwargs):
-        if args not in memory:
-            memory[args] = function(*args)
-        return memory[args]
-
-    return wrapper
-
-
-@memoize
+@lru_cache(maxsize=None)
 def get_region(code, name):
     region, _ = models.Region.objects.get_or_create(code=code, defaults={"name": name})
     return region
 
 
-@memoize
+@lru_cache(maxsize=None)
 def get_department(region, code, name):
     departement, _ = models.Department.objects.get_or_create(
-        code=code, defaults={"name": name}
+        code=code, defaults={"name": name, "region": region}
     )
     return departement
 
