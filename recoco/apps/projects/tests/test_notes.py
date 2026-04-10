@@ -93,6 +93,37 @@ def test_create_private_note_can_attach_document(request, client, project_ready)
 
 
 @pytest.mark.django_db
+def test_deleting_note_soft_deletes_related_documents(
+    request, client, project_ready, current_site
+):
+    note = baker.make(models.Note, project=project_ready, site=current_site)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        the_file=SimpleUploadedFile(
+            "private-note-attachment.txt",
+            b"hello from a private note",
+            content_type="text/plain",
+        ),
+        attached_object=note,
+        private=True,
+    )
+
+    assert note.document.count() == 1
+    assert document.deleted is None
+
+    with login(client) as user:
+        assign_advisor(user, project_ready)
+        response = client.post(reverse("projects-delete-note", args=[note.id]))
+
+    assert response.status_code == 302
+    assert models.Note.on_site.filter(pk=note.pk).count() == 0
+
+    document.refresh_from_db()
+    assert document.deleted is not None
+
+
+@pytest.mark.django_db
 def test_create_private_note_not_available_for_project_collaborator(
     request, client, project
 ):

@@ -126,11 +126,14 @@ def delete_private_note(request, note_id=None):
     has_perm_or_403(request.user, "projects.use_private_notes", note.project)
 
     if request.method == "POST":
-        note.updated_on = timezone.now()
-        note.deleted = timezone.now()
+        now = timezone.now()
+        note.updated_on = now
+        note.deleted = now
         note.save()
-        note.project.updated_on = note.updated_on
+        note.project.updated_on = now
         note.project.save()
+        if note.document.exists():
+            note.document.update(deleted=now)
 
         cleanup_notifications_for_note(note)
 
