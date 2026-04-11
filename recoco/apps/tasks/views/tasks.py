@@ -137,14 +137,18 @@ def create_task(request):
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
-            if (
-                type_form.cleaned_data["next"]
-                and type_form.cleaned_data["next"] != "None"
-            ):
-                return redirect(type_form.cleaned_data["next"])
+            # TODO remove the logic about 'next' field in the form when the recommendation tab is removed
+            next_url = type_form.cleaned_data["next"]
+            conversation_url = reverse(
+                "projects-project-detail-conversations", args=[project.id]
+            )
+            if not next_url or next_url == "None":
+                next_url = conversation_url
 
-            next_url = reverse("projects-project-detail-actions", args=[project.id])
+            if not action.public and next_url == conversation_url:
+                next_url += "#drafts"
             return redirect(next_url)
+
     else:
         type_form = PushTypeActionForm(request.user, request.GET)
 
@@ -312,6 +316,7 @@ def update_task(request, task_id=None):
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
+            # TODO remove this next logic when recommendation tab will be removed
             if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
                 return redirect(form.cleaned_data["next"])
 
@@ -485,8 +490,7 @@ def delete_task(request, task_id=None):
         task.deleted = timezone.now()
         task.save()
 
-    next_url = reverse("projects-project-detail-actions", args=[task.project_id])
-    next_url = request.headers.get("referer", next_url)
+    next_url = reverse("projects-project-detail-conversations", args=[task.project_id])
     return redirect(next_url)
 
 
