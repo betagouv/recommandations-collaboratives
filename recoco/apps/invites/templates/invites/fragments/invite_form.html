@@ -63,10 +63,10 @@
                 </div>
                 <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w">
                     <div class="fr-col-6">
-                        <div class="fr-input-group">
+                        <div class="fr-input-group {% if form.first_name.errors %}fr-input-group--error{% endif %}">
                             <label class="fr-label" for="input-first-name">Prénom</label>
                             <input type="text"
-                                   class="fr-input {% if form.first_name.errors %}is-invalid{% endif %}"
+                                   class="fr-input"
                                    id="input-first-name"
                                    name="{{ form.first_name.name }}"
                                    placeholder="Camille"
@@ -76,10 +76,10 @@
                         </div>
                     </div>
                     <div class="fr-col-6">
-                        <div class="fr-input-group">
+                        <div class="fr-input-group {% if form.last_name.errors %}fr-input-group--error{% endif %}">
                             <label class="fr-label" for="input-last-name">Nom</label>
                             <input type="text"
-                                   class="fr-input {% if form.last_name.errors %}is-invalid{% endif %}"
+                                   class="fr-input"
                                    id="input-last-name"
                                    name="{{ form.last_name.name }}"
                                    placeholder="Dupont"
@@ -91,10 +91,10 @@
                 </div>
                 <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w">
                     <div class="fr-col-6">
-                        <div class="fr-input-group">
+                        <div class="fr-input-group {% if form.organization.errors %}fr-input-group--error{% endif %}">
                             <label class="fr-label" for="input-organization">Organisation</label>
                             <input type="text"
-                                   class="fr-input {% if form.organization.errors %}is-invalid{% endif %}"
+                                   class="fr-input"
                                    id="input-organization"
                                    name="{{ form.organization.name }}"
                                    placeholder="DEFR59"
@@ -104,10 +104,10 @@
                         </div>
                     </div>
                     <div class="fr-col-6">
-                        <div class="fr-input-group">
+                        <div class="fr-input-group {% if form.position.errors %}fr-input-group--error{% endif %}">
                             <label class="fr-label" for="input-position">Fonction</label>
                             <input type="text"
-                                   class="fr-input {% if form.position.errors %}is-invalid{% endif %}"
+                                   class="fr-input"
                                    id="input-position"
                                    name="{{ form.position.name }}"
                                    placeholder="Chargée de mission"
@@ -116,6 +116,44 @@
                             {% for error in form.position.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         </div>
                     </div>
+                </div>
+                <div class="fr-input-group fr-mt-1w {% if form.phone_no.errors %}fr-input-group--error{% endif %}">
+                    <label class="fr-label" for="input-phone-no">Numéro de téléphone</label>
+                    <input type="tel"
+                           class="fr-input"
+                           id="input-phone-no"
+                           name="{{ form.phone_no.name }}"
+                           placeholder="0600000000"
+                           value="{{ form.phone_no.value|default:'' }}"
+                           required>
+                    {% for error in form.phone_no.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w fr-grid-row--bottom">
+                    <div class="fr-col-6">
+                        <div class="fr-input-group {% if form.password.errors or form.password_confirm.errors %}fr-input-group--error{% endif %}">
+                            <label class="fr-label" for="input-password">
+                                Mot de passe
+                                <span class="fr-hint-text">{{ form.password.help_text }}</span>
+                            </label>
+                            <input type="password"
+                                   class="fr-input"
+                                   id="input-password"
+                                   name="{{ form.password.name }}"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="fr-col-6">
+                        <div class="fr-input-group {% if form.password_confirm.errors %}fr-input-group--error{% endif %}">
+                            <label class="fr-label" for="input-password-confirm">Confirmation du mot de passe</label>
+                            <input type="password"
+                                   class="fr-input"
+                                   id="input-password-confirm"
+                                   name="{{ form.password_confirm.name }}"
+                                   required>
+                        </div>
+                    </div>
+                    {% for error in form.password.errors %}<div class="text-danger text-end fr-ml-2w">{{ error }}</div>{% endfor %}
+                    {% for error in form.password_confirm.errors %}<div class="text-danger text-end fr-ml-2w">{{ error }}</div>{% endfor %}
                 </div>
             {% endif %}
             <ul class="fr-btns-group fr-btns-group--inline-sm fr-mt-4w">
