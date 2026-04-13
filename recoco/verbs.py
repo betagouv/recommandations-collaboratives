@@ -28,6 +28,7 @@ class Recommendation:
     DRAFTED = "a créé un brouillon de recommandation"
     CREATED = "a recommandé l'action"
     REMINDER_ADDED = "a créé un rappel sur la recommandation"
+    GOT_RECO_REMINDER = "a reçu un rappel de recommandations"
     COMMENTED = "a commenté la recommandation"
 
     SEEN = "a consulté la recommandation"
@@ -70,6 +71,8 @@ class Project:
 
     # Only related to advisor kanban
     USER_STATUS_UPDATED = "a changé l'état de son suivi dossier"
+
+    GOT_WHATSUP_REMINDER = "a reçu un rappel de suivi de dossier"
 
     SET_INACTIVE = "a mis en pause le dossier"
     SET_ACTIVE = "a réactivé le dossier"
