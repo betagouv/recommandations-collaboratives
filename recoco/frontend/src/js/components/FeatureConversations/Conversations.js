@@ -456,6 +456,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     Alpine.store('onLeaveAlert').setDirty(false);
   },
   uploadFile(file) {
+    file.private = false;
     const formData = new FormData();
     formData.append('the_file', file);
     return api.post(documentsUrl(this.projectId), formData, {
