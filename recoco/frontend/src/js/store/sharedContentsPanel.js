@@ -88,7 +88,9 @@ Alpine.store('sharedContentsPanel', {
    * Get total count of files (conversation + external)
    */
   get filesCount() {
-    return this.files.length + this.externalFiles.length;
+    return (
+      this.files.length + this.externalFiles.length + this.privateFiles.length
+    );
   },
 
   /**
