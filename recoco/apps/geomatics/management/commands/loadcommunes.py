@@ -7,7 +7,7 @@ Management command to import communes into geomatics
 This command relies on the csv file with commune / departement / region data
 available from the following url:
 
-https://www.data.gouv.fr/fr/datasets/communes-de-france-base-des-codes-postaux/
+https://www.data.gouv.fr/datasets/communes-et-villes-de-france-en-csv-excel-json-parquet-et-feather
 
 
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
