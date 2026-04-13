@@ -21,11 +21,13 @@ VERB_BY_KIND = {
 def backfill_reminder_traces(apps, schema_editor):
     Reminder = apps.get_model("reminders", "Reminder")
     Action = apps.get_model("actstream", "Action")
+    Project = apps.get_model("projects", "Project")
+    User = apps.get_model("auth", "User")
     ContentType = apps.get_model("contenttypes", "ContentType")
 
-    reminder_ct = ContentType.objects.get(app_label="reminders", model="reminder")
-    project_ct = ContentType.objects.get(app_label="projects", model="project")
-    user_ct = ContentType.objects.get(app_label="auth", model="user")
+    reminder_ct = ContentType.objects.get_for_model(Reminder)
+    project_ct = ContentType.objects.get_for_model(Project)
+    user_ct = ContentType.objects.get_for_model(User)
 
     reminders = (
         Reminder.objects.exclude(sent_on=None)
