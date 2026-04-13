@@ -18,6 +18,7 @@ from rest_framework.test import APIClient
 
 from recoco import verbs
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.projects import models as project_models
 from recoco.apps.projects import utils
 from recoco.apps.resources.models import Resource
 from recoco.utils import login
@@ -568,8 +569,16 @@ def test_project_task_notifications_list_closed_to_anonymous_user(request, proje
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "role",
+    [
+        "random",
+        "collaborator",
+        "advisor",
+    ],
+)
 def test_project_task_notifications_list_returns_notifications_of_advisor(
-    request, project
+    request, project, role
 ):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
@@ -585,8 +594,11 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(
         private=False,
     )
 
-    # FIXME here the point should be to state the specific permission
-    utils.assign_advisor(user, project)
+    match role:
+        case "collaborator":
+            utils.assign_collaborator(user, project)
+        case "advisor":
+            utils.assign_advisor(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -611,9 +623,18 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(
 # mark all notifications as read
 
 
+# todo make versions for different user roles
+@pytest.mark.parametrize(
+    "role",
+    [
+        "random",  # can happen if someone has been removed but is not general
+        "collaborator",
+        "advisor",
+    ],
+)
 @pytest.mark.django_db
 def test_project_task_notifications_mark_read_updates_notifications_of_advisor(
-    request, project
+    request, project, role
 ):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
@@ -631,8 +652,11 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(
 
     assert user.notifications.unread().count() == 1
 
-    # FIXME here the point should be to state the specific permission
-    utils.assign_advisor(user, project)
+    match role:
+        case "collaborator":
+            utils.assign_collaborator(user, project)
+        case "advisor":
+            utils.assign_advisor(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -650,7 +674,7 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(
 
 
 @pytest.mark.django_db
-def test_unassigned_switchtender_should_see_recommendations(request):
+def test_assigned_switchtender_should_see_recommendations(request):
     site = get_current_site(request)
     task = baker.make(models.Task, site=site, project__sites=[site])
 
@@ -663,6 +687,23 @@ def test_unassigned_switchtender_should_see_recommendations(request):
         response = client.get(url)
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unassigned_switchtender_should_not_see_recommendations(request):
+    site = get_current_site(request)
+    task = baker.make(models.Task, site=site, project__sites=[site])
+    other_project = baker.make(project_models.Project, sites=[site])
+
+    client = APIClient()
+
+    with login(client) as user:
+        utils.assign_advisor(user, other_project)
+
+        url = reverse("project-tasks-list", args=[task.project.id])
+        response = client.get(url)
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
