@@ -68,6 +68,7 @@
                         </svg>
                     </div>
                 </div>
+                {% comment %} TODO extraire le x-data dans le composant JS {% endcomment %}
                 <div x-data="{ selectedCodes: {{ selected_departments|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; } }"
                      @selected-departments="selectedCodes = normalize($event.detail)"
                      @user-close-selector="$nextTick(() => $el.closest('form').submit())">
