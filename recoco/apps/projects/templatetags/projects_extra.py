@@ -7,11 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-29 11:30:42 CEST
 """
 
-import json
-
 from django import template
 from django.contrib.sites.models import Site
-from django.forms import model_to_dict
 
 from recoco import utils as recoco_utils
 from recoco.apps.home.models import AdvisorAccessRequest
@@ -76,17 +73,6 @@ def get_advisor_access_requests_count():
 def is_project_owner(project, user):
     """Return True if the given user is the owner of the given project"""
     return project.owner == user
-
-
-@register.filter(name="to_json")
-def to_json(value, fields=None):
-    """Transforme un objet Python en JSON avec des champs spécifiques."""
-    if fields:
-        field_list = [field.strip() for field in fields.split(",")]
-        data = model_to_dict(value, fields=field_list)
-    else:
-        data = model_to_dict(value)
-    return json.dumps(data)
 
 
 @register.simple_tag
