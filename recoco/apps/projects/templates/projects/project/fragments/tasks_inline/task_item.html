@@ -33,7 +33,6 @@
                           class="text-dark">Brouillon</span>
                 </div>
             </template>
-
         </div>
         <div class="d-flex align-items-center"
              :class="task.topic && task.topic.name ? 'justify-content-between' : 'justify-content-end'">
@@ -53,17 +52,19 @@
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <h6 class="fr-mb-0 fr-mt-1v fw-bold title-info text-transform-none text-blue text-decoration-underline"
-                        x-text="currentTask.intent"></h6>
+                x-text="currentTask.intent"></h6>
         </div>
         {% if embed_view is not True %}
             <article class="fr-mt-1v fr-mb-2v">
                 <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                     <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
-                         class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0 font-size-14px fw-400"></div>
+                         class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0 font-size-14px fw-400">
+                    </div>
                 </template>
                 <template x-if="!task.resource_id && task.content">
                     <div x-html="truncate(renderMarkdown(task.content),100)"
-                         class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0 font-size-14px fw-400"></div>
+                         class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0 font-size-14px fw-400">
+                    </div>
                 </template>
                 <template x-if="!task.resource_id && task.contact">
                     <div x-data="{contact: task.contact,isOpenDeleteContact:null}"
@@ -74,30 +75,35 @@
             </article>
         {% endif %}
         <template x-if="task.resource">
-            <article class="fr-mb-2v w-100 h-100">{% include "projects/project/fragments/task/task_comment.html" with content="tiny" height="100" %}</article>
-            <!-- DS integration -->
-            <template x-if="task.resource.has_dsresource">
-            <hr class="fr-mt-3w">
-            <div>
-                <h4 class="fw-bolder">
-                    <img height="31px"
-                         width="32px"
-                         src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
-                         alt="Pictogramme Démarches Simplifiées">
-                    Pré-créer un dossier sur Demarches-simplifiees.fr
-                </h4>
-                <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                    En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
-                    <br>
-                    Des champs seront pré-remplis avec les informations déjà renseignées ici.
-                </p>
-                <a class="fr-btn fr-btn--secondary fr-btn--sm"
-                   @click.stop=""
-                   x-bind:href="task.ds_folder.dossier_url"
-                   target="_blank">Aller sur Demarches-simplifiees.fr</a>
-              {# todo set url but based on js data : {% url 'projects-task-ds-prefill' task.id %} instead of task.ds_folder.dossier_url #}
-            </div>
-        </template>
+            <article class="fr-mb-2v w-100 h-100">
+                <!-- DS integration -->
+                <template x-if="task.resource.has_dsresource">
+                    <div>
+                        {% include "projects/project/fragments/task/task_comment.html" with content="tiny" %}
+                        <hr class="fr-pb-2w fr-mt-2w">
+                        <h4 class="fw-bolder fr-mb-0">
+                            <img height="31px"
+                                 width="32px"
+                                 src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                                 alt="Pictogramme Démarches Simplifiées">
+                            Pré-créer un dossier sur Demarches-simplifiees.fr
+                        </h4>
+                        <p class="fr-text-mention--grey fr-text--sm fr-mb-3v">
+                            En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
+                            <br>
+                            Des champs seront pré-remplis avec les informations déjà renseignées ici.
+                        </p>
+                        <a class="fr-btn fr-btn--secondary fr-btn--sm"
+                           @click.stop=""
+                           :href="'{% url 'projects-task-ds-prefill' 0 %}'.replace(0, task.id)"
+                           target="_blank">Aller sur Demarches-simplifiees.fr</a>
+                        {# todo set url but based on js data : {% url 'projects-task-ds-prefill' task.id %} instead of task.ds_folder.dossier_url #}
+                    </div>
+                </template>
+                <template x-if="!task.resource.has_dsresource">
+                    {% include "projects/project/fragments/task/task_comment.html" with content="tiny" height="100" %}
+                </template>
+            </article>
         </template>
         <footer class="fr-mt-auto">
             <div class="d-flex justify-content-between align-items-center">
@@ -106,14 +112,12 @@
                         {% include "projects/project/fragments/task/task_user_card.html" %}
                         <span class="align-middle text-grey-dark font-very-small specific-lineheight-20 fr-icon-calendar-line fr-icon--sm fr-ml-1v">
                             le <span x-text="formatDate(currentTask.created_on, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
-
                         </span>
                     </div>
                     <template x-if="task.public">
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" with full_width=False %}
                     </template>
                 {% endif %}
-
             </div>
         </footer>
     </div>
