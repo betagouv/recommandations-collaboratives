@@ -1,3 +1,4 @@
+{% load static %}
 <div class="task-item__resource task-item__resource--bordered">
     {% if not draft_recommendation %}
         <template x-if="!recommendation.visited">
@@ -31,6 +32,29 @@
     <template x-if="recommendation.resource?.subtitle">
         <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
            x-text="recommendation.resource.subtitle"></p>
+    </template>
+    <!-- DS integration -->
+    <template x-if="recommendation.resource.has_dsresource">
+        <div>
+            <hr class="fr-pb-3v fr-mt-3v">
+            <h4 class="fw-bolder fr-mb-0">
+                <img height="31px"
+                     width="32px"
+                     src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                     alt="Pictogramme Démarches Simplifiées">
+                Pré-créer un dossier sur Demarches-simplifiees.fr
+            </h4>
+            <p class="fr-text-mention--grey fr-text--xs fr-mb-3v">
+                En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
+                <br>
+                Des champs seront pré-remplis avec les informations déjà renseignées ici.
+            </p>
+            <a class="fr-btn fr-btn--secondary fr-btn--sm"
+               @click.stop=""
+               :href="'{% url 'projects-task-ds-prefill' 0 %}'.replace(0, recommendation.id)"
+               target="_blank">Aller sur Demarches-simplifiees.fr</a>
+            <hr class="fr-pb-3v fr-mt-3v">
+        </div>
     </template>
     {% if not draft_recommendation %}
         <div class="d-flex justify-content-between fr-mt-1w">
