@@ -43,7 +43,7 @@
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content visible">
                             <template x-if="taskId && currentTask.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(currentTask.resource_id, taskId)"></iframe> {# fixme taskid is likely the message but not the task anyway #}
+                                        :src="resourcePreviewUrl(currentTask.resource_id, taskId)"></iframe>
                             </template>
                             <template x-if="taskId && !currentTask.resource_id">
                                 <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
