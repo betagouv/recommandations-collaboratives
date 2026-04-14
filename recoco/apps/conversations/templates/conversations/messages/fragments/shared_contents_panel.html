@@ -151,9 +151,10 @@ Managed by Alpine store: $store.sharedContentsPanel
                                             <div x-data="{file: {...file, attachment: file.the_file}}"
                                                  class="shared-contents-panel__file-section">
                                                 <!-- Date header with grouping -->
-                                                <template x-if="index === 0 || formatDateFrench(file.created_on) !== formatDateFrench($store.sharedContentsPanel.privateFiles[index - 1]?.created_on)">
+                                                <template x-if="index === 0 || formatDate(file.created_on, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.privateFiles[index - 1]?.created_on, { year: 'numeric', month: 'long', day: 'numeric' })">
                                                     <p class="shared-contents-panel__date-header"
-                                                       x-text="formatDateFrench(file.created_on)"></p>
+                                                       x-text="formatDate(file.created_on, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                                    </p>
                                                 </template>
                                                 {% include "conversations/messages/fragments/shared_contents_file_card.html" with external=True %}
                                             </div>
