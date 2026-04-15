@@ -12,11 +12,12 @@
 {% endblock js %}
 {% comment %} TODO remove crm.css file {% endcomment %}
 {% block content %}
+    <!-- CRM Navbar -->
+    {% include "crm/fragments/navigation.html" with projects=True %}
     <div x-data="Crm" class="d-flex fr-px-0 crm-font">
-        {% comment %} TODO  {% endcomment %}
-        <!-- CRM Navbar -->
-        {% comment %} TODO  {% endcomment %}
         <!-- Breadcrumb -->
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: '{{ project.name }}' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
         {% comment %} TODO  {% endcomment %}
         <!-- Left column -->
         <div>
