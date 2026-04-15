@@ -1518,6 +1518,7 @@ pygments==2.20.0 \
     #   ipython-pygments-lexers
     #   jupyter-console
     #   nbconvert
+    #   pytest
     #   rich
     #   sphinx
     #   sphinx-prompt
