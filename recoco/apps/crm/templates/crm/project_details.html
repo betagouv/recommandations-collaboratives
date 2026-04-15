@@ -66,9 +66,40 @@
             {% comment %} TODO  {% endcomment %}
             <!-- Banner multiportail project -->
             <div></div>
-            {% comment %} TODO  {% endcomment %}
             <!-- Impact tags checkbox list -->
-            <div></div>
+            <div class="d-flex align-items-center small">
+                <fieldset class="fr-fieldset fr-mx-0"
+                          id="checkboxes-inline"
+                          aria-labelledby="checkboxes-inline-legend">
+                    <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend fr-mx-0 fr-px-0"
+                            id="checkboxes-inline-legend">Suivi de l'impact</legend>
+                    <div class="crm-group-checkbox">
+                        {% with project.crm_annotations.tags.names as active_tags %}
+                            {% for crm_tag in site_config.crm_available_tags.all %}
+                                <form class="fr-mr-2v"
+                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <input class="button"
+                                           hidden
+                                           name="tag"
+                                           value="{{ crm_tag.name }}"
+                                           id="id_tag_{{ crm_tag.name|slugify }}" />
+                                    <div class="crm-form-check form-check form-check-inline">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="checkbox-{{ crm_tag.name|slugify }}"
+                                               onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
+                                               id="checkbox-{{ crm_tag.name|slugify }}"
+                                               {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                        <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
+                                    </div>
+                                </form>
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                </fieldset>
+            </div>
             {% comment %} TODO  {% endcomment %}
             <!-- Create new note btn -->
             <div>

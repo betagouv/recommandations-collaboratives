@@ -2,10 +2,17 @@
   &-left-col {
     width: 30%;
   }
-  &-left-col {
+  &-right-col {
     width: 70%;
     border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
     border-left: 1px solid var(--light-border-default-grey, #e5e5e5);
     background: #fafafa;
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    flex: 1 0 0;
+    align-self: stretch;
   }
 }
