@@ -41,18 +41,18 @@
                 <img height="31px"
                      width="32px"
                      src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
-                     alt="Pictogramme Démarches Simplifiées">
-                Pré-créer un dossier sur Demarches-simplifiees.fr
+                     alt="Pictogramme Démarche numérique">
+                Pré-créer un dossier sur Démarche numérique
             </h4>
             <p class="fr-text-mention--grey fr-text--xs fr-mb-3v">
-                En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
+                En cliquant ci-dessous, vous créerez un dossier en brouillon sur demarche.numerique.gouv.fr.
                 <br>
                 Des champs seront pré-remplis avec les informations déjà renseignées ici.
             </p>
             <a class="fr-btn fr-btn--secondary fr-btn--sm"
                @click.stop=""
                :href="'{% url 'projects-task-ds-prefill' 0 %}'.replace(0, recommendation.id)"
-               target="_blank">Aller sur Demarches-simplifiees.fr</a>
+               target="_blank">Aller sur Démarche numérique</a>
             <hr class="fr-pb-3v fr-mt-3v">
         </div>
     </template>
