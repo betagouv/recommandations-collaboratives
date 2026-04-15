@@ -72,17 +72,19 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     });
     Alpine.store('tasksData')._notify();
     this.countElementsInDiscussion();
-    await this.extractSharedContents();
-    this.loadExternalFiles();
-    this.loadPrivateFiles();
-    window.addEventListener('hashchange', async () => {
-      await this.detectTaskOpenFromHash();
-      this.detectTasksOpenFromHash();
-      this.detectFilesOpenFromHash();
+    this.extractSharedContents().then(async () => {
+      this.loadExternalFiles();
+      await this.detectOpenActionsFromHash();
     });
+    window.addEventListener('hashchange', async () => {
+      await this.detectOpenActionsFromHash();
+    });
+  },
+  async detectOpenActionsFromHash() {
     await this.detectTaskOpenFromHash();
     this.detectTasksOpenFromHash();
     this.detectFilesOpenFromHash();
+    this.detectDraftsOpenFromHash();
   },
   async detectTaskOpenFromHash() {
     const urlFromHash = location.hash.match(/^#action-(\d+)/);
@@ -117,6 +119,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         Alpine.store('resourcePreviewPanel').close();
       }
       Alpine.store('sharedContentsPanel').open('files');
+    }
+  },
+  detectDraftsOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#drafts/);
+    if (urlFromHash) {
+      Alpine.store('sharedContentsPanel').open('draft-recommendations');
     }
   },
   /**
@@ -358,7 +366,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const user = {};
       user.data = {
         id: +id,
-        place: this.users.length,
         first_name: 'Inconnu',
         last_name: 'Inconnu',
         email: 'inconnu@example.com',

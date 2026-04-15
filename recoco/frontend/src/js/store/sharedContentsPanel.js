@@ -3,6 +3,7 @@ import Alpine from 'alpinejs';
 Alpine.store('sharedContentsPanel', {
   isOpen: false,
   activeTab: 'recommendations', // 'recommendations' | 'files' | 'draft-recommendations'
+  lastActiveTab: 'recommendations', // 'recommendations' | 'files' | 'draft-recommendations'
   recommendations: [],
   files: [],
   draftRecommendations: [],
@@ -13,6 +14,7 @@ Alpine.store('sharedContentsPanel', {
   open(tab = null) {
     if (tab) {
       this.activeTab = tab;
+      this.lastActiveTab = tab;
     }
     this.isOpen = true;
 
@@ -29,6 +31,7 @@ Alpine.store('sharedContentsPanel', {
 
   switchTab(tab) {
     this.activeTab = tab;
+    this.lastActiveTab = tab;
   },
 
   setRecommendations(recommendations) {
@@ -73,7 +76,7 @@ Alpine.store('sharedContentsPanel', {
   reopenIfNeeded() {
     if (this.shouldReopenOnDetailClose) {
       this.shouldReopenOnDetailClose = false;
-      this.open('recommendations');
+      this.open(this.lastActiveTab);
     }
   },
 
