@@ -20,7 +20,6 @@ from django.views.decorators.http import require_http_methods
 
 from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import models as project_models
-from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
     can_administrate_project,
     reactivate_if_necessary,
@@ -115,17 +114,6 @@ def create_task(request):
                 action.below(previous_today_action)
             else:
                 action.top()
-
-            # Check if we have a file or link
-            document_form = DocumentUploadForm(request.POST, request.FILES)
-            if document_form.is_valid():
-                if document_form.cleaned_data["the_file"]:
-                    document = document_form.save(commit=False)
-                    document.attached_object = action
-                    document.site = request.site
-                    document.uploaded_by = request.user
-                    document.project = action.project
-                    document.save()
 
             # Notify other switchtenders
             signals.action_created.send(
@@ -295,16 +283,6 @@ def update_task(request, task_id=None):
             instance.project.updated_on = instance.updated_on
             instance.project.save()
 
-            document_form = DocumentUploadForm(request.POST, request.FILES)
-            if document_form.is_valid():
-                if document_form.cleaned_data["the_file"]:
-                    document = document_form.save(commit=False)
-                    document.attached_object = instance
-                    document.site = request.site
-                    document.uploaded_by = request.user
-                    document.project = instance.project
-                    document.save()
-
             # If we are going public, notify
             if was_public is False and instance.public is True:
                 signals.action_created.send(
@@ -329,7 +307,6 @@ def update_task(request, task_id=None):
             "next": request.GET.get("next"),
         }
         form = UpdateTaskForm(instance=task, initial=initial)
-        document_form = DocumentUploadForm()
         # Initialize preserved_content for template compatibility
         preserved_content = ""
     return render(request, "tasks/tasks/task_update.html", locals())
