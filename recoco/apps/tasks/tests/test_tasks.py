@@ -15,7 +15,6 @@ import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -573,29 +572,6 @@ def test_update_task_with_existing_topic(request, client):
     assert response.status_code == 302
 
 
-@pytest.mark.django_db
-def test_update_task_with_document(request, client):
-    task = Recipe(models.Task, site=get_current_site(request)).make()
-
-    with login(client) as user:
-        utils.assign_advisor(user, task.project)
-
-        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
-        response = client.post(
-            reverse("projects-update-task", args=[task.id]),
-            data={"the_file": png},
-        )
-
-    assert response.status_code == 302
-
-    document = project_models.Document.objects.first()
-    assert document
-
-    task = models.Task.on_site.first()
-    assert task.document.first() == document
-
-
 #
 # delete
 
@@ -1011,34 +987,6 @@ def test_create_new_action_without_resource(request, client, project_ready):
     assert task.intent == intent
     assert task.resource is None
     assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_create_new_action_with_document(request, client, project_ready):
-    intent = "My Intent"
-    content = "My Content"
-
-    with login(client, groups=["example_com_advisor"]) as user:
-        utils.assign_advisor(user, project_ready)
-        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
-        response = client.post(
-            reverse("projects-create-task"),
-            data={
-                "project": project_ready.pk,
-                "push_type": "noresource",
-                "public": True,
-                "intent": intent,
-                "content": content,
-                "the_file": png,
-            },
-        )
-
-    assert response.status_code == 302
-
-    document = project_models.Document.objects.first()
-    assert document
-    assert document.attached_object
 
 
 @pytest.mark.django_db

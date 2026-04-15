@@ -2,7 +2,8 @@
 {% load humanize %}
 {% load gravatar %}
 {% regroup project.notes.private by created_on.date as notes_by_day %}
-<div class="message-window flex-grow-1 d-flex flex-column-reverse overflow-y-auto-x-hidden">
+<div class="message-window flex-grow-1 d-flex flex-column-reverse overflow-y-auto-x-hidden"
+     x-data="{noteIdToDelete: null, onClickHandleDelete(){$refs.formProjectsDeleteNote.submit()}}">
     <ul class="list-unstyled list-group">
         {% for date, notes in notes_by_day|slice:":20" %}
             <li class="list-group-item border-0 fr-m-0 fr-p-0">
@@ -25,10 +26,23 @@
                             <div class="d-flex align-items-center">
                                 {% include "user/user_card.html" with user=note.created_by %}
                                 {% if note.created_by == request.user %}
-                                    <span class="align-middle small text-dark fr-ml-2v">
-                                        - <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
-    href="{% url 'projects-update-note' note.pk %}">éditer</a>
-                                    </span>
+                                    {% if note.document.count > 0 or note.contact %}
+                                        <form id="form-projects-delete-note"
+                                              x-ref="formProjectsDeleteNote"
+                                              method="post"
+                                              :action="'{% url 'projects-delete-note' 0 %}'.replace('0', noteIdToDelete)">
+                                            {% csrf_token %}
+                                        </form>
+                                        <button data-fr-opened="false"
+                                                aria-controls="modal"
+                                                type="button"
+                                                class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
+                                                @click="noteIdToDelete = {{ note.id }}"
+                                                data-fr-js-modal-button="true">Supprimer</button>
+                                    {% else %}
+                                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
+                                           href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         {% endif %}
@@ -37,4 +51,5 @@
             </li>
         {% endfor %}
     </ul>
+    {% include "conversations/messages/fragments/confirm_delete_message.html" %}
 </div>
