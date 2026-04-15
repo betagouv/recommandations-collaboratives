@@ -15,4 +15,17 @@
     flex: 1 0 0;
     align-self: stretch;
   }
+  &__section-title {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 22px;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    &-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
 }

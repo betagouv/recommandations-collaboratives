@@ -65,11 +65,11 @@
             <!-- Banner multiportail project -->
             {% include "crm/fragments/banner_project_multiportal.html" with project=project %}
             <!-- Impact tags checkbox list -->
-            <div class="d-flex align-items-center small">
+            <section class="d-flex align-items-center small">
                 <fieldset class="fr-fieldset fr-mx-0"
                           id="checkboxes-inline"
                           aria-labelledby="checkboxes-inline-legend">
-                    <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend fr-mx-0 fr-px-0"
+                    <legend class="project-crm__section-title fr-mx-0 fr-px-0"
                             id="checkboxes-inline-legend">Suivi de l'impact</legend>
                     <div class="crm-group-checkbox">
                         {% with project.crm_annotations.tags.names as active_tags %}
@@ -97,17 +97,22 @@
                         {% endwith %}
                     </div>
                 </fieldset>
-            </div>
+            </section>
             {% comment %} TODO  {% endcomment %}
             <!-- Create new note btn -->
-            <div>
+            <section class="w-100">
+                <div class="project-crm__section-title-container">
+                    <h3 class="project-crm__section-title">Notes</h3>
+                    <a class="fr-btn fr-btn--primary fr-btn--sm"
+                       href="{% url 'crm-project-note-create' project.pk %}">Ajouter une note</a>
+                </div>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Notes list -->
                 {% comment %} TODO  {% endcomment %}
                 <!-- Pinned notes -->
                 {% comment %} TODO  {% endcomment %}
                 <!-- Note card -->
-            </div>
+            </section>
             {% comment %} TODO  {% endcomment %}
             <!-- Activity timeline -->
             <div></div>
