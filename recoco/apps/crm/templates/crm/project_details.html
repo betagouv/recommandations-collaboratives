@@ -10,9 +10,78 @@
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
+{% comment %} TODO remove crm.css file {% endcomment %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0 crm-font">
-        {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
+        {% comment %} TODO  {% endcomment %}
+        <!-- CRM Navbar -->
+        {% comment %} TODO  {% endcomment %}
+        <!-- Breadcrumb -->
+        {% comment %} TODO  {% endcomment %}
+        <!-- Left column -->
+        <div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Project info -->
+            <div>
+                {% comment %} TODO  {% endcomment %}
+                <!-- Name -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Organization -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Commune -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Region -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Updated at -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Created at -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Number of message in conv -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Number of participants in conv -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Number of reco in conv -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Number of files -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Tags -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Next email reminder -->
+            </div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Client team -->
+            <div></div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Advisor team -->
+            <div></div>
+        </div>
+        {% comment %} TODO  {% endcomment %}
+        <!-- Right column -->
+        <div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Banner project status -->
+            <div></div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Banner multiportail project -->
+            <div></div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Impact tags checkbox list -->
+            <div></div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Create new note btn -->
+            <div>
+                {% comment %} TODO  {% endcomment %}
+                <!-- Notes list -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Pinned notes -->
+                {% comment %} TODO  {% endcomment %}
+                <!-- Note card -->
+            </div>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Activity timeline -->
+            <div></div>
+        </div>
+        {% comment %} {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% if request.site != site_origin.site %}
                 <div class="fr-notice fr-notice--info">
@@ -50,30 +119,16 @@
                     </div>
                     <hr />
                     <div class="d-flex align-items-center small">
-                        <fieldset class="fr-fieldset"
-                                  id="checkboxes-inline"
-                                  aria-labelledby="checkboxes-inline-legend">
-                            <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend"
-                                    id="checkboxes-inline-legend">Suivi de l'impact</legend>
+                        <fieldset class="fr-fieldset" id="checkboxes-inline" aria-labelledby="checkboxes-inline-legend">
+                            <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend" id="checkboxes-inline-legend">Suivi de l'impact</legend>
                             <div class="crm-group-checkbox">
                                 {% with project.crm_annotations.tags.names as active_tags %}
                                     {% for crm_tag in site_config.crm_available_tags.all %}
-                                        <form class="fr-mr-2v"
-                                              action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                              method="post">
+                                        <form class="fr-mr-2v" action="{% url 'crm-project-toggle-annotation' project.pk %}" method="post">
                                             {% csrf_token %}
-                                            <input class="button"
-                                                   hidden
-                                                   name="tag"
-                                                   value="{{ crm_tag.name }}"
-                                                   id="id_tag_{{ crm_tag.name|slugify }}" />
+                                            <input class="button" hidden name="tag" value="{{ crm_tag.name }}" id="id_tag_{{ crm_tag.name|slugify }}" />
                                             <div class="crm-form-check form-check form-check-inline">
-                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       name="checkbox-{{ crm_tag.name|slugify }}"
-                                                       onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
-                                                       id="checkbox-{{ crm_tag.name|slugify }}"
-                                                       {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                                <input class="form-check-input" type="checkbox" name="checkbox-{{ crm_tag.name|slugify }}" onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()" id="checkbox-{{ crm_tag.name|slugify }}" {% if crm_tag.name in active_tags %}checked{% endif %}>
                                                 <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
                                             </div>
                                         </form>
@@ -87,15 +142,12 @@
                     <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
                         <span>Voir le dossier</span>
                     </a>
-                    <a href="{% url 'crm-project-update' project.pk %}"
-                       class="btn btn-outline-secondary"
-                       aria-current="page">Gérer le dossier</a>
+                    <a href="{% url 'crm-project-update' project.pk %}" class="btn btn-outline-secondary" aria-current="page">Gérer le dossier</a>
                 </div>
             </div>
             <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
                 <div class="d-flex justify-content-between align-items-start">
-                    <a class="btn btn-primary fr-mb-3w"
-                       href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
+                    <a class="btn btn-primary fr-mb-3w" href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
                 </div>
                 {% for note in sticky_notes.all %}
                     {% include "crm/note.html" with pinned=True get_user_profile=True %}
@@ -109,5 +161,5 @@
                 {% include "crm/timeline.html" %}
             </div>
         </div>
-    </div>
-{% endblock content %}
+        </div> {% endcomment %}
+    {% endblock content %}
