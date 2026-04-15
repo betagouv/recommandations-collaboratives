@@ -215,28 +215,6 @@ Alpine.data(
         );
         this.updateMyDepartmentsActive();
       },
-      get selectedCount() {
-        if (this.regions) {
-          return this.regions
-            .flatMap((r) => r.departments)
-            .filter((d) => d.active).length;
-        }
-        if (this.departments) {
-          return this.departments.filter((d) => d.active).length;
-        }
-        return 0;
-      },
-      get selectedLabel() {
-        const count = this.selectedCount;
-        if (count === 0) return null;
-        if (count === 1) {
-          const dept = this.regions
-            ? this.regions.flatMap((r) => r.departments).find((d) => d.active)
-            : this.departments?.find((d) => d.active);
-          return dept ? `${dept.code} - ${dept.name}` : '1 département';
-        }
-        return `${count} départements`;
-      },
       extractDepartmentFromSelectedRegions(regions) {
         const extractedDepartements = regions
           .flatMap((region) =>
