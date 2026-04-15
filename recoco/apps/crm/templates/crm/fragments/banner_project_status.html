@@ -5,10 +5,19 @@
 {% if project.inactive_since %}
     <div class="project-banner project-banner--paused">
         <p class="fr-mb-0">
-            Ce dossier a été mis en pause par {{ user.firstName }} {{ user.lastName }}
-            {% if user.organization %}({{ user.organization }}){% endif %}
-            <button>Réactiver le dossier</button>
+            Ce dossier a été mis en pause
+            {% comment %} TODO Set data available {% endcomment %}
+            {% comment %} {% if user %}
+                par {{ user.firstName }} {{ user.lastName }}
+                {% if user.organization %}({{ user.organization }}){% endif %}
+            {% endif %} {% endcomment %}
         </p>
+        <form id="admin-activate-project"
+              method="post"
+              action="{% url 'projects-project-set-active' project.pk %}">
+            {% csrf_token %}
+            <button class="project-banner__btn project-banner__btn--white">Réactiver le dossier</button>
+        </form>
     </div>
 {% elif project.status == 'REJECTED' %}
     <div class="project-banner project-banner--rejected">
