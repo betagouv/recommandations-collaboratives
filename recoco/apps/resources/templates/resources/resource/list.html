@@ -28,8 +28,7 @@
              class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
         <div class="d-flex justify-content-between align-items-center fr-mb-2w">
             <h1 class=" align-items-center fr-mb-2w">
-                {% if resources_count %}{{ resources_count }}{% endif %}
-                Ressources
+                {{ resources_count }} ressource{{ resources_count|pluralize }} {% if query or categories or limit_areas %}<span class="fw-400">trouvée{{ resources_count|pluralize }} pour {% if query %}"<em>{{ query }}</em>"{% if categories or limit_areas %},{% endif %}{% endif %}{% if categories %} {% if categories|length == 1 %}la catégorie{% else %}les catégories{% endif%} <em>{{ categories|join:', ' }}</em> {% if limit_areas %}et {% endif %}{% endif %}{% if limit_areas %}{% if limit_areas|length == 1 %}le département {{ limit_areas }}{% else %}{{ limit_areas|length }} départements{% endif %}{% endif %}.</span>{% endif %}
             </h1>
             {% if "manage_resources" in user_site_perms %}
                 <a class="fr-btn fr-btn--sm fr-btn--primary fr-mr-1w"
@@ -43,26 +42,28 @@
                     {% include "projects/project/fragments/search_bar.html" with placeholder="Rechercher" value=query show_search_button=True %}
                     <input type="hidden" value="on" name="searching">
                 </div>
-                <div class="w-100 d-flex justify-content-around">
-                    <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());"
-                         class="d-flex align-items-center w-100 fr-mx-2w">
-                        <label class="fr-segmented__legend inline text-nowrap fr-mb-0 fr-mr-1w">Catégories :</label>
-                        <template x-for="id in selectedIds" :key="id">
-                            <input type="hidden" :name="categoryMap[id]" value="on">
-                        </template>
-                        <div x-data="{ selected: selectedIds }" class="w-100">
-                            {% include "tools/multi_select.html" with extra_classes="multi-select--pill align-items-center fr-pl-1w" placeholder="Toutes les catégories" %}
+                {% if category_options|length > 1 %}
+                    <div class="w-100 d-flex justify-content-around">
+                        <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());"
+                            class="d-flex align-items-center w-100 fr-mx-2w">
+                            <label class="fr-segmented__legend inline text-nowrap fr-mb-0 fr-mr-1w">Catégories :</label>
+                            <template x-for="id in selectedIds" :key="id">
+                                <input type="hidden" :name="categoryMap[id]" value="on">
+                            </template>
+                            <div x-data="{ selected: selectedIds }" class="w-100">
+                                {% include "tools/multi_select.html" with placeholder="Toutes les catégories" no_inside_border=True %}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="w-100 d-flex">
+                {% endif %}
+                <div class="w-100 d-flex{% if category_options|length < 1 %} fr-ml-4w{% endif %}">
                     <div x-data="{ selectedCodes: {{ limit_areas|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; }}"
                          @selected-departments="selectedCodes = normalize($event.detail)"
                          @user-close-selector="$nextTick(() => $el.closest('form').submit())">
                         <template x-for="code in selectedCodes" :key="code">
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
-                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Territoire :" extra_classes="inline-chevron" %}
+                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
                 </div>
             </div>
@@ -81,12 +82,6 @@
                         <span class="text-secondary">Essayez de supprimer des mots-clés ou d'ajouter des catégories.</span>
                         <br />
                         <span class="small">Vous pouvez aussi <a href="{% url 'resources-resource-search' %}">réinitialiser</a> vos critères de recherche ou <a href="?searching=on">élargir la zone géographique</a>.</span>
-                    </div>
-                {% else %}
-                    <div class="col-12">
-                        <span class="text-secondary">
-                            {{ resources_count }} résultat{{ resources_count|pluralize }} trouvé{{ resources_count|pluralize }} pour "<em>{{ query }}</em>".
-                        </span>
                     </div>
                 {% endif %}
             </div>

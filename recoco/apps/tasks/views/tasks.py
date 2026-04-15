@@ -321,7 +321,7 @@ def task_recommendation_list(request):
     recommendations = (
         models.TaskRecommendation.on_site.all()
         .select_related("resource__category")
-        .prefetch_related("departments")
+        .prefetch_related("departments", "condition_tags")
     )
 
     return render(request, "tasks/tasks/recommendation_list.html", locals())
