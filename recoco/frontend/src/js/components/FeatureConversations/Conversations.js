@@ -74,6 +74,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countElementsInDiscussion();
     this.extractSharedContents().then(async () => {
       this.loadExternalFiles();
+      this.loadPrivateFiles();
       await this.detectOpenActionsFromHash();
     });
     window.addEventListener('hashchange', async () => {
@@ -151,6 +152,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       try {
         const privateFiles = JSON.parse(privateFilesElement.textContent);
         this.$store.sharedContentsPanel.setPrivateFiles(privateFiles || []);
+
         this.countOf.documents += privateFiles.length;
       } catch (error) {
         console.error('Failed to parse private files:', error);
