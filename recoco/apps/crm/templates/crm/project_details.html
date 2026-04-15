@@ -8,19 +8,20 @@
     {{ project.name }} - CRM
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/project-crm.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% comment %} TODO remove crm.css file {% endcomment %}
 {% block content %}
     <!-- CRM Navbar -->
     {% include "crm/fragments/navigation.html" with projects=True %}
-    <div x-data="Crm" class="d-flex fr-px-0 crm-font">
+    <div x-data="Crm" class="project-crm">
         <!-- Breadcrumb -->
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: '{{ project.name }}' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
         {% comment %} TODO  {% endcomment %}
         <!-- Left column -->
-        <div>
+        <div class="project-crm-left-col">
             {% comment %} TODO  {% endcomment %}
             <!-- Project info -->
             <div>
@@ -58,7 +59,7 @@
         </div>
         {% comment %} TODO  {% endcomment %}
         <!-- Right column -->
-        <div>
+        <div class="project-crm-right-col">
             {% comment %} TODO  {% endcomment %}
             <!-- Banner project status -->
             <div></div>
