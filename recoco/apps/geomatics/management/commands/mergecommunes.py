@@ -7,7 +7,7 @@ Management command to update projects after commune loading
 This command relies on the CSV file listing defunct commune INSEE codes and
 their replacement, available from La Poste:
 
-https://datanova.laposte.fr/datasets/laposte-communes-nouvelles
+https://datanova.laposte.fr/datasets/laposte-commnouv
 (can be also found on datagouv)
 
 authors: guillaume.libersat@beta.gouv.fr
