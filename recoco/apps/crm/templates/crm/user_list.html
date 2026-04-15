@@ -41,8 +41,7 @@
                          :class="{ 'input-active': focused }">
                         <select name="{{ users.form.role.name }}"
                                 id="id_role"
-                                class="input-field bg-transparent border-0 fw-normal text-dark fr-px-2w appearance-none"
-                                style="cursor: pointer; outline: none;"
+                                class="input-field bg-transparent border-0 fw-normal text-dark fr-px-2w appearance-none cursor-pointer no-outline"
                                 @focus="focused = true"
                                 @blur="focused = false"
                                 onchange="this.form.submit()">
