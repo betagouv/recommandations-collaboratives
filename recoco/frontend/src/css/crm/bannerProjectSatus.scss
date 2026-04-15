@@ -24,6 +24,7 @@
     }
   }
   &--rejected,
+  &--deleted,
   &--predraft {
     background: var(--dark-text-mention-grey, #929292);
   }

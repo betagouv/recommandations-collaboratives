@@ -10,7 +10,7 @@
             {% comment %} {% if user %}
                 par {{ user.firstName }} {{ user.lastName }}
                 {% if user.organization %}({{ user.organization }}){% endif %}
-            {% endif %} {% endcomment %}
+            {% endif %} {% endcomment %}.
         </p>
         <form id="admin-activate-project"
               method="post"
@@ -26,11 +26,15 @@
 {% elif project.status == 'DRAFT' %}
     <div class="project-banner project-banner--draft">
         <p class="fr-mb-0">
-            Ce dossier est en attente de validation. Vous pouver le <a href="{% url 'projects-moderation-list' %}">valider ici</a>
+            Ce dossier est en attente de validation. Vous pouver le <a href="{% url 'projects-moderation-list' %}">valider ici.</a>
         </p>
     </div>
 {% elif project.status == 'PRE_DRAFT' %}
     <div class="project-banner project-banner--predraft">
         <p class="fr-mb-0">Ce dossier a est incomplet : son dépôt n'a pas été finalisé, il n'est pas actif.</p>
+    </div>
+{% elif project.deleted %}
+    <div class="project-banner project-banner--deleted">
+        <p class="fr-mb-0">Ce dossier a été supprimé.</p>
     </div>
 {% endif %}
