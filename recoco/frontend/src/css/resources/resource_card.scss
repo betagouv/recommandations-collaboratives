@@ -1,5 +1,4 @@
 .card-resource {
-  max-height: 280px;
 
   &__body {
     padding-top: 1.5rem;
@@ -33,17 +32,9 @@
     text-underline-offset: auto;
     text-underline-position: from-font;
     margin-bottom: 12px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
   }
 
   &__text {
-    overflow: hidden;
-    display: -webkit-box;
-    line-clamp: 4;
-    -webkit-box-orient: vertical;
     color: var(--light-neutral-grey-200, #3a3a3a);
     font-family: Marianne;
     font-size: 14px;

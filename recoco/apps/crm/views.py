@@ -392,12 +392,12 @@ def merge_organizations_with_name(orgs, name):
     # update old sites in new organization
     sites = [s for s in Site.objects.filter(organizations__in=old_orgs)]
     new_org.sites.add(*sites)
-    # update new organization name
-    new_org.name = name
-    new_org.save()
     # delete old orgs
     old_ids = [o.id for o in old_orgs]
     addressbook_models.Organization.objects.filter(id__in=old_ids).delete()
+    # update new organization name
+    new_org.name = name
+    new_org.save()
 
 
 @login_required
