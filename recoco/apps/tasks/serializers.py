@@ -205,7 +205,6 @@ class TaskWithMessageSerializer(TaskSerializer):
             "resource",
             "resource_id",
             "topic",
-            # todo display possibility for ds_folder
             "notifications",
             "followups_count",
             "comments_count",
