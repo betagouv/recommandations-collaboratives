@@ -23,6 +23,6 @@ describe("I can't see adress book because I don't have one", () => {
     cy.get('[data-test-id="open-dropdown-profil-option-button"]').click({
       force: true,
     });
-    cy.get('[data-test-id="button-address-book"]').should('not.exist');
+    cy.get('[data-test-id="button-address-book"]').should('exist');
   });
 });

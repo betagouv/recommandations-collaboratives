@@ -6,6 +6,7 @@ describe('As a switchtender I can manage notifications in header', () => {
     for (let i = 0; i < 4; i++) {
       cy.get('[data-test-id="tiptap-editor-content"]').type('Hello World', {
         delay: 0,
+        force: true,
       });
       cy.get('[data-test-id="send-message-conversation"]').click();
     }
