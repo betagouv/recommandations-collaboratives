@@ -211,9 +211,6 @@ def create_ds_prefill_link(recommendation_id: int):
         project=recommendation.project,
         ds_resource=ds_resource,
     )
-    if not len(content):
-        return
-
     resp = requests.post(
         url=f"{settings.DS_API_BASE_URL}/demarches/{ds_resource.number}/dossiers",
         json=content,
@@ -221,7 +218,7 @@ def create_ds_prefill_link(recommendation_id: int):
     )
     if resp.status_code != 201:
         raise DSAPIError(
-            f"Failed to create a DS folder for the DS resource {ds_resource.name}",
+            f"Failed to prefill d for the DS resource {ds_resource.name}",
             status_code=resp.status_code,
         )
 
