@@ -156,4 +156,5 @@ class EditChoiceForm(forms.ModelForm):
 
     def clean_conclusion(self):
         cl = self.cleaned_data["conclusion"]
-        return nh3.clean(cl)
+        if cl:
+            return nh3.clean(cl)
