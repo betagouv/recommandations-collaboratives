@@ -1151,6 +1151,29 @@ def test_switchtender_writes_advisors_note(request, client, project):
 
 
 @pytest.mark.django_db
+def test_switchtender_writes_advisors_note_sanitized(request, client, project):
+    site = get_current_site(request)
+    other_advisor = baker.make(auth.User)
+    utils.assign_advisor(other_advisor, project, site)
+
+    with login(client) as user:
+        utils.assign_advisor(user, project, site)
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data={
+                "advisors_note": 'content and <img src="x" onerror="alert(\'evil content\')" />',
+                "form-TOTAL_FORMS": 1,
+                "form-INITIAL_FORMS": 0,
+            },
+        )
+
+    assert response.status_code == 302
+    project = models.Project.objects.all()[0]
+    assert "onerror" not in project.advisors_note
+
+
+@pytest.mark.django_db
 def test_switchtender_view_project_topics(request, client, make_project):
     site = get_current_site(request)
     topic = Recipe(models.Topic, site=site, name="a nice topic").make()
