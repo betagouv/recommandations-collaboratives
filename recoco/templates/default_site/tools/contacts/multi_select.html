@@ -140,8 +140,7 @@
                                                                        x-text="region.name"
                                                                        :for="`region-${region.code}`"></label>
                                                             </div>
-                                                            <div class="departments-list"
-                                                                 style="margin-left: 1.5em"
+                                                            <div class="departments-list fr-ml-3w"
                                                                  x-ref="departmentsList">
                                                                 <template x-for="dep in region.departments" :key="dep.code">
                                                                     <div class="d-flex align-items-center department-item px-2 py-1 rounded cursor-pointer position-relative"
