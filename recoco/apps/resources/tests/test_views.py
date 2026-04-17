@@ -30,6 +30,7 @@ from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import login
 
+from ...demarches_simplifiees.models import DSResource
 from .. import models
 
 ########################################################################
@@ -465,6 +466,28 @@ def test_resource_detail_contacts_to_display(request, client):
 
         response = client.get(url)
         assert response.context["contacts_to_display"] == [contact.id]
+
+
+@pytest.mark.django_db
+def test_resource_detail_ds_prefill_button(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+    baker.make(
+        DSResource,
+        resource=resource,
+        schema={"number": 42},
+    )
+    Recipe(Task, resource=resource).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["resource"].has_dsresource
 
 
 #
@@ -1140,6 +1163,31 @@ def test_embedded_resource_detail_contacts_to_display(request, client):
 
         response = client.get(url)
         assert response.context["contacts_to_display"] == [contact.id]
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_ds_prefill_button(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+    baker.make(
+        DSResource,
+        resource=resource,
+        schema={"number": 42},
+    )
+    task = Recipe(Task, resource=resource).make()
+
+    url = f"{reverse('resources-resource-detail-embeded', args=[resource.id])}?task_id={task.id}"
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["resource"].has_dsresource
+        assert reverse("projects-task-ds-prefill", args=(task.id,)) in str(
+            response.content
+        )
 
 
 # eof

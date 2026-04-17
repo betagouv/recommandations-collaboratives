@@ -16,6 +16,7 @@ from recoco.apps.survey.models import (
     Session,
     Survey,
 )
+from recoco.settings.common import DS_API_BASE_URL
 
 from ...geomatics.models import Commune, Department
 from ...tasks.models import Task
@@ -284,7 +285,7 @@ def test_return_ds_prefill_link_calls_ds_data_with_prefill(client):
             project=task.project, site=task.site, ds_resource=ds_resource
         )
         mock_post.assert_called_with(
-            url=f"https://www.demarches-simplifiees.fr/api/public/v1/demarches/{ds_resource.number}/dossiers",
+            url=f"{DS_API_BASE_URL}/demarches/{ds_resource.number}/dossiers",
             json=prefill_data,
             timeout=30,
         )
