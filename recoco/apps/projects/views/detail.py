@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
-import nh3
 from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -414,7 +413,6 @@ def project_create_or_update_topics(request, project_id=None):
             if changed_note:
                 project.advisors_note_on = timezone.now()
                 project.advisors_note_by = request.user
-                project.advisors_note = nh3.clean(project.advisors_note)
             project.save()
             form.save_m2m()
             if changed_note:

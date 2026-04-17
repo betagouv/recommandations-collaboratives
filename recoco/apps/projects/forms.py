@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
+import nh3
 from django import forms
 from django.db import transaction
 from django.db.models import QuerySet
@@ -102,6 +103,10 @@ class ProjectForm(forms.ModelForm):
             "description": "Contexte du dossier",
         }
 
+        def clean_description(self):
+            desc = self.cleaned_data["description"]
+            return nh3.clean(desc)
+
 
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
@@ -132,6 +137,10 @@ class ProjectTopicsForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = ["advisors_note"]
+
+    def clean_advisors_note(self):
+        note = self.cleaned_data["advisors_note"]
+        return nh3.clean(note)
 
 
 class ProjectModerationForm(forms.Form):

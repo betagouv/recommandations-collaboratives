@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-27 11:33:08 CEST
 """
 
+import nh3
 from django import forms
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
@@ -102,6 +103,10 @@ class AnswerForm(forms.Form):
 
         return True
 
+    def clean_comment(self):
+        com = self.cleaned_data["comment"]
+        return nh3.clean(com)
+
 
 # editor forms
 
@@ -148,3 +153,7 @@ class EditChoiceForm(forms.ModelForm):
     class Meta:
         model = models.Choice
         fields = ["text", "value", "conclusion", "signals", "priority"]
+
+    def clean_conclusion(self):
+        cl = self.cleaned_data["conclusion"]
+        return nh3.clean(cl)
