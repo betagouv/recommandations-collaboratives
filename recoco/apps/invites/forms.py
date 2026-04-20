@@ -8,17 +8,14 @@ created : 2022-04-19 14:16:20 CEST
 """
 
 from django import forms
-from django.contrib.auth.password_validation import validate_password
-from django.core.validators import RegexValidator
+from django.contrib.auth import models as auth_models
+from django.contrib.auth.forms import SetPasswordMixin
 from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
-from . import models
+from recoco.apps.addressbook import models as addressbook_models
 
-phone_validator = RegexValidator(
-    regex=r"^(\+33|0)[0-9]{9}$",
-    message="Format attendu : 0102030405 ou +33102030405.",
-)
+from . import models
 
 
 class InviteForm(forms.ModelForm):
@@ -29,7 +26,7 @@ class InviteForm(forms.ModelForm):
         fields = ["email", "message"]
 
 
-class InviteAcceptForm(forms.Form):
+class InviteAcceptForm(SetPasswordMixin, forms.Form):
     """Complementary informations when accepting an invitation"""
 
     first_name = forms.CharField(required=True)
@@ -41,25 +38,37 @@ class InviteAcceptForm(forms.Form):
         label="Numéro de téléphone",
         widget=PhoneNumberInternationalFallbackWidget(),
     )
-    password = forms.CharField(
-        widget=forms.PasswordInput,
-        required=True,
-        help_text="10 caractères minimum, au moins 1 majuscule et 1 chiffre.",
-    )
-    password_confirm = forms.CharField(widget=forms.PasswordInput, required=True)
-
-    def clean_password(self):
-        password = self.cleaned_data.get("password")
-        if password:
-            validate_password(password)
-        return password
+    password, password_confirm = SetPasswordMixin.create_password_fields()
 
     def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        password_confirm = cleaned_data.get("password_confirm")
-        if password and password_confirm and password != password_confirm:
-            self.add_error(
-                "password_confirm", "Les mots de passe ne correspondent pas."
-            )
-        return cleaned_data
+        self.validate_passwords("password", "password_confirm")
+        return super().clean()
+
+    def __init__(self, *args, **kwargs):
+        self.invite = kwargs.pop("invite")
+        self.site = kwargs.pop("site")
+        super().__init__(*args, **kwargs)
+
+    def _post_clean(self):
+        super()._post_clean()
+        self.user = auth_models.User(
+            username=self.invite.email,
+            email=self.invite.email,
+            first_name=self.cleaned_data.get("first_name"),
+            last_name=self.cleaned_data.get("last_name"),
+        )
+        self.validate_password_for_user(self.user, "password")
+
+    def save(self):
+        self.set_password_and_save(self.user, "password")
+
+        org_name = self.cleaned_data.get("organization")
+        organization = addressbook_models.Organization.get_or_create(org_name)
+        organization.sites.add(self.site)
+
+        self.user.profile.organization = organization
+        self.user.profile.organization_position = self.cleaned_data.get("position")
+        self.user.profile.phone_no = self.cleaned_data.get("phone_no")
+
+        self.user.profile.save()
+        return self.user
