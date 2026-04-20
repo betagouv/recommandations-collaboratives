@@ -15,7 +15,7 @@ dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
     "cryptography==46.0.7",
-    "django>=5.1.15,<5.2",
+    "django>=5.2.1,<6",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
     "django-allauth[mfa,openid,socialaccount]==65.14.1",
