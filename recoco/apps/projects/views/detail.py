@@ -251,31 +251,6 @@ def project_recommendations_embed(request, project_id=None):
 
 
 @login_required
-def project_actions_inline(request, project_id=None):
-    """Inline Action page for given project"""
-
-    project = get_object_or_404(
-        models.Project.objects.select_related("commune__department"),
-        sites=request.site,
-        pk=project_id,
-    )
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_tasks", project
-    )
-
-    return render(request, "projects/project/actions_inline.html", locals())
-
-
-@login_required
 def project_conversations_new(request, project_id=None):
     """New Conversation page for project"""
 
