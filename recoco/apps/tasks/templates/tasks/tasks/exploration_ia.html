@@ -17,7 +17,7 @@
 {% endblock js %}
 {% block content %}
     <div class="row justify-content-center">
-        <div class="col-10 fr-p-3w" x-data="ExplorationIA({ projectId: {{ project.id }}, siteId: {{ request.site.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}
+        <div class="col-10 fr-p-3w" x-data="ExplorationIA({ siteId: {{ request.site.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}
             {% if project.commune %}- {{ project.commune.name }}{% endif %}
             .
             {% if project.description %}{{ project.description|escapejs }}{% endif %}
@@ -260,8 +260,8 @@
                             Vous pouvez effectuer une nouvelle recherche ou passer à la synthèse.
                         </p>
                     </div>
-                    <!-- ÉTAPE 1 : Resultats IA (chunks + bibliographie) - masqué à l'étape 2 quand on a des co-recos -->
-                    <div x-show="hasAnswerResults() && !isLoading && !(currentPhase === 2 && coRecommendations.length > 0)"
+                    <!-- ÉTAPE 1 : Resultats IA (chunks + bibliographie) -->
+                    <div x-show="hasAnswerResults() && !isLoading"
                          class="row g-4 fr-mb-3w"
                          data-test-id="exploration-ia-answer-results">
                         <!-- Colonne principale : Reponse -->
@@ -364,23 +364,8 @@
                         <p class="fr-callout__title">Aucun résultat trouvé</p>
                         <p class="fr-callout__text">Essayez d'autres mots-clés ou simplifiez votre recherche.</p>
                     </div>
-                    <!-- Historique des selections (Phase 2) -->
-                    <template x-if="currentPhase === 2 && allSelectedItems.length > 0">
-                        <div class="fr-mb-3w exploration-ia-history"
-                             data-test-id="exploration-ia-history">
-                            <h3 class="fr-text--md fr-mb-2w">
-                                <span class="fr-icon-history-line fr-mr-1v"></span>
-                                Éléments déjà sélectionnés (<span x-text="allSelectedItems.length"></span>)
-                            </h3>
-                            <div class="exploration-ia-history__tags">
-                                <template x-for="item in allSelectedItems" :key="item.id">
-                                    <span class="fr-tag fr-tag--sm" x-text="truncate(item.title, 30)"></span>
-                                </template>
-                            </div>
-                        </div>
-                    </template>
                     <!-- Actions de phase -->
-                    <template x-if="currentPhase > 0 && searchQuery.length > 0 && foundAnswer">
+                    <template x-if="searchQuery.length > 0 && foundAnswer">
                         <div class="footer-actions d-flex align-items-center fr-py-3w border-top"
                              :class="{ 'justify-content-between': selectedChunks.length == 0, 'justify-content-end': selectedChunks.length > 0 }"
                              data-test-id="exploration-ia-phase-actions">
@@ -429,18 +414,7 @@
             <!-- Phase 3 : Synthese et création de recommandation -->
             <template x-if="currentPhase === 3">
                 <div data-test-id="exploration-ia-synthesis-phase">
-                    <!-- Chargement synthese -->
-                    <div x-show="isSynthesizing"
-                         class="exploration-ia-loading"
-                         data-test-id="exploration-ia-synthesizing">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Analyse en cours...</span>
-                        </div>
-                        <p class="text-secondary fr-mt-2w">Préparation de la synthèse...</p>
-                    </div>
-                    <!-- Resultats de synthese -->
-                    <div x-show="!isSynthesizing"
-                         data-test-id="exploration-ia-synthesis-results">
+                    <div data-test-id="exploration-ia-synthesis-results">
                         <!-- En-tête avec résumé -->
                         <div class="fr-callout fr-callout--green-emeraude fr-mb-3w"
                              data-test-id="exploration-ia-summary">
@@ -448,10 +422,6 @@
                                 <span class="fr-icon-checkbox-circle-fill fr-mr-1v" aria-hidden="true"></span>
                                 Vos <strong x-text="getAllSelectedResources().length"></strong> ressources sont prêtes pour créer vos recommandations.
                             </p>
-                            {% comment %}
-                            <p class="fr-callout__text">
-                            </p>
-                            {% endcomment %}
                         </div>
                         <!-- Ressources sélectionnées (étapes 1 et 2 combinées) -->
                         <div class="exploration-ia-synthesis__section fr-mb-4w"
