@@ -216,7 +216,7 @@ export function resourcePreviewUrl(resourceId, taskId) {
   if (taskId) {
     return `/ressource/${resourceId}/embed?task_id=${taskId}`;
   }
-  return `/ressource/${resourceId}/embed/`;
+  return `/ressource/${resourceId}/embed`;
 }
 
 export function postExternalRessourceUrl() {

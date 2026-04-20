@@ -85,6 +85,7 @@ ADVISOR_PERMISSIONS = [
     "projects.change_project",
     "projects.change_location",
     "projects.use_project_tags",
+    "projects.manage_private_documents",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -593,6 +594,7 @@ class Project(models.Model):
             ("manage_tasks", "Can manage tasks"),
             # Documents
             ("manage_documents", "Can manage the documents"),
+            ("manage_private_documents", "Can manage advisor space documents"),
             # Invitation/sharing/members
             ("invite_collaborators", "Can invite collaborators"),
             ("invite_advisors", "Can invite advisors"),
@@ -882,6 +884,11 @@ class Note(models.Model):
     def __str__(self):  # pragma: nocover
         return f"Note: #{self.id}"
 
+    def save(self, **kwargs):
+        if self.pk:
+            self.updated_on = timezone.now()
+        super().save(**kwargs)
+
 
 class DocumentManager(models.Manager):
     """Manager for active document"""
@@ -978,6 +985,8 @@ class Document(models.Model):
     attached_object = GenericForeignKey("content_type", "object_id")
 
     description = models.CharField(max_length=256, default="", blank=True)
+
+    private = models.BooleanField(default=True)  # for advisors only
 
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)

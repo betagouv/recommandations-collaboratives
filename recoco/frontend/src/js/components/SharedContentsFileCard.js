@@ -15,6 +15,7 @@ import {
  */
 Alpine.data('SharedContentsFileCard', (config = {}) => ({
   isExternal: config.isExternal || false,
+  file: config.file || null,
 
   /**
    * Get the full filename from the file object

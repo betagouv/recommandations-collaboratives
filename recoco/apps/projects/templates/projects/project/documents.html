@@ -20,7 +20,7 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with files_links=True %}
-    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     <div class="fr-p-3w">
         <div class="row">
             <div class="col-8">
@@ -36,7 +36,9 @@
                         {% include "projects/project/fragments/files_links/file_upload_button.html" with type="project" action=upload_action small=True %}
                     {% endif %}
                 </div>
-                {% include "projects/project/fragments/files_links/file_list.html" with files=all_files files_from_edl=answers_with_files.all %}
+                <!-- Fichiers partagés -->
+                {% include "projects/project/fragments/files_links/file_list.html" with files=public_files files_from_edl=answers_with_files.all is_activate_pinning_action=True %}
+                <!-- Fichiers récupérés de l'état des lieux -->
                 {% for answer in answers_with_files.all %}
                     {% if answer.attachment %}
                         <div class="fr-mb-2w">
@@ -75,6 +77,14 @@
                         </div>
                     {% endif %}
                 {% endfor %}
+                {% if private_files.exists %}
+                    <!-- Fichiers privés -->
+                    <hr />
+                    <div data-test-id="private-files-section">
+                        <h6 class="text-uppercase small fr-mb-0">Fichiers partagés dans l'espace conseiller</h6>
+                        {% include "projects/project/fragments/files_links/file_list.html" with files=private_files is_activate_pinning_action=False %}
+                    </div>
+                {% endif %}
             </div>
             <div class="col-4">
                 <div class="d-flex align-items-center justify-content-between fr-mb-3w">
@@ -90,10 +100,10 @@
                 <div class="d-flex align-items-center justify-content-between fr-mb-2v fr-mt-3w fr-pt-2v">
                     <h6 class="text-uppercase small fr-mb-0">Fichiers épinglés</h6>
                 </div>
-                {% include "projects/project/fragments/files_links/file_list.html" with search=False files=pinned_files is_pinned=True %}
+                {% include "projects/project/fragments/files_links/file_list.html" with search=False files=pinned_files is_pinned=True is_activate_pinning_action=True %}
             </div>
         </div>
     </div>
-    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
     {% include "projects/project/onboarding_tutorial.html" %}
 {% endblock project_detail %}

@@ -1,5 +1,5 @@
 {% load static %}
-{% if not search == False %}
+{% if search %}
     <div x-data="Files({{ files.all.count }})" id="filesId">
         {% include "projects/project/fragments/files_links/file_search.html" with files=files %}
         {% if files.count == 0 and files_from_edl.count == 0 %}

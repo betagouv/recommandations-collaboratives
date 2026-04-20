@@ -3,15 +3,18 @@ import Alpine from 'alpinejs';
 Alpine.store('sharedContentsPanel', {
   isOpen: false,
   activeTab: 'recommendations', // 'recommendations' | 'files' | 'draft-recommendations'
+  lastActiveTab: 'recommendations', // 'recommendations' | 'files' | 'draft-recommendations'
   recommendations: [],
   files: [],
   draftRecommendations: [],
   externalFiles: [], // Files from EDL (État des lieux)
+  privateFiles: [], // Files from private notes
   shouldReopenOnDetailClose: false, // Track if we should re-open when detail panel closes
 
   open(tab = null) {
     if (tab) {
       this.activeTab = tab;
+      this.lastActiveTab = tab;
     }
     this.isOpen = true;
 
@@ -28,6 +31,7 @@ Alpine.store('sharedContentsPanel', {
 
   switchTab(tab) {
     this.activeTab = tab;
+    this.lastActiveTab = tab;
   },
 
   setRecommendations(recommendations) {
@@ -42,12 +46,18 @@ Alpine.store('sharedContentsPanel', {
     this.externalFiles = externalFiles;
   },
 
+  setPrivateFiles(privateFiles) {
+    this.privateFiles = privateFiles;
+  },
+
   setDraftRecommendations(draftRecommendations) {
     this.draftRecommendations = draftRecommendations;
   },
 
   removeDraftRecommendation(recommendationId) {
-    this.draftRecommendations = this.draftRecommendations.filter((draft) => draft.id !== recommendationId);
+    this.draftRecommendations = this.draftRecommendations.filter(
+      (draft) => draft.id !== recommendationId
+    );
   },
 
   /**
@@ -66,7 +76,7 @@ Alpine.store('sharedContentsPanel', {
   reopenIfNeeded() {
     if (this.shouldReopenOnDetailClose) {
       this.shouldReopenOnDetailClose = false;
-      this.open('recommendations');
+      this.open(this.lastActiveTab);
     }
   },
 
@@ -81,9 +91,10 @@ Alpine.store('sharedContentsPanel', {
    * Get total count of files (conversation + external)
    */
   get filesCount() {
-    return this.files.length + this.externalFiles.length;
+    return (
+      this.files.length + this.externalFiles.length + this.privateFiles.length
+    );
   },
-
 
   /**
    * Get total count of draft recommendations
@@ -95,7 +106,11 @@ Alpine.store('sharedContentsPanel', {
    * Get total count of all shared contents
    */
   get totalCount() {
-    return this.recommendationsCount + this.draftRecommendationsCount + this.filesCount;
+    return (
+      this.recommendationsCount +
+      this.draftRecommendationsCount +
+      this.filesCount
+    );
   },
 });
 

@@ -32,6 +32,7 @@ class NotificationFormatter:
             verbs.Recommendation.COMMENTED: self.format_action_commented,
             verbs.Recommendation.CREATED: self.format_action_recommended,
             verbs.Document.ADDED_FILE: self.format_document_uploaded,
+            verbs.Document.ADDED_ADVISOR_FILE: self.format_document_uploaded,
             verbs.Document.ADDED_LINK: self.format_document_uploaded,
         }
 

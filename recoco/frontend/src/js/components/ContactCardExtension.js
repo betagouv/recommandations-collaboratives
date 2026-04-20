@@ -50,7 +50,7 @@ export const ContactCardExtension = Node.create({
 
   // Produce the HTML to export from tiptap
   renderHTML({ HTMLAttributes }) {
-    const contact = { HTMLAttributes };
+    const contact = HTMLAttributes;
     //   id: HTMLAttributes.id,
     //   first_name: HTMLAttributes.firstName,
     //   last_name: HTMLAttributes.lastName,
@@ -72,7 +72,7 @@ export const ContactCardExtension = Node.create({
       [
         'div',
         {
-          class: 'contact-card-light position-relativefr-p-3v bg-white',
+          class: 'contact-card-light position-relative fr-p-3v bg-white',
         },
         [
           'div',

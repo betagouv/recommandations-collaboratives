@@ -765,6 +765,33 @@ class TestSendNewRecommendationsRemindersDigestByProject:
             2025, 4, 10, 8, 0, 0, tzinfo=timezone.utc
         )
 
+    def test_activity_trace_sent(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        due_reminder = baker.make(Reminder)
+        project = baker.make(projects_models.Project, sites=[current_site])
+        owner = baker.make(auth.User)
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
+        )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {}
+
+        with patch("recoco.apps.communication.digests.send_email"):
+            with patch("recoco.apps.communication.digests.action") as mock_action:
+                send_new_recommendations_reminders_digest_by_project(
+                    site=current_site, project=project, dry_run=False
+                )
+
+        mock_action.send.assert_called_once_with(
+            owner,
+            verb=verbs.Recommendation.GOT_RECO_REMINDER,
+            action_object=due_reminder,
+            target=project,
+            public=False,
+        )
+
 
 @pytest.mark.django_db
 @patch("recoco.apps.communication.digests.make_or_update_whatsup_reminder")
@@ -855,6 +882,33 @@ class TestSendWhatsupRemindersDigestByProject:
         assert due_reminder.sent_to == owner
         assert due_reminder.sent_on == datetime(
             2025, 4, 10, 8, 0, 0, tzinfo=timezone.utc
+        )
+
+    def test_activity_trace_sent(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        due_reminder = baker.make(Reminder)
+        project = baker.make(projects_models.Project, sites=[current_site])
+        owner = baker.make(auth.User)
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
+        )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {}
+
+        with patch("recoco.apps.communication.digests.send_email"):
+            with patch("recoco.apps.communication.digests.action") as mock_action:
+                send_whatsup_reminders_digest_by_project(
+                    site=current_site, project=project, dry_run=False
+                )
+
+        mock_action.send.assert_called_once_with(
+            owner,
+            verb=verbs.Project.GOT_WHATSUP_REMINDER,
+            action_object=due_reminder,
+            target=project,
+            public=False,
         )
 
 

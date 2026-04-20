@@ -20,7 +20,6 @@ from django.views.decorators.http import require_http_methods
 
 from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import models as project_models
-from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
     can_administrate_project,
     reactivate_if_necessary,
@@ -116,17 +115,6 @@ def create_task(request):
             else:
                 action.top()
 
-            # Check if we have a file or link
-            document_form = DocumentUploadForm(request.POST, request.FILES)
-            if document_form.is_valid():
-                if document_form.cleaned_data["the_file"]:
-                    document = document_form.save(commit=False)
-                    document.attached_object = action
-                    document.site = request.site
-                    document.uploaded_by = request.user
-                    document.project = action.project
-                    document.save()
-
             # Notify other switchtenders
             signals.action_created.send(
                 sender=create_task,
@@ -137,14 +125,18 @@ def create_task(request):
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
-            if (
-                type_form.cleaned_data["next"]
-                and type_form.cleaned_data["next"] != "None"
-            ):
-                return redirect(type_form.cleaned_data["next"])
+            # TODO remove the logic about 'next' field in the form when the recommendation tab is removed
+            next_url = type_form.cleaned_data["next"]
+            conversation_url = reverse(
+                "projects-project-detail-conversations", args=[project.id]
+            )
+            if not next_url or next_url == "None":
+                next_url = conversation_url
 
-            next_url = reverse("projects-project-detail-actions", args=[project.id])
+            if not action.public and next_url == conversation_url:
+                next_url += "#drafts"
             return redirect(next_url)
+
     else:
         type_form = PushTypeActionForm(request.user, request.GET)
 
@@ -291,16 +283,6 @@ def update_task(request, task_id=None):
             instance.project.updated_on = instance.updated_on
             instance.project.save()
 
-            document_form = DocumentUploadForm(request.POST, request.FILES)
-            if document_form.is_valid():
-                if document_form.cleaned_data["the_file"]:
-                    document = document_form.save(commit=False)
-                    document.attached_object = instance
-                    document.site = request.site
-                    document.uploaded_by = request.user
-                    document.project = instance.project
-                    document.save()
-
             # If we are going public, notify
             if was_public is False and instance.public is True:
                 signals.action_created.send(
@@ -312,6 +294,7 @@ def update_task(request, task_id=None):
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
+            # TODO remove this next logic when recommendation tab will be removed
             if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
                 return redirect(form.cleaned_data["next"])
 
@@ -324,7 +307,6 @@ def update_task(request, task_id=None):
             "next": request.GET.get("next"),
         }
         form = UpdateTaskForm(instance=task, initial=initial)
-        document_form = DocumentUploadForm()
         # Initialize preserved_content for template compatibility
         preserved_content = ""
     return render(request, "tasks/tasks/task_update.html", locals())
@@ -344,7 +326,7 @@ def task_recommendation_list(request):
     recommendations = (
         models.TaskRecommendation.on_site.all()
         .select_related("resource__category")
-        .prefetch_related("departments")
+        .prefetch_related("departments", "condition_tags")
     )
 
     return render(request, "tasks/tasks/recommendation_list.html", locals())
@@ -485,8 +467,7 @@ def delete_task(request, task_id=None):
         task.deleted = timezone.now()
         task.save()
 
-    next_url = reverse("projects-project-detail-actions", args=[task.project_id])
-    next_url = request.headers.get("referer", next_url)
+    next_url = reverse("projects-project-detail-conversations", args=[task.project_id])
     return redirect(next_url)
 
 
