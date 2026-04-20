@@ -306,7 +306,11 @@ def test_choice_create_and_redirect(request, client):
         models.Question, question_set__survey__site=get_current_site(request)
     ).make()
     url = reverse("survey-editor-choice-create", args=[question.id])
-    data = {"value": "some value", "text": "the text of the choice"}
+    data = {
+        "value": "some value",
+        "text": "the text of the choice",
+        "conclusion": '<img src = "x" onerror="alert(\'tosanitize\')" />',
+    }
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
@@ -314,6 +318,7 @@ def test_choice_create_and_redirect(request, client):
     choice = models.Choice.objects.all()[0]
     assert choice.text == data["text"]
     assert choice.value == data["value"]
+    assert "tosanitize" not in choice.conclusion
 
     new_url = reverse(
         "survey-editor-question-set-details", args=[question.question_set_id]
@@ -346,7 +351,11 @@ def test_choice_update_and_redirect(request, client):
         models.Choice, question__question_set__survey__site=get_current_site(request)
     ).make()
     url = reverse("survey-editor-choice-update", args=[choice.id])
-    data = {"value": "some value", "text": "the text of the choice"}
+    data = {
+        "value": "some value",
+        "text": "the text of the choice",
+        "conclusion": '<img src = "x" onerror="alert(\'tosanitize\')" />',
+    }
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
@@ -354,6 +363,7 @@ def test_choice_update_and_redirect(request, client):
     choice = models.Choice.objects.get(id=choice.id)
     assert choice.text == data["text"]
     assert choice.value == data["value"]
+    assert "tosanitize" not in choice.conclusion
 
     new_url = reverse(
         "survey-editor-question-set-details", args=[choice.question.question_set_id]
