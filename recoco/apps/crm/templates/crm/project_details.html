@@ -27,16 +27,22 @@
             <div>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Name -->
+                <h1 class="project-crm__project-name">{{ project.name }}</h1>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Organization -->
+                <h2 class="project-crm__project-org">{{ project.owner.profile.organization.name }}</h2>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Commune -->
+                <span class="project-crm__project-commune fr-icon-target-line">{{ project.commune.name }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Region -->
+                <span class="project-crm__project-region fr-icon-target-line">{{ project.commune.region.name }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Updated at -->
+                <span class="project-crm__project-updated-at fr-icon-calendar-line">{{ project.updated_on|date:"d/m/Y" }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Created at -->
+                <span class="project-crm__project-created-at fr-icon-calendar-line">{{ project.created_on|date:"d/m/Y" }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of message in conv -->
                 {% comment %} TODO  {% endcomment %}
@@ -47,8 +53,16 @@
                 <!-- Number of files -->
                 {% comment %} TODO  {% endcomment %}
                 <!-- Tags -->
+                <span class="project-crm__project-tags">
+                    {% for tag in project.tags.all %}
+                        <span class="project-crm__project-tag">#{{ tag }}</span>
+                    {% endfor %}
+                </span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Next email reminder -->
+                <span class="project-crm__project-next-email-reminder">
+                    Prochaine rappel le {{ project.next_email_reminder|date:"d/m/Y" }}
+                </span>
             </div>
             {% comment %} TODO  {% endcomment %}
             <!-- Client team -->
