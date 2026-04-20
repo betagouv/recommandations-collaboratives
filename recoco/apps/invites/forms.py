@@ -10,6 +10,8 @@ created : 2022-04-19 14:16:20 CEST
 from django import forms
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import RegexValidator
+from phonenumber_field.formfields import PhoneNumberField
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
 from . import models
 
@@ -34,10 +36,10 @@ class InviteAcceptForm(forms.Form):
     last_name = forms.CharField(required=True)
     organization = forms.CharField(required=True)
     position = forms.CharField(required=True)
-    phone_no = forms.CharField(
+    phone_no = PhoneNumberField(
         required=True,
-        max_length=16,
-        validators=[phone_validator],
+        label="Numéro de téléphone",
+        widget=PhoneNumberInternationalFallbackWidget(),
     )
     password = forms.CharField(
         widget=forms.PasswordInput,
