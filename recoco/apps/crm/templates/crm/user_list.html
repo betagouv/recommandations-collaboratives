@@ -113,14 +113,14 @@
                             <th scope="col">Organisation</th>
                             <th scope="col">Statut</th>
                             <th scope="col">Dossiers</th>
-                            <th scope="col">Dernière connexion</th>
+                            <th scope="col" class="text-ellipsis">Dernière connexion</th>
                             <th scope="col">Inscription</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for crm_user in display_qs %}
                             <tr>
-                                <td>
+                                <td class="text-ellipsis">
                                     <a class="fr-link project-table__project-name"
                                        href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.last_name }}</a>
                                 </td>
