@@ -164,14 +164,12 @@ Parameters:
                 {% if can_add_reco %}
                     <div x-data="{ open: false }" x-on:click.outside="open = false" class="position-relative">
                         <button data-test-id="create-task-button"
-                                x-on:click.stop="open = !open"
-                                @click.prevent
+                                x-on:click.prevent.stop="open = !open"
                                 class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
                             <span class="fr-icon-list-check-line fr-icon--sm"></span>
                             Créer une recommandation
                         </button>
                         <ul x-show="open"
-                            :class="{'show':open}"
                             class="common-dropdown common-dropdown__top-menu list-unstyled flex-column item-no-space">
                             <li>
                                 <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
