@@ -103,6 +103,9 @@ const config = {
         ResourceCategoryFilter: resolve(
           './src/js/components/ResourceCategoryFilter.js'
         ),
+        DepartmentsFilterWrapper: resolve(
+          './src/js/components/DepartmentsFilterWrapper.js'
+        ),
         departmentsSelector: resolve(
           './src/js/styles/departments-selector.css.js'
         ),
