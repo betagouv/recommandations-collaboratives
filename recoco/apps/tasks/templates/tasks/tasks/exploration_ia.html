@@ -133,8 +133,8 @@
                                      :data-test-id="'exploration-ia-source-card-' + citation.label">
                                     <div class="d-flex align-items-center gap-2 fr-mb-1v">
                                         <span class="fr-badge fr-badge--sm"
-                                              :class="{ 'fr-badge--green-emeraude': citation.source_type === 'resource', 'fr-badge--purple-glycine': citation.source_type === 'recommendation' }"
-                                              x-text="citation.source_type === 'resource' ? 'Ressource' : 'Reco'"></span>
+                                              :class="{ 'fr-badge--green-emeraude': citation.source_type.toLocaleLowerCase() === 'resource', 'fr-badge--purple-glycine': citation.source_type.toLocaleLowerCase() === 'recommendation' }"
+                                              x-text="citation.source_type.toLocaleLowerCase() === 'resource' ? 'Ressource' : 'Reco'"></span>
                                         <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                               x-text="'#' + citation.label"></span>
                                     </div>
@@ -319,7 +319,8 @@
                                                         </div>
                                                         <div class="flex-grow-1">
                                                             <!-- Texte du chunk (avec support Markdown) -->
-                                                            <div class="exploration-ia-chunk__text" x-html="parseMarkdown(item.chunk.text)"></div>
+                                                            <div class="exploration-ia-chunk__text"
+                                                                 x-html="parseMarkdown(item.chunk.text)"></div>
                                                             <!-- Badges des sources -->
                                                             <div class="exploration-ia-chunk__sources fr-mt-1w"
                                                                  x-show="item.chunk.sources && item.chunk.sources.length > 0">
@@ -355,8 +356,8 @@
                                                 <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                                       x-text="'Source ' + citation.label"></span>
                                                 <span class="fr-badge fr-badge--sm fr-badge--no-icon"
-                                                      :class="{ 'fr-badge--green-emeraude': citation.source_type === 'resource', 'fr-badge--purple-glycine': citation.source_type === 'recommendation' }"
-                                                      x-text="getSourceTypeLabel(citation.source_type)"></span>
+                                                      :class="{ 'fr-badge--green-emeraude': citation.source_type.toLocaleLowerCase() === 'resource', 'fr-badge--purple-glycine': citation.source_type.toLocaleLowerCase() === 'recommendation' }"
+                                                      x-text="getSourceTypeLabel(citation.source_type.toLocaleLowerCase())"></span>
                                             </div>
                                             <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
                                             <button @click.stop="openResourceModal(citation)"
@@ -503,14 +504,24 @@
                                                           x-show="resource.label"
                                                           x-text="'#' + resource.label"></span>
                                                 </div>
-                                                <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
-                                                   class="fr-btn fr-btn--primary fr-btn--sm"
-                                                   target="_blank"
-                                                   x-show="resource.resource_id"
-                                                   title="Créer une recommandation à partir de cette ressource">
-                                                    <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
-                                                    Créer une recommandation
-                                                </a>
+                                                <template x-if="resource.resource_id">
+                                                    <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
+                                                       class="fr-btn fr-btn--primary fr-btn--sm"
+                                                       target="_blank"
+                                                       title="Créer une recommandation à partir de cette ressource">
+                                                        <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                                        Créer une recommandation
+                                                    </a>
+                                                </template>
+                                                <template x-if="!resource.resource_id">
+                                                    <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&push_type=noresource' + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
+                                                       class="fr-btn fr-btn--primary fr-btn--sm"
+                                                       target="_blank"
+                                                       title="Créer une recommandation à partir de cette ressource">
+                                                        <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                                        Créer une recommandation
+                                                    </a>
+                                                </template>
                                             </div>
                                             <!-- Contenu en deux colonnes -->
                                             <div class="row">
@@ -531,7 +542,7 @@
                                                     <!-- Lien vers la fiche (ouvre la modale) -->
                                                     <div class="fr-mt-2w">
                                                         <button @click="openResourceModal({ resource_id: resource.resource_id, reco_id: resource.reco_id, project_id: resource.project_id, source_type: resource.source_type, title: resource.title, content: resource.content, label: resource.label })"
-                                                                class="fr-link fr-link--sm"
+                                                                class="fr-btn fr-btn--secondary fr-btn--sm"
                                                                 type="button"
                                                                 x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
                                                             <span class="fr-icon-eye-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
