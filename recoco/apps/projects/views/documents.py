@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -19,7 +20,9 @@ from django.utils import timezone
 from recoco.apps.survey.models import Answer
 from recoco.utils import has_perm, has_perm_or_403
 
-from .. import models, signals
+from ...conversations import models as conversation_models
+from ...conversations import signals as conversation_signals
+from .. import models
 from ..forms import DocumentUploadForm
 from ..utils import get_advising_context_for_project, is_regional_actor_for_project
 
@@ -110,11 +113,21 @@ def document_upload(request, project_id):
             instance.uploaded_by = request.user
             instance.private = False
 
-            try:
-                instance.save()
+            msg = conversation_models.Message(
+                posted_by=instance.uploaded_by, project=project
+            )
+            node = conversation_models.DocumentNode(
+                document=instance, position=1, message=msg
+            )
 
-                signals.document_uploaded.send(
-                    sender=document_upload, instance=instance
+            try:
+                with transaction.atomic():
+                    instance.save()
+                    msg.save()
+                    node.save()
+
+                conversation_signals.message_posted.send(
+                    sender=document_upload, message=msg
                 )
 
                 messages.success(
@@ -122,7 +135,7 @@ def document_upload(request, project_id):
                     "Le document a bien été enregistré",
                 )
 
-            except IntegrityError:
+            except IntegrityError as _e:
                 messages.error(request, "Impossible de sauver le document")
 
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))
