@@ -284,39 +284,54 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <!-- Liste des chunks de reponse -->
-                                    <template x-for="(chunk, index) in answerChunks" :key="index">
-                                        <div class="exploration-ia-chunk"
-                                             :class="{ 'exploration-ia-chunk--with-source': chunk.sources && chunk.sources.length > 0, 'exploration-ia-chunk--selected': isChunkSelected(index) }"
-                                             @click="chunk.sources && chunk.sources.length > 0 ? toggleChunkSelection(index) : null"
-                                             @mouseenter="highlightSources(chunk.sources)"
-                                             @mouseleave="clearHighlight()"
-                                             :style="chunk.sources && chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
-                                             :data-test-id="'exploration-ia-chunk-' + index">
-                                            <!-- Checkbox de selection -->
-                                            <div class="d-flex align-items-start gap-3">
-                                                <div class="exploration-ia-chunk__checkbox"
-                                                     x-show="chunk.sources && chunk.sources.length > 0">
-                                                    <input type="checkbox"
-                                                           class="fr-checkbox"
-                                                           :id="'chunk-select-' + index"
-                                                           :checked="isChunkSelected(index)"
-                                                           @click.stop
-                                                           @change="toggleChunkSelection(index)">
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <!-- Texte du chunk (avec support Markdown) -->
-                                                    <div class="exploration-ia-chunk__text" x-html="parseMarkdown(chunk.text)"></div>
-                                                    <!-- Badges des sources -->
-                                                    <div class="exploration-ia-chunk__sources fr-mt-1w"
-                                                         x-show="chunk.sources && chunk.sources.length > 0">
-                                                        <template x-for="sourceLabel in chunk.sources" :key="sourceLabel">
-                                                            <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
-                                                                  x-text="'Source ' + sourceLabel"></span>
-                                                        </template>
+                                    <!-- Liste des chunks de reponse, groupes par sous-question -->
+                                    <template x-for="(group, groupIdx) in groupedAnswerChunks" :key="groupIdx">
+                                        <div class="exploration-ia-subquestion-group fr-mb-3w">
+                                            <div x-show="group.subQuestion"
+                                                 class="exploration-ia-subquestion fr-mb-2w"
+                                                 :data-test-id="'exploration-ia-subquestion-' + groupIdx">
+                                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus exploration-ia-subquestion__badge"
+                                                      x-text="'Sous-question ' + (groupIdx + 1) + ' / ' + groupedAnswerChunks.length"
+                                                      :data-test-id="'exploration-ia-subquestion-badge-' + groupIdx"></span>
+                                                <h4 class="exploration-ia-subquestion__title fr-text--md fr-mb-0">
+                                                    <span class="fr-icon-question-line fr-mr-1v" aria-hidden="true"></span>
+                                                    <span x-text="group.subQuestion"></span>
+                                                </h4>
+                                            </div>
+                                            <template x-for="item in group.chunks" :key="item.index">
+                                                <div class="exploration-ia-chunk"
+                                                     :class="{ 'exploration-ia-chunk--with-source': item.chunk.sources && item.chunk.sources.length > 0, 'exploration-ia-chunk--selected': isChunkSelected(item.index) }"
+                                                     @click="item.chunk.sources && item.chunk.sources.length > 0 ? toggleChunkSelection(item.index) : null"
+                                                     @mouseenter="highlightSources(item.chunk.sources)"
+                                                     @mouseleave="clearHighlight()"
+                                                     :style="item.chunk.sources && item.chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
+                                                     :data-test-id="'exploration-ia-chunk-' + item.index">
+                                                    <!-- Checkbox de selection -->
+                                                    <div class="d-flex align-items-start gap-3">
+                                                        <div class="exploration-ia-chunk__checkbox"
+                                                             x-show="item.chunk.sources && item.chunk.sources.length > 0">
+                                                            <input type="checkbox"
+                                                                   class="fr-checkbox"
+                                                                   :id="'chunk-select-' + item.index"
+                                                                   :checked="isChunkSelected(item.index)"
+                                                                   @click.stop
+                                                                   @change="toggleChunkSelection(item.index)">
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <!-- Texte du chunk (avec support Markdown) -->
+                                                            <div class="exploration-ia-chunk__text" x-html="parseMarkdown(item.chunk.text)"></div>
+                                                            <!-- Badges des sources -->
+                                                            <div class="exploration-ia-chunk__sources fr-mt-1w"
+                                                                 x-show="item.chunk.sources && item.chunk.sources.length > 0">
+                                                                <template x-for="sourceLabel in item.chunk.sources" :key="sourceLabel">
+                                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
+                                                                          x-text="'Source ' + sourceLabel"></span>
+                                                                </template>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </template>
                                         </div>
                                     </template>
                                 </div>
