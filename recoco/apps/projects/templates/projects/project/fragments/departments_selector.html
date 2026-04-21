@@ -30,7 +30,7 @@
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
          x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' , selectedDepartments: {{ selected_departments|default:'null' }}, userDepartments: {{ user_departments|default:'null' }} })"
          x-on:click.outside="open && $dispatch('user-close-selector'); open = false; ">
-        <div class="d-flex align-items-center {% if "inline-chevron" in extra_classes %}fr-pr-1w {% else %}fr-pr-3w {% endif %}bg-white rounded-pill"
+        <div class="d-flex align-items-center {% if 'inline-chevron' in extra_classes %}fr-pr-1w {% else %}fr-pr-3w {% endif %}bg-white rounded-pill"
              x-on:click.prevent="open = !open"
              type="button"
              :class="{'input-active':open}">

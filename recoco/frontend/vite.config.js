@@ -103,6 +103,9 @@ const config = {
         ResourceCategoryFilter: resolve(
           './src/js/components/ResourceCategoryFilter.js'
         ),
+        DepartmentsFilterWrapper: resolve(
+          './src/js/components/DepartmentsFilterWrapper.js'
+        ),
         departmentsSelector: resolve(
           './src/js/styles/departments-selector.css.js'
         ),
@@ -222,6 +225,7 @@ const config = {
           './src/js/styles/resource-preview-panel.css.js'
         ),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
+        userListCrm: resolve('./src/js/apps/CRM/userListCrm.js'),
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),

@@ -64,6 +64,7 @@ class UserFilter(django_filters.FilterSet):
     departments = django_filters.ModelMultipleChoiceFilter(
         label="Départements conseillés",
         field_name="profile__departments",
+        to_field_name="code",
         queryset=geomatics_models.Department.objects.all(),
     )
 

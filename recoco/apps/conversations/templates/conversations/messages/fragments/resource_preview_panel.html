@@ -29,9 +29,7 @@ Managed by Alpine store: $store.resourcePreviewPanel
                 <!-- Scrollable content area -->
                 <div class="resource-preview-panel__body">
                     {% include "conversations/messages/fragments/preview_panel_message.html" %}
-                    <iframe class="w-100 d-flex flex-column rounded"
-                            style="border: none;
-                                   overflow: hidden"
+                    <iframe class="w-100 d-flex flex-column rounded border-0 overflow-hidden"
                             scrolling="no"
                             @load="$el.style.height = $el.contentDocument.body.scrollHeight + 'px'"
                             :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.messageId)"></iframe>
