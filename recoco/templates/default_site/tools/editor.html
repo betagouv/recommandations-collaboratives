@@ -162,39 +162,30 @@ Parameters:
                 {% endif %}
                 <!-- Recommendation module -->
                 {% if can_add_reco %}
-                    {% if advising or is_staff %}
-                        <div x-data="{ open: false }" x-on:click.outside="open = false" class="position-relative">
-                            <button data-test-id="create-task-button"
-                                    x-on:click.stop="open = !open"
-                                    @click.prevent
-                                    class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
-                                <span class="fr-icon-list-check-line fr-icon--sm"></span>
-                                Créer une recommandation
-                            </button>
-                            <ul x-show="open"
-                                :class="{'show':open}"
-                                class="common-dropdown common-dropdown__top-menu list-unstyled flex-column item-no-space">
-                                <li>
-                                    <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
-                                       @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)">
-                                        Recommandation vierge
-                                    </button>
-                                </li>
-                                <li>
-                                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                                    class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
-                                    data-test-id="see-suggest-task-button">Ressources suggérées</a>
-                                </li>
-                            </ul>
-                        </div>
-                    {% else %}
+                    <div x-data="{ open: false }" x-on:click.outside="open = false" class="position-relative">
                         <button data-test-id="create-task-button"
-                                @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)"
+                                x-on:click.stop="open = !open"
+                                @click.prevent
                                 class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
                             <span class="fr-icon-list-check-line fr-icon--sm"></span>
                             Créer une recommandation
                         </button>
-                    {% endif %}
+                        <ul x-show="open"
+                            :class="{'show':open}"
+                            class="common-dropdown common-dropdown__top-menu list-unstyled flex-column item-no-space">
+                            <li>
+                                <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
+                                    @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)">
+                                    Recommandation vierge
+                                </button>
+                            </li>
+                            <li>
+                                <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                                class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
+                                data-test-id="see-suggest-task-button">Ressources suggérées</a>
+                            </li>
+                        </ul>
+                    </div>
                 {% endif %}
                 <!-- Contact module -->
                 {% if can_attach_contact %}
