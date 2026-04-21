@@ -507,6 +507,18 @@ def user_list(request):
 
     selected_departments = request.GET.getlist("departments")
 
+    has_active_filter = any(
+        [
+            request.GET.get("username"),
+            request.GET.get("role"),
+            selected_departments,
+            request.GET.get("inactive"),
+        ]
+    )
+
+    max_users_without_filter = 25
+    display_qs = users.qs if has_active_filter else users.qs[:max_users_without_filter]
+
     # required by default on crm
     search_form = forms.CRMSearchForm()
 

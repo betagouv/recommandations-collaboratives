@@ -25,7 +25,11 @@
                 <span class="project-list-crm__projects-count-label">
                     {% with users.qs.count as users_count %}
                         {% if users_count > 0 %}
-                            {{ users_count }} résultat{{ users_count|pluralize }}
+                            {% if not has_active_filter and users_count > max_users_without_filter %}
+                                {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }}
+                            {% else %}
+                                {{ users_count }} résultat{{ users_count|pluralize }}
+                            {% endif %}
                         {% else %}
                             Aucun résultat
                         {% endif %}
@@ -82,7 +86,11 @@
                     <caption class="fr-ml-2v">
                         {% with users.qs.count as users_count %}
                             {% if users_count > 0 %}
-                                {{ users_count }} résultat{{ users_count|pluralize }}
+                                {% if not has_active_filter and users_count > max_users_without_filter %}
+                                    {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }} — utilisez les filtres pour affiner
+                                {% else %}
+                                    {{ users_count }} résultat{{ users_count|pluralize }}
+                                {% endif %}
                             {% else %}
                                 Aucun résultat
                             {% endif %}
@@ -111,7 +119,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for crm_user in users.qs %}
+                        {% for crm_user in display_qs %}
                             <tr>
                                 <td>
                                     <a class="fr-link project-table__project-name"
