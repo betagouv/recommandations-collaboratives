@@ -66,6 +66,7 @@ dependencies = [
     "metabase-api==3.4",
     "multimethod==1.7",
     "mwclient==0.11.0",
+    "nh3>=0.3.4",
     "pandoc==2.4",
     "pillow==12.2.0",
     "psycopg[c]>=3.2.12",
