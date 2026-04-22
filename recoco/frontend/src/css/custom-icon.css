@@ -122,3 +122,8 @@
 .fr-icon-pushpin-line::before {
   mask-image: url(../assets/pushpin-line.svg);
 }
+
+.fr-icon-mail::after,
+.fr-icon-mail::before {
+  mask-image: url(../assets/mail.svg);
+}
