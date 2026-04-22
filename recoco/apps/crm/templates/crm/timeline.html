@@ -39,9 +39,6 @@
                         {% endif %}
                         <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
                     </div>
-                    {% if action.action_object.resource %}
-                        <div class="border fr-p-2v rounded bg-white w-100">{{ action.action_object.resource.title }}</div>
-                    {% endif %}
                     {% if action.action_object.comment %}
                         <div class="border fr-p-2v rounded bg-white w-100">
                             "{{ action.action_object.comment }}" à propos de <a href=" {{ action.action_object.task.get_absolute_url }}">{{
