@@ -6,8 +6,26 @@
   border-radius: 4px;
   border: 1px solid var(--light-border-default-grey, #e5e5e5);
   background: #fff;
-  &:not(:first-of-type) {
+  &-container {
     margin-top: 0.75rem;
+  }
+  &--linked {
+    background: #eee;
+    color: #161616;
+    padding-left: 4px;
+    margin-bottom: 1.5rem;
+    color: var(--light-neutral-grey-50, #161616);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+  &-link-user {
+    color: var(--light-neutral-grey-50, #161616);
+  }
+  &-inside-container {
+    background: #fafafa;
+    padding-left: 12px;
+    padding-top: 12px;
   }
   &--pinned {
     border: 1px solid #0063cb;

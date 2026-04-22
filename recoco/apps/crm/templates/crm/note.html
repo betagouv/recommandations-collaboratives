@@ -5,68 +5,72 @@
     {% vite_asset 'js/styles/crm-note.css.js' %}
 {% endblock js %}
 <div x-data="Note"
-     x-ref="note"
-     class="crm__note {% if pinned %}crm__note--pinned{% endif %}"
-     :class="isOpen ? 'open' : 'closed'"
-     id="note-{{ note.pk }}">
-    <!-- Header - Title -->
-    <div class="d-flex align-items-center justify-content-between">
-        <div class="d-flex justify-content-center align-items-center">
-            {% if pinned %}<span class="crm__note-pin-icon fr-icon fr-icon-pushpin-line fr-icon--sm fr-mr-1v"></span>{% endif %}
-            <span class="crm__note-title">
-                {% if note.title %}{{ note.title }}{% endif %}
-                <span class="fr-ml-1v">
-                    {% if note.kind == 0 %}
-                        (rendez-vous téléphonique)
-                    {% elif note.kind == 1 %}
-                        (email)
-                    {% elif note.kind == 2 %}
-                        (test utilisateur)
-                    {% endif %}
-                </span>
-            </span>
-            {% if get_user_profile and note.related and note.content_type == user_ct %}
-                <div class="d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-ml-1w fr-mb-0 fr-px-2v fr-py-1v fr-text--sm">
-                    <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
-                    </svg>
-                    <a href="{% url 'crm-user-details' note.related.pk %}"
-                       class="no-wrap{% if not note.related.is_active %}text-decoration-line-through{% endif %}">Liée à {{ note.related.first_name }} {{ note.related.last_name }}</a>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-    <!-- Tags -->
-    {% if note.tags.count %}
-        <div class="crm__note-container-tags" data-cy="container-tags">
-            <span class="fr-icon-tag-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-            {% for tag in note.tags.all %}<span class="crm__note-tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
+     class="crm__note-container {% if get_user_profile and note.related and note.content_type == user_ct %}crm__note--linked{% endif %}">
+    {% if get_user_profile and note.related and note.content_type == user_ct %}
+        <div class="d-flex fr-py-1v">
+            <span class="fr-icon fr-icon-corner-down-right-line fr-icon--sm fr-ml-1w fr-mr-1v"></span>
+            <p class="fr-mb-0">
+                initialement publiée sur le profil de
+                <a href="{% url 'crm-user-details' note.related.pk %}"
+                   class="crm__note-link-user fw-bold {% if not note.related.is_active %}text-decoration-line-through{% endif %}">{{ note.related.first_name }} {{ note.related.last_name }}</a>
+            </p>
         </div>
     {% endif %}
-    <!-- Content -->
-    <article class="crm__note-content">
-        {{ note.content_rendered|safe }}
-        <span x-ref="noteToggleButton"
-              class="crm-note-toggle-button"
-              x-on:click="isOpen = ! isOpen"
-              x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
-    </article>
-    <!-- Footer - Posted info  -->
-    <div class="d-flex justify-content-between align-items-center w-100">
-        <div class="d-flex">
-            {% include "user/user_card.html" with user=note.created_by %}
-            <span class="crm__note-footer-date">
-                {% if note.updated_on|date != note.created_on|date %}
-                    mise à jour le {{ note.updated_on|date }} (créée le {{ note.created_on|date }})
-                {% else %}
-                    le {{ note.created_on|date }}
+    <div class="{% if get_user_profile and note.related and note.content_type == user_ct %}crm__note-inside-container{% endif %}">
+        <div x-ref="note"
+             class="crm__note {% if pinned %}crm__note--pinned{% endif %}"
+             id="note-{{ note.pk }}">
+            <!-- Header - Title -->
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex justify-content-center align-items-center">
+                    {% if pinned %}<span class="crm__note-pin-icon fr-icon fr-icon-pushpin-line fr-icon--sm fr-mr-1v"></span>{% endif %}
+                    <span class="crm__note-title">
+                        {% if note.title %}{{ note.title }}{% endif %}
+                        <span class="fr-ml-1v">
+                            {% if note.kind == 0 %}
+                                (rendez-vous téléphonique)
+                            {% elif note.kind == 1 %}
+                                (email)
+                            {% elif note.kind == 2 %}
+                                (test utilisateur)
+                            {% endif %}
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <!-- Tags -->
+            {% if note.tags.count %}
+                <div class="crm__note-container-tags" data-cy="container-tags">
+                    <span class="fr-icon-tag-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                    {% for tag in note.tags.all %}<span class="crm__note-tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            <!-- Content -->
+            <article class="crm__note-content">
+                {{ note.content_rendered|safe }}
+                <span x-ref="noteToggleButton"
+                      class="crm-note-toggle-button"
+                      x-on:click="isOpen = ! isOpen"
+                      x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            </article>
+            <!-- Footer - Posted info  -->
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <div class="d-flex">
+                    {% include "user/user_card.html" with user=note.created_by %}
+                    <span class="crm__note-footer-date">
+                        {% if note.updated_on|date != note.created_on|date %}
+                            mise à jour le {{ note.updated_on|date }} (créée le {{ note.created_on|date }})
+                        {% else %}
+                            le {{ note.created_on|date }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% get_note_update_url note as update_url %}
+                {% if update_url %}
+                    <a href="{{ update_url }}"
+                       class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line">Éditer</a>
                 {% endif %}
-            </span>
+            </div>
         </div>
-        {% get_note_update_url note as update_url %}
-        {% if update_url %}
-            <a href="{{ update_url }}"
-               class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line">Éditer</a>
-        {% endif %}
     </div>
 </div>
