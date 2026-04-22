@@ -19,6 +19,7 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.demarches_simplifiees.services import create_ds_prefill_link
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.utils import (
     can_administrate_project,
@@ -310,6 +311,14 @@ def update_task(request, task_id=None):
         # Initialize preserved_content for template compatibility
         preserved_content = ""
     return render(request, "tasks/tasks/task_update.html", locals())
+
+
+@login_required
+@require_http_methods(["GET"])
+def task_generate_ds_prefill(request, task_id):
+    """Generates a link to a prefilled ds demande and redirect to it"""
+    url = create_ds_prefill_link(task_id)
+    return redirect(url)
 
 
 ########

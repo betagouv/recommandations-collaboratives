@@ -27,14 +27,15 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
+from recoco.apps.demarches_simplifiees.models import DSResource
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
+from recoco.apps.projects import models, utils
+from recoco.apps.resources.models import Resource
 from recoco.apps.tasks import models as task_models
 from recoco.apps.tasks import signals
 from recoco.utils import get_group_for_site, login
-
-from .. import models, utils
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
@@ -416,6 +417,31 @@ def test_project_actions_available_for_restricted_switchtender(
         user.profile.departments.add(other)
         response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_actions_with_has_ds_resource(request, client, project):
+    site = get_current_site(request)
+    resource = Recipe(
+        Resource,
+        sites=[site],
+        status=Resource.PUBLISHED,
+    ).make()
+    baker.make(
+        DSResource,
+        resource=resource,
+        schema={"number": 42},
+    )
+    Recipe(task_models.Task, resource=resource, project=project).make()
+
+    url = reverse("projects-project-detail-actions", args=[project.id])
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+        response = client.get(url)
+        assert response.context["project"].tasks.first().resource.has_dsresource
+        assert reverse("projects-task-ds-prefill", args=(0,)) in str(
+            response.content
+        )  # 0 because it is modified by js
 
 
 # conversations

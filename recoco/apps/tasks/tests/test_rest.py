@@ -18,12 +18,12 @@ from rest_framework.test import APIClient
 
 from recoco import verbs
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.conversations.models import Message
+from recoco.apps.demarches_simplifiees.models import DSResource
 from recoco.apps.projects import utils
 from recoco.apps.resources.models import Resource
+from recoco.apps.tasks import models
 from recoco.utils import login
-
-from ...conversations.models import Message
-from .. import models
 
 ########################################################################
 # tasks
@@ -49,6 +49,37 @@ def test_project_collaborator_can_see_project_tasks_for_site(request, project):
 
     assert response.status_code == 200
     assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+
+
+@pytest.mark.django_db
+def test_can_see_project_tasks_for_site_with_dsresource(request, project):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+
+    resource_with_ds = baker.make(Resource)
+    baker.make(
+        DSResource,
+        resource=resource_with_ds,
+        schema={"number": 42},
+    )
+    resource = baker.make(Resource)
+    baker.make(models.Task, project=project, site=site, public=True, resource=resource)
+    baker.make(
+        models.Task,
+        project=project,
+        site=site,
+        public=True,
+        resource=resource_with_ds,
+    )
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.data[0]["resource"]["has_dsresource"]
+    assert not response.data[1]["resource"]["has_dsresource"]
 
 
 @pytest.mark.django_db
