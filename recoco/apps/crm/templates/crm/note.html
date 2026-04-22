@@ -1,17 +1,19 @@
 {% load static %}
 {% load crm_tags %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/crm-note.css.js' %}
+{% endblock js %}
 <div x-data="Note"
      x-ref="note"
-     class="project-crm__note {% if pinned %}project-crm__note--pinned{% endif %}"
+     class="crm__note {% if pinned %}crm__note--pinned{% endif %}"
      :class="isOpen ? 'open' : 'closed'"
      id="note-{{ note.pk }}">
     <!-- Header - Title -->
     <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex justify-content-center align-items-center">
-            {% if pinned %}
-                <span class="project-crm__note-pin-icon fr-icon fr-icon-pushpin-line fr-icon--sm fr-mr-1v"></span>
-            {% endif %}
-            <span class="project-crm__note-title">
+            {% if pinned %}<span class="crm__note-pin-icon fr-icon fr-icon-pushpin-line fr-icon--sm fr-mr-1v"></span>{% endif %}
+            <span class="crm__note-title">
                 {% if note.title %}{{ note.title }}{% endif %}
                 <span class="fr-ml-1v">
                     {% if note.kind == 0 %}
@@ -36,13 +38,13 @@
     </div>
     <!-- Tags -->
     {% if note.tags.count %}
-        <div class="project-crm__note-container-tags" data-cy="container-tags">
+        <div class="crm__note-container-tags" data-cy="container-tags">
             <span class="fr-icon-tag-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-            {% for tag in note.tags.all %}<span class="project-crm__note-tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
+            {% for tag in note.tags.all %}<span class="crm__note-tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
         </div>
     {% endif %}
     <!-- Content -->
-    <article class="project-crm__note-content">
+    <article class="crm__note-content">
         {{ note.content_rendered|safe }}
         <span x-ref="noteToggleButton"
               class="crm-note-toggle-button"
@@ -53,7 +55,7 @@
     <div class="d-flex justify-content-between align-items-center w-100">
         <div class="d-flex">
             {% include "user/user_card.html" with user=note.created_by %}
-            <span class="project-crm__note-footer-date">
+            <span class="crm__note-footer-date">
                 le
                 {% if note.updated_on|date != note.created_on|date %}
                     {{ note.updated_on }}&nbsp;|&nbsp;{{ note.created_on|date:"n" }} {{ note.created_on|date:"N" }}
