@@ -1,11 +1,10 @@
 .project-crm {
-
   &-left-col {
     width: 30%;
   }
 
   &__project-name {
-    color: var(--light-text-default-grey, #3A3A3A);
+    color: var(--light-text-default-grey, #3a3a3a);
     font-size: 18px;
     font-weight: 700;
     line-height: 150%; /* 27px */
@@ -30,8 +29,8 @@
   }
 
   &__section-title-container {
-    border-top: 1px solid var(--light-border-default-grey, #E5E5E5);
-    background: #FAFAFA;
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background: #fafafa;
   }
 
   &__section-title {
@@ -43,7 +42,7 @@
   }
 
   &__section-container {
-    border-top: 1px solid var(--light-border-default-grey, #E5E5E5);
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
   }
 
   &-right-col {
@@ -58,6 +57,12 @@
     gap: 24px;
     flex: 1 0 0;
     align-self: stretch;
+  }
+
+  &__container-tags {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
   }
 
   &__section-title {
@@ -99,56 +104,5 @@
     justify-content: center;
     align-items: center;
     gap: 4px;
-  }
-
-  &__note {
-    display: flex;
-    flex-direction: column;
-    padding: 12px;
-    align-items: flex-start;
-    border-radius: 4px;
-    border: 1px solid var(--light-border-default-grey, #e5e5e5);
-    background: #fff;
-    &:not(:first-of-type) {
-      margin-top: 0.75rem;
-    }
-    &--pinned {
-      border: 1px solid #0063cb;
-    }
-    &-pin-icon {
-      color: #0063cb;
-    }
-    &-title {
-      color: var(--light-text-default-grey, #3a3a3a);
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 150%; /* 21px */
-    }
-    &-container-tags {
-      display: flex;
-      align-items: baseline;
-      color: var(--light-text-mention-grey, #666);
-    }
-    &-tag {
-      font-size: 10px;
-      font-weight: 400;
-    }
-    &-content {
-      margin-top: 10px;
-      margin-bottom: 10px;
-      p {
-        margin-bottom: 0;
-      }
-    }
-    &-footer {
-      &-date {
-        margin-left: 0.25rem;
-        color: #929292;
-        font-size: 12px;
-        font-style: italic;
-        font-weight: 400;
-        line-height: 24px; /* 200% */
-      }
-    }
   }
 }

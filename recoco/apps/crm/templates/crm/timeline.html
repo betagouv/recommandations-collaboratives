@@ -9,7 +9,7 @@
             {% include "crm/fragments/action_account_request.html" %}
         {% else %}
             <li class="d-flex flex-columns list-group-item">
-                <div class=" flex-row flex-grow-1">
+                <div class="flex-row flex-grow-1">
                     <div class="d-flex flex-grow w-100 flex-grow-1 font-size-12px no-wrap">
                         {% if action.actor %}
                             {% include "user/user_card.html" with user=action.actor show_organization=False %}
