@@ -24,46 +24,39 @@
         <div class="project-crm-left-col">
             {% comment %} TODO  {% endcomment %}
             <!-- Project info -->
-            <div>
-                {% comment %} TODO  {% endcomment %}
+            <div class="d-flex flex-column">
                 <!-- Name -->
                 <h1 class="project-crm__project-name">{{ project.name }}</h1>
-                {% comment %} TODO  {% endcomment %}
                 <!-- Organization -->
                 <h2 class="project-crm__project-org">{{ project.owner.profile.organization.name }}</h2>
-                {% comment %} TODO  {% endcomment %}
                 <!-- Commune -->
-                <span class="project-crm__project-commune fr-icon-target-line">{{ project.commune.name }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-commune fr-icon-target-line fr-icon--sm">{{ project.commune.name }}</span>
                 <!-- Region -->
-                <span class="project-crm__project-region fr-icon-target-line">{{ project.commune.region.name }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-region fr-icon-target-line fr-icon--sm">{{ project.commune.department.region }}</span>
                 <!-- Updated at -->
-                <span class="project-crm__project-updated-at fr-icon-calendar-line">{{ project.updated_on|date:"d/m/Y" }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-updated-at fr-icon-calendar-line fr-icon--sm">{{ project.updated_on|date:"d/m/Y" }}</span>
                 <!-- Created at -->
-                <span class="project-crm__project-created-at fr-icon-calendar-line">{{ project.created_on|date:"d/m/Y" }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-created-at fr-icon-calendar-line fr-icon--sm">{{ project.created_on|date:"d/m/Y" }}</span>
                 <!-- Number of message in conv -->
-                <span class="project-crm__project-messages-count fr-icon-chat-1-line">{{ project.messages_count }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-messages-count fr-icon-chat-2-line fr-icon--sm">{{ project.messages_count }}</span>
                 <!-- Number of participants in conv -->
-                <span class="project-crm__project-participants-count fr-icon-user-line">{{ project.participants_count }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-participants-count fr-icon-user-line fr-icon--sm">{{ project.participants_count }}</span>
                 <!-- Number of reco in conv -->
-                <span class="project-crm__project-recos-count fr-icon-lightning-charge-line">{{ project.recos_count }}</span>
+                <span class="project-crm__project-recos-count fr-icon-list-check-line fr-icon--sm">{{ project.recommendations_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of files -->
-                <span class="project-crm__project-files-count fr-icon-attachment-line">{{ project.files_count }}</span>
+                <span class="project-crm__project-files-count fr-icon-file-download-line fr-icon--sm">{{ project.documents_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Tags -->
-                <span class="project-crm__project-tags">
+                <span class="project-crm__project-tags fr-icon-tag-line fr-icon--sm">
                     {% for tag in project.tags.all %}<span class="project-crm__project-tag">#{{ tag }}</span>{% endfor %}
                 </span>
-                {% comment %} TODO  {% endcomment %}
+                {% comment %} TODO - Add variable from backend and suppress mocked data {% endcomment %}
                 <!-- Next email reminder -->
-                <span class="project-crm__project-next-email-reminder">
-                    Prochaine rappel le {{ project.next_email_reminder|date:"d/m/Y" }}
+                <span class="project-crm__project-next-email-reminder fr-icon-mail fr-icon--sm">
+                    {% with project.next_reminder as next_reminder %}
+                    Prochaine rappel le {{ next_reminder }}
+                    {% endwith %}
                 </span>
             </div>
             {% comment %} TODO  {% endcomment %}
