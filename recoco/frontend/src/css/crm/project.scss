@@ -79,6 +79,14 @@
     }
   }
 
+  &__timeline-date {
+    color: var(--light-neutral-grey-625, #929292);
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 24px;
+  }
+
   &__user-active {
     color: var(--light-text-title-blue-france, #000091);
     font-size: 14px;
