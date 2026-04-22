@@ -909,6 +909,15 @@ a.fr-text-inverted--grey {
     border: none;
     box-shadow: none;
   }
+  &-transparent {
+    border-radius: 2px;
+    border: 1px solid var(--light-text-mention-grey, #666);
+    background: transparent;
+    color: var(--light-text-mention-grey, #666);
+    &:hover {
+      background-color: var(--light-background-default-grey, #eee) !important;
+    }
+  }
   &:not(:disabled):hover {
     background-color: var(--light-background-alt-grey-hover, #e6e6e6);
     background: var(--light-background-alt-grey-hover, #e6e6e6);

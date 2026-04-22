@@ -45,22 +45,20 @@
                 <span class="project-crm__project-created-at fr-icon-calendar-line">{{ project.created_on|date:"d/m/Y" }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of message in conv -->
-                 <span class="project-crm__project-messages-count fr-icon-chat-1-line">{{ project.messages_count }}</span>
+                <span class="project-crm__project-messages-count fr-icon-chat-1-line">{{ project.messages_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of participants in conv -->
-                 <span class="project-crm__project-participants-count fr-icon-user-line">{{ project.participants_count }}</span>
+                <span class="project-crm__project-participants-count fr-icon-user-line">{{ project.participants_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of reco in conv -->
-                 <span class="project-crm__project-recos-count fr-icon-lightning-charge-line">{{ project.recos_count }}</span>
+                <span class="project-crm__project-recos-count fr-icon-lightning-charge-line">{{ project.recos_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of files -->
-                    <span class="project-crm__project-files-count fr-icon-attachment-line">{{ project.files_count }}</span>
+                <span class="project-crm__project-files-count fr-icon-attachment-line">{{ project.files_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Tags -->
                 <span class="project-crm__project-tags">
-                    {% for tag in project.tags.all %}
-                        <span class="project-crm__project-tag">#{{ tag }}</span>
-                    {% endfor %}
+                    {% for tag in project.tags.all %}<span class="project-crm__project-tag">#{{ tag }}</span>{% endfor %}
                 </span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Next email reminder -->
@@ -124,18 +122,14 @@
                     <a class="fr-btn fr-btn--primary fr-btn--sm"
                        href="{% url 'crm-project-note-create' project.pk %}">Ajouter une note</a>
                 </div>
-                {% comment %} TODO  {% endcomment %}
                 <!-- Pinned notes -->
                 {% for note in sticky_notes.all %}
                     {% include "crm/note.html" with pinned=True get_user_profile=True %}
                 {% endfor %}
-                {% comment %} TODO  {% endcomment %}
                 <!-- Notes list -->
                 {% for note in notes.all %}
                     {% include "crm/note.html" with get_user_profile=True %}
                 {% endfor %}
-                {% comment %} TODO  {% endcomment %}
-                <!-- Note card -->
             </section>
             {% comment %} TODO  {% endcomment %}
             <!-- Activity timeline -->
