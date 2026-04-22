@@ -5,6 +5,13 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from model_bakery import baker
 
+from recoco.apps.demarches_simplifiees.models import DSMapping, DSResource
+from recoco.apps.demarches_simplifiees.services import (
+    create_ds_prefill_link,
+    find_ds_resource_for_project,
+    make_ds_data_from_project,
+)
+from recoco.apps.geomatics.models import Commune, Department
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.models import Project, ProjectMember
 from recoco.apps.resources.models import Resource
@@ -16,16 +23,8 @@ from recoco.apps.survey.models import (
     Session,
     Survey,
 )
+from recoco.apps.tasks.models import Task
 from recoco.settings.common import DS_API_BASE_URL
-
-from ...geomatics.models import Commune, Department
-from ...tasks.models import Task
-from ..models import DSMapping, DSResource
-from ..services import (
-    create_ds_prefill_link,
-    find_ds_resource_for_project,
-    make_ds_data_from_project,
-)
 
 
 class TestfindDSResourceForProject:
@@ -285,7 +284,7 @@ def test_return_ds_prefill_link_calls_ds_data_with_prefill(client):
             project=task.project, site=task.site, ds_resource=ds_resource
         )
         mock_post.assert_called_with(
-            url=f"{DS_API_BASE_URL}/demarches/{ds_resource.number}/dossiers",
+            url=f"{DS_API_BASE_URL}demarches/{ds_resource.number}/dossiers",
             json=prefill_data,
             timeout=30,
         )

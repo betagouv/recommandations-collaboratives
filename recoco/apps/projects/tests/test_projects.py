@@ -27,16 +27,15 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
+from recoco.apps.demarches_simplifiees.models import DSResource
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
+from recoco.apps.projects import models, utils
+from recoco.apps.resources.models import Resource
 from recoco.apps.tasks import models as task_models
 from recoco.apps.tasks import signals
 from recoco.utils import get_group_for_site, login
-
-from ...demarches_simplifiees.models import DSResource
-from ...resources.models import Resource
-from .. import models, utils
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her

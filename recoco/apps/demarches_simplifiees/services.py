@@ -1,5 +1,6 @@
 import logging
 from typing import Any
+from urllib.parse import urljoin
 
 import requests
 from django.conf import settings
@@ -9,8 +10,8 @@ from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
+from recoco.apps.tasks.models import Task
 
-from ..tasks.models import Task
 from .exceptions import DSAPIError
 from .models import DSMapping, DSResource
 from .utils import MappingField
@@ -175,7 +176,7 @@ def load_ds_resource_schema(ds_resource_id: int):
         return
 
     resp = requests.get(
-        url=f"{ds_resource.preremplir_url}/schema",
+        url=urljoin(ds_resource.preremplir_url, "schema"),
         timeout=30,
     )
     if resp.status_code != 200:
@@ -212,13 +213,15 @@ def create_ds_prefill_link(recommendation_id: int):
         ds_resource=ds_resource,
     )
     resp = requests.post(
-        url=f"{settings.DS_API_BASE_URL}/demarches/{ds_resource.number}/dossiers",
+        url=urljoin(
+            settings.DS_API_BASE_URL, f"demarches/{ds_resource.number}/dossiers"
+        ),
         json=content,
         timeout=30,
     )
     if resp.status_code != 201:
         raise DSAPIError(
-            f"Failed to prefill d for the DS resource {ds_resource.name}",
+            f"Failed to generate a prefill url for the DS resource {ds_resource.name}",
             status_code=resp.status_code,
         )
 

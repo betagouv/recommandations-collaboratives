@@ -18,13 +18,12 @@ from rest_framework.test import APIClient
 
 from recoco import verbs
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.conversations.models import Message
+from recoco.apps.demarches_simplifiees.models import DSResource
 from recoco.apps.projects import utils
 from recoco.apps.resources.models import Resource
+from recoco.apps.tasks import models
 from recoco.utils import login
-
-from ...conversations.models import Message
-from ...demarches_simplifiees.models import DSResource
-from .. import models
 
 ########################################################################
 # tasks

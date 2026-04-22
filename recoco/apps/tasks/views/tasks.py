@@ -316,7 +316,7 @@ def update_task(request, task_id=None):
 @login_required
 @require_http_methods(["GET"])
 def task_generate_ds_prefill(request, task_id):
-    """Generates a link to a prefilled ds demande an redirect to it"""
+    """Generates a link to a prefilled ds demande and redirect to it"""
     url = create_ds_prefill_link(task_id)
     return redirect(url)
 

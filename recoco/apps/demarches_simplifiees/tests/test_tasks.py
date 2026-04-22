@@ -10,7 +10,7 @@ from ..services import load_ds_resource_schema
 
 @pytest.mark.django_db
 class TestLoadDSResourceSchema:
-    ds_url = f"{settings.DS_BASE_URL}/preremplir/ds-name/schema"
+    ds_url = f"{settings.DS_BASE_URL}preremplir/ds-name/schema"
 
     @responses.activate
     def test_no_ds_resource(self):

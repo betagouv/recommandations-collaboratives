@@ -1,4 +1,5 @@
 from copy import deepcopy as copy
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -41,7 +42,7 @@ class DSResource(TimeStampedModel):
 
     @property
     def preremplir_url(self) -> str:
-        return f"{settings.DS_BASE_URL}/preremplir/{self.name}"
+        return urljoin(settings.DS_BASE_URL, f"preremplir/{self.name}/")
 
     @property
     def fields(self) -> list[MappingField]:
