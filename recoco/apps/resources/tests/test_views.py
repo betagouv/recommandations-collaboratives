@@ -23,7 +23,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from reversion.models import Version
 
 from recoco.apps.addressbook.models import Contact
-from recoco.apps.demarches_simplifiees.models import DSResource
+from recoco.apps.demarches_simplifiees import models as ds_models
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.hitcount.models import Hit, HitCount
 from recoco.apps.projects import models as projects_models
@@ -365,6 +365,69 @@ def test_duplication_creates_new_resource(request, client, current_site):
 
 
 @pytest.mark.django_db
+def test_duplication_creates_new_ds_resource_mapping(request, client, current_site):
+    old_resource = Recipe(
+        models.Resource,
+        status=models.Resource.PUBLISHED,
+        sites=[current_site],
+        title="A Nice title",
+        created_by=baker.make(User),
+        category=baker.make(resources_models.Category),
+    ).make()
+    dep = Recipe(geomatics.Department).make()
+    ds_resource = Recipe(
+        ds_models.DSResource,
+        name="initial_name",
+        schema='{"field": "this is a json"}',
+        resource=old_resource,
+    ).make()
+    ds_resource.departments.set([dep])
+    ds_mapping = Recipe(
+        ds_models.DSMapping,
+        ds_resource=ds_resource,
+        site=current_site,
+        mapping='{"other": "json file"}',
+    ).make()
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.post(url, follow=True)
+        assert response.status_code == 200
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        assert models.Resource.objects.count() == 2
+
+        new_resource = models.Resource.objects.exclude(id=old_resource.id).first()
+
+        assert (
+            last_url
+            == f"{reverse('resources-resource-update', args=[new_resource.id])}?is_duplicate=true"
+        )
+
+        assert ds_models.DSResource.objects.filter(resource=new_resource).count() == 1
+        new_ds_resource = ds_models.DSResource.objects.filter(
+            resource=new_resource
+        ).first()
+        assert new_ds_resource is not None
+        assert new_ds_resource.schema == ds_resource.schema
+        assert ds_resource.name in new_ds_resource.name
+        assert set(new_ds_resource.departments.all()) == set(
+            ds_resource.departments.all()
+        )
+
+        assert (
+            ds_models.DSMapping.objects.filter(ds_resource=new_ds_resource).count() == 1
+        )
+        new_mapping = ds_models.DSMapping.objects.filter(
+            ds_resource=new_ds_resource
+        ).first()
+        assert new_mapping.mapping == ds_mapping.mapping
+        assert new_mapping.site == ds_mapping.site
+        assert new_mapping.ds_resource == new_ds_resource
+
+
+@pytest.mark.django_db
 def test_duplication_needs_permission(request, client, current_site):
     old_resource = Recipe(
         models.Resource,
@@ -476,7 +539,7 @@ def test_resource_detail_ds_prefill_button(request, client):
         status=models.Resource.PUBLISHED,
     ).make()
     Recipe(
-        DSResource,
+        ds_models.DSResource,
         resource=resource,
         schema={"number": 42},
     ).make()
@@ -1173,7 +1236,7 @@ def test_embedded_resource_detail_ds_prefill_button(request, client):
         status=models.Resource.PUBLISHED,
     ).make()
     Recipe(
-        DSResource,
+        ds_models.DSResource,
         resource=resource,
         schema={"number": 42},
     ).make()
