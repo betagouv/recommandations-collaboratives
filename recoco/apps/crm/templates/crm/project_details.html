@@ -10,6 +10,7 @@
 {% block js %}
     {% vite_asset 'js/styles/project-crm.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/components/GravatarCache.js' %}
 {% endblock js %}
 {% comment %} TODO remove crm.css file {% endcomment %}
 {% block content %}
@@ -61,37 +62,53 @@
             </div>
             {% comment %} TODO  {% endcomment %}
             <!-- Client team -->
-            <div class="fr-px-3w crm-border-bottom fr-pb-2v">
-                <h5 class="crm-user-decoration d-inline-block relative">
-                    Demandeur et partenaires <strong>({{ project.members.all|length }})</strong>
-                </h5>
-                <ul class="list-unstyled">
-                    {% for member in project.members.all %}
-                        <li>{% include "crm/user_item.html" with user=member %}</li>
-                    {% empty %}
-                        {% if project_creation_request %}
-                            <li>
-                                <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
-                                </svg>
-                                {{ project_creation_request.email }}
-                            </li>
-                        {% else %}
-                            <li>Aucun demandeur ou partenaire</li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
+            <div>
+                <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="project-crm__section-title">
+                        Equipe demandeur
+                    </span>
+                </div>
+                {% for member in project.members.all %}
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                        <a class="project-crm__user-active d-flex align-items-center"
+                           href="{% url 'crm-user-details' member.pk %}">
+                           <img x-data="GravatarCache()"
+                                class="align-middle rounded-circle d-inline-block fr-p-1v {% if not transparent_background %}bg-white{% endif %} z-3"
+                                width="35px"
+                                :src="gravatarUrl({{ member.email }}, 25, {{ member.first_name }} {{ member.last_name }})"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom"
+                                :title="{{ member.first_name }} {{ member.last_name }}"
+                                tabindex="0">
+                            <span class="">{{ member.get_full_name|default:member.email }}</span>
+                            {% if not member.is_active %}
+                            <div class="project-crm__inactive-member">
+                                <span>compte désactivé</span>
+                            </div>
+                            {% endif %}
+                        </a>
+                        {% comment %} <li>{% include "crm/user_item.html" with user=member %}</li> {% endcomment %}
+                    </div>
+                {% empty %}
+                    <li>Aucun demandeur ou partenaire</li>
+                {% endfor %}
             </div>
             {% comment %} TODO  {% endcomment %}
             <!-- Advisor team -->
-            <div class="fr-pt-2w fr-mb-3w fr-px-3w crm-border-bottom">
-                <h5 class="crm-user-decoration d-inline-block relative">
-                    Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong>
-                </h5>
+            <div>
+                <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="project-crm__section-title">
+                        Equipe conseil
+                    </span>
+                </div>
+
+                {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True %}
+
+
                 <ul class="fr-mb-2v fr-px-0 list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
                     {% for group in grouped_st %}
-                        <div class="fr-mb-3w">
+                        <div class="">
                             {% if group.grouper %}
                                 <a class="d-flex align-items-center"
                                    href="{% url 'crm-organization-details' group.grouper.pk %}">
