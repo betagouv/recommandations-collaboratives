@@ -56,11 +56,10 @@
         <div class="d-flex">
             {% include "user/user_card.html" with user=note.created_by %}
             <span class="crm__note-footer-date">
-                le
                 {% if note.updated_on|date != note.created_on|date %}
-                    {{ note.updated_on }}&nbsp;|&nbsp;{{ note.created_on|date:"n" }} {{ note.created_on|date:"N" }}
+                    mise à jour le {{ note.updated_on|date }} (créée le {{ note.created_on|date }})
                 {% else %}
-                    {{ note.created_on|date }}
+                    le {{ note.created_on|date }}
                 {% endif %}
             </span>
         </div>
