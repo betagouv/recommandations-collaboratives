@@ -5,7 +5,8 @@
      class="project-crm__note {% if pinned %}project-crm__note--pinned{% endif %}"
      :class="isOpen ? 'open' : 'closed'"
      id="note-{{ note.pk }}">
-    <div class="d-flex align-items-center justify-content-between fr-mb-2v">
+    <!-- Header - Title -->
+    <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex justify-content-center align-items-center">
             {% if pinned %}
                 <span class="project-crm__note-pin-icon fr-icon fr-icon-pushpin-line fr-icon--sm fr-mr-1v"></span>
@@ -32,42 +33,46 @@
                 </div>
             {% endif %}
         </div>
-        <div class="d-flex justify-content-center align-items-center">
-            <span class="d-flex align-items-center {% if note.title %} fr-ml-2w {% else %} fr-ml-0{% endif %} specific-fontsize-08 specific-color-grey">
-                <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
-                </svg>
-                {{ note.created_by.get_full_name|default:note.created_by.email }}
-            </span>
-            <span class="d-flex align-items-center specific-fontsize-08 specific-color-grey specific-ml-15px">
-                <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clock-fill" />
-                </svg>
-                {% if note.updated_on|date != note.created_on|date %}
-                    {{ note.updated_on }}&nbsp;|&nbsp;{{ note.created_on|date:"n" }} {{ note.created_on|date:"N" }}
-                {% else %}
-                    {{ note.created_on }}
-                {% endif %}
-            </span>
-            {% get_note_update_url note as update_url %}
-            {% if update_url %}
-                <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
-                    <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                    </svg>
-                    <a href="{{ update_url }}">éditer</a>
-                </span>
-            {% endif %}
-        </div>
     </div>
-    <div class="d-flex fr-mb-2v">
-        {% for tag in note.tags.all %}<span class="fr-mx-1v badge rounded-pill bg-dark">{{ tag }}</span>{% endfor %}
+    <!-- Tags -->
+    <div class="project-crm__note-container-tags" data-cy="container-tags">
+        <span class="fr-icon-tag-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+        {% for tag in note.tags.all %}<span class="project-crm__note-tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
     </div>
-    <article>
+    <!-- Content -->
+    <article class="project-crm__note-content">
         {{ note.content_rendered|safe }}
         <span x-ref="noteToggleButton"
               class="crm-note-toggle-button"
               x-on:click="isOpen = ! isOpen"
               x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
     </article>
+    <!-- Footer - Posted info  -->
+    <div class="d-flex justify-content-center align-items-center">
+        <span class="d-flex align-items-center specific-fontsize-08 specific-color-grey">
+            <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
+            </svg>
+            {{ note.created_by.get_full_name|default:note.created_by.email }}
+        </span>
+        <span class="d-flex align-items-center specific-fontsize-08 specific-color-grey specific-ml-15px">
+            <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clock-fill" />
+            </svg>
+            {% if note.updated_on|date != note.created_on|date %}
+                {{ note.updated_on }}&nbsp;|&nbsp;{{ note.created_on|date:"n" }} {{ note.created_on|date:"N" }}
+            {% else %}
+                {{ note.created_on }}
+            {% endif %}
+        </span>
+        {% get_note_update_url note as update_url %}
+        {% if update_url %}
+            <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
+                <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
+                </svg>
+                <a href="{{ update_url }}">éditer</a>
+            </span>
+        {% endif %}
+    </div>
 </div>
