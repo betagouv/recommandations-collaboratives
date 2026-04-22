@@ -15,10 +15,7 @@ from allauth.account.internal.flows.email_verification import (
     send_verification_email_for_user,
 )
 from allauth.account.models import EmailAddress
-from allauth.account.utils import (
-    filter_users_by_email,
-    setup_user_email,
-)
+from allauth.account.utils import filter_users_by_email, setup_user_email
 from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -62,6 +59,7 @@ from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
+from recoco.apps.conversations.models import DocumentNode, Message, RecommendationNode
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
@@ -826,6 +824,17 @@ def project_details(request, project_id):
     user_ct = ContentType.objects.get_for_model(User)
 
     project_ct = ContentType.objects.get_for_model(Project)
+
+    conversation_stats = {
+        "messages_count": Message.not_deleted.filter(project=project),
+        "participants_count": project.members.count() + project.switchtenders.count(),
+        "recommendations_count": RecommendationNode.objects.filter(
+            message__project=project, message__deleted=None
+        ).count(),
+        "documents_count": DocumentNode.objects.filter(
+            message__project=project, message__deleted=None
+        ).count(),
+    }
 
     participants = project.members.all()
     participant_ids = list(participants.values_list("id", flat=True))
