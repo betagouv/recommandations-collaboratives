@@ -8,7 +8,6 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="User()"
      class="user-card position-relative d-flex flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
