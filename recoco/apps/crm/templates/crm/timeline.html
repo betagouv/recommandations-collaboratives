@@ -6,25 +6,13 @@
         {% if action.verb == verbs.Project.INVITATION %}
             {% include "crm/fragments/action_invite.html" %}
         {% elif action.verb == verbs.User.ADVISOR_REQUEST %}
-          {% include "crm/fragments/action_account_request.html" %}
+            {% include "crm/fragments/action_account_request.html" %}
         {% else %}
             <li class="d-flex flex-columns list-group-item">
-                {% if action.actor %}
-                    <div class="align-middle fr-mx-2v flex-shrink">
-                        <img class="rounded-circle"
-                             src="{% gravatar_url action.actor.email size=24 %}"
-                             alt="{{ action.actor }}">
-                    </div>
-                {% endif %}
                 <div class=" flex-row flex-grow-1">
-                    <div class="flex-grow w-100 flex-grow-1">
+                    <div class="d-flex flex-grow w-100 flex-grow-1 font-size-12px no-wrap">
                         {% if action.actor %}
-                            <span class="actor">
-                                <a href="{% url 'crm-user-details' action.actor.pk %}">
-                                    {{ action.actor.first_name|default:action.actor.email }}
-                                    {{ action.actor.last_name|default:"" }}
-                                </a>
-                            </span>
+                            {% include "user/user_card.html" with user=action.actor show_organization=False %}
                         {% else %}
                             <span class="actor">(compte supprimé)</span>
                         {% endif %}
@@ -32,19 +20,18 @@
                             <strong>{{ action.verb }}</strong>
                         </span>
                         {% if action.action_object.email %}
-                            <a href="{% url 'crm-user-details' action.action_object.pk %}">
+                            <a href="{% url 'crm-user-details' action.action_object.pk %}"
+                               class="fr-ml-1v">
                                 {{ action.action_object.first_name|default:action.action_object.email }}
                                 {{ action.action_object.last_name|default:"" }}
                             </a>
                         {% endif %}
                         {% if action.action_object.feed_label %}
-                                    <a href="{{ action.action_object.get_absolute_url }}">
-                                        {{ action.action_object.feed_label }}
-                                    </a>
+                            <a href="{{ action.action_object.get_absolute_url }}" class="fr-ml-1v">{{ action.action_object.feed_label }}</a>
                         {% endif %}
                         {% if action.target and action.target_content_type.model == "project" %}
-                            <span class="target">
-                                {% if action.verb != verbs.Project.BECAME_OBSERVER and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.LEFT_OBSERVING and action.verb != verbs.Project.LEFT_ADVISING %}
+                            <span class="fr-ml-1v target">
+                                {% if action.verb != verbs.Project.BECAME_OBSERVER and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.LEFT_OBSERVING and action.verb != verbs.Project.LEFT_ADVISING and 'dossier' not in action.verb %}
                                     sur le dossier
                                 {% endif %}
                                 <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
@@ -63,6 +50,6 @@
                 {% endif %}
             </div>
         </li>
-        {% endif %}
-    {% endfor %}
+    {% endif %}
+{% endfor %}
 </ul>
