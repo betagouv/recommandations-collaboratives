@@ -701,11 +701,14 @@ class ResourcePatchReviewView(
         patch = self.object
         resource = patch.resource
         pending_version, previous_version = self._get_versions(resource, patch)
+        is_new_resource = previous_version is None
         context.update(
             {
                 "resource": resource,
                 "pending_version": pending_version,
                 "previous_version": previous_version,
+                "is_new_resource": is_new_resource,
+                "proposed_data": pending_version.field_dict if pending_version else {},
                 "amend_form": EditResourceForm(
                     initial=self._amend_form_initial(pending_version)
                 ),
@@ -733,15 +736,20 @@ class ResourcePatchReviewView(
             return redirect(reverse("resources-patches-list"))
 
         if action_name == "accept":
-            # Accept as-is: apply the proposed version directly via revert()
-            pending_version, _ = self._get_versions(resource, patch)
+            pending_version, previous_version = self._get_versions(resource, patch)
             if not pending_version:
                 messages.error(request, "Version proposée introuvable.")
                 return redirect(reverse("resources-patches-list"))
 
             with transaction.atomic():
                 with reversion.create_revision():
-                    pending_version.revert()
+                    if previous_version is None:
+                        # New resource proposal: publish it
+                        resource.status = models.Resource.PUBLISHED
+                        resource.save()
+                    else:
+                        # Existing resource patch: apply proposed version via revert()
+                        pending_version.revert()
                     reversion.set_user(request.user)
                     reversion.set_comment(f"Proposition #{patch.pk} acceptée")
                 patch.status = models.ResourceRevisionMeta.ACCEPTED
@@ -766,6 +774,9 @@ class ResourcePatchReviewView(
                 with reversion.create_revision():
                     resource = form.save(commit=False)
                     resource.updated_on = timezone.now()
+                    if previous_version is None:
+                        # New resource proposal: also publish it
+                        resource.status = models.Resource.PUBLISHED
                     resource.save()
                     form.save_m2m()
                     reversion.set_user(request.user)

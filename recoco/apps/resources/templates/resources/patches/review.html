@@ -32,8 +32,30 @@
             </p>
         </div>
 
-        {# ── Diff ── #}
-        {% if compare_data %}
+        {# ── Content ── #}
+        {% if is_new_resource %}
+            <h3>Nouvelle ressource proposée</h3>
+            {% if proposed_data %}
+                <dl class="fr-mb-3w">
+                    <dt class="fr-text--bold">Titre</dt>
+                    <dd>{{ proposed_data.title }}</dd>
+                    {% if proposed_data.subtitle %}
+                        <dt class="fr-text--bold">Sous-titre</dt>
+                        <dd>{{ proposed_data.subtitle }}</dd>
+                    {% endif %}
+                    {% if proposed_data.summary %}
+                        <dt class="fr-text--bold">Résumé</dt>
+                        <dd>{{ proposed_data.summary }}</dd>
+                    {% endif %}
+                    {% if proposed_data.content %}
+                        <dt class="fr-text--bold">Contenu</dt>
+                        <dd><pre class="highlight">{{ proposed_data.content }}</pre></dd>
+                    {% endif %}
+                </dl>
+            {% else %}
+                <p class="fr-text--sm fr-text--mention-grey">Aucune donnée disponible pour cette proposition.</p>
+            {% endif %}
+        {% elif compare_data %}
             <h3>Modifications proposées</h3>
             {% include "reversion-compare/compare_partial.html" %}
         {% else %}

@@ -82,10 +82,12 @@ class ResourceViewSet(viewsets.ModelViewSet):
         )
 
     def get_permissions(self):
-        # Any authenticated user can submit a patch proposal via PATCH/PUT with as_patch=True
-        if self.action in ("update", "partial_update") and self.request.data.get(
-            "as_patch", False
-        ):
+        # Any authenticated user can submit a patch proposal via PATCH/PUT/POST with as_patch=True
+        if self.action in (
+            "update",
+            "partial_update",
+            "create",
+        ) and self.request.data.get("as_patch", False):
             return [permissions.IsAuthenticated()]
         return super().get_permissions()
 
@@ -104,6 +106,27 @@ class ResourceViewSet(viewsets.ModelViewSet):
             case _:
                 return ResourceSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if serializer.validated_data.pop("as_patch", False):
+            meta = self._create_resource_proposal_new(request, serializer)
+            return Response(
+                {
+                    "id": meta.pk,
+                    "revision_id": meta.revision_id,
+                    "resource_id": meta.resource_id,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
@@ -119,6 +142,23 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
         self.perform_update(serializer)
         return Response(serializer.data)
+
+    def _create_resource_proposal_new(self, request, serializer):
+        """Create a brand-new Resource in DRAFT inside a revision for moderation."""
+        with transaction.atomic():
+            serializer.validated_data["status"] = Resource.DRAFT
+            with reversion.create_revision():
+                resource = serializer.save()
+                reversion.set_user(request.user)
+                reversion.set_comment("Proposition de création")
+
+            version = Version.objects.get_for_object(resource).first()
+            meta = ResourceRevisionMeta.objects.create(
+                revision=version.revision,
+                resource=resource,
+                proposed_by=request.user,
+            )
+        return meta
 
     def _create_patch_proposal(self, request, resource, serializer):
         """Apply proposed changes into a reversion revision, then revert the live object.
