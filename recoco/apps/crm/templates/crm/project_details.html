@@ -15,10 +15,10 @@
 {% block content %}
     <!-- CRM Navbar -->
     {% include "crm/fragments/navigation.html" with projects=True %}
-    <div x-data="Crm" class="project-crm">
-        <!-- Breadcrumb -->
-        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: '{{ project.name }}' } }"
-             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <!-- Breadcrumb -->
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: '{{ project.name }}' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <div x-data="Crm" class="project-crm d-flex">
         {% comment %} TODO  {% endcomment %}
         <!-- Left column -->
         <div class="project-crm-left-col">
@@ -45,12 +45,16 @@
                 <span class="project-crm__project-created-at fr-icon-calendar-line">{{ project.created_on|date:"d/m/Y" }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of message in conv -->
+                 <span class="project-crm__project-messages-count fr-icon-chat-1-line">{{ project.messages_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of participants in conv -->
+                 <span class="project-crm__project-participants-count fr-icon-user-line">{{ project.participants_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of reco in conv -->
+                 <span class="project-crm__project-recos-count fr-icon-lightning-charge-line">{{ project.recos_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Number of files -->
+                    <span class="project-crm__project-files-count fr-icon-attachment-line">{{ project.files_count }}</span>
                 {% comment %} TODO  {% endcomment %}
                 <!-- Tags -->
                 <span class="project-crm__project-tags">
