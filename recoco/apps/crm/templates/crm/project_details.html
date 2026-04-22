@@ -63,10 +63,57 @@
             </div>
             {% comment %} TODO  {% endcomment %}
             <!-- Client team -->
-            <div></div>
+            <div class="fr-px-3w crm-border-bottom fr-pb-2v">
+                <h5 class="crm-user-decoration d-inline-block relative">
+                    Demandeur et partenaires <strong>({{ project.members.all|length }})</strong>
+                </h5>
+                <ul class="list-unstyled">
+                    {% for member in project.members.all %}
+                        <li>{% include "crm/user_item.html" with user=member %}</li>
+                    {% empty %}
+                        {% if project_creation_request %}
+                            <li>
+                                <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
+                                </svg>
+                                {{ project_creation_request.email }}
+                            </li>
+                        {% else %}
+                            <li>Aucun demandeur ou partenaire</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
             {% comment %} TODO  {% endcomment %}
             <!-- Advisor team -->
-            <div></div>
+            <div class="fr-pt-2w fr-mb-3w fr-px-3w crm-border-bottom">
+                <h5 class="crm-user-decoration d-inline-block relative">
+                    Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong>
+                </h5>
+                <ul class="fr-mb-2v fr-px-0 list-unstyled">
+                    {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+                    {% for group in grouped_st %}
+                        <div class="fr-mb-3w">
+                            {% if group.grouper %}
+                                <a class="d-flex align-items-center"
+                                   href="{% url 'crm-organization-details' group.grouper.pk %}">
+                                    <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                                    </svg>
+                                    <strong>{{ group.grouper }}</strong>
+                                </a>
+                            {% endif %}
+                            <ul class="list-unstyled fr-mx-3w fr-mb-3w">
+                                {% for switchtender in group.list %}
+                                    <li>{% include "crm/user_item.html" with user=switchtender %}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% empty %}
+                        Pas de participant
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
         {% comment %} TODO  {% endcomment %}
         <!-- Right column -->
