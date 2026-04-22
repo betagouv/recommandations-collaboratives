@@ -2,38 +2,25 @@
 {% load crm_tags %}
 <div x-data="Note"
      x-ref="note"
-     class="relative crm-note"
+     class="project-crm__note {% if pinned %}project-crm__note--pinned{% endif %}"
      :class="isOpen ? 'open' : 'closed'"
      id="note-{{ note.pk }}">
     <div class="d-flex align-items-center justify-content-between fr-mb-2v">
         <div class="d-flex justify-content-center align-items-center">
             {% if pinned %}
-                <span>
-                    <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pin-angle" />
-                    </svg>
-                    &nbsp;
-                </span>
+                <span class="project-crm__note-pin-icon fr-icon fr-icon-pushpin-line fr-icon--sm fr-mr-1v"></span>
             {% endif %}
-            <span class="crm-note-tag-title d-flex flex-wrap">
-                {% if note.kind == 0 %}
-                    <svg class="bi fr-mr-1v" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone-outbound" />
-                    </svg>
-                {% else %}
-                    {% if note.kind == 1 %}
-                        <svg class="bi fr-mr-1v" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-paper-heart" />
-                        </svg>
-                    {% else %}
-                        {% if note.kind == 2 %}
-                            <svg class="bi fr-mr-1v" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-workspace" />
-                            </svg>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
+            <span class="project-crm__note-title">
                 {% if note.title %}{{ note.title }}{% endif %}
+                <span class="fr-ml-1v">
+                    {% if note.kind == 0 %}
+                        (rendez-vous téléphonique)
+                    {% elif note.kind == 1 %}
+                        (email)
+                    {% elif note.kind == 2 %}
+                        (test utilisateur)
+                    {% endif %}
+                </span>
             </span>
             {% if get_user_profile and note.related and note.content_type == user_ct %}
                 <div class="d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-ml-1w fr-mb-0 fr-px-2v fr-py-1v fr-text--sm">
