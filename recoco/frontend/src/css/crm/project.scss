@@ -29,6 +29,23 @@
     margin-right: 4px;
   }
 
+  &__section-title-container {
+    border-top: 1px solid var(--light-border-default-grey, #E5E5E5);
+    background: #FAFAFA;
+  }
+
+  &__section-title {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 22px; /* 183.333% */
+    text-transform: uppercase;
+  }
+
+  &__section-container {
+    border-top: 1px solid var(--light-border-default-grey, #E5E5E5);
+  }
+
   &-right-col {
     width: 70%;
     border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
@@ -55,6 +72,33 @@
       align-items: center;
       justify-content: space-between;
     }
+  }
+
+  &__user-active {
+    color: var(--light-text-title-blue-france, #000091);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 150%; /* 21px */
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: auto;
+    text-underline-offset: auto;
+    text-underline-position: from-font;
+  }
+
+  &__inactive-member {
+    border-radius: 1px;
+    background: var(--light-text-disabled-grey, #929292);
+    position: absolute;
+    right: 16px;
+    top: 15px;
+    display: flex;
+    height: 26px;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
   }
 
   &__note {
