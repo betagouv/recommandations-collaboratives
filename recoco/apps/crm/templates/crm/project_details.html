@@ -12,7 +12,6 @@
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/components/GravatarCache.js' %}
 {% endblock js %}
-{% comment %} TODO remove crm.css file {% endcomment %}
 {% block content %}
     <!-- CRM Navbar -->
     {% include "crm/fragments/navigation.html" with projects=True %}
@@ -64,27 +63,25 @@
             <!-- Client team -->
             <div>
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="project-crm__section-title">
-                        Equipe demandeur
-                    </span>
+                    <span class="project-crm__section-title">Equipe demandeur</span>
                 </div>
                 {% for member in project.members.all %}
                     <div class="project-crm__section-container fr-px-3w fr-py-2w">
                         <a class="project-crm__user-active d-flex align-items-center"
                            href="{% url 'crm-user-details' member.pk %}">
-                           <img x-data="GravatarCache()"
-                                class="align-middle rounded-circle d-inline-block fr-p-1v {% if not transparent_background %}bg-white{% endif %} z-3"
-                                width="35px"
-                                :src="gravatarUrl({{ member.email }}, 25, {{ member.first_name }} {{ member.last_name }})"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="bottom"
-                                :title="{{ member.first_name }} {{ member.last_name }}"
-                                tabindex="0">
+                            <img x-data="GravatarCache()"
+                                 class="align-middle rounded-circle d-inline-block fr-p-1v {% if not transparent_background %}bg-white{% endif %} z-3"
+                                 width="35px"
+                                 :src="gravatarUrl({{ member.email }}, 25, {{ member.first_name }} {{ member.last_name }})"
+                                 data-bs-toggle="tooltip"
+                                 data-bs-placement="bottom"
+                                 :title="{{ member.first_name }} {{ member.last_name }}"
+                                 tabindex="0">
                             <span class="">{{ member.get_full_name|default:member.email }}</span>
                             {% if not member.is_active %}
-                            <div class="project-crm__inactive-member">
-                                <span>compte désactivé</span>
-                            </div>
+                                <div class="project-crm__inactive-member">
+                                    <span>compte désactivé</span>
+                                </div>
                             {% endif %}
                         </a>
                         {% comment %} <li>{% include "crm/user_item.html" with user=member %}</li> {% endcomment %}
@@ -97,14 +94,9 @@
             <!-- Advisor team -->
             <div>
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="project-crm__section-title">
-                        Equipe conseil
-                    </span>
+                    <span class="project-crm__section-title">Equipe conseil</span>
                 </div>
-
                 {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True %}
-
-
                 <ul class="fr-mb-2v fr-px-0 list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
                     {% for group in grouped_st %}
@@ -144,7 +136,7 @@
                           aria-labelledby="checkboxes-inline-legend">
                     <legend class="project-crm__section-title fr-mb-1w"
                             id="checkboxes-inline-legend">Suivi de l'impact</legend>
-                    <div class="crm-group-checkbox">
+                    <div class="project-crm__container-tags">
                         {% with project.crm_annotations.tags.names as active_tags %}
                             {% for crm_tag in site_config.crm_available_tags.all %}
                                 <form class="fr-mr-2v"
@@ -171,10 +163,9 @@
                     </div>
                 </fieldset>
             </section>
-            {% comment %} TODO  {% endcomment %}
             <!-- Create new note btn -->
             <section class="w-100">
-                <div class="project-crm__section-title-container">
+                <div class="project-crm__section-title-container no-border">
                     <h3 class="project-crm__section-title">Notes</h3>
                     <a class="fr-btn fr-btn--primary fr-btn--sm"
                        href="{% url 'crm-project-note-create' project.pk %}">Ajouter une note</a>
@@ -199,28 +190,5 @@
                 {% include "crm/timeline.html" %}
             </section>
         </div>
-        {% comment %} {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-3w fr-py-3w d-flex justify-content-between align-items-center{% if active_project %}fr-mb-2w {% endif %}">
-                <div>
-                    <h3 class="d-flex fr-mb-0 align-items-center">
-                        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-                        </svg>
-                        <span>{{ project.name }}</span>
-                    </h3>
-                    <div class="fr-mt-1v d-flex flex-wrap small">
-                        {% for tag in project.tags.all %}<span class="crm-project-tag fr-mx-1v">#{{ tag }}</span>{% endfor %}
-                    </div>
-                    <hr />
-                </div>
-                <div>
-                    <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                        <span>Voir le dossier</span>
-                    </a>
-                    <a href="{% url 'crm-project-update' project.pk %}" class="btn btn-outline-secondary" aria-current="page">Gérer le dossier</a>
-                </div>
-            </div>
-        </div> {% endcomment %}
     </div>
 {% endblock content %}
