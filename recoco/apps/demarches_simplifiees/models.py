@@ -1,4 +1,5 @@
 from copy import deepcopy as copy
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -10,9 +11,8 @@ from recoco.apps.geomatics.models import Department
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Question, QuestionSet
-from recoco.apps.tasks.models import Task
 
-from .utils import MappingField, hash_data, project_mapping_fields
+from .utils import MappingField, project_mapping_fields
 
 
 class DSResource(TimeStampedModel):
@@ -42,7 +42,7 @@ class DSResource(TimeStampedModel):
 
     @property
     def preremplir_url(self) -> str:
-        return f"{settings.DS_BASE_URL}/preremplir/{self.name}"
+        return urljoin(settings.DS_BASE_URL, f"preremplir/{self.name}/")
 
     @property
     def fields(self) -> list[MappingField]:
@@ -69,47 +69,6 @@ class DSResource(TimeStampedModel):
         except KeyError:
             pass
         return fields
-
-
-class DSFolder(TimeStampedModel):
-    ds_resource = models.ForeignKey(
-        DSResource,
-        on_delete=models.CASCADE,
-    )
-
-    dossier_id = models.CharField(max_length=255)
-    dossier_url = models.URLField()
-    dossier_number = models.IntegerField()
-    dossier_prefill_token = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
-
-    content = models.JSONField()
-    content_hash = models.CharField(max_length=255)
-
-    recommendation = models.OneToOneField(
-        Task,
-        related_name="ds_folder",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-
-    class Meta:
-        verbose_name = "Dossier pré-rempli"
-        verbose_name_plural = "Dossiers pré-remplis"
-        ordering = ["-created"]
-        unique_together = ["recommendation", "ds_resource"]
-
-    def __str__(self) -> str:
-        return self.dossier_id
-
-    def save(self, *args, **kwargs):
-        self.content_hash = hash_data(dict(self.content))
-        super().save(*args, **kwargs)
-
-    @property
-    def prefilled_count(self) -> int:
-        return len(self.content)
 
 
 class DSMappingManager(models.Manager):

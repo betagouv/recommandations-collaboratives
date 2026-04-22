@@ -23,14 +23,14 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from reversion.models import Version
 
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.demarches_simplifiees.models import DSResource
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.hitcount.models import Hit, HitCount
 from recoco.apps.projects import models as projects_models
+from recoco.apps.resources import models
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import login
-
-from .. import models
 
 ########################################################################
 # resources
@@ -148,7 +148,7 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     url = reverse("resources-resource-search")
     url = f"{url}?limit_areas=f{departments[0]}&query=resource"
 
-    membership = baker.make(projects_models.ProjectMember)
+    membership = Recipe(projects_models.ProjectMember).make()
     with login(client, user=membership.member):
         Recipe(
             projects_models.Project,
@@ -319,12 +319,12 @@ def test_duplication_creates_new_resource(request, client, current_site):
     old_resource = Recipe(
         models.Resource,
         status=models.Resource.PUBLISHED,
-        sites=[get_current_site(request), baker.make(Site)],
+        sites=[get_current_site(request), Recipe(Site).make()],
         title="A Nice title",
         expires_on=date(2022, 12, 12),
-        created_by=baker.make(User),
+        created_by=Recipe(User).make(),
         imported_from="https://toto.com",
-        category=baker.make(resources_models.Category),
+        category=Recipe(resources_models.Category).make(),
         subtitle="sous-titre",
         summary="ceci est un résumé",
         content="ceci est un contenu",
@@ -450,7 +450,7 @@ def test_resource_detail_contacts_to_display(request, client):
         status=models.Resource.PUBLISHED,
     ).make()
 
-    contact = baker.make(Contact)
+    contact = Recipe(Contact).make()
 
     url = reverse("resources-resource-detail", args=[resource.id])
 
@@ -465,6 +465,28 @@ def test_resource_detail_contacts_to_display(request, client):
 
         response = client.get(url)
         assert response.context["contacts_to_display"] == [contact.id]
+
+
+@pytest.mark.django_db
+def test_resource_detail_ds_prefill_button(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+    Recipe(
+        DSResource,
+        resource=resource,
+        schema={"number": 42},
+    ).make()
+    Recipe(Task, resource=resource).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["resource"].has_dsresource
 
 
 #
@@ -603,9 +625,9 @@ def test_update_resource_from_non_origin_site_does_not_duplicate_with_get(
 @pytest.mark.resource_update
 @pytest.mark.django_db
 def test_update_resource_from_non_origin_site_with_invalid_form(request, client):
-    original_resource = baker.make(models.Resource)
+    original_resource = Recipe(models.Resource).make()
     current_site = get_current_site(request)
-    other_site = baker.make(Site)
+    other_site = Recipe(Site).make()
 
     original_resource.sites.add(current_site, other_site)
     original_resource.site_origin = other_site
@@ -1140,6 +1162,31 @@ def test_embedded_resource_detail_contacts_to_display(request, client):
 
         response = client.get(url)
         assert response.context["contacts_to_display"] == [contact.id]
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_ds_prefill_button(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+    Recipe(
+        DSResource,
+        resource=resource,
+        schema={"number": 42},
+    ).make()
+    task = Recipe(Task, resource=resource).make()
+
+    url = f"{reverse('resources-resource-detail-embeded', args=[resource.id])}?task_id={task.id}"
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["resource"].has_dsresource
+        assert reverse("projects-task-ds-prefill", args=(task.id,)) in str(
+            response.content
+        )
 
 
 # eof
