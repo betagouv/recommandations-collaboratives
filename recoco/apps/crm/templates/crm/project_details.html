@@ -22,40 +22,42 @@
         {% comment %} TODO  {% endcomment %}
         <!-- Left column -->
         <div class="project-crm-left-col">
-            {% comment %} TODO  {% endcomment %}
             <!-- Project info -->
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column fr-p-5v">
                 <!-- Name -->
-                <h1 class="project-crm__project-name">{{ project.name }}</h1>
+                <h1 class="project-crm__project-name fr-mb-0">{{ project.name }}</h1>
                 <!-- Organization -->
-                <h2 class="project-crm__project-org">{{ project.owner.profile.organization.name }}</h2>
+                <h2 class="project-crm__project-org fr-mb-3v">{{ project.owner.profile.organization.name }}</h2>
                 <!-- Commune -->
-                <span class="project-crm__project-commune fr-icon-target-line fr-icon--sm">{{ project.commune.name }}</span>
+                <span class="project-crm__project-information fr-icon-target-line fr-icon--sm fr-mb-1v">{{ project.commune.name }}</span>
                 <!-- Region -->
-                <span class="project-crm__project-region fr-icon-target-line fr-icon--sm">{{ project.commune.department.region }}</span>
+                <span class="project-crm__project-information fr-icon-target-line fr-icon--sm fr-mb-1v">Région {{ project.commune.department.region }}</span>
                 <!-- Updated at -->
-                <span class="project-crm__project-updated-at fr-icon-calendar-line fr-icon--sm">{{ project.updated_on|date:"d/m/Y" }}</span>
+                <span class="project-crm__project-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">Mis à jour le {{ project.updated_on|date:"j F Y" }}</span>
                 <!-- Created at -->
-                <span class="project-crm__project-created-at fr-icon-calendar-line fr-icon--sm">{{ project.created_on|date:"d/m/Y" }}</span>
+                <span class="project-crm__project-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">Déposé le {{ project.created_on|date:"j F Y" }}</span>
                 <!-- Number of message in conv -->
-                <span class="project-crm__project-messages-count fr-icon-chat-2-line fr-icon--sm">{{ project.messages_count }}</span>
+                 <span class="project-crm__project-information fr-icon-chat-2-line fr-icon--sm fr-mb-1v">{{ conversation_stats.messages_count|length }} message{{ conversation_stats.messages_count|length|pluralize:"s" }}</span>
                 <!-- Number of participants in conv -->
-                <span class="project-crm__project-participants-count fr-icon-user-line fr-icon--sm">{{ project.participants_count }}</span>
+                 <span class="project-crm__project-information fr-icon-user-line fr-icon--sm fr-mb-1v">{{ conversation_stats.participants_count }} participant{{ conversation_stats.participants_count|pluralize:"s" }}</span>
                 <!-- Number of reco in conv -->
-                <span class="project-crm__project-recos-count fr-icon-list-check-line fr-icon--sm">{{ project.recommendations_count }}</span>
-                {% comment %} TODO  {% endcomment %}
+                 <span class="project-crm__project-information fr-icon-list-check-line fr-icon--sm fr-mb-1v">{{ conversation_stats.recommendations_count }} recommandation{{ conversation_stats.recommendations_count|pluralize:"s" }}</span>
                 <!-- Number of files -->
-                <span class="project-crm__project-files-count fr-icon-file-download-line fr-icon--sm">{{ project.documents_count }}</span>
-                {% comment %} TODO  {% endcomment %}
+                <span class="project-crm__project-information fr-icon-file-download-line fr-icon--sm fr-mb-1v">{{ conversation_stats.documents_count }} document{{ conversation_stats.documents_count|pluralize:"s" }}</span>
                 <!-- Tags -->
-                <span class="project-crm__project-tags fr-icon-tag-line fr-icon--sm">
-                    {% for tag in project.tags.all %}<span class="project-crm__project-tag">#{{ tag }}</span>{% endfor %}
+                <span class="project-crm__project-information fr-icon-tag-line fr-icon--sm fr-mb-1v">
+                    {% for tag in project.tags.all %}
+                        <span class="project-crm__project-information">#{{ tag }}</span>
+                    {% endfor %}
                 </span>
-                {% comment %} TODO - Add variable from backend and suppress mocked data {% endcomment %}
                 <!-- Next email reminder -->
-                <span class="project-crm__project-next-email-reminder fr-icon-mail fr-icon--sm">
+                <span class="project-crm__project-information fr-icon-mail fr-icon--sm">
                     {% with project.next_reminder as next_reminder %}
-                    Prochaine rappel le {{ next_reminder }}
+                        {% if next_reminder %}
+                            Prochaine rappel le {{ next_reminder }}
+                        {% else %}
+                            Aucun rappel programmé
+                        {% endif %}
                     {% endwith %}
                 </span>
             </div>
