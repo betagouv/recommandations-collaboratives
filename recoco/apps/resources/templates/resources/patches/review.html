@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Proposition #{{ patch.pk }} — {{ resource.title }}{% endblock title %}
+{% block css %}
+    <style>
+        del { background-color: #ffe6e6; text-decoration: none; color: #000; }
+        ins { background-color: #e6ffe6; text-decoration: none; color: #000; }
+        pre.highlight { max-width: 900px; white-space: pre-line; }
+        sup.follow { color: #5555ff; }
+    </style>
+{% endblock css %}
+{% block content %}
+    {% include "crm/fragments/navigation.html" with resources=True %}
+    <div class="fr-container fr-py-6w">
+
+        <nav class="fr-breadcrumb" aria-label="vous êtes ici">
+            <ol class="fr-breadcrumb__list">
+                <li><a class="fr-breadcrumb__link" href="{% url 'resources-patches-list' %}">Propositions</a></li>
+                <li><a class="fr-breadcrumb__link" href="{% url 'resources-resource-detail' resource.pk %}">{{ resource.title|truncatechars:40 }}</a></li>
+                <li><span class="fr-breadcrumb__link">Proposition #{{ patch.pk }}</span></li>
+            </ol>
+        </nav>
+
+        <h2>Proposition #{{ patch.pk }} — {{ resource.title }}</h2>
+
+        <div class="fr-callout fr-my-3w">
+            <p class="fr-callout__text">
+                Proposée par
+                <strong>{{ patch.proposed_by.get_full_name|default:patch.proposed_by.username }}</strong>
+                le {{ patch.revision.date_created|date:"d/m/Y à H:i" }}.
+                Statut&nbsp;: <strong>{{ patch.get_status_display }}</strong>
+            </p>
+        </div>
+
+        {# ── Diff ── #}
+        {% if compare_data %}
+            <h3>Modifications proposées</h3>
+            {% include "reversion-compare/compare_partial.html" %}
+        {% else %}
+            <p class="fr-text--sm fr-text--mention-grey">Impossible de calculer le diff (version de référence introuvable).</p>
+        {% endif %}
+
+        {# ── Actions ── #}
+        {% if patch.status == 0 %}
+            <form method="post"
+                  action="{% url 'resources-patch-review' resource.pk patch.pk %}"
+                  class="fr-mt-4w"
+                  x-data="{ showAmend: {{ show_amend|yesno:'true,false' }} }">
+                {% csrf_token %}
+
+                <div class="fr-input-group">
+                    <label class="fr-label" for="review_comment">Commentaire de modération (optionnel)</label>
+                    <textarea class="fr-input" id="review_comment" name="review_comment" rows="2"
+                              placeholder="Note conservée dans l'historique…"></textarea>
+                </div>
+
+                <div class="fr-btns-group fr-btns-group--inline fr-mt-3w">
+                    <button type="submit" name="action" value="accept" class="fr-btn">
+                        Accepter tel quel
+                    </button>
+                    <button type="button" class="fr-btn fr-btn--secondary" @click="showAmend = !showAmend">
+                        Amender avant d'accepter
+                    </button>
+                    <button type="submit" name="action" value="reject" class="fr-btn fr-btn--tertiary fr-btn--icon-left fr-icon-close-circle-line">
+                        Rejeter
+                    </button>
+                </div>
+
+                {# ── Amend form (collapsed by default) ── #}
+                <div x-show="showAmend" x-cloak class="fr-mt-4w fr-p-3w" style="border: 1px solid #ddd;">
+                    <h4>Amender le contenu avant acceptation</h4>
+                    <p class="fr-text--sm fr-text--mention-grey">
+                        Les champs ci-dessous sont pré-remplis avec les valeurs proposées.
+                        Modifiez-les si nécessaire, puis cliquez sur « Accepter (version amendée) ».
+                    </p>
+
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.title.id_for_label }}">Titre</label>
+                        {{ amend_form.title }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.subtitle.id_for_label }}">Sous-titre</label>
+                        {{ amend_form.subtitle }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.summary.id_for_label }}">Résumé</label>
+                        {{ amend_form.summary }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.category.id_for_label }}">Catégorie</label>
+                        {{ amend_form.category }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.departments.id_for_label }}">Départements</label>
+                        {{ amend_form.departments }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.contacts.id_for_label }}">Contacts</label>
+                        {{ amend_form.contacts }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.expires_on.id_for_label }}">Date d'expiration</label>
+                        {{ amend_form.expires_on }}
+                    </div>
+                    <div class="fr-input-group">
+                        <label class="fr-label" for="{{ amend_form.content.id_for_label }}">Contenu</label>
+                        {{ amend_form.content|safe }}
+                    </div>
+
+                    <button type="submit" name="action" value="accept_amended" class="fr-btn fr-mt-2w">
+                        Accepter (version amendée)
+                    </button>
+                </div>
+
+            </form>
+
+        {% else %}
+            <div class="fr-alert fr-alert--info fr-mt-3w">
+                <p>
+                    Proposition {{ patch.get_status_display|lower }}
+                    {% if patch.reviewed_by %}par {{ patch.reviewed_by.get_full_name }}{% endif %}
+                    {% if patch.reviewed_on %}le {{ patch.reviewed_on|date:"d/m/Y" }}{% endif %}.
+                </p>
+                {% if patch.review_comment %}<p>Commentaire&nbsp;: {{ patch.review_comment }}</p>{% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock content %}
