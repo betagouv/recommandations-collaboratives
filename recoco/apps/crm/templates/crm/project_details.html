@@ -19,9 +19,11 @@
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: '{{ project.name }}' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div x-data="Crm" class="project-crm d-flex">
-        {% comment %} TODO  {% endcomment %}
         <!-- Left column -->
-        <div class="project-crm-left-col">
+        <div class="project-crm-left-col position-relative">
+            <div class="position-absolute top-0 end-0 fr-p-2w">
+                <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line" href="{% url 'crm-project-update' project.pk %}"></a>
+            </div>
             <!-- Project info -->
             <div class="d-flex flex-column fr-p-5v">
                 <!-- Name -->
@@ -59,7 +61,6 @@
                     {% endwith %}
                 </span>
             </div>
-            {% comment %} TODO  {% endcomment %}
             <!-- Client team -->
             <div>
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
@@ -78,7 +79,6 @@
                     <li>Aucun demandeur ou partenaire</li>
                 {% endfor %}
             </div>
-            {% comment %} TODO  {% endcomment %}
             <!-- Advisor team -->
             <div>
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
