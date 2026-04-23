@@ -67,24 +67,12 @@
                 </div>
                 {% for member in project.members.all %}
                     <div class="project-crm__section-container fr-px-3w fr-py-2w">
-                        <a class="project-crm__user-active d-flex align-items-center"
-                           href="{% url 'crm-user-details' member.pk %}">
-                            <img x-data="GravatarCache()"
-                                 class="align-middle rounded-circle d-inline-block fr-p-1v {% if not transparent_background %}bg-white{% endif %} z-3"
-                                 width="35px"
-                                 :src="gravatarUrl({{ member.email }}, 25, {{ member.first_name }} {{ member.last_name }})"
-                                 data-bs-toggle="tooltip"
-                                 data-bs-placement="bottom"
-                                 :title="{{ member.first_name }} {{ member.last_name }}"
-                                 tabindex="0">
-                            <span class="">{{ member.get_full_name|default:member.email }}</span>
-                            {% if not member.is_active %}
-                                <div class="project-crm__inactive-member">
-                                    <span>compte désactivé</span>
-                                </div>
-                            {% endif %}
-                        </a>
-                        {% comment %} <li>{% include "crm/user_item.html" with user=member %}</li> {% endcomment %}
+                        {% include "user/user_card.html" with user=member user_activity=True %}
+                        {% if not member.is_active %}
+                        <div class="project-crm__inactive-member">
+                            <span>compte désactivé</span>
+                        </div>
+                        {% endif %}
                     </div>
                 {% empty %}
                     <li>Aucun demandeur ou partenaire</li>
@@ -96,30 +84,14 @@
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
                     <span class="project-crm__section-title">Equipe conseil</span>
                 </div>
-                {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True %}
-                <ul class="fr-mb-2v fr-px-0 list-unstyled">
-                    {% regroup project.switchtenders.all by profile.organization as grouped_st %}
-                    {% for group in grouped_st %}
-                        <div class="">
-                            {% if group.grouper %}
-                                <a class="d-flex align-items-center"
-                                   href="{% url 'crm-organization-details' group.grouper.pk %}">
-                                    <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
-                                    </svg>
-                                    <strong>{{ group.grouper }}</strong>
-                                </a>
-                            {% endif %}
-                            <ul class="list-unstyled fr-mx-3w fr-mb-3w">
-                                {% for switchtender in group.list %}
-                                    <li>{% include "crm/user_item.html" with user=switchtender %}</li>
-                                {% endfor %}
-                            </ul>
+                {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+                {% for group in grouped_st %}
+                    {% for switchtender in group.list %}
+                        <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                            {% include "user/user_card.html" with user=switchtender user_activity=True %}
                         </div>
-                    {% empty %}
-                        Pas de participant
                     {% endfor %}
-                </ul>
+                {% endfor %}
             </div>
         </div>
         {% comment %} TODO  {% endcomment %}
