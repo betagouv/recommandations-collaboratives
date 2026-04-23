@@ -21,6 +21,11 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["name"]
 
 
+class TopicListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.name
+
+
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Document
@@ -135,7 +140,8 @@ class ProjectSerializer(
         ):
             return obj.advisors_note
 
-    topics = TopicSerializer(many=True)
+    topics = TopicListingField(read_only=True, many=True)
+
     orga_owner = SerializerMethodField()
 
     def get_orga_owner(self, obj):
