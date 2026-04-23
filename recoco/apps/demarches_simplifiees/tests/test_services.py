@@ -1,8 +1,17 @@
+from unittest.mock import Mock, patch
+
 import pytest
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from model_bakery import baker
 
+from recoco.apps.demarches_simplifiees.models import DSMapping, DSResource
+from recoco.apps.demarches_simplifiees.services import (
+    create_ds_prefill_link,
+    find_ds_resource_for_project,
+    make_ds_data_from_project,
+)
+from recoco.apps.geomatics.models import Commune, Department
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.models import Project, ProjectMember
 from recoco.apps.resources.models import Resource
@@ -14,9 +23,8 @@ from recoco.apps.survey.models import (
     Session,
     Survey,
 )
-
-from ..models import DSMapping, DSResource
-from ..services import find_ds_resource_for_project, make_ds_data_from_project
+from recoco.apps.tasks.models import Task
+from recoco.settings.common import DS_API_BASE_URL
 
 
 class TestfindDSResourceForProject:
@@ -207,3 +215,77 @@ class TestMakeDSDataFromProject:
             "champ_Q2hhbXAtMTk3NzQ0NQ": "EPCI",
             "champ_Q2hhbXAtMzI4MDE4Mw": "Adaptation au changement climatique et prévention des risques naturels",
         }, print(data)
+
+
+def returns_empty(reco_id):
+    res = create_ds_prefill_link(reco_id)
+    assert res is None
+
+
+@pytest.mark.django_db
+def test_create_ds_prefill_link_no_reco():
+    returns_empty(42)
+
+
+@pytest.mark.django_db
+def test_create_ds_prefill_link_no_resource():
+    task = baker.make(Task)
+    returns_empty(task.id)
+
+
+@pytest.mark.django_db
+def test_create_ds_prefill_link_no_ds_resource():
+    resource = baker.make(Resource)
+    task = baker.make(Task, resource=resource)
+    returns_empty(task.id)
+
+
+@pytest.mark.django_db
+def test_return_ds_prefill_link_calls_ds_data_with_prefill(client):
+    department = baker.make(Department)
+    commune = baker.make(Commune, department=department)
+    project = baker.make(Project, commune=commune)
+    resource = baker.make(Resource)
+    ds_resource = baker.make(
+        DSResource,
+        resource=resource,
+        departments=[commune.department],
+        schema={"number": 42},
+    )
+    task = baker.make(Task, resource=resource, project=project)
+    prefill_data = "prefill_data"
+
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
+    mocked_link = "mocked_ds_link"
+
+    with (
+        patch(
+            "recoco.apps.demarches_simplifiees.services.make_ds_data_from_project",
+            Mock(return_value=prefill_data),
+        ) as mock_make_ds_data,
+        patch(
+            "requests.post",
+            Mock(
+                return_value=MockResponse(
+                    status_code=201, json_data={"dossier_url": mocked_link}
+                )
+            ),
+        ) as mock_post,
+    ):
+        response = create_ds_prefill_link(task.id)
+        mock_make_ds_data.assert_called_with(
+            project=task.project, site=task.site, ds_resource=ds_resource
+        )
+        mock_post.assert_called_with(
+            url=f"{DS_API_BASE_URL}demarches/{ds_resource.number}/dossiers",
+            json=prefill_data,
+            timeout=30,
+        )
+        assert response == mocked_link

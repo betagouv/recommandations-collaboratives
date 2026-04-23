@@ -55,6 +55,7 @@ def unread_notifications_processor(request):
 
     show_project_verb_list = [
         verbs.Document.ADDED_FILE,
+        verbs.Document.ADDED_ADVISOR_FILE,
         verbs.Document.ADDED_LINK,
         verbs.Recommendation.COMMENTED,
         verbs.Recommendation.CREATED,

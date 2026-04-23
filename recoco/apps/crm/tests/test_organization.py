@@ -259,8 +259,7 @@ def test_crm_organization_merge_page_with_empty_list(request, client):
     assert response.status_code == 302
 
 
-@pytest.mark.django_db
-def test_crm_organization_merge_processing(request, client):
+def generate_orgs(request):
     site = get_current_site(request)
 
     departments = baker.make(geomatics.Department, _quantity=4)
@@ -271,6 +270,13 @@ def test_crm_organization_merge_processing(request, client):
         o.sites.add(site)
         o.departments.add(d)
         orgs.append(o)
+
+    return orgs, departments, site
+
+
+@pytest.mark.django_db
+def test_crm_organization_merge_processing(request, client):
+    orgs, departments, site = generate_orgs(request)
 
     url = reverse("crm-organization-merge")
 
@@ -291,6 +297,21 @@ def test_crm_organization_merge_processing(request, client):
     assert org.name == data["name"]
     org_dpts = (d.code for d in org.departments.all())
     assert set(org_dpts) == set(d.code for d in departments)
+
+
+@pytest.mark.django_db
+def test_crm_organization_no_fail_if_reuse_of_name(request, client):
+    orgs, departments, site = generate_orgs(request)
+
+    url = reverse("crm-organization-merge")
+
+    data = {"name": orgs[1].name, "org_ids": [o.id for o in orgs]}
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
