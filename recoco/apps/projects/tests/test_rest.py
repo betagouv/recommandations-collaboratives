@@ -549,6 +549,9 @@ def check_project_content(project, data):
         "advisors_note",
         "exclude_stats",
         "muted",
+        "deleted",
+        "orga_owner",
+        "topics",
     ]
     assert set(data.keys()) == set(expected)
 
