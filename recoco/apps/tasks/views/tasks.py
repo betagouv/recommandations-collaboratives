@@ -164,7 +164,7 @@ def visit_task(request, task_id):
     if task.resource:
         return redirect(reverse("resources-resource-detail", args=[task.resource.pk]))
 
-    url = f"{reverse('projects-project-detail-conversations', args=[task.project_id])}#action-{task_id}"
+    url = f"{reverse('projects-project-detail-conversations', args=[task.project_id])}#action-{task.pk}"
     return redirect(url)
 
     # clean that if we actually remove the action tab in project
