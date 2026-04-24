@@ -147,7 +147,7 @@ class ProjectSerializer(
     def get_orga_owner(self, obj):
         return (
             obj.owner.profile.organization.name
-            if obj.owner.profile.organization
+            if obj.owner and obj.owner.profile.organization
             else ""
         )
 
