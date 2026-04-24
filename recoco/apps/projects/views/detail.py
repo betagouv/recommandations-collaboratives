@@ -205,6 +205,12 @@ def project_knowledge(request, project_id=None):
 def project_actions(request, project_id=None):
     """Action page for given project"""
 
+    # we test to remove this part so we keep the code but redirect to new interface
+    url = (
+        reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
+    )
+    return redirect(url)
+
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
