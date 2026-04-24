@@ -67,7 +67,37 @@ class ProjectDetail(APIView):
 
     def get_object(self, pk):
         try:
-            return models.Project.on_site.with_site_status().get(pk=pk)
+            return (
+                models.Project.all_on_site.with_site_status()
+                .select_related(
+                    "commune__department__region",
+                )
+                .prefetch_related(
+                    Prefetch(
+                        "switchtenders",
+                        User.objects.select_related(
+                            "profile",
+                            "profile__organization",
+                            "profile__organization__group",
+                        ),
+                    ),
+                    "project_sites",
+                    "tags",
+                    Prefetch(
+                        "members",
+                        User.objects.filter(
+                            projectmember__is_owner=True
+                        ).select_related(
+                            "profile",
+                            "profile__organization",
+                            "profile__organization__group",
+                        ),
+                        to_attr="_owner",
+                    ),  # _owner is looked at in getter
+                    "project_creation_requests",
+                    "topics",
+                )
+            ).get(pk=pk)
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
 
@@ -131,13 +161,23 @@ class ProjectList(ListAPIView):
         queryset = (
             self.filter_queryset(self.get_queryset())
             .prefetch_related(
-                "switchtenders__profile__organization",
+                Prefetch(
+                    "switchtenders",
+                    User.objects.select_related(
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
+                    ),
+                ),
                 "project_sites",
                 "tags",
+                "members",
                 Prefetch(
                     "members",
                     User.objects.filter(projectmember__is_owner=True).select_related(
-                        "profile", "profile__organization"
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
                     ),
                     to_attr="_owner",
                 ),  # _owner is looked at in getter
