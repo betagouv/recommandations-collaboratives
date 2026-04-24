@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.filters import BaseFilterBackend
 
 from recoco.apps.projects.models import Project
+from recoco.utils import has_perm
 
 
 class ProjectActivityFilter(BaseFilterBackend):
@@ -65,4 +66,16 @@ class ProjectSiteStatusFilter(BaseFilterBackend):
         project_site_status = request.GET.getlist("status", None)
         if project_site_status:
             queryset = queryset.filter(project_site_status__in=project_site_status)
+        return queryset
+
+
+class DefaultNoDeletedFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        # TODO for review : is this a proper permission ? now grist has staff permission. Alternative is to give
+        # it admin role, to hardcode reference to the user, to manually give it specific permissions
+        # or to create a role to which we manually give permissions
+        if not request.GET.get("with-deleted", None) or has_perm(
+            request.user, "sites.delete_projects"
+        ):
+            queryset = queryset.filter(deleted=None)
         return queryset

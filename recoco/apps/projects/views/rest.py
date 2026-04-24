@@ -43,7 +43,12 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
+from ..filters import (
+    DefaultNoDeletedFilter,
+    DepartmentsFilter,
+    ProjectActivityFilter,
+    ProjectSiteStatusFilter,
+)
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
@@ -64,6 +69,7 @@ class ProjectDetail(APIView):
     """Retrieve a project"""
 
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DefaultNoDeletedFilter]
 
     def get_object(self, pk):
         try:
@@ -142,11 +148,12 @@ class ProjectList(ListAPIView):
         DepartmentsFilter,
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
+        DefaultNoDeletedFilter,
     ]
 
     def get_queryset(self):
         return (
-            models.Project.on_site.for_user(self.request.user)
+            models.Project.all_on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
             .annotate(
                 project_site_status=Subquery(
