@@ -11,13 +11,13 @@
                          :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
                          data-gravatar-key="{{ user.email }}-18"
                          alt="{{ action.actor }}">
-        <span class="crm-user-card__name{% if not member.is_active %}-inactive{% endif %}"><a href="{% url 'crm-user-details' user.pk %}">{{ user.get_full_name }}</a></span>
+        <span class="crm-user-card__name{% if not user.is_active %}-inactive{% endif %}"><a href="{% url 'crm-user-details' user.pk %}">{{ user.get_full_name }}</a></span>
     </div>
     <div class="d-flex">
         {% if user.profile.organization.name %}
-            <span class="crm-user-card__org{% if not member.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ user.profile.organization.name }}</span>
+            <span class="crm-user-card__org{% if not user.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ user.profile.organization.name }}</span>
         {% elif project_owner and project.org_name %}
-            <span class="crm-user-card__org{% if not member.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ project.org_name }}</span>
+            <span class="crm-user-card__org{% if not user.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ project.org_name }}</span>
         {% endif %}
     </div>
 </div>
