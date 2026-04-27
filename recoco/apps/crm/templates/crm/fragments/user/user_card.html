@@ -1,0 +1,23 @@
+{% load gravatar %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/user.js' %}
+{% endblock js %}
+
+<div x-data="User()" class="crm-user-card d-flex flex-column">
+    <div class="d-flex">
+        <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
+                         :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
+                         :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
+                         data-gravatar-key="{{ user.email }}-18"
+                         alt="{{ action.actor }}">
+        <span class="crm-user-card__name{% if not member.is_active %}-inactive{% endif %}"><a href="{% url 'crm-user-details' user.pk %}">{{ user.get_full_name }}</a></span>
+    </div>
+    <div class="d-flex">
+        {% if user.profile.organization.name %}
+            <span class="crm-user-card__org{% if not member.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ user.profile.organization.name }}</span>
+        {% elif project_owner and project.org_name %}
+            <span class="crm-user-card__org{% if not member.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ project.org_name }}</span>
+        {% endif %}
+    </div>
+</div>

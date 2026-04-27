@@ -127,3 +127,8 @@
 .fr-icon-mail::before {
   mask-image: url(../assets/mail.svg);
 }
+
+.fr-icon-people::after,
+.fr-icon-people::before {
+  mask-image: url(../assets/people.svg);
+}

@@ -9,6 +9,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/styles/project-crm.css.js' %}
+    {% vite_asset 'js/styles/card-crm.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/components/GravatarCache.js' %}
 {% endblock js %}
@@ -68,12 +69,12 @@
                     <span class="project-crm__section-title">Equipe demandeur</span>
                 </div>
                 {% for member in project.members.all %}
-                    <div class="project-crm__section-container fr-px-3w fr-py-2w">
-                        {% include "user/user_card.html" with user=member user_activity=True %}
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
+                        {% include "crm\fragments\user\user_card.html" with user=member user_activity=True %}
                         {% if not member.is_active %}
-                            <div class="project-crm__inactive-member">
-                                <span>compte désactivé</span>
-                            </div>
+                        <div class="project-crm__inactive-member">
+                            <span class="project-crm__inactive-member-text">compte désactivé</span>
+                        </div>
                         {% endif %}
                     </div>
                 {% empty %}

@@ -104,13 +104,19 @@
     border-radius: 1px;
     background: var(--light-text-disabled-grey, #929292);
     position: absolute;
-    right: 16px;
-    top: 15px;
+    right: 20px;
+    top: 22px;
     display: flex;
     height: 26px;
     padding: 4px 8px;
     justify-content: center;
     align-items: center;
     gap: 4px;
+    &-text {
+      color: var(--light-text-inverted-grey, #FFF);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 18px; /* 180% */
+    }
   }
 }
