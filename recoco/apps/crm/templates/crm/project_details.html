@@ -16,13 +16,14 @@
     <!-- CRM Navbar -->
     {% include "crm/fragments/navigation.html" with projects=True %}
     <!-- Breadcrumb -->
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: '{{ project.name }}' } }"
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: `{{ project.name }}` } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div x-data="Crm" class="project-crm d-flex">
         <!-- Left column -->
         <div class="project-crm-left-col position-relative">
             <div class="position-absolute top-0 end-0 fr-p-2w">
-                <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line" href="{% url 'crm-project-update' project.pk %}"></a>
+                <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line"
+                   href="{% url 'crm-project-update' project.pk %}"></a>
             </div>
             <!-- Project info -->
             <div class="d-flex flex-column fr-p-5v">
@@ -70,9 +71,9 @@
                     <div class="project-crm__section-container fr-px-3w fr-py-2w">
                         {% include "user/user_card.html" with user=member user_activity=True %}
                         {% if not member.is_active %}
-                        <div class="project-crm__inactive-member">
-                            <span>compte désactivé</span>
-                        </div>
+                            <div class="project-crm__inactive-member">
+                                <span>compte désactivé</span>
+                            </div>
                         {% endif %}
                     </div>
                 {% empty %}
