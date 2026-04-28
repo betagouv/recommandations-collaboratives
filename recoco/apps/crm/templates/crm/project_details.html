@@ -84,7 +84,9 @@
                         {% endif %}
                     </div>
                 {% empty %}
-                    <li>Aucun demandeur ou partenaire</li>
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
+                        <span class="font-size-12px">Aucun demandeur ou partenaire</span>
+                    </div>
                 {% endfor %}
             </div>
             <!-- Advisor team -->
@@ -99,6 +101,10 @@
                             {% include "crm/fragments/user/user_card.html" with user=switchtender %}
                         </div>
                     {% endfor %}
+                {% empty %}
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                        <span class="font-size-12px">Aucun participant</span>
+                    </div>
                 {% endfor %}
             </div>
         </div>
