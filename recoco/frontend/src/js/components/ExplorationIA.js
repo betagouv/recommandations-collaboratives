@@ -4,11 +4,12 @@ import DOMPurify from 'dompurify';
 import { ToastType } from '../models/toastType';
 
 const ML_API_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL;
+const ML_API_TOKEN = import.meta.env.VITE_ML_API_TOKEN;
 
 Alpine.data('ExplorationIA', (config = {}) => ({
   // === CONFIGURATION ===
   projectId: config.projectId || null,
-  apiToken: config.apiToken || 'cBnsSKjYEdet6qs47KnsTLVW04di2gsS',
+  apiToken: config.apiToken || ML_API_TOKEN,
   siteId: config.siteId || null,
 
   // === CONTEXTE DU PROJET ===

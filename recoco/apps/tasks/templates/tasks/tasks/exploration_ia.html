@@ -17,7 +17,7 @@
 {% endblock js %}
 {% block content %}
     <div class="row justify-content-center">
-        <div class="col-10 fr-p-3w" x-data="ExplorationIA({ projectId: {{ project.id }}, siteId: {{ request.site.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}
+        <div class="col-10 fr-p-3w" x-data="ExplorationIA({ projectId: {{ project.id }}, siteId: {{ request.site.id }}, projectContext: `{{ project.name }}
             {% if project.commune %}- {{ project.commune.name }}{% endif %}
             .
             {% if project.description %}{{ project.description|escapejs }}{% endif %}
