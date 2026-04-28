@@ -321,6 +321,7 @@
             color: #3a3a3a;
             font-size: 14px;
             font-weight: 700;
+            margin-right: 0.25rem;
           }
           &__filename,
           &__size {
@@ -331,7 +332,7 @@
           &__info-container,
           &__actions-container {
             display: flex;
-            align-items: center;
+            align-items: baseline;
           }
         }
       }
@@ -442,14 +443,14 @@
 }
 
 .task-item {
-  [target='_blank']:after {
-    content: '';
-    height: 100%;
-    width: 100%;
-    mask-image: none;
-    -webkit-mask-image: none;
-    background: none;
-  }
+  // [target='_blank']:after {
+  //   content: '';
+  //   height: 100%;
+  //   width: 100%;
+  //   mask-image: none;
+  //   -webkit-mask-image: none;
+  //   background: none;
+  // }
   &__topic {
     --color-topic: #667dcf;
     color: var(--color-topic);

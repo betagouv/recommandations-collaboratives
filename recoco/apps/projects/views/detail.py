@@ -11,6 +11,7 @@ from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Prefetch
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -21,6 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
+from recoco.apps.resources.models import Resource
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -203,9 +205,18 @@ def project_knowledge(request, project_id=None):
 def project_actions(request, project_id=None):
     """Action page for given project"""
 
+    # we test to remove this part so we keep the code but redirect to new interface
+    url = (
+        reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
+    )
+    return redirect(url)
+
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
+        .prefetch_related(
+            "tasks", Prefetch("tasks__resource", Resource.objects.with_ds_annotations())
+        )
         .select_related("commune__department"),
         pk=project_id,
     )
@@ -248,31 +259,6 @@ def project_recommendations_embed(request, project_id=None):
     actions = project.tasks.filter(public=True).order_by("-created_on", "-updated_on")
 
     return render(request, "projects/project/actions_embed.html", locals())
-
-
-@login_required
-def project_actions_inline(request, project_id=None):
-    """Inline Action page for given project"""
-
-    project = get_object_or_404(
-        models.Project.objects.select_related("commune__department"),
-        sites=request.site,
-        pk=project_id,
-    )
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_tasks", project
-    )
-
-    return render(request, "projects/project/actions_inline.html", locals())
 
 
 @login_required
@@ -319,6 +305,16 @@ def project_conversations_new(request, project_id=None):
         .values("id", "attachment", "updated_on")
     )
 
+    private_files = (
+        list(
+            models.Document.objects.filter(project_id=project_id, private=True).values(
+                "id", "created_on", "the_file"
+            )
+        )
+        if has_perm(request.user, "manage_private_documents", project)
+        else []
+    )
+
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -329,6 +325,7 @@ def project_conversations_new(request, project_id=None):
             "advising_position": advising_position,
             "recipients": recipients_data,
             "edl_files": edl_files,
+            "private_files": private_files,
         },
     )
 

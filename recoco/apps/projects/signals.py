@@ -388,13 +388,31 @@ def project_document_uploaded(sender, instance, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
+    verb = (
+        verbs.Document.ADDED_ADVISOR_FILE
+        if instance.private
+        else verbs.Document.ADDED_FILE
+        if instance.the_file
+        else verbs.Document.ADDED_LINK
+    )
+
     # Add a trace
     action.send(
         instance.uploaded_by,
-        verb=verbs.Document.ADDED_FILE if instance.the_file else instance.the_link,
+        verb=verb,
         action_object=instance,
         target=project,
     )
+
+    if instance.private:
+        notification = {
+            "sender": instance.uploaded_by,
+            "verb": verbs.Document.ADDED_ADVISOR_FILE,
+            "action_object": instance,
+            "target": project,
+        }
+
+        notify_advisors_of_project(project, notification, exclude=instance.uploaded_by)
 
 
 ################################################################

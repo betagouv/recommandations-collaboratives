@@ -37,6 +37,7 @@ from reversion.models import Version
 from reversion_compare.views import HistoryCompareDetailView
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.demarches_simplifiees.models import DSMapping, DSResource
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.projects import models as projects
@@ -221,6 +222,7 @@ class BaseResourceDetailView(DetailView):
     """Return the details of given resource"""
 
     model = models.Resource
+    queryset = models.Resource.objects.with_ds_annotations()
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
@@ -305,6 +307,21 @@ class DuplicateResourceView(
             new_resource.sites.set([current_site])
             new_resource.tags.set(resource_to_copy.tags.all())
 
+            for old_ds_resource in resource_to_copy.dsresource_set.all():
+                new_ds_resource = DSResource.objects.create(
+                    name=old_ds_resource.name + str(timezone.now()),
+                    schema=old_ds_resource.schema,
+                    resource=new_resource,
+                )
+                new_ds_resource.departments.set(old_ds_resource.departments.all())
+                for old_mapping in old_ds_resource.ds_mappings.all():
+                    DSMapping.objects.create(
+                        ds_resource=new_ds_resource,
+                        site=old_mapping.site,
+                        enabled=old_mapping.enabled,
+                        mapping=old_mapping.mapping,
+                    )
+
         url = reverse("resources-resource-update", args=[new_resource.id])
         return redirect(f"{url}?is_duplicate=true")
 
@@ -340,19 +357,14 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
 
 class EmbededResourceDetailView(BaseResourceDetailView):
-    model = models.Resource
     template_name = "resources/resource/details_embeded.html"
-    pk_url_kwarg = "resource_id"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if task_id := self.request.GET.get("task_id"):
-            context["task"] = (
-                self.object.recommandations.filter(pk=task_id)
-                .select_related("ds_folder")
-                .first()
-            )
+        if task_id_str := self.request.GET.get("task_id"):
+            task_id = int(task_id_str)
+            context["task"] = self.object.recommandations.filter(pk=task_id).first()
 
         return context
 

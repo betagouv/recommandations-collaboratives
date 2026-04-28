@@ -32,6 +32,7 @@
     {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
     {{ is_switchtender|json_script:"isSwitchtender" }}
     {{ edl_files|json_script:"djangoEdlFiles" }}
+    {{ private_files|json_script:"djangoPrivateFiles" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
