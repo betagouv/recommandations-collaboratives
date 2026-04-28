@@ -38,9 +38,7 @@ const config = {
         advisorCreateProject: resolve('./src/js/apps/advisorCreateProject.js'),
         home: resolve('./src/js/apps/home.js'),
         crm: resolve('./src/js/apps/crm.js'),
-        project: resolve('./src/js/apps/project.js'),
         boardProjects: resolve('./src/js/apps/boardProjects.js'),
-        tasks: resolve('./src/js/apps/tasks.js'),
         embedResource: resolve('./src/js/apps/embedResource.js'),
         advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),
         auth: resolve('./src/js/apps/auth.js'),
@@ -110,7 +108,6 @@ const config = {
         personnalDashboardStyles: resolve(
           './src/js/styles/personnal-dashboard.css.js'
         ),
-        tasksModalStyles: resolve('./src/js/styles/tasks-modal.css.js'),
         switchtenderListStyles: resolve(
           './src/js/styles/switchtender-list.css.js'
         ),

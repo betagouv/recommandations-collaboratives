@@ -6,9 +6,6 @@
                     <div class="d-flex fr-mr-3w">
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
                     </div>
-                    {% if embed_view is not True %}
-                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
-                    {% endif %}
                 </div>
                 {% if advising or is_staff %}
                     <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
@@ -23,19 +20,13 @@
                     <div class="d-flex fr-mr-3w">
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
                     </div>
-                    {% if embed_view is not True %}
-                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
-                    {% endif %}
                 </div>
-                    {% if advising or is_staff %}
-                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                            class="fr-btn fr-btn--secondary"
-                            data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
-                    {% endif %}
+                {% if advising or is_staff %}
+                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                        class="fr-btn fr-btn--secondary"
+                        data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                {% endif %}
             </div>
         </template>
     </div>
-    {% if embed_view is not True %}
-        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_new_tasks_banner.html" %}
-    {% endif %}
 </div>
