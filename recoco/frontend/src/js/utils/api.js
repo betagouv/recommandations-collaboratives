@@ -183,6 +183,10 @@ export function taskNotificationsUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/notifications/`;
 }
 
+export function publishTaskUrl(projectId, taskId) {
+  return `/api/projects/${projectId}/tasks/${taskId}/publish/`;
+}
+
 export function markTaskNotificationsAsReadUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/notifications/mark_all_as_read/`;
 }
@@ -212,7 +216,7 @@ export function resourcePreviewUrl(resourceId, taskId) {
   if (taskId) {
     return `/ressource/${resourceId}/embed?task_id=${taskId}`;
   }
-  return `/ressource/${resourceId}/embed/`;
+  return `/ressource/${resourceId}/embed`;
 }
 
 export function postExternalRessourceUrl() {

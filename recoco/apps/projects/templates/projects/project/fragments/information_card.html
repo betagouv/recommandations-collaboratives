@@ -22,7 +22,7 @@
         {% if "use_advisor_note" in user_project_perms and is_editable %}
             <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-pencil-line fr-text--xs"
                href="{% url "projects-project-topics" project.id %}#advisor-note"
-               data-cy="edit-internal-note">Éditer</a>
+               data-cy="edit-internal-note">Modifier</a>
         {% endif %}
     </div>
     {% if is_advisor_note %}

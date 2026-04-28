@@ -96,7 +96,7 @@
                         {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="3" rect_y="3" rect_width="60" rect_height="18" view_box_size="0 0 65 50" %}
                     </template>
                 </div>
-                <div class="fr-segmented__element">
+                {% comment %} <div class="fr-segmented__element">
                     <input value="tasks"
                            type="radio"
                            {% if recommandations %}checked{% endif %}
@@ -114,7 +114,7 @@
                             {% endif %}
                         </a>
                     </label>
-                </div>
+                </div> {% endcomment %}
                 <div class="fr-segmented__element"
                      {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-files-links" %}
@@ -277,7 +277,7 @@
                                         {% endif %}
                                         {% if advising_position.is_advisor or advising_position.is_observer %}
                                             <div class="d-flex">
-                                                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-5v border-none border-radius-1px"
+                                                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-5v border-radius-1px"
                                                         aria-controls="modal-action"
                                                         title="Fermer"
                                                         type="button"
@@ -294,7 +294,7 @@
                                             </div>
                                         {% else %}
                                             <div class="d-flex">
-                                                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-5v border-none border-radius-1px"
+                                                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-5v border-radius-1px"
                                                         aria-controls="modal-action"
                                                         title="Fermer"
                                                         type="button"

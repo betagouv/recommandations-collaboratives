@@ -119,6 +119,41 @@
   border-radius: 4px;
 }
 
+// Groupe de chunks partageant une meme sous-question
+.exploration-ia-subquestion-group {
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+}
+
+.exploration-ia-subquestion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--light-background-alt-blue-france, #f5f5fe);
+  border-radius: 0 4px 4px 0;
+
+  &__badge {
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    color: var(--light-text-title-grey, #161616);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+
+    span[class^='fr-icon-'] {
+      color: var(--light-accent-blue-france, #000091);
+    }
+  }
+}
+
 // Chunks de reponse IA
 .exploration-ia-chunk {
   padding: 1rem;

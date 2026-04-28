@@ -11,15 +11,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from recoco.apps.survey.models import Answer
-from recoco.utils import has_perm_or_403
+from recoco.utils import has_perm, has_perm_or_403
 
-from .. import models, signals
+from ...conversations import models as conversation_models
+from ...conversations import signals as conversation_signals
+from .. import models
 from ..forms import DocumentUploadForm
 from ..utils import get_advising_context_for_project, is_regional_actor_for_project
 
@@ -36,6 +39,7 @@ def document_list(request, project_id=None):
     )
 
     has_perm_or_403(request.user, "manage_documents", project)
+    with_advisor_files = has_perm(request.user, "manage_private_documents", project)
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -48,8 +52,17 @@ def document_list(request, project_id=None):
     all_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]
     )
-    pinned_files = all_files.filter(pinned=True)
-    links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
+
+    public_files = all_files.filter(private=False)
+    private_files = (
+        all_files.filter(private=True)
+        if with_advisor_files
+        else models.Document.objects.none()
+    )
+    pinned_files = public_files.filter(pinned=True)
+    links = models.Document.objects.filter(project_id=project.pk).exclude(
+        the_link=None, private=False
+    )
 
     # Fetch Answers from Surveys if they have attachments
     answers_with_files = Answer.objects.filter(session__project_id=project_id).exclude(
@@ -71,7 +84,8 @@ def document_list(request, project_id=None):
         "projects/project/documents.html",
         context={
             "project": project,
-            "all_files": all_files,
+            "public_files": public_files,
+            "private_files": private_files,
             "pinned_files": pinned_files,
             "links": links,
             "is_regional_actor": is_regional_actor,
@@ -97,12 +111,23 @@ def document_upload(request, project_id):
             instance.project = project
             instance.site = request.site
             instance.uploaded_by = request.user
+            instance.private = False
+
+            msg = conversation_models.Message(
+                posted_by=instance.uploaded_by, project=project
+            )
+            node = conversation_models.DocumentNode(
+                document=instance, position=1, message=msg
+            )
 
             try:
-                instance.save()
+                with transaction.atomic():
+                    instance.save()
+                    msg.save()
+                    node.save()
 
-                signals.document_uploaded.send(
-                    sender=document_upload, instance=instance
+                conversation_signals.message_posted.send(
+                    sender=document_upload, message=msg
                 )
 
                 messages.success(
@@ -110,7 +135,7 @@ def document_upload(request, project_id):
                     "Le document a bien été enregistré",
                 )
 
-            except IntegrityError:
+            except IntegrityError as _e:
                 messages.error(request, "Impossible de sauver le document")
 
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))

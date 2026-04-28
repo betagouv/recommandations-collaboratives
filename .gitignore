@@ -50,5 +50,4 @@ docker/docker-compose.local.yml
 
 # local scripts
 scripts/*_local.py
-recoco/frontend/.env.development
-recoco/frontend/.env.production
+recoco/frontend/.env.*

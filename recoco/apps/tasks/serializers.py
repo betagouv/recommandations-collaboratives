@@ -9,7 +9,6 @@ from rest_framework import serializers
 
 from recoco.apps.addressbook.models import Contact
 from recoco.apps.addressbook.serializers import NestedContactSerializer
-from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import reactivate_if_necessary
@@ -20,6 +19,7 @@ from recoco.apps.resources.serializers import (
 )
 from recoco.rest_api.serializers import BaseSerializerMixin
 
+from ..conversations.serializers import MessageSerializer
 from .models import Task, TaskFollowup
 
 
@@ -99,7 +99,6 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
             "resource",
             "resource_id",
             "topic",
-            "ds_folder",
             "notifications",
             "followups_count",
             "comments_count",
@@ -120,7 +119,6 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
     created_by = UserSerializer(read_only=True)
     document = DocumentSerializer(read_only=True, many=True)
     topic = TopicSerializer(read_only=True)
-    ds_folder = DSFolderSerializer(read_only=True)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
@@ -184,6 +182,42 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
                 f"Invalid resource ID {value} for site {self.current_site}."
             )
         return value
+
+
+class TaskWithMessageSerializer(TaskSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "status",
+            "visited",
+            "public",
+            "priority",
+            "order",
+            "intent",
+            "content",
+            "contact",
+            "contact_id",
+            "created_on",
+            "updated_on",
+            "created_by",
+            "document",
+            "resource",
+            "resource_id",
+            "topic",
+            "notifications",
+            "followups_count",
+            "comments_count",
+            "site",
+            "message",
+        ]
+        read_only_fields = [
+            "created_on",
+            "updated_on",
+            "created_by",
+        ]
+
+    message = MessageSerializer(read_only=True)
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):

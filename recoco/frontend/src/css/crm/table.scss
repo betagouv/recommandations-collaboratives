@@ -17,18 +17,23 @@
     td {
       padding: 0.375rem 0.5rem;
     }
-    .column {
-      &--large {
-        width: 22%;
-        max-width: 22%;
+    // Largeurs des colonnes via colgroup
+    col {
+      &.col--large {
+        width: 20%;
       }
-      &--medium {
+      &.col--medium {
         width: 15%;
-        max-width: 15%;
       }
-      &--small {
-        width: 8%;
-        max-width: 8%;
+      &.col--small {
+        width: 10%;
+      }
+      &.col--fixed-180 {
+        min-width: 180px;
+      }
+
+      &.col--fixed-160 {
+        min-width: 160px;
       }
     }
     .fr-link {

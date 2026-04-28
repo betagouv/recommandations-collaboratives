@@ -33,6 +33,12 @@ Alpine.data('FormResource', (resourceId) => {
       contacts: [],
     },
     init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDuplicate = urlParams.get('is_duplicate');
+      if (isDuplicate) {
+        this.$store.onLeaveAlert.setDirty(true);
+      }
+
       Alpine.nextTick(() => {
         this.initFormFields(this.$refs.formResource);
       });
@@ -123,6 +129,7 @@ Alpine.data('FormResource', (resourceId) => {
       // Form is valid - let the standard form submission proceed
       // The hidden fields will carry the complex data (status, content, contacts)
       this.$nextTick(() => {
+        this.$store.onLeaveAlert.setDirty(false);
         this.$refs.formResource.submit();
       });
     },
@@ -183,6 +190,9 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     validateField(field) {
+      if (!this.$store.onLeaveAlert.isDirty) {
+        this.$store.onLeaveAlert.setDirty(true);
+      }
       this.validate();
       if (
         (!this.formFields[field.name].pristine) &&

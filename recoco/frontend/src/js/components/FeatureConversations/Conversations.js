@@ -1,5 +1,6 @@
 import Alpine from '../../utils/globals';
 import { ToastType } from '../../models/toastType';
+import TASK_STATUSES from '../../config/statuses';
 import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
@@ -11,20 +12,26 @@ import api, {
   editTaskUrl,
   markTaskNotificationAsVisited,
   conversationsMessageMarkAsReadUrl,
+  resourcePreviewUrl,
+  publishTaskUrl,
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
-import { formatDateFrench } from '../../utils/date';
+import { formatDate } from '../../utils/date';
+import { formatFileSize } from '../../utils/file';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
+  TASK_STATUSES,
+  formatDate,
+  editTaskUrl,
+  resourcePreviewUrl,
+  formatFileSize,
   projectId,
   currentUserId,
   feed: {},
-  messages: [],
   messagesLoaded: false,
   showMessages: false,
   sendingMessage: false,
   tasks: [],
-  users: [],
   messagesParticipants: [],
   documents: [],
   contacts: [],
@@ -35,6 +42,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     new_messages: 0,
     tasks: 0,
     unread_recommendations: 0,
+    draft_recommendations: 0,
     contacts: 0,
     documents: 0,
   },
@@ -47,8 +55,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   lastMessageDate: null,
   elementToDelete: null,
   theFiles: [],
-  formatDateFrench,
-  editTaskUrl,
+  isSwitchtender: JSON.parse(
+    document.getElementById('isSwitchtender').textContent
+  ),
   async init() {
     this.getMessagesParticipants();
     await this.getActivities();
@@ -58,17 +67,189 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    this.$store.tasksData._subscribe(() => {
-      this.tasks = this.$store.tasksData.tasks;
+    Alpine.store('tasksData')._subscribe(async () => {
+      this.tasks = Alpine.store('tasksData').tasks;
     });
-    this.$store.tasksData._notify();
+    Alpine.store('tasksData')._notify();
     this.countElementsInDiscussion();
+    this.extractSharedContents().then(async () => {
+      this.loadExternalFiles();
+      this.loadPrivateFiles();
+      await this.detectOpenActionsFromHash();
+    });
+    window.addEventListener('hashchange', async () => {
+      await this.detectOpenActionsFromHash();
+    });
+  },
+  async detectOpenActionsFromHash() {
+    await this.detectTaskOpenFromHash();
+    this.detectTasksOpenFromHash();
+    this.detectFilesOpenFromHash();
+    this.detectDraftsOpenFromHash();
+  },
+  async detectTaskOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#action-(\d+)/);
+    if (urlFromHash) {
+      const taskId = parseInt(urlFromHash[1], 10);
+      const recommendation = this.feed.recommendations.find(
+        (recommendation) => recommendation.id === taskId
+      );
+      if (!recommendation) {
+        return;
+      }
+      const message = this.getMessageById(recommendation.messageId);
+      if (Alpine.store('sharedContentsPanel').isOpen) {
+        Alpine.store('sharedContentsPanel').close();
+      }
+      await this.openResourcePreviewPanel(recommendation, message);
+    }
+  },
+  detectTasksOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#actions/);
+    if (urlFromHash) {
+      if (Alpine.store('resourcePreviewPanel').isOpen) {
+        Alpine.store('resourcePreviewPanel').close();
+      }
+      Alpine.store('sharedContentsPanel').open('recommendations');
+    }
+  },
+  detectFilesOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#files/);
+    if (urlFromHash) {
+      if (Alpine.store('resourcePreviewPanel').isOpen) {
+        Alpine.store('resourcePreviewPanel').close();
+      }
+      Alpine.store('sharedContentsPanel').open('files');
+    }
+  },
+  detectDraftsOpenFromHash() {
+    const urlFromHash = location.hash.match(/^#drafts/);
+    if (urlFromHash) {
+      Alpine.store('sharedContentsPanel').open('draft-recommendations');
+    }
+  },
+  /**
+   * Load external files from EDL (État des lieux) into the shared contents panel store
+   */
+  loadExternalFiles() {
+    const edlFilesElement = document.getElementById('djangoEdlFiles');
+    if (edlFilesElement && Alpine.store('sharedContentsPanel')) {
+      try {
+        const edlFiles = JSON.parse(edlFilesElement.textContent);
+        Alpine.store('sharedContentsPanel').setExternalFiles(edlFiles || []);
+        this.countOf.documents += edlFiles.length;
+      } catch (error) {
+        console.error('Failed to parse EDL files:', error);
+      }
+    }
+  },
+  /**
+   * Load private files from project into the shared contents panel store
+   */
+  loadPrivateFiles() {
+    const privateFilesElement = document.getElementById('djangoPrivateFiles');
+    if (privateFilesElement && this.$store.sharedContentsPanel) {
+      try {
+        const privateFiles = JSON.parse(privateFilesElement.textContent);
+        this.$store.sharedContentsPanel.setPrivateFiles(privateFiles || []);
+
+        this.countOf.documents += privateFiles.length;
+      } catch (error) {
+        console.error('Failed to parse private files:', error);
+      }
+    }
   },
   getRecommendationById(id) {
     const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
     return foundRecommendation;
+  },
+  async handleOpenPannelSharedContents(tabName) {
+    await this.extractSharedContents();
+    Alpine.store('sharedContentsPanel').open(tabName);
+  },
+  /**
+   * Extract recommendations and files from feed elements and populate the sharedContentsPanel store
+   */
+  async extractSharedContents() {
+    if (!this.feed.elements) return;
+
+    const recommendations = [];
+    const files = [];
+    const draftRecommendations = this.tasks.filter(
+      (task) => task.public === false
+    );
+
+    // Iterate over feed elements in reverse (most recent first)
+    const sortedElements = [...this.feed.elements]
+      .filter((el) => el.type === 'message' && !el.deleted)
+      .sort((a, b) => {
+        const dateElementA = Date.parse(a.created ?? 0);
+        const dateElementB = Date.parse(b.created ?? 0);
+        return dateElementB - dateElementA; // Descending order (most recent first)
+      });
+
+    for (const message of sortedElements) {
+      if (!message.nodes) continue;
+
+      for (const node of message.nodes) {
+        if (node.type === 'RecommendationNode') {
+          const recommendation = this.getRecommendationById(
+            node.recommendation_id
+          );
+          if (recommendation) {
+            recommendations.push({
+              ...recommendation,
+              messageId: message.id,
+              messageCreated: message.created,
+              messagePostedBy: message.posted_by,
+              nodeId: node.id,
+            });
+          }
+        } else if (node.type === 'DocumentNode') {
+          // Fetch document if not in cache to get filename and other properties
+          const document = await this.getDocumentById(node.document_id);
+          if (document) {
+            files.push({
+              ...document,
+              messageId: message.id,
+              messageCreated: message.created,
+              nodeId: node.id,
+            });
+          }
+        }
+      }
+    }
+    this.feed.recommendations = recommendations;
+
+    // Update the store
+    if (Alpine.store('sharedContentsPanel')) {
+      Alpine.store('sharedContentsPanel').setRecommendations(recommendations);
+      Alpine.store('sharedContentsPanel').setDraftRecommendations(
+        draftRecommendations
+      );
+      Alpine.store('sharedContentsPanel').setFiles(files);
+    }
+
+    // Update draft count
+    this.countOf.draft_recommendations = draftRecommendations.length;
+  },
+  /**
+   * Open a recommendation from the shared contents panel
+   * Closes the panel list and opens the resource detail panel
+   */
+  async openRecommendationFromPanel(recommendation) {
+    // Close the shared contents panel but mark for re-open
+    Alpine.store('sharedContentsPanel').closeForDetail();
+
+    // Find the corresponding message
+    const message = this.getMessageById(recommendation.messageId);
+
+    if (message && recommendation) {
+      // Open the resource preview panel
+      await this.openResourcePreviewPanel(recommendation, message);
+    }
   },
   getMessageById(id) {
     return this.feed.messages.find((message) => message.id === +id);
@@ -121,7 +302,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       );
       this.messagesParticipants = [
         ...participants.data,
-        ...this.$store.djangoData.recipients.map((recipient) => ({
+        ...Alpine.store('djangoData').recipients.map((recipient) => ({
           id: +recipient.id,
           first_name: recipient.first_name,
           last_name: recipient.last_name,
@@ -179,7 +360,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   getUserById(id) {
     if (id === this.currentUserId) {
-      return this.$store.djangoData.currentUser;
+      return Alpine.store('djangoData').currentUser;
     }
     const foundUser = this.messagesParticipants.find((user) => user.id === +id);
     if (!foundUser) {
@@ -187,10 +368,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const user = {};
       user.data = {
         id: +id,
-        place: this.users.length,
-        first_name: 'John',
-        last_name: 'Doe',
-        email: 'john.doe@example.com',
+        first_name: 'Inconnu',
+        last_name: 'Inconnu',
+        email: 'inconnu@example.com',
         phone_no: '0642424242',
         last_login: {
           date: '2021-01-01',
@@ -217,9 +397,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return `${this.countOf.new_messages} élément${this.countOf.new_messages > 1 ? 's' : ''} non lu${this.countOf.new_messages > 1 ? 's' : ''}`;
   },
   async getDocumentById(id) {
-    const foundDocument = this.documents.find(
+    const foundDocumentIndex = this.documents.findIndex(
       (document) => document.id === +id
     );
+
+    const foundDocument =
+      foundDocumentIndex !== -1 ? this.documents[foundDocumentIndex] : null;
+
     if (!foundDocument) {
       try {
         const document = await api.get(documentUrl(this.projectId, id));
@@ -241,6 +425,33 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
+  async publishDraftRecommendation(recommendation) {
+    recommendation.isLoading = true;
+    try {
+      const messageResponse = await api.post(
+        publishTaskUrl(this.projectId, recommendation.id)
+      );
+
+      this.feed.elements.push({
+        ...messageResponse.data.message,
+        type: 'message',
+      });
+      // extract shared contents
+      await this.extractSharedContents();
+      this.scrollToNewMessage();
+      // Update counts
+      this.countOf.tasks += 1;
+      this.countOf.draft_recommendations -= 1;
+      // Delete the draft recommendation from the tasks list
+      this.$store.sharedContentsPanel.removeDraftRecommendation(
+        recommendation.id
+      );
+    } catch (error) {
+      throw new Error('Failed to publish draft recommendation', error);
+    } finally {
+      recommendation.isLoading = false;
+    }
+  },
   async sendFormMessage() {
     this.sendingMessage = true;
     if (this.isEditorInEditMode) {
@@ -251,9 +462,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } else {
       await this.sendMessage();
     }
-    this.$store.onLeaveAlert.setDirty(false);
+    Alpine.store('onLeaveAlert').setDirty(false);
   },
   uploadFile(file) {
+    file.private = false;
     const formData = new FormData();
     formData.append('the_file', file);
     return api.post(documentsUrl(this.projectId), formData, {
@@ -263,10 +475,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     });
   },
   async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
-    if (!this.$store.editor.currentMessageJSON) return;
+    if (!Alpine.store('editor').currentMessageJSON) return;
 
-    const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-      this.$store.editor.currentMessageJSON
+    const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
+      Alpine.store('editor').currentMessageJSON
     );
 
     // Only upload files for *new* documents
@@ -284,7 +496,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         const errorMessage =
           error.response?.data?.the_file?.[0] ||
           "Contactez nous via le chat pour obtenir de l'aide.";
-        this.$store.app.displayToastMessage({
+        Alpine.store('app').displayToastMessage({
           message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
           timeout: 5000,
           type: ToastType.error,
@@ -332,13 +544,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.scrollToNewMessage();
       }
 
-      this.$store.editor.clearEditorContent();
+      Alpine.store('editor').clearEditorContent();
       this.updateCountOfElementsInDiscussion(messageResponse.data);
       this.messageIdToReply = null;
       this.sendingMessage = false;
     } catch (error) {
       this.sendingMessage = false;
-      this.$store.app.displayToastMessage({
+      Alpine.store('app').displayToastMessage({
         message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
         timeout: 5000,
         type: ToastType.error,
@@ -387,10 +599,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.countOf.messages += change;
     }
   },
-  onClickHandleReply(message) {
-    this.messageIdToReply = message.id;
+  onClickHandleReply(messageId) {
+    this.messageIdToReply = messageId;
     this.isEditorInReplyMode = true;
-    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+    Alpine.raw(Alpine.store('editor').editorInstance).commands.focus();
   },
   onClickCancelReply() {
     this.messageIdToReply = null;
@@ -436,18 +648,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         };
       }
     });
-    const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
+    const tiptapJson = Alpine.store('editor').convertNodesToTipTapJson(
       message.nodes
     );
 
-    Alpine.raw(this.$store.editor.editorInstance).commands.setContent(
+    Alpine.raw(Alpine.store('editor').editorInstance).commands.setContent(
       tiptapJson
     );
-    this.$store.editor.currentMessageJSON = tiptapJson;
+    Alpine.store('editor').currentMessageJSON = tiptapJson;
 
-    const { to } = Alpine.raw(this.$store.editor.editorInstance).state
+    const { to } = Alpine.raw(Alpine.store('editor').editorInstance).state
       .selection;
-    Alpine.raw(this.$store.editor.editorInstance)
+    Alpine.raw(Alpine.store('editor').editorInstance)
       .chain()
       .focus()
       .setTextSelection(to)
@@ -487,10 +699,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.isEditorInEditMode = activateEditMode;
 
     if (!activateEditMode) {
-      Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
+      Alpine.raw(Alpine.store('editor').editorInstance).commands.clearContent();
     }
   },
-  async onClickRessourceConsummeNotification(recommendation, message) {
+  async onClickRessourceConsumeNotification(recommendation, message) {
     trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
@@ -509,17 +721,50 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       throw new Error('Failed to mark task notification as visited', error);
     }
   },
+  async openResourcePreviewPanel(recommendation, message) {
+    try {
+      // Mark as visited and track analytics
+      await this.onClickRessourceConsumeNotification(recommendation, message);
+      if (Alpine.store('resourcePreviewPanel')) {
+        Alpine.store('resourcePreviewPanel').open(recommendation, message);
+      } else {
+        console.error('resourcePreviewPanel store not found!');
+      }
+    } catch (error) {
+      console.error('Error in openResourcePreviewPanel:', error);
+    }
+  },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(
-      (message) => message.id === messageIdToEdit
+      (m) => m.id === messageIdToEdit
     );
-    this.feed.elements[messageIndex] = { ...message, type: 'message' };
+
+    // Invalidate document cache for documents in this message
+    if (message.nodes) {
+      for (const node of message.nodes) {
+        if (node.type === 'DocumentNode' && node.document_id) {
+          const docIndex = this.documents.findIndex(
+            (doc) => doc.id === +node.document_id
+          );
+          if (docIndex !== -1) {
+            this.documents.splice(docIndex, 1);
+          }
+        }
+      }
+    }
+
+    // Replace the message in the feed using splice to force Alpine.js reactivity
+    this.feed.elements.splice(messageIndex, 1, { ...message, type: 'message' });
   },
   // Simple ifchanged implementation
   shouldShowDate(element) {
     const dateString =
       element.type === 'message' ? element.created : element.timestamp;
-    const dateToCompare = this.formatDateFrench(dateString);
+    const dateToCompare = this.formatDate(dateString, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
     if (dateToCompare !== this.lastMessageDate) {
       this.lastMessageDate = dateToCompare;
       return true;
@@ -536,17 +781,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
 
   async goToCreateRecommendation(url) {
-    if (this.$store.editor.currentMessageJSON) {
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
+    if (Alpine.store('editor').currentMessageJSON) {
+      Alpine.store('onLeaveAlert').setDirty(false);
+      const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
+        Alpine.store('editor').currentMessageJSON
       );
       if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
         const documentNode = parsedNodesFromEditor.find(
           (node) => node.type === 'DocumentNode'
         );
         // connect to the database
-        await this.$store.idbObjectStoreMgmt.init();
-        const value = await this.$store.idbObjectStoreMgmt.add({
+        await Alpine.store('idbObjectStoreMgmt').init();
+        const value = await Alpine.store('idbObjectStoreMgmt').add({
           file: documentNode.file,
         });
       }

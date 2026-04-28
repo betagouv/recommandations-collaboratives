@@ -17,7 +17,7 @@
 {% endblock js %}
 {% block content %}
     <div class="row justify-content-center">
-        <div class="col-10 fr-p-3w" x-data="ExplorationIA({ projectId: {{ project.id }}, siteId: {{ request.site.id }}, apiToken: '{{ ml_api_token|default:'' }}', projectContext: `{{ project.name }}
+        <div class="col-10 fr-p-3w" x-data="ExplorationIA({ projectId: {{ project.id }}, siteId: {{ request.site.id }}, projectContext: `{{ project.name }}
             {% if project.commune %}- {{ project.commune.name }}{% endif %}
             .
             {% if project.description %}{{ project.description|escapejs }}{% endif %}
@@ -133,8 +133,8 @@
                                      :data-test-id="'exploration-ia-source-card-' + citation.label">
                                     <div class="d-flex align-items-center gap-2 fr-mb-1v">
                                         <span class="fr-badge fr-badge--sm"
-                                              :class="{ 'fr-badge--green-emeraude': citation.source_type === 'resource', 'fr-badge--purple-glycine': citation.source_type === 'recommendation' }"
-                                              x-text="citation.source_type === 'resource' ? 'Ressource' : 'Reco'"></span>
+                                              :class="{ 'fr-badge--green-emeraude': citation.source_type.toLocaleLowerCase() === 'resource', 'fr-badge--purple-glycine': citation.source_type.toLocaleLowerCase() === 'recommendation' }"
+                                              x-text="citation.source_type.toLocaleLowerCase() === 'resource' ? 'Ressource' : 'Reco'"></span>
                                         <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                               x-text="'#' + citation.label"></span>
                                     </div>
@@ -284,39 +284,55 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <!-- Liste des chunks de reponse -->
-                                    <template x-for="(chunk, index) in answerChunks" :key="index">
-                                        <div class="exploration-ia-chunk"
-                                             :class="{ 'exploration-ia-chunk--with-source': chunk.sources && chunk.sources.length > 0, 'exploration-ia-chunk--selected': isChunkSelected(index) }"
-                                             @click="chunk.sources && chunk.sources.length > 0 ? toggleChunkSelection(index) : null"
-                                             @mouseenter="highlightSources(chunk.sources)"
-                                             @mouseleave="clearHighlight()"
-                                             :style="chunk.sources && chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
-                                             :data-test-id="'exploration-ia-chunk-' + index">
-                                            <!-- Checkbox de selection -->
-                                            <div class="d-flex align-items-start gap-3">
-                                                <div class="exploration-ia-chunk__checkbox"
-                                                     x-show="chunk.sources && chunk.sources.length > 0">
-                                                    <input type="checkbox"
-                                                           class="fr-checkbox"
-                                                           :id="'chunk-select-' + index"
-                                                           :checked="isChunkSelected(index)"
-                                                           @click.stop
-                                                           @change="toggleChunkSelection(index)">
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <!-- Texte du chunk (avec support Markdown) -->
-                                                    <div class="exploration-ia-chunk__text" x-html="parseMarkdown(chunk.text)"></div>
-                                                    <!-- Badges des sources -->
-                                                    <div class="exploration-ia-chunk__sources fr-mt-1w"
-                                                         x-show="chunk.sources && chunk.sources.length > 0">
-                                                        <template x-for="sourceLabel in chunk.sources" :key="sourceLabel">
-                                                            <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
-                                                                  x-text="'Source ' + sourceLabel"></span>
-                                                        </template>
+                                    <!-- Liste des chunks de reponse, groupes par sous-question -->
+                                    <template x-for="(group, groupIdx) in groupedAnswerChunks" :key="groupIdx">
+                                        <div class="exploration-ia-subquestion-group fr-mb-3w">
+                                            <div x-show="group.subQuestion"
+                                                 class="exploration-ia-subquestion fr-mb-2w"
+                                                 :data-test-id="'exploration-ia-subquestion-' + groupIdx">
+                                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus exploration-ia-subquestion__badge"
+                                                      x-text="'Sous-question ' + (groupIdx + 1) + ' / ' + groupedAnswerChunks.length"
+                                                      :data-test-id="'exploration-ia-subquestion-badge-' + groupIdx"></span>
+                                                <h4 class="exploration-ia-subquestion__title fr-text--md fr-mb-0">
+                                                    <span class="fr-icon-question-line fr-mr-1v" aria-hidden="true"></span>
+                                                    <span x-text="group.subQuestion"></span>
+                                                </h4>
+                                            </div>
+                                            <template x-for="item in group.chunks" :key="item.index">
+                                                <div class="exploration-ia-chunk"
+                                                     :class="{ 'exploration-ia-chunk--with-source': item.chunk.sources && item.chunk.sources.length > 0, 'exploration-ia-chunk--selected': isChunkSelected(item.index) }"
+                                                     @click="item.chunk.sources && item.chunk.sources.length > 0 ? toggleChunkSelection(item.index) : null"
+                                                     @mouseenter="highlightSources(item.chunk.sources)"
+                                                     @mouseleave="clearHighlight()"
+                                                     :style="item.chunk.sources && item.chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
+                                                     :data-test-id="'exploration-ia-chunk-' + item.index">
+                                                    <!-- Checkbox de selection -->
+                                                    <div class="d-flex align-items-start gap-3">
+                                                        <div class="exploration-ia-chunk__checkbox"
+                                                             x-show="item.chunk.sources && item.chunk.sources.length > 0">
+                                                            <input type="checkbox"
+                                                                   class="fr-checkbox"
+                                                                   :id="'chunk-select-' + item.index"
+                                                                   :checked="isChunkSelected(item.index)"
+                                                                   @click.stop
+                                                                   @change="toggleChunkSelection(item.index)">
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <!-- Texte du chunk (avec support Markdown) -->
+                                                            <div class="exploration-ia-chunk__text"
+                                                                 x-html="parseMarkdown(item.chunk.text)"></div>
+                                                            <!-- Badges des sources -->
+                                                            <div class="exploration-ia-chunk__sources fr-mt-1w"
+                                                                 x-show="item.chunk.sources && item.chunk.sources.length > 0">
+                                                                <template x-for="sourceLabel in item.chunk.sources" :key="sourceLabel">
+                                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
+                                                                          x-text="'Source ' + sourceLabel"></span>
+                                                                </template>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </template>
                                         </div>
                                     </template>
                                 </div>
@@ -340,8 +356,8 @@
                                                 <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                                       x-text="'Source ' + citation.label"></span>
                                                 <span class="fr-badge fr-badge--sm fr-badge--no-icon"
-                                                      :class="{ 'fr-badge--green-emeraude': citation.source_type === 'resource', 'fr-badge--purple-glycine': citation.source_type === 'recommendation' }"
-                                                      x-text="getSourceTypeLabel(citation.source_type)"></span>
+                                                      :class="{ 'fr-badge--green-emeraude': citation.source_type.toLocaleLowerCase() === 'resource', 'fr-badge--purple-glycine': citation.source_type.toLocaleLowerCase() === 'recommendation' }"
+                                                      x-text="getSourceTypeLabel(citation.source_type.toLocaleLowerCase())"></span>
                                             </div>
                                             <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
                                             <button @click.stop="openResourceModal(citation)"
@@ -488,14 +504,24 @@
                                                           x-show="resource.label"
                                                           x-text="'#' + resource.label"></span>
                                                 </div>
-                                                <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
-                                                   class="fr-btn fr-btn--primary fr-btn--sm"
-                                                   target="_blank"
-                                                   x-show="resource.resource_id"
-                                                   title="Créer une recommandation à partir de cette ressource">
-                                                    <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
-                                                    Créer une recommandation
-                                                </a>
+                                                <template x-if="resource.resource_id">
+                                                    <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
+                                                       class="fr-btn fr-btn--primary fr-btn--sm"
+                                                       target="_blank"
+                                                       title="Créer une recommandation à partir de cette ressource">
+                                                        <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                                        Créer une recommandation
+                                                    </a>
+                                                </template>
+                                                <template x-if="!resource.resource_id">
+                                                    <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&push_type=noresource' + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
+                                                       class="fr-btn fr-btn--primary fr-btn--sm"
+                                                       target="_blank"
+                                                       title="Créer une recommandation à partir de cette ressource">
+                                                        <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                                        Créer une recommandation
+                                                    </a>
+                                                </template>
                                             </div>
                                             <!-- Contenu en deux colonnes -->
                                             <div class="row">
@@ -516,7 +542,7 @@
                                                     <!-- Lien vers la fiche (ouvre la modale) -->
                                                     <div class="fr-mt-2w">
                                                         <button @click="openResourceModal({ resource_id: resource.resource_id, reco_id: resource.reco_id, project_id: resource.project_id, source_type: resource.source_type, title: resource.title, content: resource.content, label: resource.label })"
-                                                                class="fr-link fr-link--sm"
+                                                                class="fr-btn fr-btn--secondary fr-btn--sm"
                                                                 type="button"
                                                                 x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
                                                             <span class="fr-icon-eye-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>

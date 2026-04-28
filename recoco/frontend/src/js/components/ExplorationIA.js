@@ -4,11 +4,12 @@ import DOMPurify from 'dompurify';
 import { ToastType } from '../models/toastType';
 
 const ML_API_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL;
+const ML_API_TOKEN = import.meta.env.VITE_ML_API_TOKEN;
 
 Alpine.data('ExplorationIA', (config = {}) => ({
   // === CONFIGURATION ===
   projectId: config.projectId || null,
-  apiToken: config.apiToken || 'blahblah',
+  apiToken: config.apiToken || ML_API_TOKEN,
   siteId: config.siteId || null,
 
   // === CONTEXTE DU PROJET ===
@@ -79,63 +80,67 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   loadMockData() {
     this.answerChunks = [
       {
-        text: "Voici les informations trouvées concernant les aides pour mettre en place un jardin partagé.",
-        sources: []
+        text: 'Voici les informations trouvées concernant les aides pour mettre en place un jardin partagé.',
+        sources: [],
       },
       {
         text: "Le plan de relance a prévu un budget de **17 millions d'euros en 2021** pour financer les jardins partagés et collectifs via des appels à projets départementaux gérés par les DDT (Directions Départementales des Territoires).",
-        sources: ["1.1"]
+        sources: ['1.1'],
       },
       {
         text: "Les taux de subvention varient selon le bénéficiaire :\n- **Associations** : jusqu'à **80%** du coût global du projet\n- **Collectivités territoriales et leurs groupements** : jusqu'à **50%**\n- **Bailleurs sociaux (publics ou privés)** : jusqu'à **50%**",
-        sources: ["1.1"]
+        sources: ['1.1'],
       },
       {
         text: "Les dépenses éligibles incluent les investissements **matériels et immatériels**, comme les prestations d'ingénierie ou les études de sols.",
-        sources: ["1.1"]
+        sources: ['1.1'],
       },
       {
-        text: "Vous pouvez aussi consulter les aides régionales et européennes en cliquant sur ce lien : [Aides et appels à projets de la région Île-de-France](https://www.iledefrance.fr/aides-et-appels-a-projets).",
-        sources: ["2.1"]
+        text: 'Vous pouvez aussi consulter les aides régionales et européennes en cliquant sur ce lien : [Aides et appels à projets de la région Île-de-France](https://www.iledefrance.fr/aides-et-appels-a-projets).',
+        sources: ['2.1'],
       },
       {
         text: "Un guide méthodologique sur l'accès collectif au foncier (mis à jour en 2007) évoque des montages juridiques et financiers, comme l'association des amis d'une SCI, pour faciliter l'obtention de subventions.",
-        sources: ["3.1"]
-      }
+        sources: ['3.1'],
+      },
     ];
 
     this.citations = [
       {
-        label: "1.1",
-        title: "Financer la création de jardins partagés et collectifs",
-        content: "Pour encourager le développement de l'agriculture urbaine, le plan de relance a prévu d'engager un budget global de 17 millions d'euros en 2021...",
+        label: '1.1',
+        title: 'Financer la création de jardins partagés et collectifs',
+        content:
+          "Pour encourager le développement de l'agriculture urbaine, le plan de relance a prévu d'engager un budget global de 17 millions d'euros en 2021...",
         resource_id: 120,
         reco_id: null,
         project_id: null,
-        source_type: "resource"
+        source_type: 'resource',
       },
       {
-        label: "2.1",
-        title: "Bénéficier des aides régionales et européennes",
-        content: "Vous pouvez également retrouver l'ensemble des aides de la région...",
+        label: '2.1',
+        title: 'Bénéficier des aides régionales et européennes',
+        content:
+          "Vous pouvez également retrouver l'ensemble des aides de la région...",
         resource_id: null,
         reco_id: 5623,
         project_id: 2557,
-        source_type: "recommendation"
+        source_type: 'recommendation',
       },
       {
-        label: "3.1",
+        label: '3.1',
         title: "Quelques éléments sur l'articulation SCI - association",
-        content: "Par ailleurs, il existe un guide méthodologique sur l'accès collectif et solidaire au foncier et au bâti...",
+        content:
+          "Par ailleurs, il existe un guide méthodologique sur l'accès collectif et solidaire au foncier et au bâti...",
         resource_id: null,
         reco_id: 4521,
         project_id: 778,
-        source_type: "recommendation"
-      }
+        source_type: 'recommendation',
+      },
     ];
 
     this.foundAnswer = true;
-    this.searchQuery = "Quelles aides puis-je avoir pour mettre en place un jardin partagé ?";
+    this.searchQuery =
+      'Quelles aides puis-je avoir pour mettre en place un jardin partagé ?';
   },
 
   // === RECHERCHE API ML ===
@@ -189,7 +194,11 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         // Ancien format (fallback)
         this.results = this.mapResults(data);
       }
-      console.log('ExplorationIA mapped results:', this.answerChunks, this.citations);
+      console.log(
+        'ExplorationIA mapped results:',
+        this.answerChunks,
+        this.citations
+      );
     } catch (err) {
       this.error = 'Erreur lors de la recherche. Veuillez réessayer.';
       console.error('ExplorationIA search error:', err);
@@ -264,7 +273,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     }
     if (this.currentPhase === 2) {
       // Peut continuer si on a des éléments sélectionnés (étape 1 ou co-recos étape 2)
-      return this.selectedCitationsForStep2.length > 0 || this.selectedCoRecoIds.length > 0;
+      return (
+        this.selectedCitationsForStep2.length > 0 ||
+        this.selectedCoRecoIds.length > 0
+      );
     }
     return false;
   },
@@ -299,7 +311,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
           const citation = this.getCitationByLabel(label);
-          if (citation && !selectedCitations.find((c) => c.label === citation.label)) {
+          if (
+            citation &&
+            !selectedCitations.find((c) => c.label === citation.label)
+          ) {
             selectedCitations.push({
               id: citation.label,
               title: citation.title,
@@ -388,7 +403,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
           coOccurrenceScore: resource.coOccurrenceScore,
           isCoRecommendation: true, // Marqueur pour identifier les co-recos
         }));
-        this.synthesis.resources = [...this.synthesis.resources, ...coRecoItems];
+        this.synthesis.resources = [
+          ...this.synthesis.resources,
+          ...coRecoItems,
+        ];
       }
 
       // Si tous les types sont vides, mettre tout dans resources
@@ -498,9 +516,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   getSelectedChunksData() {
     return this.selectedChunks.map((index) => {
       const chunk = this.answerChunks[index];
-      const sourceCitations = (chunk.sources || []).map((label) =>
-        this.getCitationByLabel(label)
-      ).filter(Boolean);
+      const sourceCitations = (chunk.sources || [])
+        .map((label) => this.getCitationByLabel(label))
+        .filter(Boolean);
       return {
         text: chunk.text,
         sources: chunk.sources,
@@ -601,7 +619,12 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
           const citation = this.getCitationByLabel(label);
-          if (citation && citation.source_type === 'recommendation' && !citation.resource_id && citation.reco_id) {
+          if (
+            citation &&
+            citation.source_type === 'recommendation' &&
+            !citation.resource_id &&
+            citation.reco_id
+          ) {
             if (!recoCitations.find((c) => c.reco_id === citation.reco_id)) {
               recoCitations.push(citation);
             }
@@ -615,16 +638,22 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   async fetchResourceIdFromRecommendation(projectId, recoId) {
     // Appeler l'API pour récupérer les détails de la recommandation et extraire le resource_id
     try {
-      const response = await fetch(`/api/projects/${projectId}/tasks/${recoId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'same-origin',
-      });
+      const response = await fetch(
+        `/api/projects/${projectId}/tasks/${recoId}/`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin',
+        }
+      );
 
       if (!response.ok) {
-        console.warn(`Impossible de récupérer la task ${recoId}:`, response.status);
+        console.warn(
+          `Impossible de récupérer la task ${recoId}:`,
+          response.status
+        );
         return null;
       }
 
@@ -666,7 +695,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       });
 
       if (!response.ok) {
-        console.warn(`Impossible de récupérer la ressource ${resourceId}:`, response.status);
+        console.warn(
+          `Impossible de récupérer la ressource ${resourceId}:`,
+          response.status
+        );
         return null;
       }
 
@@ -684,12 +716,18 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     // Récupérer les resource_ids depuis les recommandations sélectionnées
     const recoCitations = this.getSelectedRecommendationCitations();
     if (recoCitations.length > 0) {
-      console.log('ExplorationIA: Récupération des resource_ids depuis les recommandations...', recoCitations);
+      console.log(
+        'ExplorationIA: Récupération des resource_ids depuis les recommandations...',
+        recoCitations
+      );
 
       // Appeler l'API en parallèle pour chaque recommandation
       const resourceIdPromises = recoCitations.map(async (citation) => {
         if (citation.project_id && citation.reco_id) {
-          const resourceId = await this.fetchResourceIdFromRecommendation(citation.project_id, citation.reco_id);
+          const resourceId = await this.fetchResourceIdFromRecommendation(
+            citation.project_id,
+            citation.reco_id
+          );
           if (resourceId) {
             // Mettre à jour la citation avec le resource_id trouvé
             citation.resource_id = resourceId;
@@ -712,7 +750,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       return;
     }
 
-    console.log('ExplorationIA: Resource IDs pour co-recommandations:', resourceIds);
+    console.log(
+      'ExplorationIA: Resource IDs pour co-recommandations:',
+      resourceIds
+    );
 
     // Sauvegarder les citations sélectionnées avant de passer à l'étape 2
     this.selectedCitationsForStep2 = this.getSelectedCitations();
@@ -754,7 +795,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       const coRecoItems = data.co_recommendations || data || [];
 
       if (coRecoItems.length > 0) {
-        console.log('ExplorationIA: Récupération des détails des ressources...', coRecoItems);
+        console.log(
+          'ExplorationIA: Récupération des détails des ressources...',
+          coRecoItems
+        );
 
         // Appeler l'API en parallèle pour chaque resource_id
         const resourcePromises = coRecoItems.map(async (item) => {
@@ -774,7 +818,8 @@ Alpine.data('ExplorationIA', (config = {}) => ({
           .map(({ resource, score }) => ({
             id: resource.id,
             title: resource.title || 'Sans titre',
-            content: resource.summary || resource.content || resource.text || '',
+            content:
+              resource.summary || resource.content || resource.text || '',
             url: resource.url || null,
             category: resource.category?.name || null,
             tags: resource.tags || [],
@@ -821,18 +866,33 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
     this.selectedChunks.forEach((index) => {
       const chunk = this.answerChunks[index];
-      console.log('getSelectedCitations - processing chunk at index', index, ':', chunk);
+      console.log(
+        'getSelectedCitations - processing chunk at index',
+        index,
+        ':',
+        chunk
+      );
 
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
           const citation = this.getCitationByLabel(label);
-          console.log('getSelectedCitations - label:', label, 'citation found:', citation);
+          console.log(
+            'getSelectedCitations - label:',
+            label,
+            'citation found:',
+            citation
+          );
 
           if (citation) {
-            const existingCitation = citations.find((c) => c.label === citation.label);
+            const existingCitation = citations.find(
+              (c) => c.label === citation.label
+            );
             if (existingCitation) {
               // Ajouter le texte du chunk s'il n'est pas déjà présent
-              if (chunk.text && !existingCitation.chunkTexts.includes(chunk.text)) {
+              if (
+                chunk.text &&
+                !existingCitation.chunkTexts.includes(chunk.text)
+              ) {
                 existingCitation.chunkTexts.push(chunk.text);
               }
             } else {
@@ -853,7 +913,8 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   hasSelectedResources() {
     // Vérifie s'il y a des ressources directes OU des recommandations (qui peuvent avoir des ressources liées)
     const hasDirectResources = this.getSelectedResourceIds().length > 0;
-    const hasRecommendations = this.getSelectedRecommendationCitations().length > 0;
+    const hasRecommendations =
+      this.getSelectedRecommendationCitations().length > 0;
     return hasDirectResources || hasRecommendations;
   },
 
@@ -880,7 +941,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   },
 
   getSelectedCoRecommendations() {
-    return this.coRecommendations.filter((r) => this.selectedCoRecoIds.includes(r.id));
+    return this.coRecommendations.filter((r) =>
+      this.selectedCoRecoIds.includes(r.id)
+    );
   },
 
   // Combine toutes les ressources sélectionnées (étape 1 + étape 2) pour la synthèse
@@ -919,6 +982,22 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     });
 
     return allResources;
+  },
+
+  get groupedAnswerChunks() {
+    // Regroupe les chunks consécutifs partageant la même sous-question
+    // afin d'afficher une section par sous-question à l'étape 1.
+    const groups = [];
+    this.answerChunks.forEach((chunk, index) => {
+      const subQuestion = chunk.sub_question || null;
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && lastGroup.subQuestion === subQuestion) {
+        lastGroup.chunks.push({ chunk, index });
+      } else {
+        groups.push({ subQuestion, chunks: [{ chunk, index }] });
+      }
+    });
+    return groups;
   },
 
   get orderedCitations() {
@@ -997,7 +1076,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       // Si pas de resource_id direct mais c'est une recommandation, essayer de récupérer la ressource liée
       if (!resourceId && citation.reco_id && citation.project_id) {
         console.log('Récupération de la recommandation...', citation);
-        const recommendation = await this.fetchRecommendationDetails(citation.project_id, citation.reco_id);
+        const recommendation = await this.fetchRecommendationDetails(
+          citation.project_id,
+          citation.reco_id
+        );
 
         if (recommendation) {
           this.resourceModal.recommendation = recommendation;
@@ -1042,22 +1124,31 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   async fetchRecommendationDetails(projectId, recoId) {
     try {
-      const response = await fetch(`/api/projects/${projectId}/tasks/${recoId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'same-origin',
-      });
+      const response = await fetch(
+        `/api/projects/${projectId}/tasks/${recoId}/`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin',
+        }
+      );
 
       if (!response.ok) {
-        console.warn(`Impossible de récupérer la recommandation ${recoId}:`, response.status);
+        console.warn(
+          `Impossible de récupérer la recommandation ${recoId}:`,
+          response.status
+        );
         return null;
       }
 
       return await response.json();
     } catch (err) {
-      console.error('Erreur lors de la récupération de la recommandation:', err);
+      console.error(
+        'Erreur lors de la récupération de la recommandation:',
+        err
+      );
       return null;
     }
   },
@@ -1096,7 +1187,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     if (!html || !citationMarkdown) return html;
 
     // 1. Nettoyer la citation (enlever guillemets JSON)
-    const cleanCitation = citationMarkdown.trim().replace(/^["']|["']$/g, '').trim();
+    const cleanCitation = citationMarkdown
+      .trim()
+      .replace(/^["']|["']$/g, '')
+      .trim();
     if (cleanCitation.length < 10) return html;
 
     // 2. Convertir la citation markdown en texte brut
@@ -1112,7 +1206,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
     try {
       const regex = new RegExp(`(${pattern})`, 'gis');
-      return html.replace(regex, '<mark class="exploration-ia-highlight">$1</mark>');
+      return html.replace(
+        regex,
+        '<mark class="exploration-ia-highlight">$1</mark>'
+      );
     } catch (e) {
       console.warn('Erreur regex highlight:', e);
       return html;
@@ -1128,7 +1225,8 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     const citationContent = this.resourceModal.citation.content;
 
     // Construire le contenu complet de la ressource
-    let fullContent = resource.content || resource.text || resource.summary || '';
+    let fullContent =
+      resource.content || resource.text || resource.summary || '';
 
     // Parser le markdown en HTML, puis surligner la citation
     const htmlContent = this.parseMarkdown(fullContent);
@@ -1142,7 +1240,11 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
     const recommendation = this.resourceModal.recommendation;
     const citationContent = this.resourceModal.citation.content;
-    let fullContent = recommendation.content || recommendation.comment || recommendation.intent || '';
+    let fullContent =
+      recommendation.content ||
+      recommendation.comment ||
+      recommendation.intent ||
+      '';
 
     // Parser le markdown en HTML, puis surligner la citation
     const htmlContent = this.parseMarkdown(fullContent);

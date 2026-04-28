@@ -26,6 +26,11 @@ function MapEditor(projectOptions) {
       const geoData = await this.$store.geolocation.initGeolocationData(
         this.project
       );
+      this.project = {
+        ...this.project,
+        location_x: geoData.longitude,
+        location_y: geoData.latitude,
+      };
       this.map = await this.initMap(this.project, geoData);
       const Map = this.map;
       setTimeout(function () {

@@ -2,9 +2,6 @@
 {% load static %}
 {% load guardian_tags %}
 {% load django_vite %}
-{% block js %}
-    {% vite_asset 'js/apps/featureAddContact.js' %}
-{% endblock js %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -38,22 +35,19 @@
             Mettre à jour une note
         </h2>
         <section>
-            {% if form.contact.value %}<template x-if='contact'>{% endif %}
-                <form id="form-projects-update-note" method="post" action="." class="form" novalidate x-data="{message: {text: '', contact:
-                    {% if form.contact.value %}
-                        contact
-                    {% else %}
-                        ''
-                    {% endif %}
-                    } }" {% if form.contact.value %}x-init="message.contact = await getContact({{ form.contact.value }})"{% endif %}>
-                    {% csrf_token %}
-                    <div class="d-flex">
-                        {% include "tools/editor.html" with model="message" can_attach_contact=True contact_var_name="selectedContact" input_name=form.content.name input_required=True initial_content=form.content.value initial_content_escapejs=True %}
-                        <input type="hidden" name="contact" :value="message.contact?.id">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
-                </form>
-                {% if form.contact.value %}</template>{% endif %}
+            <form id="form-projects-update-note"
+                  method="post"
+                  action="."
+                  class="form"
+                  novalidate
+                  x-data="{message: {text: ''}}">
+                {% csrf_token %}
+                <div class="d-flex">
+                    {% include "tools/editor.html" with model="message" input_name=form.content.name input_required=True initial_content=form.content.value initial_content_escapejs=True %}
+                    <input type="hidden" name="contact" :value="message.contact?.id">
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
             {% if note.public and 'use_public_notes' in user_project_perms or not note.public and 'use_private_notes' %}
                 <hr />
                 <div class="d-flex justify-content-end">

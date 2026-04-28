@@ -334,7 +334,12 @@ def test_accept_invite_as_team_member_triggers_action_trace(request, client, pro
         response = client.post(url)
 
     assert response.status_code == 302
-    assert action_models.Action.objects.filter(verb=verbs.Project.JOINED).count() == 1
+    assert (
+        action_models.Action.objects.filter(
+            verb=verbs.Project.JOINED_BY_INVITATION
+        ).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
@@ -581,6 +586,9 @@ def test_anonymous_accepts_invite_as_switchtender(request, client, project):
         "last_name": "Last",
         "organization": "Some Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     url = reverse("invites-invite-accept", args=[invite.pk])
@@ -619,6 +627,9 @@ def test_anonymous_accepts_invite_as_collaborator(request, client, project):
         "last_name": "Last",
         "organization": "Some Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     url = reverse("invites-invite-accept", args=[invite.pk])
@@ -659,6 +670,9 @@ def test_accepting_invitation_assigns_organization_to_current_site(
         "last_name": "Last",
         "organization": "New Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     url = reverse("invites-invite-accept", args=[invite.pk])
@@ -689,6 +703,9 @@ def test_accepting_invitation_updates_organization_with_current_site(
         "last_name": "Last",
         "organization": "New Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     baker.make(addressbook_models.Organization, name=data["organization"])

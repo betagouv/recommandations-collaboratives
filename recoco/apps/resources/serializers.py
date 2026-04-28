@@ -75,15 +75,20 @@ class ResourceDetailSerializer(ResourceSerializer):
             "content",
             "created_on",
             "updated_on",
+            "nb_uses",
             "contacts",
+            "expires_on",
+            "expired",
         ]
         read_only_fields = ResourceSerializer.Meta.read_only_fields + [
             "created_on",
             "updated_on",
             "created_by",
+            "nb_uses",
         ]
 
     contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects, many=True)
+    nb_uses = serializers.IntegerField(required=False)
 
 
 class ResourceWritableSerializer(ResourceDetailSerializer):

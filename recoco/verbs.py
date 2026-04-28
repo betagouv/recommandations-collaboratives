@@ -16,9 +16,9 @@ class User:
 
 
 class Document:
-    ADDED = "a ajouté un lien ou un document"
-    ADDED_FILE = "a ajouté un document"
-    ADDED_LINK = "a ajouté un lien"
+    ADDED_ADVISOR_FILE = "a ajouté dans l'espace conseiller le document"
+    ADDED_FILE = "a ajouté le document"
+    ADDED_LINK = "a ajouté le lien"
 
 
 class CRM:
@@ -29,6 +29,7 @@ class Recommendation:
     DRAFTED = "a créé un brouillon de recommandation"
     CREATED = "a recommandé l'action"
     REMINDER_ADDED = "a créé un rappel sur la recommandation"
+    GOT_RECO_REMINDER = "a reçu un rappel de recommandations"
     COMMENTED = "a commenté la recommandation"
 
     SEEN = "a consulté la recommandation"
@@ -44,13 +45,15 @@ class Recommendation:
 
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
+    INVITATION_OWNER = "a invité en tant que référent"
 
-    JOINED = "a rejoint le dossier"
+    JOINED_BY_INVITATION = "a accepté l'invitation"
     JOINED_OWNER = "a rejoint en tant que référent le dossier"
     NEW_OWNER = "est dorénavant référent sur le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a déposé un nouveau dossier, en attente de validation"
+    SUBMITTED_BY = "a déposé une nouvelle demande"
+    SUBMITTED_BY_ADVISOR = "a créé en tant que conseiller le dossier"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"
@@ -70,19 +73,22 @@ class Project:
     # Only related to advisor kanban
     USER_STATUS_UPDATED = "a changé l'état de son suivi dossier"
 
+    GOT_WHATSUP_REMINDER = "a reçu un rappel de suivi de dossier"
+
     SET_INACTIVE = "a mis en pause le dossier"
     SET_ACTIVE = "a réactivé le dossier"
 
-    EDITED = "a modifé les informations du dossier"
+    EDITED = "a modifié les informations du dossier"
     UPDATE_ADVISORS_NOTE = "a modifié la note interne du dossier"
 
 
 class Survey:
-    STARTED = "a démarré l'état des lieux"
+    STARTED = "a commencé à remplir l'état des lieux"
     UPDATED = "a mis à jour l'état des lieux"
 
 
 class Conversation:
+    PUBLIC_MESSAGE = "a envoyé un message dans l'espace conversation"  # deprecated but reflects state in db so should not be deleted
     PRIVATE_MESSAGE = "a envoyé un message dans l'espace conseillers"
     POST_MESSAGE = "a envoyé un message"
 

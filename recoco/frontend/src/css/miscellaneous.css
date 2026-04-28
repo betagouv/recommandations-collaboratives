@@ -106,7 +106,6 @@
   z-index: 100;
 
   width: max-content;
-  right: 0px;
   top: 80%;
 
   background-color: white;
@@ -186,8 +185,8 @@
 }
 
 .border-grey-light {
-  border: 1px solid #E5E5E5;
-  border-color: #E5E5E5 !important;
+  border: 1px solid #e5e5e5;
+  border-color: #e5e5e5 !important;
 }
 
 .border-blue {

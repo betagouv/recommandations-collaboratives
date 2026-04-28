@@ -16,11 +16,49 @@ export const formatFileSize = (bytes) => {
 /**
  * Obtient l'extension d'un fichier à partir de son nom
  * @param {string} fileName - Nom du fichier
+ * @param {boolean} uppercase - Si true, retourne l'extension en majuscules
  * @returns {string} Extension du fichier
  */
-export const getFileExtension = (fileName) => {
+export const getFileExtension = (fileName, { uppercase = false } = {}) => {
   if (!fileName) return '';
-  return fileName.split('.').pop().toLowerCase();
+  const lastDot = fileName.lastIndexOf('.');
+  if (lastDot <= 0) return '';
+  const ext = fileName.substring(lastDot + 1);
+  return uppercase ? ext.toUpperCase() : ext.toLowerCase();
+};
+
+/**
+ * Obtient le nom du fichier sans son extension
+ * @param {string} fileName - Nom du fichier
+ * @returns {string} Nom du fichier sans extension
+ */
+export const getFilenameWithoutExt = (fileName) => {
+  if (!fileName) return '';
+  const lastDot = fileName.lastIndexOf('.');
+  return lastDot > 0 ? fileName.substring(0, lastDot) : fileName;
+};
+
+/**
+ * Extrait le nom de fichier depuis un chemin ou une URL
+ * @param {string} path - Chemin ou URL du fichier
+ * @returns {string} Nom du fichier
+ */
+export const getFilenameFromPath = (path) => {
+  if (!path) return '';
+  return path.split('/').pop() || '';
+};
+
+/**
+ * Construit l'URL d'un fichier externe (EDL)
+ * @param {string} attachment - Chemin ou URL du fichier
+ * @returns {string} URL complète du fichier
+ */
+export const getExternalFileUrl = (attachment) => {
+  if (!attachment) return '';
+  if (attachment.startsWith('/') || attachment.startsWith('http')) {
+    return attachment;
+  }
+  return '/media/' + attachment;
 };
 
 /**

@@ -59,20 +59,30 @@
                                class="fr-nav__link"
                                data-test-id="button-address-book"
                                {% if 'addressbook-contact' in url_name %}aria-current="page"{% endif %}>
-                            Carnet de contacts <span class="badge text-bg-primary">New</span></a>
+                            Carnet de contacts</a>
+                        </li>
+                    {% endif %}
+                    <!-- Contact Book -->
+                    {% if "manage_resources" in user_site_perms and not is_staff %}
+                        <li>
+                            <a href="{% url 'crm-resource-list' %}"
+                               class="fr-nav__link"
+                               data-test-id="button-resource-list"
+                               {% if 'crm-resource-list' in url_name %}aria-current="page"{% endif %}>
+                            Gestion des fiches ressources </a>
                         </li>
                     {% endif %}
                     {% if is_staff %}
                         <li>
                             <a class="fr-nav__link"
-                               href="https://reco-co.gitbook.io/reco-co/pour-les-administrateurs-dun-portail"
+                               href="https://reco-co.gitbook.io/reco-co"
                                data-test-id="documentation-button-staff"
                                target="_blank">Documentation <span class="visually-hidden">Nouvelle fenêtre</span></a>
                         </li>
                     {% elif is_switchtender or is_administrating_project %}
                         <li>
                             <a class="fr-nav__link"
-                               href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites"
+                               href="https://www.canva.com/design/DAG-fierGRM/F0F43ZX2ZV1wCdFh64X-PA/view#12"
                                data-test-id="documentation-button-advisor"
                                target="_blank">Documentation <span class="visually-hidden">Nouvelle fenêtre</span></a>
                         </li>

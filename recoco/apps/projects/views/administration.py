@@ -42,6 +42,7 @@ from recoco.utils import (
 
 from .. import forms, models
 from ..utils import (
+    assign_advisor,
     get_advising_context_for_project,
     is_regional_actor_for_project,
     notify_advisors_of_project,
@@ -310,6 +311,26 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
     }
     notify_advisors_of_project(project, notification)
     notify_members_of_project(project, notification)
+
+    return redirect(reverse("projects-project-administration", args=[project_id]))
+
+
+@login_required
+@require_http_methods(["POST"])
+def promote_collaborator_as_advisor(request, project_id, user_id=None):
+    """Promote a collectivity member to referent role"""
+    project = get_object_or_404(models.Project.on_site, pk=project_id)
+
+    is_staff_for_site_or_403(request.user, request.site)
+
+    user = get_object_or_404(auth_models.User, id=user_id)
+    if request.site not in user.profile.sites.all():
+        # user is not on current site
+        raise Http404()
+
+    with transaction.atomic():
+        unassign_collaborator(user, project)
+        assign_advisor(user, project)
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
 

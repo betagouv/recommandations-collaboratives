@@ -151,7 +151,7 @@
                     {% else %}
                         <ul class="d-flex flex-column list-unstyled fr-mb-0">
                             {% for advisor in project.switchtender_sites.all %}
-                                <li class="d-flex align-items-start justify-content-between fr-mb-1v">
+                                <li class="d-flex align-items-center justify-content-between fr-mb-1v">
                                     {% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}
                                     {% if request.user == advisor.switchtender %}
                                         <form id="projects-project-switchtender-leave"
@@ -209,15 +209,26 @@
                     <ul class="flex-column list-unstyled fr-mb-0">
                         {% for pm in project.projectmember_set.all %}
                             {% if pm.is_owner %}
-                                <li class="d-flex align-items-start justify-content-between fr-mb-1v">
+                                <li class="d-flex align-items-center justify-content-between fr-mb-1v">
                                     {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
                                     <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du dossier</span>
                                 </li>
                             {% else %}
-                                <li class="d-flex align-items-start justify-content-between fr-mb-1v">
+                                <li class="d-flex align-items-center justify-content-between fr-mb-1v">
                                     {% include "user/user_card.html" with user=pm.member user_activity=True %}
                                     <div class="d-flex align-items-center">
                                         {% if is_staff %}
+                                            <form id="form-projects-access-promote-advisor"
+                                                  class="fr-mr-2v"
+                                                  action="{% url 'projects-project-promote-advisor' project.pk pm.member.pk %}"
+                                                  method="post">
+                                                {% csrf_token %}
+                                                <button data-bs-toggle="tooltip"
+                                                        data-bs-title="Accorder les droits Conseiller sur ce dossier"
+                                                        class="fr-btn fr-btn--secondary fr-icon-magic-fill">
+                                                    Accorder les droits Conseiller sur ce dossier
+                                                </button>
+                                            </form>
                                             <form id="form-projects-access-promote-user"
                                                   class="fr-mr-2v"
                                                   action="{% url 'projects-project-promote-referent' project.pk pm.member.pk %}"

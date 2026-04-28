@@ -16,15 +16,19 @@ Parameters:
 - placeholder (string)
 - is_action_pusher (boolean)
 - can_compress_editor (boolean)
+- max_contacts (integer): Maximum number of contacts allowed (0 = no limit)
+- max_files (integer): Maximum number of files allowed (0 = no limit)
+- is_notification_alert (boolean)
 {% endcomment %}
 {% load static %}
 {% load django_vite %}
+{% load waffle_tags %}
 {% block js %}
     {% vite_asset 'js/styles/tools-editor.css.js' %}
     {% vite_asset 'js/styles/contact-card.css.js' %}
 {% endblock js %}
 <div class="w-100 position-relative editor-container"
-     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }})' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }})' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }})' {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }}, {{ max_contacts|default:0 }}, {{ max_files|default:0 }})' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }}, {{ max_contacts|default:0 }}, {{ max_files|default:0 }})' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }}, {{ max_contacts|default:0 }}, {{ max_files|default:0 }})' {% endif %}
      @reset-contact="handleResetContact()"
      @set-content.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
@@ -84,6 +88,11 @@ Parameters:
                     </div>
                 </div>
             </template>
+            {% if is_notification_alert %}
+                <div class="position-absolute top-0-25 end-0-5 z-index-1">
+                    <span class="d-flex align-items-center indicator-text"><span class="fr-icon-attention fr-icon--sm fr-mr-1v"></span>Tous les membres du dossier seront notifiés par email</span>
+                </div>
+            {% endif %}
             <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage == 3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>
@@ -140,6 +149,7 @@ Parameters:
                     <!-- Action file -->
                     <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
                             type="button"
+                            :disabled="!canAddFile"
                             @click="$refs.fileUploadInput.click(); isEditorFocused = true;">
                         <span class="file-upload-text">Ajouter un fichier</span>
                     </button>
@@ -153,43 +163,70 @@ Parameters:
                 {% endif %}
                 <!-- Recommendation module -->
                 {% if can_add_reco %}
-                    <button data-test-id="create-task-button"
-                            @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)"
-                            class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
-                        <span class="fr-icon-list-check-line fr-icon--sm"></span>
-                        Créer une recommandation
-                    </button>
-                {% endif %}
-                <!-- Contact module -->
-                {% if can_attach_contact %}
-                    <div x-cloak>
-                        <button @click.prevent="openModalSearchContact; isEditorFocused = true;"
-                                data-test-id="button-add-contact-in-editor"
-                                class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm fr-icon-contact-book-line fr-btn--icon-left justify-content-center fr-text--sm button-add-contact">
-                            Ajouter un contact
+                    <div x-data="{ open: false }"
+                         x-on:click.outside="open = false"
+                         class="position-relative">
+                        <button data-test-id="create-task-button"
+                                x-on:click.prevent.stop="open = !open"
+                                class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                            <span class="fr-icon-list-check-line fr-icon--sm"></span>
+                            Créer une recommandation
                         </button>
-                        {% include "tools/contacts/search_contact_modal.html" %}
-                        <input type="hidden"
-                               {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
-                    </div>
-                {% endif %}
+                        <ul x-show="open"
+                            class="common-dropdown common-dropdown__top-menu list-unstyled flex-column item-no-space">
+                            <li>
+                                <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
+                                        @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)">
+                                    Nouvelle recommandation
+                                </button>
+                            </li>
+                            <li>
+                                <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                                   class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
+                                   data-test-id="see-suggest-task-button">Recommandations assistées par IA</a>
+                            </li>
+                            {% flag "suggest_reco_btn" %}
+                            <li>
+                                <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                                   class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
+                                   data-test-id="see-suggest-task-button">Ressources suggérées</a>
+                            </li>
+                        {% endflag %}
+                    </ul>
+                </div>
+            {% endif %}
+            <!-- Contact module -->
+            {% if can_attach_contact %}
+                <div x-cloak>
+                    <button @click.prevent="openModalSearchContact; isEditorFocused = true;"
+                            :disabled="!canAddContact"
+                            data-test-id="button-add-contact-in-editor"
+                            class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm fr-icon-contact-book-line fr-btn--icon-left justify-content-center fr-text--sm button-add-contact">
+                        Ajouter un contact
+                    </button>
+                    {% include "tools/contacts/search_contact_modal.html" %}
+                    <input type="hidden"
+                           {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if errors %}
+        {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
+    {% endif %}
+    <!-- Slot pour le bouton d'envoi -->
+    {% if show_send_button %}
+        <div class="d-flex justify-content-end">
+            <div class="d-flex gap-2 send-message">
+                <button data-test-id="send-message-conversation"
+                        :disabled="!isFormValid || sendingMessage"
+                        form="{{ form_id|default:'conversation-form' }}"
+                        class="fr-btn fr-btn--sm"
+                        :class="{'fr-icon-send-message fr-icon--sm fr-btn--icon-left': !isEditorInEditMode}"
+                        type="submit"
+                        x-text="isEditorInEditMode ? 'Modifier' : 'Envoyer'"></button>
             </div>
         </div>
-        {% if errors %}
-            {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
-        {% endif %}
-        <!-- Slot pour le bouton d'envoi -->
-        {% if show_send_button %}
-            <div class="d-flex justify-content-end">
-                <div class="d-flex gap-2 send-message">
-                    <button data-test-id="send-message-conversation"
-                            :disabled="!isFormValid || sendingMessage"
-                            form="{{ form_id|default:'conversation-form' }}"
-                            class="fr-btn fr-btn--sm"
-                            type="submit"
-                            x-text="isEditorInEditMode ? 'Modifier' : 'Envoyer'"></button>
-                </div>
-            </div>
-        {% endif %}
-    </div>
+    {% endif %}
+</div>
 </div>

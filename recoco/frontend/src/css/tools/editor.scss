@@ -197,3 +197,16 @@
     flex-direction: column;
   }
 }
+
+.indicator-text {
+  color: var(--light-text-title-grey, #161616);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 150% */
+}
+
+.common-dropdown__top-menu {
+  top: auto;
+  bottom: 100%;
+}

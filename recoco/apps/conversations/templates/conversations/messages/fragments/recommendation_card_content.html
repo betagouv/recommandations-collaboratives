@@ -1,0 +1,84 @@
+{% load static %}
+<div class="task-item__resource task-item__resource--bordered">
+    {% if not draft_recommendation %}
+        <template x-if="!recommendation.visited">
+            <span class="badge text-white task-item__resource-badge"
+                  x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
+        </template>
+    {% endif %}
+    <template x-if="recommendation.topic">
+        <div class="task-item__topic"
+             :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
+            <span class="task-item__topic-icon"></span>
+            <p class="task-item__topic-name fr-mb-0"
+               x-text="recommendation.topic?.name"></p>
+        </div>
+    </template>
+    <h4>
+        <button type="button"
+                class="fr-link"
+                x-text="recommendation.intent"
+                @click="await openResourcePreviewPanel(recommendation, element)"></button>
+    </h4>
+    <template x-if="!recommendation.resource">
+        <div class="task-item__content task-item__content-ellipsis"
+             x-html="renderMarkdown(recommendation.content)"></div>
+    </template>
+    <template x-if="recommendation.resource?.support_orga">
+        <p class="task-item__resource-orga fr-mt-1v fr-mb-0">
+            <span class="fr-icon fr-icon--xs fr-icon-government-line"></span> <span x-text="recommendation.resource.support_orga"></span>
+        </p>
+    </template>
+    <template x-if="recommendation.resource?.subtitle">
+        <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
+           x-text="recommendation.resource.subtitle"></p>
+    </template>
+    <!-- DS integration -->
+    <template x-if="recommendation.resource.has_dsresource">
+        <div>
+            <hr class="fr-pb-3v fr-mt-3v">
+            <h4 class="fw-bolder fr-mb-0">
+                <img height="31px"
+                     width="32px"
+                     src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                     alt="Pictogramme Démarche numérique">
+                Pré-créer un dossier sur Démarche numérique
+            </h4>
+            <p class="fr-text-mention--grey fr-text--xs fr-mb-3v">
+                En cliquant ci-dessous, vous créerez un dossier en brouillon sur demarche.numerique.gouv.fr.
+                <br>
+                Des champs seront pré-remplis avec les informations déjà renseignées ici.
+            </p>
+            <a class="fr-btn fr-btn--secondary fr-btn--sm"
+               @click.stop=""
+               :href="'{% url 'projects-task-ds-prefill' 0 %}'.replace(0, recommendation.id)"
+               target="_blank">Aller sur Démarche numérique</a>
+            <hr class="fr-pb-3v fr-mt-3v">
+        </div>
+    </template>
+    {% if not draft_recommendation %}
+        <div class="d-flex justify-content-between fr-mt-1w">
+            <div class="d-flex">
+                {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
+                <template x-if="recommendation.status !== TASK_STATUSES.DONE && recommendation.status !== TASK_STATUSES.NOT_INTERESTED && recommendation.status !== TASK_STATUSES.ALREADY_DONE && !{{ project.is_inactive_since|yesno:'true,false' }}">
+                    <div class="d-flex align-items-center active-reminder"
+                         x-tooltip="`Le demandeur recevra des rappels email tant que cette recommandation n'est pas traitée`">
+                        <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v"
+                              aria-hidden="true"></span>
+                        <span>Rappels actifs</span>
+                    </div>
+                </template>
+                <template x-if="recommendation.status === TASK_STATUSES.DONE || recommendation.status === TASK_STATUSES.NOT_INTERESTED || recommendation.status === TASK_STATUSES.ALREADY_DONE || {{ project.is_inactive_since|yesno:'true,false' }}">
+                    <div class="d-flex align-items-center non-active-reminder"
+                         x-tooltip="`Pas de rappel envoyé au demandeur sur cette recommandation déjà traitée`">
+                        <span class="fr-icon-notification-off-line fr-icon--sm fr-mr-1v"
+                              aria-hidden="true"></span>
+                        <span>Pas de rappel</span>
+                    </div>
+                </template>
+            </div>
+            <button class="fr-btn fr-btn--sm fr-btn--primary"
+                    @click.prevent="await openResourcePreviewPanel(recommendation, element)">Consulter</button>
+        </div>
+    {% endif %}
+</div>

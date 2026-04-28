@@ -4,6 +4,14 @@
 <!-- Card -->
 <div class="card-resource card h-100">
     <div class="card-resource__body fr-p-3v">
+        {% if not resource.public %}
+            <div class="card-top-information d-flex align-items-center">
+                <div class="left-0">
+                    <span data-test-id="task-draft-status"
+                            class="bg-yellow text-dark">Brouillon</span>
+                </div>
+            </div>
+        {% endif %}
         <div class="card-resource__category rounded-top">
             <span class="card-resource__category--badge bg-color-{{ resource.category.color|default:"darkgrey" }} fr-mr-1v"></span>
             <span class="card-resource__category--name">
@@ -18,15 +26,15 @@
         <div class="card-resource__text">
             {{ resource.subtitle }}
         </div>
-        <div class="card-resource__date">
-            <span class="card-resource__footer--label fr-icon-calendar-line fr-icon--sm fr-btn--icon-left">Mise à jour le : {{ resource.updated_on|date:"d/m/Y" }}</span>
-        </div>
         <div class="card-resource__orga-related">
             {% if resource.support_orga %}
                 <span class="card-resource__footer--label fr-icon-building-line fr-icon--sm fr-btn--icon-left">
-                    {{ resource.support_orga.name }}
+                    {{ resource.support_orga }}
                 </span>
             {% endif %}
+        </div>
+        <div class="card-resource__date">
+            <span class="card-resource__footer--label fr-icon-calendar-line fr-icon--sm fr-btn--icon-left">Mise à jour le : {{ resource.updated_on|date:"d/m/Y" }}</span>
         </div>
         <div class="card-resource__departments">
             {% if resource.departments.all %}

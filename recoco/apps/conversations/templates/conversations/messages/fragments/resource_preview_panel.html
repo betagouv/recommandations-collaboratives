@@ -1,0 +1,51 @@
+{% comment %}
+Resource Preview Panel - Overlay panel that displays when clicking a recommendation with resource.
+Managed by Alpine store: $store.resourcePreviewPanel
+{% endcomment %}
+<template x-if="$store.resourcePreviewPanel.isOpen">
+    <div x-data="{ closePanel() { $store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded(); } }">
+        <div class="resource-preview-panel__backdrop backdrop-overlay"
+             @click="closePanel()"></div>
+        <div class="resource-preview-panel"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Détail de la recommandation"
+             x-trap.inert="$store.resourcePreviewPanel.isOpen"
+             @keydown.escape.window="closePanel()">
+            <!-- Header -->
+            <div class="resource-preview-panel__header">
+                <button type="button"
+                        class="resource-preview-panel__back-btn"
+                        @click="closePanel()">
+                    <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
+                    Recommandations
+                </button>
+                <button type="button"
+                        class="resource-preview-panel__close-btn fr-btn--close fr-btn"
+                        aria-label="Fermer"
+                        @click="closePanel()">Fermer</button>
+            </div>
+            <template x-if="$store.resourcePreviewPanel.recommendation?.resource">
+                <!-- Scrollable content area -->
+                <div class="resource-preview-panel__body">
+                    {% include "conversations/messages/fragments/preview_panel_message.html" %}
+                    <iframe class="w-100 d-flex flex-column rounded"
+                            style="border: none;
+                                   overflow: hidden"
+                            scrolling="no"
+                            @load="$el.style.height = $el.contentDocument.body.scrollHeight + 'px'"
+                            :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.recommendation.id)"></iframe>
+                </div>
+            </template>
+            <template x-if="!$store.resourcePreviewPanel.recommendation?.resource">
+                <div class="resource-preview-panel__body">
+                    <h2 class="resource-preview-panel__title fr-mb-1w"
+                        x-text="$store.resourcePreviewPanel.recommendation.intent"></h2>
+                    {% include "conversations/messages/fragments/created_by_reply.html" with button_class="fr-btn-primary" %}
+                    <p class="fr-mt-3w rendered-markdown"
+                       x-html="renderMarkdown($store.resourcePreviewPanel.recommendation.content)"></p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
