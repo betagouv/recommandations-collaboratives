@@ -22,6 +22,17 @@
             .
             {% if project.description %}{{ project.description|escapejs }}{% endif %}
             ` })" data-test-id="exploration-ia-container">
+            <!-- Barre d'actions : aide -->
+            <div class="d-flex justify-content-end fr-mb-1w">
+                <button @click="openWelcomeModal()"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm"
+                        type="button"
+                        aria-label="Revoir l'aide sur l'exploration assistée"
+                        data-test-id="exploration-ia-show-welcome-modal-btn">
+                    <span class="fr-icon-question-line fr-mr-1v" aria-hidden="true"></span>
+                    Revoir l'aide
+                </button>
+            </div>
             <!-- Stepper DSFR -->
             <div class="fr-stepper fr-mb-3w" data-test-id="exploration-ia-stepper">
                 <h2 class="fr-stepper__title">
@@ -593,6 +604,8 @@
                     </div>
                 </div>
             </template>
+            <!-- Modale d'accueil (affichée une seule fois par utilisateur) -->
+            {% include "tasks/tasks/fragments/exploration_ia/welcome_modal.html" %}
             <!-- Modale de détail ressource -->
             <div x-show="resourceModal.isOpen"
                  class="exploration-ia-modal-overlay"

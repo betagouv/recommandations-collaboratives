@@ -63,6 +63,12 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     error: null,
   },
 
+  // === MODALE D'ACCUEIL ===
+  welcomeModalStorageKey: 'explorationIA_welcomeShown',
+  welcomeModal: {
+    isOpen: false,
+  },
+
   // === LIFECYCLE ===
   init() {
     console.log('ExplorationIA init', ML_API_BASE_URL);
@@ -70,6 +76,27 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.$watch('currentPhase', () => {
       this.scrollToTop();
     });
+    // Affiche la modale d'accueil uniquement à la première visite
+    try {
+      if (!localStorage.getItem(this.welcomeModalStorageKey)) {
+        this.welcomeModal.isOpen = true;
+      }
+    } catch (e) {
+      // localStorage indisponible (mode privé, etc.) : on n'affiche pas la modale pour éviter une boucle
+    }
+  },
+
+  closeWelcomeModal() {
+    this.welcomeModal.isOpen = false;
+    try {
+      localStorage.setItem(this.welcomeModalStorageKey, 'true');
+    } catch (e) {
+      // ignore
+    }
+  },
+
+  openWelcomeModal() {
+    this.welcomeModal.isOpen = true;
   },
 
   scrollToTop() {
