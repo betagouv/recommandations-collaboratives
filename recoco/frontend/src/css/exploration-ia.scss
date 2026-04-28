@@ -1,0 +1,825 @@
+.exploration-ia {
+  &__header {
+    margin-bottom: 1.5rem;
+  }
+
+  &__stepper {
+    margin-bottom: 2rem;
+  }
+
+  &__context {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--light-text-title-grey, #161616);
+  }
+}
+
+.exploration-ia-card {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+  background-color: #ffffff;
+
+  &:hover {
+    border-color: var(--light-accent-blue-france, #000091);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &--selected {
+    border-color: var(--light-accent-blue-france, #000091);
+    background-color: var(--background-alt-blue-france);
+
+    &:hover {
+      border-color: var(--light-accent-blue-france, #000091);
+    }
+  }
+
+  .card-body {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+  }
+
+  .card-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.85rem;
+    flex-grow: 1;
+  }
+
+  .card-footer {
+    font-size: 0.8rem;
+  }
+}
+
+.exploration-ia-history {
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.exploration-ia-synthesis {
+  &__section {
+    margin-bottom: 2rem;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  &__empty {
+    color: var(--light-text-mention-grey, #666);
+    font-style: italic;
+    padding: 1rem;
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+    border-radius: 4px;
+  }
+}
+
+// Animation pour le chargement
+.exploration-ia-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+// Badge de score
+.exploration-ia-score {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border-radius: 4px;
+}
+
+// Groupe de chunks partageant une meme sous-question
+.exploration-ia-subquestion-group {
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+}
+
+.exploration-ia-subquestion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--light-background-alt-blue-france, #f5f5fe);
+  border-radius: 0 4px 4px 0;
+
+  &__badge {
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    color: var(--light-text-title-grey, #161616);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+
+    span[class^='fr-icon-'] {
+      color: var(--light-accent-blue-france, #000091);
+    }
+  }
+}
+
+// Chunks de reponse IA
+.exploration-ia-chunk {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &--with-source {
+    padding-left: 1rem;
+    border-left: 3px solid var(--light-accent-blue-france, #000091);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+
+    &:hover {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+    }
+  }
+
+  &--selected {
+    background-color: var(
+      --light-background-action-low-blue-france,
+      #e3e3fd
+    ) !important;
+    border-color: var(--light-accent-blue-france, #000091);
+  }
+
+  &__checkbox {
+    padding-top: 0.25rem;
+
+    input[type='checkbox'] {
+      width: 1.25rem;
+      height: 1.25rem;
+      cursor: pointer;
+      accent-color: var(--light-accent-blue-france, #000091);
+    }
+  }
+
+  &__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--light-text-default-grey, #3a3a3a);
+
+    strong {
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+    }
+
+    ul,
+    ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+
+    a {
+      color: var(--light-accent-blue-france, #000091);
+      text-decoration: underline;
+    }
+  }
+
+  &__sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+}
+
+// Bibliographie
+.exploration-ia-bibliography {
+  position: sticky;
+  top: 1rem;
+
+  .card-header {
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+
+    h3 {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.exploration-ia-citation {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border-radius: 4px;
+  border: 2px solid var(--light-border-default-grey, #e5e5e5);
+  transition: all 0.2s ease-in-out;
+
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  // Etat surligne au survol d'un chunk
+  &--highlighted {
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
+    border-color: var(--light-accent-blue-france, #000091);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 145, 0.15);
+
+    .fr-badge--blue-cumulus {
+      background-color: var(--light-accent-blue-france, #000091);
+      color: #fff;
+    }
+  }
+
+  // Etat selectionne (chunk coche)
+  &--selected {
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
+    border-color: var(--light-accent-blue-france, #000091);
+    box-shadow: 0 2px 8px rgba(0, 0, 145, 0.1);
+
+    .fr-badge--blue-cumulus {
+      background-color: var(--light-accent-blue-france, #000091);
+      color: #fff;
+    }
+  }
+}
+.fr-search-bar {
+  margin-top: 0.5rem;
+}
+
+.fr-callout {
+  padding: 1.5rem;
+  .fr-btn {
+    margin-top: 0;
+  }
+  &__text {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+// Sources sélectionnées (Etape 2 - petites cartes en ligne)
+.exploration-ia-selected-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.exploration-ia-source-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  border-left: 3px solid var(--light-accent-blue-france, #000091);
+  border-radius: 4px;
+  min-width: 200px;
+  max-width: 280px;
+  transition: all 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--light-background-contrast-grey, #eeeeee);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &__title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+    margin: 0.25rem 0;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &__btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    min-height: auto !important;
+    margin-top: 0.5rem;
+  }
+}
+
+// Co-recommandations (Etape 2) - utilise le style card-resource
+.exploration-ia-co-reco {
+  transition: all 0.2s ease-in-out;
+  border: 2px solid var(--light-border-default-grey, #e5e5e5);
+  max-height: none; // Override card-resource max-height
+
+  &:hover {
+    border-color: var(--light-accent-blue-france, #000091);
+    box-shadow: 0 4px 12px rgba(0, 169, 95, 0.15);
+    transform: translateY(-2px);
+  }
+
+  &--selected {
+    background-color: var(--light-background-action-low-blue-france, #e3e3fd);
+    border-color: var(--light-accent-blue-france, #000091);
+
+    &:hover {
+      border-color: var(--light-accent-blue-france, #000091);
+    }
+
+    .card-resource__body {
+      background-color: transparent;
+    }
+  }
+
+  // Styles spécifiques pour card-resource dans ce contexte
+  .card-resource__category {
+    padding-bottom: 0;
+  }
+
+  .card-resource__title {
+    margin-bottom: 8px;
+
+    a {
+      color: var(--light-text-action-high-blue-france, #000091);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .card-resource__text {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    padding-bottom: 8px;
+  }
+
+  .card-resource__departments {
+    margin-top: auto;
+  }
+
+  input[type='checkbox'] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--light-accent-blue-france, #000091);
+    flex-shrink: 0;
+  }
+}
+
+// Cartes de synthèse (Étape 3)
+.exploration-ia-synthesis-card {
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: var(--light-accent-blue-france, #000091);
+    box-shadow: 0 4px 12px rgba(0, 0, 145, 0.1);
+  }
+
+  &--co-reco {
+    border-left: 3px solid var(--light-accent-blue-france, #000091);
+
+    &:hover {
+      border-color: var(--light-accent-blue-france, #000091);
+      border-left-color: var(--light-accent-blue-france, #000091);
+    }
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+    line-height: 1.4;
+  }
+
+  .card-text {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .card-footer {
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+  }
+
+  // Zone du texte généré par l'IA (colonne droite)
+  &__ai-content {
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+    border-left: 3px solid var(--light-accent-blue-france, #000091);
+
+    p {
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--light-text-default-grey, #3a3a3a);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    ul,
+    ol {
+      margin: 0.5rem 0;
+      padding-left: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+    }
+
+    a {
+      color: var(--light-accent-blue-france, #000091);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+// Récapitulatif pour la recommandation
+.exploration-ia-reco-summary {
+  border: 2px solid var(--light-accent-blue-france, #000091);
+  background-color: var(--light-background-alt-blue-france, #f5f5fe);
+
+  .card-header {
+    background-color: var(--light-accent-blue-france, #000091);
+    color: #fff;
+
+    h3 {
+      color: var(--light-accent-blue-france, #000091);
+    }
+  }
+}
+
+.exploration-ia-reco-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+    font-size: 0.9rem;
+    gap: 0.5rem;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+    }
+
+    &--co-reco {
+      background-color: var(
+        --light-background-action-low-green-emeraude,
+        #e3fdeb
+      );
+
+      &:hover {
+        background-color: var(
+          --light-background-contrast-green-emeraude,
+          #c3fad5
+        );
+      }
+    }
+
+    // Icône de type
+    > span:first-of-type {
+      color: var(--light-accent-blue-france, #000091);
+      flex-shrink: 0;
+    }
+
+    // Titre de la ressource
+    .flex-grow-1 {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    // Boutons d'action
+    > a {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.footer-actions {
+  position: sticky;
+  background: white;
+  bottom: 0;
+}
+
+// Indication de phase (accompagnement utilisateur)
+.exploration-ia-phase-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--light-background-action-low-blue-france, #e3e3fd);
+  border-radius: 0 4px 4px 0;
+  font-weight: 500;
+  color: var(--light-text-title-grey, #161616);
+  font-size: 0.95rem;
+
+  span[class^='fr-icon-'] {
+    color: var(--light-accent-blue-france, #000091);
+    font-size: 1.1rem;
+  }
+}
+
+// === MODALE RESSOURCE ===
+.exploration-ia-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.exploration-ia-modal {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    min-height: 200px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+  }
+
+  // Zone du passage cité
+  &__citation {
+    background: linear-gradient(
+      135deg,
+      var(--light-background-action-low-blue-france, #e3e3fd) 0%,
+      var(--light-background-alt-blue-france, #f5f5fe) 100%
+    );
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--light-accent-blue-france, #000091);
+  }
+
+  &__blockquote {
+    margin: 0;
+    padding: 0;
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--light-text-default-grey, #3a3a3a);
+    position: relative;
+
+    &::before {
+      content: '"';
+      font-size: 2rem;
+      color: var(--light-accent-blue-france, #000091);
+      opacity: 0.3;
+      position: absolute;
+      left: -1rem;
+      top: -1rem;
+    }
+  }
+
+  // Métadonnées (catégorie, tags)
+  &__meta {
+    padding: 0.75rem 0;
+  }
+
+  // Contenu de la ressource
+  &__content {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--light-text-default-grey, #3a3a3a);
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--light-text-title-grey, #161616);
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+    h2 {
+      font-size: 1.3rem;
+    }
+    h3 {
+      font-size: 1.15rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    ul,
+    ol {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    a {
+      color: var(--light-accent-blue-france, #000091);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+    }
+
+    blockquote {
+      margin: 1rem 0;
+      padding: 0.75rem 1rem;
+      border-left: 3px solid var(--light-accent-blue-france, #000091);
+      background-color: var(--light-background-alt-grey, #f6f6f6);
+      font-style: italic;
+    }
+
+    pre,
+    code {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+
+    code {
+      padding: 0.15rem 0.3rem;
+    }
+
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+
+      code {
+        padding: 0;
+        background: none;
+      }
+    }
+  }
+}
+
+// === MISE EN SURBRILLANCE DU PASSAGE CITÉ ===
+.exploration-ia-highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 230, 0, 0.4) 0%,
+    rgba(255, 200, 0, 0.3) 100%
+  );
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  border-bottom: 2px solid var(--light-accent-yellow-tournesol, #ffd100);
+  box-shadow: 0 1px 3px rgba(255, 209, 0, 0.3);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 230, 0, 0.6) 0%,
+      rgba(255, 200, 0, 0.5) 100%
+    );
+  }
+}
+
+// Animation de scroll vers le passage surligné
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(255, 230, 0, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 230, 0, 0.7);
+  }
+  100% {
+    background-color: rgba(255, 230, 0, 0.4);
+  }
+}
+
+.exploration-ia-highlight--animated {
+  animation: highlight-pulse 1s ease-in-out 2;
+}
+
+// Responsive pour la modale
+@media (max-width: 768px) {
+  .exploration-ia-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .exploration-ia-modal {
+    max-height: 95vh;
+    border-radius: 4px;
+
+    &__header,
+    &__body,
+    &__footer {
+      padding: 1rem;
+    }
+
+    &__header h2 {
+      font-size: 1.1rem;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { resolve } from 'path';
 const config = {
   plugins: [],
   root: resolve('./src'),
+  envDir: resolve('./'),
   base: '/static/',
   server: {
     origin: 'http://localhost:3000',
@@ -222,6 +223,8 @@ const config = {
           './src/js/styles/resource-preview-panel.css.js'
         ),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
+        explorationIA: resolve('./src/js/apps/explorationIA.js'),
+        explorationIAStyles: resolve('./src/js/styles/exploration-ia.css.js'),
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),
