@@ -25,6 +25,7 @@ def get_queryset() -> QuerySet:
                 verbs.Conversation.POST_MESSAGE,
                 verbs.Conversation.PRIVATE_MESSAGE,
                 verbs.Document.ADDED_FILE,
+                verbs.Document.ADDED_ADVISOR_FILE,
                 verbs.Document.ADDED_LINK,
                 verbs.Recommendation.CREATED,
                 verbs.Recommendation.COMMENTED,

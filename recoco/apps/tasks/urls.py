@@ -46,6 +46,11 @@ urlpatterns = [
         name="projects-update-task",
     ),
     path(
+        r"task/<int:task_id>/ds_prefill/",
+        tasks.task_generate_ds_prefill,
+        name="projects-task-ds-prefill",
+    ),
+    path(
         r"task/<int:task_id>/sort/<str:order>",
         tasks.sort_task,
         name="projects-sort-task",

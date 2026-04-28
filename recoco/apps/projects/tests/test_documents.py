@@ -11,14 +11,17 @@ import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from pytest_django.asserts import assertContains, assertNotContains
 
-from recoco.apps.projects.utils import assign_collaborator
+from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
 
+from ...conversations import models as conversation_models
 from .. import models
 
 
@@ -54,6 +57,124 @@ def test_draft_project_documents_not_available_for_owner(
 
 
 @pytest.mark.django_db
+def test_private_document_is_displayed_in_project_documents_page_for_advisor(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    user = baker.make(auth_models.User)
+    assign_advisor(user, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=user,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    with login(client, user=user):
+        response = client.get(
+            reverse("projects-project-detail-documents", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        assertContains(response, "private-project-document.txt")
+
+
+@pytest.mark.django_db
+def test_private_document_is_not_displayed_in_project_documents_page_for_collaborators(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    advisor = baker.make(auth_models.User)
+    assign_advisor(advisor, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=advisor,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    member = baker.make(auth_models.User)
+    assign_collaborator(member, project_ready)
+    with login(client, user=member):
+        response = client.get(
+            reverse("projects-project-detail-documents", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        assertNotContains(response, "private-project-document.txt")
+
+
+@pytest.mark.django_db
+def test_private_document_is_given_for_conversations_panel_for_advisor(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    user = baker.make(auth_models.User)
+    assign_advisor(user, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=user,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    with login(client, user=user):
+        response = client.get(
+            reverse("projects-project-detail-conversations", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        assertContains(response, "private-project-document.txt")
+
+
+@pytest.mark.django_db
+def test_private_document_is_not_given_for_conversations_panel_for_collaborators(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    # an advisor uploads doc
+    advisor = baker.make(auth_models.User)
+    assign_advisor(advisor, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=advisor,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    # a collaborator displays the docs
+    member = baker.make(auth_models.User)
+    assign_collaborator(member, project_ready)
+    with login(client, user=member):
+        response = client.get(
+            reverse("projects-project-detail-conversations", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        assertNotContains(response, "private-project-document.txt")
+
+
+@pytest.mark.django_db
 def test_upload_document_not_available_for_non_logged_users(client, request, project):
     url = reverse("projects-documents-upload-document", args=[project.id])
     response = client.get(url)
@@ -73,11 +194,16 @@ def test_upload_file_available_for_project_collaborators(
 
     assert response.status_code == 302
 
-    document = models.Document.objects.all()[0]
+    document = models.Document.objects.first()
     assert document.project == project
     assert document.description == data["description"]
     assert document.uploaded_by == user
+    assert not document.private
     assert document.the_file is not None
+
+    msg = conversation_models.Message.objects.first()
+    assert msg.posted_by == user
+    assert msg.nodes.first().document == document
 
 
 @pytest.mark.django_db
@@ -108,9 +234,7 @@ def test_upload_document_is_either_link_or_file(client, request, project):
 
 
 @pytest.mark.django_db
-def test_upload_file_does_not_trigger_notifications(
-    client, request, project, good_file
-):
+def test_upload_file_trigger_msg_trace_notif(client, request, project, good_file):
     data = {"description": "this is some content", "the_file": good_file}
 
     other_user = baker.make(auth_models.User)
@@ -126,10 +250,12 @@ def test_upload_file_does_not_trigger_notifications(
     assert response.status_code == 302
 
     document = models.Document.objects.all()[0]
+    msg = document.documentnode_set.first().message
 
-    assert action_object_stream(document).count() == 1
+    assert action_object_stream(msg).count() == 1
+    assert action_object_stream(document).count() == 0
     assert user.notifications.count() == 0
-    assert other_user.notifications.count() == 0
+    assert other_user.notifications.count() == 1
 
 
 @pytest.mark.django_db

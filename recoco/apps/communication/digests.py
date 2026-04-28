@@ -11,6 +11,7 @@ import logging
 from dataclasses import asdict
 from itertools import groupby
 
+from actstream import action
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -130,6 +131,14 @@ def send_new_recommendations_reminders_digest_by_project(
     # Mark as dispatched
     due_reminder.mark_as_sent(sent_to=recipient)
 
+    action.send(
+        recipient,
+        verb=verbs.Recommendation.GOT_RECO_REMINDER,
+        action_object=due_reminder,
+        target=project,
+        public=False,
+    )
+
     return True
 
 
@@ -179,6 +188,14 @@ def send_whatsup_reminders_digest_by_project(
 
     # Mark as dispatched
     due_reminder.mark_as_sent(sent_to=recipient)
+
+    action.send(
+        recipient,
+        verb=verbs.Project.GOT_WHATSUP_REMINDER,
+        action_object=due_reminder,
+        target=project,
+        public=False,
+    )
 
     return True
 
