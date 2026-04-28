@@ -1,0 +1,167 @@
+.user-crm {
+    &-left-col {
+      width: 30%;
+    }
+
+    &__badges {
+        display: flex;
+        height: 26px;
+        padding: 4px 8px;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        border-radius: 1px;
+        background: var(--dark-background-flat-warning, #FC5D00);
+        color: var(--light-text-inverted-grey, #FFF);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 18px; /* 150% */
+        &--advisor {
+            background: var(--dark-background-flat-success, #27A658);
+        }
+    }
+
+    &__user-name {
+      color: var(--light-text-default-grey, #3a3a3a);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 150%; /* 27px */
+    }
+
+    &__user-org {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 150%; /* 24px */
+    }
+
+    &__actions-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        &--style {
+            border-radius: 2px;
+            background: transparent;
+            border: 1px solid var(--light-text-mention-grey, #666);
+            box-shadow: none;
+            color: var(--light-text-mention-grey, #666) !important;
+        }
+    }
+
+    &__user-information {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 150%; /* 18px */
+      &--link {
+        overflow: hidden;
+        color: var(--light-background-action-high-blue-france, #000091);
+        text-overflow: ellipsis;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 150%; /* 18px */
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+      }
+    }
+
+    &__user-information::before, &__user-information--link::before {
+      margin-right: 4px;
+    }
+
+    &__section-title-container {
+      border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+      background: #fafafa;
+    }
+
+    &__section-title {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 22px; /* 183.333% */
+      text-transform: uppercase;
+    }
+
+    &__section-container {
+      border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+    }
+
+    &-right-col {
+      width: 70%;
+      border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+      border-left: 1px solid var(--light-border-default-grey, #e5e5e5);
+      background: #fafafa;
+      display: flex;
+      padding: 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+      flex: 1 0 0;
+      align-self: stretch;
+    }
+
+    &__container-tags {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+    }
+
+    &__section-title {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 22px;
+      text-transform: uppercase;
+      margin-bottom: 0;
+      &-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    &__timeline-date {
+      color: var(--light-neutral-grey-625, #929292);
+      font-size: 12px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 24px;
+    }
+
+    &__user-active {
+      color: var(--light-text-title-blue-france, #000091);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 150%; /* 21px */
+      text-decoration-line: underline;
+      text-decoration-style: solid;
+      text-decoration-skip-ink: none;
+      text-decoration-thickness: auto;
+      text-underline-offset: auto;
+      text-underline-position: from-font;
+    }
+
+    &__inactive-member {
+      border-radius: 1px;
+      background: var(--light-text-disabled-grey, #929292);
+      position: absolute;
+      right: 20px;
+      top: 22px;
+      display: flex;
+      height: 26px;
+      padding: 4px 8px;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      &-text {
+        color: var(--light-text-inverted-grey, #FFF);
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 18px; /* 180% */
+      }
+    }
+  }
