@@ -4,8 +4,7 @@
 {% block js %}
     {% vite_asset 'js/styles/crm-note.css.js' %}
 {% endblock js %}
-<div x-data="Note"
-     class="crm__note-container {% if get_user_profile and note.related and note.content_type == user_ct %}crm__note--linked{% endif %}">
+<div class="crm__note-container {% if get_user_profile and note.related and note.content_type == user_ct %}crm__note--linked{% endif %}">
     {% if get_user_profile and note.related and note.content_type == user_ct %}
         <div class="d-flex fr-py-1v">
             <span class="fr-icon fr-icon-corner-down-right-line fr-icon--sm fr-ml-1w fr-mr-1v"></span>
@@ -17,8 +16,7 @@
         </div>
     {% endif %}
     <div class="{% if get_user_profile and note.related and note.content_type == user_ct %}crm__note-inside-container{% endif %}">
-        <div x-ref="note"
-             class="crm__note {% if pinned %}crm__note--pinned{% endif %}"
+        <div class="crm__note {% if pinned %}crm__note--pinned{% endif %}"
              id="note-{{ note.pk }}">
             <!-- Header - Title -->
             <div class="d-flex align-items-center justify-content-between">
@@ -46,13 +44,7 @@
                 </div>
             {% endif %}
             <!-- Content -->
-            <article class="crm__note-content">
-                {{ note.content_rendered|safe }}
-                <span x-ref="noteToggleButton"
-                      class="crm-note-toggle-button"
-                      x-on:click="isOpen = ! isOpen"
-                      x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
-            </article>
+            <article class="crm__note-content">{{ note.content_rendered|safe }}</article>
             <!-- Footer - Posted info  -->
             <div class="d-flex justify-content-between align-items-center w-100">
                 <div class="d-flex">

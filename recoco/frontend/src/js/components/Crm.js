@@ -1,7 +1,6 @@
 import Alpine from 'alpinejs';
 
 Alpine.data('Crm', Crm);
-Alpine.data('Note', Note);
 
 function Crm() {
   return {
@@ -20,22 +19,6 @@ function Crm() {
     goBack() {
       console.debug('go back');
       window.history.back();
-    },
-  };
-}
-
-function Note() {
-  return {
-    isOpen: false,
-    init() {
-      const note = this.$refs.note;
-      const noteToggleButton = this.$refs.noteToggleButton;
-
-      if (note && note.offsetHeight < 200) {
-        note.classList.add('is-small');
-
-        if (noteToggleButton) noteToggleButton.classList.add('hidden');
-      }
     },
   };
 }
