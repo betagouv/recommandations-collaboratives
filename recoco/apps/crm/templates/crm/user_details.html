@@ -22,7 +22,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/styles/user-crm.css.js' %}
-    {% vite_asset 'js/styles/user-card-crm.css.js' %}
+    {% vite_asset 'js/styles/project-card-crm.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% block content %}
@@ -113,16 +113,7 @@
                     </div>
                     {% for st in crm_user.projects_switchtended_per_site.all %}
                         <div class="user-crm__section-container fr-px-3w fr-py-2w">
-                            <a href="{% url 'crm-project-details' st.project.pk %}"
-                               class="fw-bold">{{ st.project.name }}</a>
-                            {% if st.project.commune %}
-                                <div class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-text--sm">{{ st.project.commune.name }}</div>
-                            {% endif %}
-                            {% with st.project.next_reminder as next_reminder %}
-                                {% if next_reminder %}
-                                    <div class="user-crm__user-information fr-icon-mail-line fr-icon--sm fr-text--sm">prochain rappel le {{ next_reminder.deadline|date:"j F Y" }}</div>
-                                {% endif %}
-                            {% endwith %}
+                            {% include "crm/fragments/project/project_card.html" with project=st.project %}
                         </div>
                     {% empty %}
                         <div class="fr-px-3w fr-py-2w">
@@ -140,16 +131,7 @@
                         </div>
                         {% for membership in memberships %}
                             <div class="user-crm__section-container fr-px-3w fr-py-2w">
-                                <a href="{% url 'crm-project-details' membership.project.pk %}"
-                                   class="fw-bold">{{ membership.project.name }}</a>
-                                {% if membership.project.commune %}
-                                    <div class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-text--sm">{{ membership.project.commune.name }}</div>
-                                {% endif %}
-                                {% with membership.project.next_reminder as next_reminder %}
-                                    {% if next_reminder %}
-                                        <div class="user-crm__user-information fr-icon-mail-line fr-icon--sm fr-text--sm">prochain rappel le {{ next_reminder.deadline|date:"j F Y" }}</div>
-                                    {% endif %}
-                                {% endwith %}
+                                {% include "crm/fragments/project/project_card.html" with project=membership.project %}
                             </div>
                         {% endfor %}
                     </div>
