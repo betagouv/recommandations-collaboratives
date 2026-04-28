@@ -28,28 +28,40 @@
                     </template>
                 </div>
                 <template x-if="countOf.tasks > 0">
-                    <a class="topic-item__message-len fr-mt-0"
-                       @click="trackClickOnRecoLink"
-                       href="{% url 'projects-project-detail-actions' project.pk %}">
-                        <p class="topic-item__message-len fr-mt-0">
+                    <button type="button"
+                            class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            @click="trackClickOnRecoLink(); handleOpenPannelSharedContents('recommendations')">
+                        <span class="topic-item__shared-item">
                             <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
                             <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
-                        </p>
-                    </a>
+                        </span>
+                    </button>
                 </template>
                 <template x-if="countOf.documents > 0">
-                    <a class="topic-item__message-len fr-mt-0"
-                       @click="trackClickOnFileLink"
-                       href="{% url 'projects-project-detail-documents' project.pk %}">
-                        <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
-                        <span x-text="`${countOf.documents} document${countOf.documents > 1 ? 's' : ''}`"></span>
-                    </a>
+                    <button type="button"
+                            class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            @click="trackClickOnFileLink(); handleOpenPannelSharedContents('files')">
+                        <span class="topic-item__shared-item">
+                            <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
+                            <span x-text="`${countOf.documents} fichier${countOf.documents > 1 ? 's' : ''}`"></span>
+                        </span>
+                    </button>
                 </template>
                 <template x-if="countOf.contacts > 0">
                     <p class="topic-item__message-len fr-mt-0">
                         <span class="fr-icon-contact-book-line fr-icon--sm" aria-hidden="true"></span>
                         <span x-text="`${countOf.contacts} contact${countOf.contacts > 1 ? 's' : ''}`"></span>
                     </p>
+                </template>
+                <template x-if="isSwitchtender && countOf.draft_recommendations > 0">
+                    <button type="button"
+                            class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            @click="$store.sharedContentsPanel.open('draft-recommendations')">
+                        <span class="topic-item__shared-item">
+                            <span class="fr-icon-draft-line fr-icon--sm" aria-hidden="true"></span>
+                            <span x-text="`${countOf.draft_recommendations} brouillon${countOf.draft_recommendations > 1 ? 's' : ''}`"></span>
+                        </span>
+                    </button>
                 </template>
             </div>
         </label>

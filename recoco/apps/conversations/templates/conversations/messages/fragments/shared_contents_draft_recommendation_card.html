@@ -1,0 +1,54 @@
+<!-- Recommendation card in shared contents panel -->
+<!-- djlint:off -->
+<div x-data='{
+                recommendation: null,
+                element: null,
+                async openResourcePreviewPanel(recommendation, element) {
+                    // Close the shared contents panel but mark for re-open when returning
+                    $store.sharedContentsPanel.closeForDetail();
+
+                    // Open the resource preview panel
+                    if ($store.resourcePreviewPanel) {
+                        $store.resourcePreviewPanel.open(recommendation, element);
+                    }
+                }
+            }'
+            x-effect="recommendation = reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
+    <!-- djlint:on -->
+    <!-- Container for the draft recommendation card -->
+    <div class="shared-contents-draft-reco-card__container">
+        <div class="shared-contents-draft-reco-card__header">
+            <span class="fr-icon-draft-line fr-icon--sm" aria-hidden="true"></span>
+            <span>Brouillon</span>
+        </div>
+        <!-- Inside container  -->
+        <div class="shared-contents-draft-reco-card__inside-container">
+            <div class="shared-contents-draft-reco-card__content">
+                <!-- Intitial comment from the user -->
+                <p class="shared-contents-draft-reco-card__initial-comment fr-mb-2w"
+                   x-text="recommendation.content"></p>
+                <!-- Recommendation card content -->
+                {% include "conversations/messages/fragments/recommendation_card_content.html" with draft_recommendation=True %}
+                <!-- User that posted the draft recommendation -->
+                <div class="d-flex align-items-center shared-contents-draft-reco-card__user fr-mt-2w"
+                     x-data="{user: recommendation.created_by}">
+                    {% include "user/user_card_js.html" with class_name="font-size-14px" %}
+                    <!-- Date of the draft recommendation -->
+                    <p class="shared-contents-draft-reco-card__date fr-ml-1v fr-mb-0">
+                        le <span x-text="formatDate(recommendation.created_on, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="shared-contents-draft-reco-card__footer fr-pt-3v fr-pl-3v">
+            <div class="d-flex gap-2">
+                <a class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
+                   :href="editTaskUrl(recommendation.id, '{{ request.path }}')">Editer</a>
+                <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
+                        @click="$dispatch('open-delete-modal', recommendation)">Supprimer</button>
+            </div>
+            <button class="fr-btn fr-btn--sm fr-icon-send-plane-fill fr-btn--icon-left fr-btn--primary justify-content-end"
+                    @click="publishDraftRecommendation(recommendation)">Publier</button>
+        </div>
+    </div>
+</div>

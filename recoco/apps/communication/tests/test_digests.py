@@ -42,7 +42,7 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 
 from ...conversations.utils import gather_annotations_for_message_notification
-from .. import digests
+from .. import digests, helpers
 
 ########################################################################
 # new reco digests
@@ -381,7 +381,7 @@ def test_send_digests_for_switchtender_does_not_include_new_recos(
 
 @pytest.mark.django_db
 def test_notification_formatter(request, make_project):
-    formatter = digests.NotificationFormatter()
+    formatter = helpers.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     organization = Recipe(addressbook_models.Organization, name="DuckCorp").make()
@@ -400,6 +400,8 @@ def test_notification_formatter(request, make_project):
     private_note = Recipe(
         projects_models.Note, content="my content", public=False
     ).make()
+    file = Recipe(projects_models.Document).make(the_file="toto")
+    link = Recipe(projects_models.Document).make(the_link="toto")
 
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
 
@@ -449,7 +451,15 @@ def test_notification_formatter(request, make_project):
             verbs.Project.SUBMITTED_BY,
             project,
             (
-                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY}: 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY} : 'Nice Project'",
+                "Super description",
+            ),
+        ),
+        (
+            verbs.Project.SUBMITTED_BY_ADVISOR,
+            project,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY_ADVISOR} : 'Nice Project'",
                 "Super description",
             ),
         ),
@@ -462,10 +472,18 @@ def test_notification_formatter(request, make_project):
             ),
         ),
         (
-            verbs.Document.ADDED,  # FIXME replace w/ ADDED_FILE ADDED_LINK
-            project,
+            verbs.Document.ADDED_FILE,
+            file,
             (
-                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED}",
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED_FILE} {file.feed_label()}",
+                None,
+            ),
+        ),
+        (
+            verbs.Document.ADDED_LINK,
+            link,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED_LINK} {link.feed_label()}",
                 None,
             ),
         ),
@@ -498,7 +516,7 @@ def test_notification_formatter(request, make_project):
 
 @pytest.mark.django_db
 def test_notification_formatter_with_bogus_user():
-    formatter = digests.NotificationFormatter()
+    formatter = helpers.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     private_note = baker.make(projects_models.Note)
@@ -513,11 +531,33 @@ def test_notification_formatter_with_bogus_user():
 
 @pytest.mark.django_db
 class TestMsgDigest:
-    def prepare(self, project_ready, current_site):
+    def prepare_context(self, project_ready):
         recipient = baker.make(User)
         sender = baker.make(User, last_name="Lexpère", first_name="Mosio")
         project_ready.members.add(recipient)
         project_ready.members.add(sender)
+        return recipient, sender, project_ready
+
+    def send_notifs(self, msgs, sender, recipient, current_site, project_ready):
+        notifs = [
+            {
+                "sender": sender,
+                "verb": verbs.Conversation.POST_MESSAGE,
+                "action_object": msg,
+                "target": project_ready,
+                "annotations": gather_annotations_for_message_notification(msg),
+            }
+            for msg in msgs
+        ]
+        for notif in notifs:
+            notify.send(
+                recipient=[recipient],
+                site=current_site,
+                **notif,
+            )
+
+    def prepare(self, project_ready, current_site):
+        recipient, sender, project_ready = self.prepare_context(project_ready)
         contact1 = baker.make(
             addressbook_models.Contact, first_name="Léa", last_name="Bonchancel"
         )
@@ -539,10 +579,8 @@ class TestMsgDigest:
         conversations_models.DocumentNode.objects.create(
             document=doc, position=2, message=msg1
         )
-        (
-            conversations_models.ContactNode.objects.create(
-                contact=contact2, position=1, message=msg2
-            ),
+        conversations_models.ContactNode.objects.create(
+            contact=contact2, position=1, message=msg2
         )
         conversations_models.MarkdownNode.objects.create(
             text="toto", position=2, message=msg2
@@ -551,28 +589,7 @@ class TestMsgDigest:
             recommendation=reco, position=3, message=msg2
         )
 
-        notifs = [
-            {
-                "sender": sender,
-                "verb": verbs.Conversation.POST_MESSAGE,
-                "action_object": msg1,
-                "target": project_ready,
-                "annotations": gather_annotations_for_message_notification(msg1),
-            },
-            {
-                "sender": sender,
-                "verb": verbs.Conversation.POST_MESSAGE,
-                "action_object": msg2,
-                "target": project_ready,
-                "annotations": gather_annotations_for_message_notification(msg2),
-            },
-        ]
-        for notif in notifs:
-            notify.send(
-                recipient=[recipient],
-                site=current_site,
-                **notif,
-            )
+        self.send_notifs([msg1, msg2], sender, recipient, current_site, project_ready)
 
         return recipient, sender, contact1, [msg1, msg2]
 
@@ -588,21 +605,37 @@ class TestMsgDigest:
         )
         assert recipient.notifications.unsent().count() == 0
 
-    def test_make_msg_digest(self, project_ready, current_site):
-        (recipient, sender, first_object, [msg1, msg2]) = self.prepare(
-            project_ready, current_site
+    def test_make_msg_digest_reco_only(self, project_ready, current_site):
+        recipient, sender, project_ready = self.prepare_context(project_ready)
+
+        reco1 = baker.make(
+            tasks_models.Task, site=current_site, intent="Holala fais ça"
         )
+        reco2 = baker.make(
+            tasks_models.Task, site=current_site, intent="Holala fais ça aussi"
+        )
+
+        msg1 = baker.make(
+            conversations_models.Message, posted_by=sender, project=project_ready
+        )
+        msg2 = baker.make(
+            conversations_models.Message, posted_by=sender, project=project_ready
+        )
+
+        conversations_models.RecommendationNode.objects.create(
+            recommendation=reco1, position=1, message=msg1
+        )
+        conversations_models.RecommendationNode.objects.create(
+            recommendation=reco2, position=1, message=msg2
+        )
+
+        self.send_notifs([msg1, msg2], sender, recipient, current_site, project_ready)
 
         expected = {
             "first_object": {
-                "email": "",
-                "first_name": "Léa",
-                "function": "",
-                "last_name": "Bonchancel",
-                "mobile_no": "",
-                "organization_name": first_object.organization.name,
-                "phone_no": "",
-                "type": "contact",
+                "text": "",
+                "title": "Holala fais ça",
+                "type": "recommendation",
             },
             "first_sender": {
                 "first_name": "Mosio",
@@ -613,12 +646,12 @@ class TestMsgDigest:
                 "pk": sender.id,
                 "short": "M. Lexpère",
             },
-            "intro_count": "2 messages, dont 2 contacts, 1 recommandation et 1 document",
+            "intro_count": "2 messages, dont 2 recommandations",
             "other_senders": False,
             # "remaining_count": "1 contact, dont 1 contact, 1 recommandation et 1 document",
             "site_name": "example.com",
-            "text": "<p>toto</p>",
-            "title_count": "2 nouveaux messages",
+            "text": "",
+            "title_count": "2 nouvelles recommandations",
         }
 
         digest = digests.make_msg_digest_by_user_and_project(
@@ -633,6 +666,7 @@ class TestMsgDigest:
             "projects-project-detail-conversations", args=[project_ready.pk]
         )
         assert f"message-id={msg1.id}" in parsed_url.query
+        assert parsed_url.fragment == "actions"
 
         del digest["message_url"]
         assert digest == expected
@@ -731,6 +765,33 @@ class TestSendNewRecommendationsRemindersDigestByProject:
             2025, 4, 10, 8, 0, 0, tzinfo=timezone.utc
         )
 
+    def test_activity_trace_sent(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        due_reminder = baker.make(Reminder)
+        project = baker.make(projects_models.Project, sites=[current_site])
+        owner = baker.make(auth.User)
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
+        )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {}
+
+        with patch("recoco.apps.communication.digests.send_email"):
+            with patch("recoco.apps.communication.digests.action") as mock_action:
+                send_new_recommendations_reminders_digest_by_project(
+                    site=current_site, project=project, dry_run=False
+                )
+
+        mock_action.send.assert_called_once_with(
+            owner,
+            verb=verbs.Recommendation.GOT_RECO_REMINDER,
+            action_object=due_reminder,
+            target=project,
+            public=False,
+        )
+
 
 @pytest.mark.django_db
 @patch("recoco.apps.communication.digests.make_or_update_whatsup_reminder")
@@ -821,6 +882,33 @@ class TestSendWhatsupRemindersDigestByProject:
         assert due_reminder.sent_to == owner
         assert due_reminder.sent_on == datetime(
             2025, 4, 10, 8, 0, 0, tzinfo=timezone.utc
+        )
+
+    def test_activity_trace_sent(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        due_reminder = baker.make(Reminder)
+        project = baker.make(projects_models.Project, sites=[current_site])
+        owner = baker.make(auth.User)
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
+        )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {}
+
+        with patch("recoco.apps.communication.digests.send_email"):
+            with patch("recoco.apps.communication.digests.action") as mock_action:
+                send_whatsup_reminders_digest_by_project(
+                    site=current_site, project=project, dry_run=False
+                )
+
+        mock_action.send.assert_called_once_with(
+            owner,
+            verb=verbs.Project.GOT_WHATSUP_REMINDER,
+            action_object=due_reminder,
+            target=project,
+            public=False,
         )
 
 

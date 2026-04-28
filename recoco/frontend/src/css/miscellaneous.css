@@ -106,7 +106,6 @@
   z-index: 100;
 
   width: max-content;
-  right: 0px;
   top: 80%;
 
   background-color: white;
@@ -116,6 +115,10 @@
     0px 1px 4px rgba(0, 0, 0, 0.23);
 
   overflow: hidden;
+}
+
+.common-dropdown__top-menu {
+  top: -230%;
 }
 
 .common-dropdown.show {

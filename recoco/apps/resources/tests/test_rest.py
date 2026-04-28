@@ -75,6 +75,69 @@ def test_resource_details_includes_content(request, api_client):
 
 
 @pytest.mark.django_db
+def test_resource_details_includes_nb_uses(request, api_client, current_site):
+    resource = Recipe(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
+    ).make()
+    Recipe(task_models.Task, resource=resource, site=current_site).make()
+
+    url = reverse("resources-detail", args=(resource.pk,))
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    assert "nb_uses" in response.data
+    assert response.data["nb_uses"] == 1
+
+
+@pytest.mark.django_db
+def test_resource_details_nb_uses_no_exclude_stats_projects(
+    request, api_client, current_site
+):
+    resource = Recipe(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
+    ).make()
+    project = Recipe(project_models.Project, exclude_stats=True).make()
+    Recipe(
+        task_models.Task,
+        resource=resource,
+        site=current_site,
+        project=project,
+    ).make()
+
+    url = reverse("resources-detail", args=(resource.pk,))
+    response = api_client.get(url)
+    assert "nb_uses" in response.data
+    assert response.data["nb_uses"] == 0
+
+
+@pytest.mark.django_db
+def test_resource_details_nb_uses_no_foreign_sites(request, api_client, current_site):
+    site = Recipe(Site).make()
+    resource = Recipe(
+        models.Resource,
+        sites=[current_site, site],
+        status=models.Resource.PUBLISHED,
+        title="public resource",
+    ).make()
+    Recipe(
+        task_models.Task,
+        resource=resource,
+        site=site,
+    ).make()
+
+    url = reverse("resources-detail", args=(resource.pk,))
+    response = api_client.get(url)
+    assert "nb_uses" in response.data
+    assert response.data["nb_uses"] == 0
+
+
+@pytest.mark.django_db
 def test_anonymous_cannot_see_unpublished_resource_in_list_api(request, api_client):
     Recipe(
         models.Resource,

@@ -9,6 +9,7 @@ created : 2022-06-06 14:16:20 CEST
 
 import os
 
+import nh3
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from crispy_forms.layout import Fieldset, Layout
@@ -164,6 +165,10 @@ class OnboardingProject(DsrcBaseForm):
 
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
+    def clean_description(self):
+        desc = self.cleaned_data["description"]
+        return nh3.clean(desc)
+
 
 class PrefillSetuserForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
@@ -283,6 +288,10 @@ class PrefillProjectForm(DsrcBaseForm):
         help_text="Décrivez votre dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
+
+    def clean_description(self):
+        desc = self.cleaned_data["description"]
+        return nh3.clean(desc)
 
 
 # eof

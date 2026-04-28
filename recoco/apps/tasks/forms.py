@@ -29,7 +29,7 @@ class TaskRecommendationForm(forms.ModelForm):
 
     class Meta:
         model = models.TaskRecommendation
-        fields = ["condition", "resource", "text", "departments"]
+        fields = ["condition_tags", "resource", "text", "departments"]
 
 
 class TaskFollowupForm(forms.ModelForm):

@@ -54,8 +54,8 @@ def unread_notifications_processor(request):
     grouped_notifications = defaultdict(list)
 
     show_project_verb_list = [
-        verbs.Document.ADDED,
         verbs.Document.ADDED_FILE,
+        verbs.Document.ADDED_ADVISOR_FILE,
         verbs.Document.ADDED_LINK,
         verbs.Recommendation.COMMENTED,
         verbs.Recommendation.CREATED,
@@ -64,7 +64,7 @@ def unread_notifications_processor(request):
         verbs.Survey.STARTED,
         verbs.Survey.UPDATED,
         verbs.Project.INVITATION,
-        verbs.Project.JOINED,
+        verbs.Project.JOINED_BY_INVITATION,
         verbs.Project.JOINED_OWNER,
         verbs.Project.NEW_OWNER,
         verbs.Project.UPDATE_ADVISORS_NOTE,

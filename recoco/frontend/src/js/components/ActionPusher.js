@@ -44,7 +44,6 @@ Alpine.data('ActionPusher', () => {
     selected_resources: [],
     public: true,
     draft: false,
-    next: null,
     async init() {
       await this.$store.idbObjectStoreMgmt.init();
       const getAllvalue = await this.$store.idbObjectStoreMgmt.getAll();

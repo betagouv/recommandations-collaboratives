@@ -39,7 +39,7 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex custom-input-border bg-white {% if extra_classes %}{{ extra_classes }}{% endif %}"
+                    <div class="{% if no_inside_border %}multi-select__container d-flex specific-border-solid1pxE5E5E5 rounded-pill{% else %}multi-select__container d-flex custom-input-border bg-white{% endif %} {% if extra_classes %}{{ extra_classes }}{% endif %}"
                          :class="isOpen() ? 'multi-select--open' : ''"
                          data-test-id="multi-select-container">
                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
@@ -63,25 +63,25 @@
                             <!-- None items selected -->
                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
                                 <input placeholder="{% if placeholder %}{{ placeholder }}{% else %}Sélectionnez pour filtrer{% endif %}"
-                                       class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0"
+                                       class="multi-select__input bg-transparent p-1 fr-px-2w appearance-none outline-none h-full w-100 text-gray-800 border-0"
                                        x-bind:value="selectedElements()"
                                        data-test-id="multi-select-input">
                             </div>
                         </div>
                         <!-- Drop down toogle with icons-->
-                        <div class="multi-select__dropdown-icon">
-                            <button type="button"
+                        <div {% if no_inside_border %}class="fr-pr-1w d-flex align-items-center"{% else %}class="multi-select__dropdown-icon"{% endif %}>
+                            <div type="button"
                                     x-show="!isOpen()"
                                     x-on:click="open()"
                                     class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none fr-pb-0-5v">
                                 <span class="fr-icon-arrow-down-s-line fr-icon--sm"></span>
-                            </button>
-                            <button type="button"
+                            </div>
+                            <div type="button"
                                     x-show="isOpen()"
                                     x-on:click="close()"
                                     class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none">
                                 <span class="fr-icon-arrow-up-s-line fr-icon--sm"></span>
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>

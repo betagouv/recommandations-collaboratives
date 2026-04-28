@@ -124,11 +124,6 @@ urlpatterns = [
         name="projects-project-detail-recommandations-embed",
     ),
     path(
-        r"project/<int:project_id>/actions/inline",
-        detail.project_actions_inline,
-        name="projects-project-detail-actions-inline",
-    ),
-    path(
         r"project/<int:project_id>/conversations",
         detail.project_conversations_new,
         name="projects-project-detail-conversations",
@@ -199,9 +194,14 @@ urlpatterns = [
         name="projects-project-administration",
     ),
     path(
-        r"project/<int:project_id>/administration/<int:user_id>/promote/",
+        r"project/<int:project_id>/administration/<int:user_id>/promote-referent/",
         administration.promote_collaborator_as_referent,
         name="projects-project-promote-referent",
+    ),
+    path(
+        r"project/<int:project_id>/administration/<int:user_id>/promote-advisor/",
+        administration.promote_collaborator_as_advisor,
+        name="projects-project-promote-advisor",
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/invite",

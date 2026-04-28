@@ -147,7 +147,7 @@ class Task(OrderedModel):
     project = models.ForeignKey(
         projects_models.Project, on_delete=models.CASCADE, related_name="tasks"
     )
-    public = models.BooleanField(default=False, blank=True)
+    public = models.BooleanField(default=False, blank=True)  # public=False means draft
     priority = models.PositiveIntegerField(
         default=1000,
         blank=True,
@@ -236,7 +236,7 @@ class Task(OrderedModel):
 
     def get_absolute_url(self):
         return (
-            reverse("projects-project-detail-actions", args=[self.project.id])
+            reverse("projects-project-detail-conversations", args=[self.project.id])
             + f"#action-{self.pk}"
         )
 
@@ -303,11 +303,7 @@ class TaskFollowup(models.Model):
         return self.task.feed_label()
 
     def get_absolute_url(self):
-        task = self.task
-        return (
-            reverse("projects-project-detail-actions", args=[task.project.id])
-            + f"#action-{task.pk}"
-        )
+        return self.task.get_absolute_url()
 
 
 class TaskFollowupRsvp(models.Model):

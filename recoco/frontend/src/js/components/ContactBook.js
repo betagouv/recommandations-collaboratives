@@ -50,7 +50,6 @@ Alpine.data('ContactBook', (departments, regions) => {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              console.log('entry.target', entry.target);
               const organizationId = entry.target.getAttribute(
                 'data-organization-id'
               );

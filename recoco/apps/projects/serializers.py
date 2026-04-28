@@ -33,7 +33,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class NewDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ["the_file", "the_link", "description", "id"]
+        fields = ["the_file", "the_link", "description", "id", "private"]
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):

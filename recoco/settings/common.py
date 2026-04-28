@@ -399,6 +399,7 @@ STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 # Notifications
 DJANGO_NOTIFICATIONS_CONFIG = {"USE_JSONFIELD": True}
+ACTSTREAM_SETTINGS = {"MANAGER": "actstream.managers.ActionManager"}
 
 # Phonenumbers
 PHONENUMBER_DEFAULT_REGION = "FR"
@@ -571,10 +572,9 @@ DJANGO_WEBHOOK = {
 }
 
 # Démarches simplifiées
-DS_BASE_URL = "https://www.demarches-simplifiees.fr"
-DS_API_BASE_URL = f"{DS_BASE_URL}/api/public/v1"
+DS_BASE_URL = "https://demarche.numerique.gouv.fr/"
+DS_API_BASE_URL = f"{DS_BASE_URL}api/public/v1/"
 DS_AUTOLOAD_SCHEMA = True
-DS_AUTOCREATE_FOLDER = True
 DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
 
 # Resource importers

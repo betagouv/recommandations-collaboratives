@@ -30,7 +30,7 @@ from recoco.apps.survey import models as survey_models
 from recoco.utils import assign_site_staff, get_group_for_site
 
 from ... import utils
-from ..communication.digests import normalize_user_name
+from ..communication.helpers import normalize_user_name
 from ..crm.models import Note
 from . import models
 

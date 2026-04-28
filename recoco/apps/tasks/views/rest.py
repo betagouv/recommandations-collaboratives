@@ -10,13 +10,14 @@ created : 2021-05-26 15:56:20 CEST
 import logging
 
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import is_member
+from recoco.apps.resources import models as resource_models
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
@@ -25,6 +26,7 @@ from ..serializers import (
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
+    TaskWithMessageSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,10 +72,14 @@ class TaskViewSet(viewsets.ModelViewSet):
                     "followups", filter=~Q(followups__comment="")
                 ),
             )
-            .select_related(
-                "ds_folder", "topic", "created_by__profile", "site", "project"
-            )
+            .select_related("topic", "created_by__profile", "site", "project")
             .prefetch_related("followups")
+            .prefetch_related(
+                Prefetch(
+                    "resource",
+                    queryset=resource_models.Resource.objects.with_ds_annotations(),
+                )
+            )
             .order_by("-created_on", "-updated_on")
         )
 
@@ -94,7 +100,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         updated_object = serializer.save()
 
-        if original_object.public is False and updated_object.public is True:
+        if not original_object.public and updated_object.public:
             signals.action_created.send(
                 sender=self,
                 task=updated_object,
@@ -167,6 +173,47 @@ class TaskViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_304_NOT_MODIFIED)
+
+    @action(
+        methods=["post"],
+        detail=True,
+    )
+    def publish(self, request, project_id, pk):
+        task = self.get_object()
+
+        has_perm_or_403(self.request.user, "projects.manage_tasks", task.project)
+
+        instance = self.get_object()
+
+        if task.public:
+            return Response(
+                data="Recommendation has already been published",
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+
+        instance.public = True
+        instance.save()
+
+        signals.action_created.send(
+            sender=self,
+            task=instance,
+            project=instance.project,
+            user=self.request.user,
+        )
+
+        message = (
+            instance.recommendationnode_set.filter(message__project=project_id)
+            .order_by("-message__created")
+            .first()
+            .message
+        )
+        instance.message = message
+        serializer = TaskWithMessageSerializer(
+            instance, context={"request": request, "message": message}
+        )
+        data = serializer.data
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 ########################################################################
