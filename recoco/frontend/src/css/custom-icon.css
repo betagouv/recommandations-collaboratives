@@ -117,3 +117,8 @@
 .fr-icon-magic-fill::before {
   mask-image: url(../assets/magic-fill.svg);
 }
+
+.fr-icon-hat-and-glasses::after,
+.fr-icon-hat-and-glasses::before {
+  mask-image: url(../assets/hat-and-glasses.svg);
+}
