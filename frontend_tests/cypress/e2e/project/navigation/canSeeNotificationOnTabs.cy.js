@@ -2,7 +2,8 @@ import editor from '../../../support/tools/editor';
 import file from '../../../fixtures/documents/file.json';
 const currentProjectId = 25;
 
-describe('I can access tabs and see notifications', () => {
+// TODO Réécrire : le badge `badge-tab-new-task` n'existe plus (onglet Recommandations supprimé)
+describe.skip('I can access tabs and see notifications', () => {
   before(() => {
     cy.login('collectivité1');
     cy.visit(`/project/${currentProjectId}/presentation`);

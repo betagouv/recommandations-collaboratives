@@ -6,8 +6,6 @@ const domElements = {
   // Project dashboard tabs
   ADMIN_PATH: '/administration',
   ADMIN_TAB: '[data-test-id="navigation-administration-tab"]',
-  ACTIONS_PATH: '/actions',
-  ACTIONS_TAB: '[data-test-id="navigation-actions-tab"]',
 
   // Pause / Reactivate project
   ADMIN_BANNER_DEACTIVATE_PROJECT:
@@ -35,8 +33,6 @@ const domElements = {
   REMINDER_EMAIL_DATE: '[data-test-id="email-date"]',
   MESSAGE_NO_REMINDER: '[data-test-id="no-reminders"]',
   REMINDER_ACCESS: '[data-test-id="reminder-settings-access"]',
-  ACTIONS_PATH: '/actions',
-  ACTIONS_TAB: '[data-test-id="project-navigation-actions"]',
 
   // Project dashboard tabs
   OVERVIEW_PATH: '/presentation',
@@ -45,9 +41,6 @@ const domElements = {
   // Project dashboard tabs
   KNOWLEDGE_PATH: '/connaissance',
   KNOWLEDGE_TAB: '[data-test-id="project-navigation-knowledge"]',
-
-  // Actions Tab - Tasks List
-  TASK_CARD: '[data-test-id="task-kanban-topic"]',
 
   // Positioning Banner
   SHOW_BANNER: '[data-test-id="show-banner"]',
@@ -77,10 +70,6 @@ class Project {
 
   navigateToPreferencesTab() {
     this.navigateToTab(this.dom.ADMIN_TAB, this.dom.ADMIN_PATH);
-  }
-
-  navigateToActionsTab() {
-    this.navigateToTab(this.dom.ACTIONS_TAB, this.dom.ACTIONS_PATH);
   }
 
   navigateToOverviewTab() {
@@ -235,10 +224,6 @@ class Project {
     }
     cy.get(this.dom.REMINDER_ACCESS).get('a').click({ force: true });
     cy.url().should('include', this.dom.ADMIN_PATH);
-  }
-
-  openTask() {
-    cy.get(this.dom.TASK_CARD).click({ force: true });
   }
 }
 

@@ -1,6 +1,7 @@
 let currentProjectId;
 
-describe('I can go to tasks tab', () => {
+// TODO Réécrire : kanban/list-tasks-switch-button et task-kanban-topic n'existent plus
+describe.skip('I can go to tasks tab', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.createProject('test project 2').then((projectId) => {

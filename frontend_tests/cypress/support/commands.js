@@ -306,7 +306,7 @@ Cypress.Commands.add(
           cy.get('[type=submit]').should('be.enabled').click({ force: true });
         }
 
-        cy.url().should('include', '/actions');
+        cy.url().should('include', '/conversations');
 
         if (!withResource) {
           cy.contains(`${label}`);
@@ -333,7 +333,7 @@ Cypress.Commands.add(
           cy.get('[type=submit]').should('be.enabled').click({ force: true });
         }
 
-        cy.url().should('include', '/actions');
+        cy.url().should('include', '/conversations');
 
         // cy.contains('reco test from action');
       } else {

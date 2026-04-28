@@ -167,9 +167,6 @@ def visit_task(request, task_id):
     url = f"{reverse('projects-project-detail-conversations', args=[task.project_id])}#action-{task.pk}"
     return redirect(url)
 
-    # clean that if we actually remove the action tab in project
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
-
 
 @login_required
 def toggle_done_task(request, task_id):
@@ -199,7 +196,9 @@ def toggle_done_task(request, task_id):
             )
         task.save()
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project_id])
+    )
 
 
 @login_required
@@ -216,7 +215,9 @@ def refuse_task(request, task_id):
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project_id])
+    )
 
 
 @login_required
@@ -233,7 +234,9 @@ def already_done_task(request, task_id):
             sender=already_done_task, task=task, project=task.project, user=request.user
         )
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project_id])
+    )
 
 
 @login_required
@@ -253,7 +256,7 @@ def sort_task(request, task_id, order):
     task.save()
 
     return redirect(
-        reverse("projects-project-detail-actions", args=[task.project_id])
+        reverse("projects-project-detail-conversations", args=[task.project_id])
         + f"#action-{task.id}"
     )
 
@@ -297,14 +300,11 @@ def update_task(request, task_id=None):
                     user=request.user,
                 )
 
-            # Redirect to `action-inline` if we're coming
-            # from `action-inline` after create
-            # TODO remove this next logic when recommendation tab will be removed
             if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
                 return redirect(form.cleaned_data["next"])
 
             return redirect(
-                reverse("projects-project-detail-actions", args=[task.project_id])
+                reverse("projects-project-detail-conversations", args=[task.project_id])
             )
     else:
         initial = {
@@ -503,7 +503,9 @@ def followup_task(request, task_id=None):
             # update activity flags and states
             reactivate_if_necessary(task.project, request.user)
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project.id])
+    )
 
 
 @login_required
@@ -525,7 +527,8 @@ def followup_task_update(request, followup_id=None):
 
             return redirect(
                 reverse(
-                    "projects-project-detail-actions", args=[followup.task.project.id]
+                    "projects-project-detail-conversations",
+                    args=[followup.task.project.id],
                 )
                 + f"#action-{followup.task.id}"
             )

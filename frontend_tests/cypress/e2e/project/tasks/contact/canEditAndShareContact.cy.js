@@ -3,7 +3,8 @@ describe('I can search and share a contact on a message editor', () => {
     cy.login('staff');
   });
 
-  it('can search, select and share a contact on a followup', () => {
+  // TODO Réécrire : task-item et la preview modal ont été supprimés
+  it.skip('can search, select and share a contact on a followup', () => {
     cy.visit(`/project/2/actions#`);
     //click on recommandation
     cy.get('[data-test-id="task-item"]').first().click({ force: true });
@@ -56,7 +57,8 @@ describe('I can search and share a contact on a message editor', () => {
     cy.get('[data-test-id="contact-card"]').should('be.visible');
   });
 
-  it('can create a contact, an organization and a national group and share the contact on a new task', () => {
+  // TODO Réécrire : create-task-button n'est plus accessible depuis /actions (page redirigée)
+  it.skip('can create a contact, an organization and a national group and share the contact on a new task', () => {
     cy.visit(`/project/2/actions#`);
     //click on create recommandation
     cy.get('[data-test-id="create-task-button"]').click({ force: true });
