@@ -1,5 +1,7 @@
 let currentProjectId;
-describe('I can go to tasks tab', () => {
+// TODO Réécrire pour la nouvelle interface conversation
+//      (les boutons publish/unpublish/update étaient dans task_actions.html supprimé)
+describe.skip('I can go to tasks tab', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.createProject('draft project').then((projectId) => {

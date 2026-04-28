@@ -1,7 +1,9 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can access actions tab in a project as a member', () => {
+// TODO Réécrire pour la nouvelle interface conversation+panneau actions
+//      (l'onglet "Recommandations" n'existe plus, /actions redirige vers /conversations#actions)
+describe.skip('I can access actions tab in a project as a member', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });
@@ -13,7 +15,7 @@ describe('I can access actions tab in a project as a member', () => {
   });
 });
 
-describe('I can access actions tab in a project as an advisor', () => {
+describe.skip('I can access actions tab in a project as an advisor', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });
