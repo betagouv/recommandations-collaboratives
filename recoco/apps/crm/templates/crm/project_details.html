@@ -46,8 +46,10 @@
                 <span class="project-crm__project-information fr-icon-user-line fr-icon--sm fr-mb-1v">{{ conversation_stats.participants_count }} participant{{ conversation_stats.participants_count|pluralize:"s" }}</span>
                 <!-- Number of reco in conv -->
                 <span class="project-crm__project-information fr-icon-list-check-line fr-icon--sm fr-mb-1v">{{ conversation_stats.recommendations_count }} recommandation{{ conversation_stats.recommendations_count|pluralize:"s" }}</span>
-                <!-- Number of files -->
-                <span class="project-crm__project-information fr-icon-file-download-line fr-icon--sm fr-mb-1v">{{ conversation_stats.documents_count }} document{{ conversation_stats.documents_count|pluralize:"s" }}</span>
+                {% if conversation_stats.documents_count %}
+                    <!-- Number of files -->
+                    <span class="project-crm__project-information fr-icon-file-download-line fr-icon--sm fr-mb-1v">{{ conversation_stats.documents_count }} document{{ conversation_stats.documents_count|pluralize:"s" }}</span>
+                {% endif %}
                 {% if project.tags.all %}
                     <!-- Tags -->
                     <span class="project-crm__project-information fr-icon-tag-line fr-icon--sm fr-mb-1v">
