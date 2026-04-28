@@ -690,6 +690,18 @@ def user_details(request, user_id):
     sticky_notes = all_notes.filter(sticky=True)
     notes = all_notes.exclude(sticky=True)
 
+    if not crm_user_is_advisor and not crm_user.is_staff:
+        user_project_ids = crm_user.projectmember_set.values_list(
+            "project_id", flat=True
+        )
+        next_user_reminder = (
+            reminders_models.Reminder.on_site.filter(
+                project_id__in=user_project_ids, sent_on=None
+            )
+            .order_by("deadline")
+            .first()
+        )
+
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_details.html", locals())

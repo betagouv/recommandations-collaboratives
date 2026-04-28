@@ -102,8 +102,10 @@
                 {% if crm_user.last_login %}
                     <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière connexion il y a {{ crm_user.last_login|timesince }}</span>
                 {% endif %}
-                <!-- Next reminders -->
-                <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel</span>
+                <!-- Next reminder (non-advisor, non-staff only) -->
+                {% if next_user_reminder %}
+                    <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel le {{ next_user_reminder.deadline|date:"j F Y" }}</span>
+                {% endif %}
             </div>
             <!-- Dossiers conseillés -->
             {% if crm_user_is_advisor %}
