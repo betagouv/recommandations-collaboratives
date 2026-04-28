@@ -70,11 +70,11 @@
                 </div>
                 {% for member in project.members.all %}
                     <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
-                        {% include "crm\fragments\user\user_card.html" with user=member %}
+                        {% include "crm/fragments/user/user_card.html" with user=member %}
                         {% if not member.is_active %}
-                        <div class="project-crm__inactive-member">
-                            <span class="project-crm__inactive-member-text">compte désactivé</span>
-                        </div>
+                            <div class="project-crm__inactive-member">
+                                <span class="project-crm__inactive-member-text">compte désactivé</span>
+                            </div>
                         {% endif %}
                     </div>
                 {% empty %}
@@ -90,7 +90,7 @@
                 {% for group in grouped_st %}
                     {% for switchtender in group.list %}
                         <div class="project-crm__section-container fr-px-3w fr-py-2w">
-                            {% include "crm\fragments\user\user_card.html" with user=switchtender %}
+                            {% include "crm/fragments/user/user_card.html" with user=switchtender %}
                         </div>
                     {% endfor %}
                 {% endfor %}
