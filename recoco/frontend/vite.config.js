@@ -225,6 +225,14 @@ const config = {
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),
+        projectCrmStyles: resolve('./src/js/styles/project-crm.css.js'),
+        bannerProjectStatusStyle: resolve(
+          './src/js/styles/banner-project-status.css.js'
+        ),
+        bannerProjectMultiportalStyles: resolve(
+          './src/js/styles/banner-project-multiportal.css.js'
+        ),
+        crmNoteStyles: resolve('.src/js/styles/crm-note.css.js'),
       },
       output: {
         chunkFileNames: undefined,

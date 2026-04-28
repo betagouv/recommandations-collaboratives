@@ -8,106 +8,172 @@
     {{ project.name }} - CRM
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/project-crm.css.js' %}
+    {% vite_asset 'js/styles/card-crm.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/components/GravatarCache.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0 crm-font">
-        {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            {% if request.site != site_origin.site %}
-                <div class="fr-notice fr-notice--info">
-                    <div class="fr-container">
-                        <div class="fr-notice__body">
-                            <span class="fr-notice__title">Il s'agit d'un dossier provenant d'un autre portail ({{ site_origin.site.name }}).</span>
-                            <span class="fr-notice__description">Les notes de CRM ne sont pas partagées, vous ne verrez donc pas celles rédigées par les autres portails. Vous pouvez néanmoins en ajouter pour vous.</span>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-            {% if project.deleted %}
-                <div class="d-block fr-mx-3w">
-                    <div class="alert alert-danger fr-mt-3w" role="alert">
-                        <span>Ce dossier a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
-                        <div class="d-flex justify-content-end fr-mt-2v">
-                            <form method="post" action="{% url 'crm-project-undelete' project.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Réactiver ce dossier</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-            <div class="crm-header fr-px-3w fr-py-3w d-flex justify-content-between align-items-center{% if active_project %}fr-mb-2w {% endif %}">
-                <div>
-                    <h3 class="d-flex fr-mb-0 align-items-center">
-                        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-                        </svg>
-                        <span>{{ project.name }}</span>
-                    </h3>
-                    <div class="fr-mt-1v d-flex flex-wrap small">
-                        {% for tag in project.tags.all %}<span class="crm-project-tag fr-mx-1v">#{{ tag }}</span>{% endfor %}
-                    </div>
-                    <hr />
-                    <div class="d-flex align-items-center small">
-                        <fieldset class="fr-fieldset"
-                                  id="checkboxes-inline"
-                                  aria-labelledby="checkboxes-inline-legend">
-                            <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend"
-                                    id="checkboxes-inline-legend">Suivi de l'impact</legend>
-                            <div class="crm-group-checkbox">
-                                {% with project.crm_annotations.tags.names as active_tags %}
-                                    {% for crm_tag in site_config.crm_available_tags.all %}
-                                        <form class="fr-mr-2v"
-                                              action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <input class="button"
-                                                   hidden
-                                                   name="tag"
-                                                   value="{{ crm_tag.name }}"
-                                                   id="id_tag_{{ crm_tag.name|slugify }}" />
-                                            <div class="crm-form-check form-check form-check-inline">
-                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       name="checkbox-{{ crm_tag.name|slugify }}"
-                                                       onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
-                                                       id="checkbox-{{ crm_tag.name|slugify }}"
-                                                       {% if crm_tag.name in active_tags %}checked{% endif %}>
-                                                <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
-                                            </div>
-                                        </form>
-                                    {% endfor %}
-                                {% endwith %}
-                            </div>
-                        </fieldset>
-                    </div>
-                </div>
-                <div>
-                    <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                        <span>Voir le dossier</span>
-                    </a>
-                    <a href="{% url 'crm-project-update' project.pk %}"
-                       class="btn btn-outline-secondary"
-                       aria-current="page">Gérer le dossier</a>
-                </div>
+    <!-- CRM Navbar -->
+    {% include "crm/fragments/navigation.html" with projects=True %}
+    <!-- Breadcrumb -->
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-project-list' %}', title: 'Dossiers'}], current: `{{ project.name }}` } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <div x-data="Crm" class="project-crm d-flex">
+        <!-- Left column -->
+        <div class="project-crm-left-col position-relative">
+            <div class="position-absolute top-0 end-0 fr-p-2w">
+                <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-eye-line"
+                   href="{% url 'projects-project-detail' project.pk %}"></a>
+                <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line"
+                   href="{% url 'crm-project-update' project.pk %}"></a>
             </div>
-            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
-                <div class="d-flex justify-content-between align-items-start">
-                    <a class="btn btn-primary fr-mb-3w"
-                       href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
+            <!-- Project info -->
+            <div class="d-flex flex-column fr-p-5v">
+                <!-- Name -->
+                <h2 class="project-crm__project-name fr-mb-0">{{ project.name }}</h2>
+                <!-- Organization -->
+                <h3 class="project-crm__project-org fr-mb-3v">{{ project.owner.profile.organization.name }}</h3>
+                <!-- Commune -->
+                <span class="project-crm__project-information fr-icon-target-line fr-icon--sm fr-mb-1v">{{ project.commune.name }}</span>
+                <!-- Region -->
+                <span class="project-crm__project-information fr-icon-target-line fr-icon--sm fr-mb-1v">Région {{ project.commune.department.region }}</span>
+                <!-- Updated at -->
+                <span class="project-crm__project-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">Mis à jour le {{ project.updated_on|date:"j F Y" }}</span>
+                <!-- Created at -->
+                <span class="project-crm__project-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">Déposé le {{ project.created_on|date:"j F Y" }}</span>
+                <!-- Number of message in conv -->
+                <span class="project-crm__project-information fr-icon-chat-2-line fr-icon--sm fr-mb-1v">{{ conversation_stats.messages_count|length }} message{{ conversation_stats.messages_count|length|pluralize:"s" }}</span>
+                <!-- Number of participants in conv -->
+                <span class="project-crm__project-information fr-icon-user-line fr-icon--sm fr-mb-1v">{{ conversation_stats.participants_count }} participant{{ conversation_stats.participants_count|pluralize:"s" }}</span>
+                <!-- Number of reco in conv -->
+                <span class="project-crm__project-information fr-icon-list-check-line fr-icon--sm fr-mb-1v">{{ conversation_stats.recommendations_count }} recommandation{{ conversation_stats.recommendations_count|pluralize:"s" }}</span>
+                {% if conversation_stats.documents_count %}
+                    <!-- Number of files -->
+                    <span class="project-crm__project-information fr-icon-file-download-line fr-icon--sm fr-mb-1v">{{ conversation_stats.documents_count }} document{{ conversation_stats.documents_count|pluralize:"s" }}</span>
+                {% endif %}
+                {% if project.tags.all %}
+                    <!-- Tags -->
+                    <span class="project-crm__project-information fr-icon-tag-line fr-icon--sm fr-mb-1v">
+                        {% for tag in project.tags.all %}<span class="project-crm__project-information">#{{ tag }}</span>{% endfor %}
+                    </span>
+                {% endif %}
+                <!-- Next email reminder -->
+                <span class="project-crm__project-information fr-icon-mail fr-icon--sm">
+                    {% with project.next_reminder as next_reminder %}
+                        {% if next_reminder %}
+                            Prochaine rappel le {{ next_reminder }}
+                        {% else %}
+                            Aucun rappel programmé
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+            <!-- Client team -->
+            <div>
+                <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="project-crm__section-title">Equipe demandeur</span>
                 </div>
+                {% for member in project.members.all %}
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
+                        {% include "crm/fragments/user/user_card.html" with user=member %}
+                        {% if not member.is_active %}
+                            <div class="project-crm__inactive-member">
+                                <span class="project-crm__inactive-member-text">compte désactivé</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
+                        <span class="font-size-12px">Aucun demandeur ou partenaire</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <!-- Advisor team -->
+            <div>
+                <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="project-crm__section-title">Equipe conseil</span>
+                </div>
+                {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+                {% for group in grouped_st %}
+                    {% for switchtender in group.list %}
+                        <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                            {% include "crm/fragments/user/user_card.html" with user=switchtender %}
+                        </div>
+                    {% endfor %}
+                {% empty %}
+                    <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                        <span class="font-size-12px">Aucun participant</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Right column -->
+        <div class="project-crm-right-col">
+            <!-- Banner project status -->
+            {% include "crm/fragments/banner_project_status.html" with project=project %}
+            <!-- Banner multiportail project -->
+            {% include "crm/fragments/banner_project_multiportal.html" with project=project %}
+            <!-- Impact tags checkbox list -->
+            <section class="d-flex align-items-center small">
+                <fieldset class="fr-fieldset fr-mx-0 fr-px-0"
+                          id="checkboxes-inline"
+                          aria-labelledby="checkboxes-inline-legend">
+                    <legend class="project-crm__section-title fr-mb-1w"
+                            id="checkboxes-inline-legend">Suivi de l'impact</legend>
+                    <div class="project-crm__container-tags">
+                        {% with project.crm_annotations.tags.names as active_tags %}
+                            {% for crm_tag in site_config.crm_available_tags.all %}
+                                <form class="fr-mr-2v"
+                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <input class="button"
+                                           hidden
+                                           name="tag"
+                                           value="{{ crm_tag.name }}"
+                                           id="id_tag_{{ crm_tag.name|slugify }}" />
+                                    <div class="crm-form-check form-check form-check-inline">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="checkbox-{{ crm_tag.name|slugify }}"
+                                               onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
+                                               id="checkbox-{{ crm_tag.name|slugify }}"
+                                               {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                        <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
+                                    </div>
+                                </form>
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                </fieldset>
+            </section>
+            <!-- Create new note btn -->
+            <section class="w-100">
+                <div class="project-crm__section-title-container no-border">
+                    <h3 class="project-crm__section-title">Notes</h3>
+                    <a class="fr-btn fr-btn--primary fr-btn--sm"
+                       href="{% url 'crm-project-note-create' project.pk %}">Ajouter une note</a>
+                </div>
+                <!-- Empty state -->
+                {% if not notes.all and not sticky_notes.all %}
+                    {% include "crm/fragments/notes/empty_state.html" %}
+                {% endif %}
+                <!-- Pinned notes -->
                 {% for note in sticky_notes.all %}
                     {% include "crm/note.html" with pinned=True get_user_profile=True %}
                 {% endfor %}
+                <!-- Notes list -->
                 {% for note in notes.all %}
                     {% include "crm/note.html" with get_user_profile=True %}
                 {% endfor %}
-            </div>
-            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
-                <h4>Activité</h4>
+            </section>
+            {% comment %} TODO  {% endcomment %}
+            <!-- Activity timeline -->
+            <section class="w-100">
+                <h3 class="project-crm__section-title">Activité du dossier</h3>
                 {% include "crm/timeline.html" %}
-            </div>
+            </section>
         </div>
     </div>
 {% endblock content %}

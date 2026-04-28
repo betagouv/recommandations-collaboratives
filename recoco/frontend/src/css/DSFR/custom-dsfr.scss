@@ -144,6 +144,12 @@ ul.fr-btns-group {
   padding-left: 0;
 }
 
+.hide-ul-style {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
 /* ¯¯¯ *\
   FORMS
 \* ˍˍˍ */
@@ -542,6 +548,14 @@ form > p {
 }
 
 /* ¯¯¯¯¯ *\
+  BORDER
+\* ˍˍˍˍˍ */
+
+.no-border {
+  border: none !important;
+}
+
+/* ¯¯¯¯¯ *\
   BACKDROP
 \* ˍˍˍˍˍˍ */
 
@@ -563,7 +577,8 @@ form > p {
   text-decoration: none !important;
 }
 
-.fr-link--underline .text-underline {
+.fr-link--underline,
+.text-underline {
   text-decoration: underline !important;
 }
 
@@ -681,6 +696,10 @@ form > p {
 
 .fw-400 p {
   font-weight: 400;
+}
+
+.fw-700 {
+  font-weight: 700;
 }
 
 .centered-item {
@@ -903,6 +922,15 @@ a.fr-text-inverted--grey {
     color: var(--light-text-title-grey, #161616);
     border: none;
     box-shadow: none;
+  }
+  &-transparent {
+    border-radius: 2px;
+    border: 1px solid var(--light-text-mention-grey, #666);
+    background: transparent;
+    color: var(--light-text-mention-grey, #666);
+    &:hover {
+      background-color: var(--light-background-default-grey, #eee) !important;
+    }
   }
   &:not(:disabled):hover {
     background-color: var(--light-background-alt-grey-hover, #e6e6e6);

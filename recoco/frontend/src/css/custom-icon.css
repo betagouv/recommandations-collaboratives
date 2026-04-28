@@ -117,3 +117,18 @@
 .fr-icon-magic-fill::before {
   mask-image: url(../assets/magic-fill.svg);
 }
+
+.fr-icon-pushpin-line::after,
+.fr-icon-pushpin-line::before {
+  mask-image: url(../assets/pushpin-line.svg);
+}
+
+.fr-icon-mail::after,
+.fr-icon-mail::before {
+  mask-image: url(../assets/mail.svg);
+}
+
+.fr-icon-people::after,
+.fr-icon-people::before {
+  mask-image: url(../assets/people.svg);
+}

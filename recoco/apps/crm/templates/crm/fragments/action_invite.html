@@ -1,21 +1,9 @@
 {% load gravatar %}
 <li class="d-flex flex-columns list-group-item">
-    {% if action.actor %}
-        <div class="align-middle fr-mx-2v flex-shrink">
-            <img class="rounded-circle"
-                 src="{% gravatar_url action.actor.email size=24 %}"
-                 alt="{{ action.actor }}">
-        </div>
-    {% endif %}
-    <div class=" flex-row flex-grow-1">
-        <div class="flex-grow w-100 flex-grow-1">
+    <div class="flex-row flex-grow-1 font-size-12px no-wrap">
+        <div class="d-flex flex-grow w-100 flex-grow-1">
             {% if action.actor %}
-                <span class="actor">
-                    <a href="{% url 'crm-user-details' action.actor.pk %}">
-                        {{ action.actor.first_name|default:action.actor.email }}
-                        {{ action.actor.last_name|default:"" }}
-                    </a>
-                </span>
+                {% include "user/user_card.html" with user=action.actor show_organization=False %}
             {% endif %}
             <span class="verb">
                 {% if action.action_object.role %}
@@ -31,7 +19,7 @@
                 {% endif %}
             </span>
             {% if action.target %}
-                <span class="target">
+                <span class="target fr-ml-1v">
                     sur le dossier <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                 </span>
             {% endif %}

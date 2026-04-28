@@ -1,0 +1,35 @@
+.project-banner {
+  border-radius: 2px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  &--draft,
+  &--paused {
+    background: var(--light-background-flat-info, #0063cb);
+    .project-banner__btn {
+      border-radius: 1px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 150%;
+      padding: 4px 8px;
+      &--white {
+        background: var(--light-background-elevated-grey, #fff);
+        color: var(--light-text-default-info, #0063cb);
+      }
+    }
+  }
+  &--rejected,
+  &--deleted,
+  &--predraft {
+    background: var(--dark-text-mention-grey, #929292);
+  }
+  a {
+    color: inherit;
+    font-weight: bolder;
+  }
+}

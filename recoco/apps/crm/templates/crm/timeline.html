@@ -1,73 +1,61 @@
 {% load gravatar %}
 {% load common_tags %}
 {% get_verbs as verbs %}
-<ul class="list-group">
-    {% for action in actions %}
-        {% if action.verb == verbs.Project.INVITATION %}
-            {% include "crm/fragments/action_invite.html" %}
-        {% elif action.verb == verbs.User.ADVISOR_REQUEST %}
-          {% include "crm/fragments/action_account_request.html" %}
-        {% else %}
-            <li class="d-flex flex-columns list-group-item">
-                {% if action.actor %}
-                    <div class="align-middle fr-mx-2v flex-shrink">
-                        <img class="rounded-circle"
-                             src="{% gravatar_url action.actor.email size=24 %}"
-                             alt="{{ action.actor }}">
-                    </div>
-                {% endif %}
-                <div class=" flex-row flex-grow-1">
-                    <div class="flex-grow w-100 flex-grow-1">
-                        {% if action.actor %}
-                            <span class="actor">
-                                <a href="{% url 'crm-user-details' action.actor.pk %}">
-                                    {{ action.actor.first_name|default:action.actor.email }}
-                                    {{ action.actor.last_name|default:"" }}
-                                </a>
+<ul class="hide-ul-style fr-mt-1w">
+    {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
+    {% for date_group in actions_by_date %}
+        <li class="project-crm__timeline-date">le {{ date_group.grouper }}</li>
+        {% for action in date_group.list %}
+            {% if action.verb == verbs.Project.INVITATION %}
+                {% include "crm/fragments/action_invite.html" %}
+            {% elif action.verb == verbs.User.ADVISOR_REQUEST %}
+                {% include "crm/fragments/action_account_request.html" %}
+            {% else %}
+                <li class="d-flex flex-columns list-group-item">
+                    <div class="flex-row flex-grow-1">
+                        <div class="d-flex flex-grow w-100 flex-grow-1 font-size-12px no-wrap">
+                            {% if action.actor %}
+                                {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                            {% else %}
+                                <span class="actor">(compte supprimé)</span>
+                            {% endif %}
+                            <span class="verb">
+                                <strong>{{ action.verb }}</strong>
                             </span>
-                        {% else %}
-                            <span class="actor">(compte supprimé)</span>
-                        {% endif %}
-                        <span class="verb">
-                            <strong>{{ action.verb }}</strong>
-                        </span>
-                        {% if action.action_object.email and action.action_object_content_type.model == "user" %}
-                            <a href="{% url 'crm-user-details' action.action_object.pk %}">
-                                {{ action.action_object.first_name|default:action.action_object.email }}
-                                {{ action.action_object.last_name|default:"" }}
-                            </a>
-                        {% elif action.action_object.email %}
+                            {% if action.action_object.email and action.action_object_content_type.model == "user" %}
+                                <a href="{% url 'crm-user-details' action.action_object.pk %}"
+                                   class="fr-ml-1v">
+                                    {{ action.action_object.first_name|default:action.action_object.email }}
+                                    {{ action.action_object.last_name|default:"" }}
+                                </a>
+                            {% elif action.action_object.email %}
                             <span>
                                 {{ action.action_object.first_name|default:action.action_object.email }}
                                 {{ action.action_object.last_name|default:"" }}
                             </span>
                         {% endif %}
-                        {% if action.action_object.feed_label %}
-                                    <a href="{{ action.action_object.get_absolute_url }}">
-                                        {{ action.action_object.feed_label }}
-                                    </a>
-                        {% endif %}
-                        {% if action.target and action.target_content_type.model == "project" %}
-                            <span class="target">
-                                {% if action.verb != verbs.Project.BECAME_OBSERVER and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.LEFT_OBSERVING and action.verb != verbs.Project.LEFT_ADVISING %}
-                                    sur le dossier
-                                {% endif %}
-                                <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                            </span>
-                        {% endif %}
-                        <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
-                    </div>
-                    {% if action.action_object.resource %}
-                        <div class="border fr-p-2v rounded bg-white w-100">{{ action.action_object.resource.title }}</div>
+                            {% if action.action_object.feed_label %}
+                                <a href="{{ action.action_object.get_absolute_url }}" class="fr-ml-1v">{{ action.action_object.feed_label }}</a>
+                            {% endif %}
+                            {% if action.target and action.target_content_type.model == "project" %}
+                                <span class="fr-ml-1v target">
+                                    {% if action.verb != verbs.Project.BECAME_OBSERVER and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.LEFT_OBSERVING and action.verb != verbs.Project.LEFT_ADVISING and 'dossier' not in action.verb %}
+                                        sur le dossier
+                                    {% endif %}
+                                    <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                </span>
+                            {% endif %}
+                            <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+                        </div>
+                        {% if action.action_object.comment %}
+                            <div class="border fr-p-2v rounded bg-white w-100">
+                                "{{ action.action_object.comment }}" à propos de <a href=" {{ action.action_object.task.get_absolute_url }}">{{
+                            notification.action_object.task }}</a>
+                        </div>
                     {% endif %}
-                    {% if action.action_object.comment %}
-                        <div class="border fr-p-2v rounded bg-white w-100">
-                            "{{ action.action_object.comment }}" à propos de <a href=" {{ action.action_object.task.get_absolute_url }}">{{
-                        notification.action_object.task }}</a>
-                    </div>
-                {% endif %}
-            </div>
-        </li>
+                </div>
+            </li>
         {% endif %}
     {% endfor %}
+{% endfor %}
 </ul>

@@ -1,0 +1,12 @@
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/banner-project-multiportal.css.js' %}
+{% endblock js %}
+{% if request.site != site_origin.site %}
+    <div class="project-banner-multiportal">
+        <p class="fr-mb-0 fw-700">Ce dossier provient d'un autre portail ({{ site_origin.site.name }}).</p>
+        <p class="fr-mb-0">
+            Les notes ne sont pas partagées, vous ne verrez donc pas celles rédigées par les autres portails. Vous pouvez néanmoins en ajouter pour vous.
+        </p>
+    </div>
+{% endif %}

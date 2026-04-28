@@ -624,7 +624,7 @@ def set_project_active(request, project_id: int):
         target=project,
     )
 
-    return redirect(reverse("projects-project-administration", args=(project.id,)))
+    return redirect(request.headers.get("referer"))
 
 
 # eof

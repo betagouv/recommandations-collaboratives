@@ -1,0 +1,40 @@
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/banner-project-status.css.js' %}
+{% endblock js %}
+{% if project.inactive_since %}
+    <div class="project-banner project-banner--paused">
+        <p class="fr-mb-0">
+            Ce dossier a été mis en pause
+            {% comment %} TODO Set data available {% endcomment %}
+            {% comment %} {% if user %}
+                par {{ user.firstName }} {{ user.lastName }}
+                {% if user.organization %}({{ user.organization }}){% endif %}
+            {% endif %} {% endcomment %}.
+        </p>
+        <form id="admin-activate-project"
+              method="post"
+              action="{% url 'projects-project-set-active' project.pk %}">
+            {% csrf_token %}
+            <button class="project-banner__btn project-banner__btn--white">Réactiver le dossier</button>
+        </form>
+    </div>
+{% elif project.status == 'REJECTED' %}
+    <div class="project-banner project-banner--rejected">
+        <p class="fr-mb-0">Ce dossier a été rejeté à la modération, il n'est pas actif.</p>
+    </div>
+{% elif project.status == 'DRAFT' %}
+    <div class="project-banner project-banner--draft">
+        <p class="fr-mb-0">
+            Ce dossier est en attente de validation. Vous pouver le <a href="{% url 'projects-moderation-list' %}">valider ici.</a>
+        </p>
+    </div>
+{% elif project.status == 'PRE_DRAFT' %}
+    <div class="project-banner project-banner--predraft">
+        <p class="fr-mb-0">Ce dossier a est incomplet : son dépôt n'a pas été finalisé, il n'est pas actif.</p>
+    </div>
+{% elif project.deleted %}
+    <div class="project-banner project-banner--deleted">
+        <p class="fr-mb-0">Ce dossier a été supprimé.</p>
+    </div>
+{% endif %}
