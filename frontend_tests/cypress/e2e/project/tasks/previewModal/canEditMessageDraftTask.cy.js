@@ -1,7 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can not comment a draft task', () => {
+describe('I can not comment a draft task @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

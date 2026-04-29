@@ -3,7 +3,7 @@ import projectView from '../../../../support/views/project';
 
 const currentProject = projects[17];
 
-describe('As an advisor, I can quit a project', () => {
+describe('As an advisor, I can quit a project @page-projet-parametres-quitter-projet', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);

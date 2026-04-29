@@ -1,7 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can read only project state', () => {
+describe('I can read only project state @page-projet-edl', () => {
   beforeEach(() => {
     cy.login('conseiller3');
   });

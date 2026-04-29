@@ -5,7 +5,7 @@ const currentCommune = commune[1];
 
 const currentProject = projects[1];
 
-describe('I can go to administration area of a project and change the project location', () => {
+describe('I can go to administration area of a project and change the project location @page-projet-parametres-modifier @page-projet-presentation-localisation', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

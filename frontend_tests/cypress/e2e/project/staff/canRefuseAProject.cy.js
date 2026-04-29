@@ -1,4 +1,4 @@
-describe('I can go to the dashboard and see the pending projects, and refuse one', () => {
+describe('I can go to the dashboard and see the pending projects, and refuse one @acces-moderation', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

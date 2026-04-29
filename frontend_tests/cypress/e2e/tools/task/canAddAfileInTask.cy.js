@@ -2,7 +2,7 @@ import file from '../../../fixtures/documents/file.json';
 
 let currentProjectId;
 
-describe('I can add a file in a task', () => {
+describe('I can add a file in a task @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.createProject('file in task').then((projectId) => {

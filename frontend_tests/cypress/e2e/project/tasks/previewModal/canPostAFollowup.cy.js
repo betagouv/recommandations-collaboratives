@@ -6,7 +6,7 @@ const currentProject = projects[1];
 const task3 = tasks[2];
 const currentUser = users[1];
 
-describe('I can go tasks tab', () => {
+describe('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can access actions tab in a project as a member', () => {
+describe('I can access actions tab in a project as a member @navigation-projet @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });
@@ -13,7 +13,7 @@ describe('I can access actions tab in a project as a member', () => {
   });
 });
 
-describe('I can access actions tab in a project as an advisor', () => {
+describe('I can access actions tab in a project as an advisor @navigation-projet @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

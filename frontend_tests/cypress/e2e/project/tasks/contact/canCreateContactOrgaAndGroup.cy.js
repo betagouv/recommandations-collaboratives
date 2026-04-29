@@ -1,4 +1,4 @@
-describe('I can create and edit a contact and an organization on contactbook', () => {
+describe('I can create and edit a contact and an organization on contactbook @page-projet-recommandations-creation', () => {
   beforeEach(() => {
     cy.login('staff');
   });

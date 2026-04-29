@@ -126,12 +126,12 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Page                       | Url                            | Fonctionnalité                                     | Code à insérer                                      | Utilisé |
 | -------------------------- | ------------------------------ | -------------------------------------------------- | --------------------------------------------------- | ------: |
 | Navigation principale      | `/`                            | Liste projet récents                               | `// @liste-projets-recents`                         |      ❌ |
-| Navigation principale      | `/`                            | Projets à examiner                                 | `// @acces-moderation`                              |      ❌ |
-| Navigation principale      | `/`                            | Ressources                                         | `// @acces-ressources`                              |      ❌ |
-| Navigation principale      | `/`                            | Notifications                                      | `// @liste-notifications`                           |      ❌ |
-| Navigation principale      | `/`                            | Accès rapide utilisateur                           | `// @acces-rapide-utilisateur`                      |      ❌ |
-| Liste des projets tableau  | `/projects/staff`              | Page                                               | `// @page-kanban-projets`                           |      ❌ |
-| Liste des projets tableau  | `/projects/staff`              | Recherche                                          | `// @recherche-kanban-projets`                      |      ❌ |
+| Navigation principale      | `/`                            | Projets à examiner                                 | `// @acces-moderation`                              |      ✅ |
+| Navigation principale      | `/`                            | Ressources                                         | `// @acces-ressources`                              |      ✅ |
+| Navigation principale      | `/`                            | Notifications                                      | `// @liste-notifications`                           |      ✅ |
+| Navigation principale      | `/`                            | Accès rapide utilisateur                           | `// @acces-rapide-utilisateur`                      |      ✅ |
+| Liste des projets tableau  | `/projects/staff`              | Page                                               | `// @page-kanban-projets`                           |      ✅ |
+| Liste des projets tableau  | `/projects/staff`              | Recherche                                          | `// @recherche-kanban-projets`                      |      ✅ |
 | Liste des projets tableau  | `/projects/staff`              | Déposer projet pour le compte de                   | `// @bouton-deposer-projet`                         |      ❌ |
 | Liste des projets tableau  | `/projects/staff`              | Export CSV                                         | `// @kanban-export-csv`                             |      ❌ |
 | Liste des projets liste    | `/projects/advisor`            | Page                                               | `// @page-liste-projets`                            |      ❌ |
@@ -142,55 +142,55 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Liste des projets carte    | `/projects/map`                | Recherche                                          | `// @recherche-map-projets`                         |      ❌ |
 | Liste des projets carte    | `/projects/map`                | Création projet                                    | `// @bouton-deposer-projet`                         |      ❌ |
 | Liste des projets carte    | `/projects/map`                | Export CSV                                         | `// @map-projets-export-csv`                        |      ❌ |
-| Projet                     | `/project/{id}`                | Navigation                                         | `// @navigation-projet`                             |      ❌ |
-| Projet                     | `/project/{id}`                | Raccourci CRM projet                               | `// @bouton-raccourci-crm-staff`                    |      ❌ |
-| Projet                     | `/project/{id}`                | Inviter                                            | `// @bouton-inviter-projet`                         |      ❌ |
-| Projet                     | `/project/{id}`                | Changement role                                    | `// @changement-role-projet`                        |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Page                                               | `// @page-projet-presentation`                      |      🚧 |
-| Projet - Présentation      | `/project/{id}/overview`       | Rappel Email                                       | `// @page-projet-presentation-rappel-email`         |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Thématique projet                                  | `// @page-projet-presentation-thematique`           |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Note interne                                       | `// @page-projet-presentation-note-interne`         |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Résumé projet saisine                              | `// @page-projet-presentation-resume-saisine`       |      ❌ |
+| Projet                     | `/project/{id}`                | Navigation                                         | `// @navigation-projet`                             |      ✅ |
+| Projet                     | `/project/{id}`                | Raccourci CRM projet                               | `// @bouton-raccourci-crm-staff`                    |      ✅ |
+| Projet                     | `/project/{id}`                | Inviter                                            | `// @bouton-inviter-projet`                         |      ✅ |
+| Projet                     | `/project/{id}`                | Changement role                                    | `// @changement-role-projet`                        |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Page                                               | `// @page-projet-presentation`                      |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Rappel Email                                       | `// @page-projet-presentation-rappel-email`         |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Thématique projet                                  | `// @page-projet-presentation-thematique`           |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Note interne                                       | `// @page-projet-presentation-note-interne`         |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Résumé projet saisine                              | `// @page-projet-presentation-resume-saisine`       |      ✅ |
 | Projet - Présentation      | `/project/{id}/overview`       | Activité du projet                                 | `// @page-projet-presentation-activite`             |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Tags projet                                        | `// @page-projet-presentation-tags`                 |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Modal localisation projet                          | `// @page-projet-presentation-localisation`         |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Inviter partenaire (ancien collectivité)           | `// @page-projet-presentation-inviter-partenaire`   |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Inviter dans l'équipe de suivi (ancien conseiller) | `// @page-projet-presentation-inviter-suivie`       |      ❌ |
+| Projet - Présentation      | `/project/{id}/overview`       | Tags projet                                        | `// @page-projet-presentation-tags`                 |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Modal localisation projet                          | `// @page-projet-presentation-localisation`         |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Inviter partenaire (ancien collectivité)           | `// @page-projet-presentation-inviter-partenaire`   |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Inviter dans l'équipe de suivi (ancien conseiller) | `// @page-projet-presentation-inviter-suivie`       |      ✅ |
 | Projet - Diagnostic        | `/project/{id}/overview`       | Marquer le diagnostic comme fait                   | `// @page-projet-presentation-mark-diagnostic-done` |      ✅ |
-| Projet - État des lieux    | `/project/{id}/connaissance`   | Page                                               | `// @page-projet-edl`                               |      ❌ |
-| Projet - État des lieux    | `/project/{id}/connaissance`   | CTA complétion                                     | `// @page-projet-edl-completer`                     |      ❌ |
-| Projet - État des lieux    | `/project/{id}/connaissance`   | Partage                                            | `// @page-projet-edl-partager`                      |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      🚧 |
-| Projet - Recommandations   | `/project/{id}/actions`        | Création                                           | `// @page-projet-recommandations-creation`          |      🚧 |
-| Projet - Recommandations   | `/project/{id}/actions`        | Modification                                       | `// @page-projet-recommandations-modification`      |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Passer en brouillon                                | `// @page-projet-recommandations-brouillon`         |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Suppression                                        | `// @page-projet-recommandations-suppression`       |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Changement ordre recommandation                    | `// @page-projet-recommandations-ordre`             |      ❌ |
+| Projet - État des lieux    | `/project/{id}/connaissance`   | Page                                               | `// @page-projet-edl`                               |      ✅ |
+| Projet - État des lieux    | `/project/{id}/connaissance`   | CTA complétion                                     | `// @page-projet-edl-completer`                     |      ✅ |
+| Projet - État des lieux    | `/project/{id}/connaissance`   | Partage                                            | `// @page-projet-edl-partager`                      |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Création                                           | `// @page-projet-recommandations-creation`          |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Modification                                       | `// @page-projet-recommandations-modification`      |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Passer en brouillon                                | `// @page-projet-recommandations-brouillon`         |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Suppression                                        | `// @page-projet-recommandations-suppression`       |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Changement ordre recommandation                    | `// @page-projet-recommandations-ordre`             |      ✅ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Etiquette non lu                                   | `// @page-projet-recommandations-etiquette-non-lue` |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Modal - Echange                                    | `// @page-projet-recommandations-modal`             |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Status (En cours, faite, non applicable)           | `// @page-projet-recommandations-status`            |      🚧 |
-| Projet - Recommandations   | `/project/{id}/actions`        | Bandeau recos non lues                             | `// @page-projet-recommandations-bandeau-non-lue`   |      ❌ |
-| Projet - Conversations     | `/project/{id}/conversations`  | Page                                               | `// @page-projet-conversations`                     |      ❌ |
-| Projet - Conversations     | `/project/{id}/conversations`  | Nouveau message                                    | `// @page-projet-conversations-nouveau-message`     |      ❌ |
-| Projet - Fichier           | `/project/{id}/documents`      | Page                                               | `// @page-projet-fichier`                           |      ❌ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Modal - Echange                                    | `// @page-projet-recommandations-modal`             |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Status (En cours, faite, non applicable)           | `// @page-projet-recommandations-status`            |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Bandeau recos non lues                             | `// @page-projet-recommandations-bandeau-non-lue`   |      ✅ |
+| Projet - Conversations     | `/project/{id}/conversations`  | Page                                               | `// @page-projet-conversations`                     |      ✅ |
+| Projet - Conversations     | `/project/{id}/conversations`  | Nouveau message                                    | `// @page-projet-conversations-nouveau-message`     |      ✅ |
+| Projet - Fichier           | `/project/{id}/documents`      | Page                                               | `// @page-projet-fichier`                           |      ✅ |
 | Projet - Fichier           | `/project/{id}/documents`      | Recherche                                          | `// @page-projet-fichier-recherche`                 |      ❌ |
-| Projet - Fichier           | `/project/{id}/documents`      | Ajouter un fichier                                 | `// @page-projet-fichier-ajouter`                   |      ❌ |
-| Projet - Fichier           | `/project/{id}/documents`      | Fichier - mettre en favori                         | `// @page-projet-fichier-favori`                    |      ❌ |
-| Projet - Fichier           | `/project/{id}/documents`      | Fichier - supprimer                                | `// @page-projet-fichier-supprimer`                 |      ❌ |
+| Projet - Fichier           | `/project/{id}/documents`      | Ajouter un fichier                                 | `// @page-projet-fichier-ajouter`                   |      ✅ |
+| Projet - Fichier           | `/project/{id}/documents`      | Fichier - mettre en favori                         | `// @page-projet-fichier-favori`                    |      ✅ |
+| Projet - Fichier           | `/project/{id}/documents`      | Fichier - supprimer                                | `// @page-projet-fichier-supprimer`                 |      ✅ |
 | Projet - Fichier           | `/project/{id}/documents`      | Fichier - télécharger                              | `// @page-projet-fichier-télécharger`               |      ❌ |
 | Projet - Fichier           | `/project/{id}/documents`      | Fichier reco                                       | `// @page-projet-fichier-reco`                      |      ❌ |
 | Projet - Fichier           | `/project/{id}/documents`      | Fichier EDL - télécharger                          | `// @page-projet-fichier-edl-télécharger`           |      ❌ |
-| Projet - Fichier           | `/project/{id}/documents`      | Epingler un lien                                   | `// @page-projet-fichier-epingler-lien`             |      ❌ |
-| Projet - Espace conseiller | `/project/{id}/suivi`          | Page                                               | `// @page-projet-espace-conseiller`                 |      ❌ |
-| Projet - Espace conseiller | `/project/{id}/suivi`          | Nouveau message                                    | `// @page-projet-espace-conseiller-nouveau-message` |      ❌ |
-| Projet - Paramètres        | `/project/{id}/administration` | Page                                               | `// @page-projet-parametres`                        |      ❌ |
-| Projet - Paramètres        | `/project/{id}/administration` | Modifier info projet                               | `// @page-projet-parametres-modifier`               |      ❌ |
-| Projet - Paramètres        | `/project/{id}/administration` | Gestion des utilisateurs                           | `// @page-projet-parametres-gestion-utilisateur`    |      ❌ |
-| Projet - Paramètres        | `/project/{id}/administration` | Gestion invitation                                 | `// @page-projet-parametres-gestion-invitation`     |      ❌ |
-| Projet - Paramètres        | `/project/{id}/administration` | Mettre projet en pause                             | `// @page-projet-parametres-pause-projet`           |      ❌ |
-| Projet - Paramètres        | `/project/{id}/administration` | Quitter le projet                                  | `// @page-projet-parametres-quitter-projet`         |      ❌ |
-| Déposer un projet          | `/onboarding/project`          | Page                                               | `// @deposer-projet`                                |      🚧 |
-| Demande compte conseiller  | `/advisor-access-request`      | Demande de compte conseiller                       | `// @demande-compte-conseiller`                     |      🚧 |
+| Projet - Fichier           | `/project/{id}/documents`      | Epingler un lien                                   | `// @page-projet-fichier-epingler-lien`             |      ✅ |
+| Projet - Espace conseiller | `/project/{id}/suivi`          | Page                                               | `// @page-projet-espace-conseiller`                 |      ✅ |
+| Projet - Espace conseiller | `/project/{id}/suivi`          | Nouveau message                                    | `// @page-projet-espace-conseiller-nouveau-message` |      ✅ |
+| Projet - Paramètres        | `/project/{id}/administration` | Page                                               | `// @page-projet-parametres`                        |      ✅ |
+| Projet - Paramètres        | `/project/{id}/administration` | Modifier info projet                               | `// @page-projet-parametres-modifier`               |      ✅ |
+| Projet - Paramètres        | `/project/{id}/administration` | Gestion des utilisateurs                           | `// @page-projet-parametres-gestion-utilisateur`    |      ✅ |
+| Projet - Paramètres        | `/project/{id}/administration` | Gestion invitation                                 | `// @page-projet-parametres-gestion-invitation`     |      ✅ |
+| Projet - Paramètres        | `/project/{id}/administration` | Mettre projet en pause                             | `// @page-projet-parametres-pause-projet`           |      ✅ |
+| Projet - Paramètres        | `/project/{id}/administration` | Quitter le projet                                  | `// @page-projet-parametres-quitter-projet`         |      ✅ |
+| Déposer un projet          | `/onboarding/project`          | Page                                               | `// @deposer-projet`                                |      ✅ |
+| Demande compte conseiller  | `/advisor-access-request`      | Demande de compte conseiller                       | `// @demande-compte-conseiller`                     |      ✅ |
 
 Le code est a positionner dans les fichiers de tests Cypress dans le nom du test pour permettre de retrouver facilement les tests concernés et de les executer selectivement à l'aide du package @cypress/grep.
 

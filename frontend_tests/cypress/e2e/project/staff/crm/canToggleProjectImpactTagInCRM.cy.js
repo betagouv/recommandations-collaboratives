@@ -1,4 +1,4 @@
-describe('I can go to CRM and toggle project impact tag', () => {
+describe('I can go to CRM and toggle project impact tag @bouton-raccourci-crm-staff', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/crm/project/2`);

@@ -1,4 +1,4 @@
-describe('As a switchtender I can manage notifications in header', () => {
+describe('As a switchtender I can manage notifications in header @liste-notifications', () => {
   before(() => {
     cy.login('collectivité1');
     cy.visit('/project/2/conversations');

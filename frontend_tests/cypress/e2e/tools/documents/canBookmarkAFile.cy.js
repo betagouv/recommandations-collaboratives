@@ -2,7 +2,7 @@ import documents from '../../../fixtures/documents/documents.json';
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can bookmark and unbookmark a file', () => {
+describe('I can bookmark and unbookmark a file @page-projet-fichier-favori', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

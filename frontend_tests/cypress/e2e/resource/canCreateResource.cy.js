@@ -1,4 +1,4 @@
-describe('I can create a resource as a switchtender', () => {
+describe('I can create a resource as a switchtender @acces-ressources', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

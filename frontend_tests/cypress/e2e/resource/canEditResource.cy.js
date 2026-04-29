@@ -12,7 +12,7 @@ const resource = {
   expires_on: '20/12/2022',
 };
 
-describe('I can edit a resource as a staff', () => {
+describe('I can edit a resource as a staff @acces-ressources', () => {
   it('edits a resource', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/ressource/1/');

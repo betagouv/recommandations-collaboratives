@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[3];
 
-describe("I can access overview page and can't see the synopsis", () => {
+describe("I can access overview page and can't see the synopsis @page-projet-presentation-resume-saisine", () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

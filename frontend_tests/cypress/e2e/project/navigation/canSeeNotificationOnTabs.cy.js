@@ -2,7 +2,7 @@ import editor from '../../../support/tools/editor';
 import file from '../../../fixtures/documents/file.json';
 const currentProjectId = 25;
 
-describe('I can access tabs and see notifications', () => {
+describe('I can access tabs and see notifications @navigation-projet', () => {
   before(() => {
     cy.login('collectivité1');
     cy.visit(`/project/${currentProjectId}/presentation`);

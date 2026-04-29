@@ -3,7 +3,7 @@ import contacts from '../../fixtures/addressbook/contacts.json';
 
 const currentResource = resources[1];
 
-describe('I can see the resource contact list if im logged', () => {
+describe('I can see the resource contact list if im logged @acces-ressources', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

@@ -1,4 +1,4 @@
-describe('I can access to my address book', () => {
+describe('I can access to my address book @acces-rapide-utilisateur', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
@@ -13,7 +13,7 @@ describe('I can access to my address book', () => {
   });
 });
 
-describe("I can't see adress book because I don't have one", () => {
+describe("I can't see adress book because I don't have one @acces-rapide-utilisateur", () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

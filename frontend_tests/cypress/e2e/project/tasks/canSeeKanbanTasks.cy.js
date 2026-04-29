@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
-describe('I can go to tasks tab', () => {
+describe('I can go to tasks tab @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

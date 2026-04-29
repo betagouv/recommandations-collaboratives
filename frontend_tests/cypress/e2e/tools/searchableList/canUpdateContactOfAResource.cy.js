@@ -1,6 +1,6 @@
 import contacts from '../../../fixtures/addressbook/contacts.json';
 
-describe('I can assign new contacts when I edit a resource', () => {
+describe('I can assign new contacts when I edit a resource @acces-ressources', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

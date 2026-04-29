@@ -1,4 +1,4 @@
-describe('I can read only public notes', () => {
+describe('I can read only public notes @page-projet-conversations', () => {
   beforeEach(() => {
     cy.login('conseiller3');
   });

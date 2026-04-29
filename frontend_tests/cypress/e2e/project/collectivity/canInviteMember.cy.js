@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[2];
 
-describe('I can invite a member', () => {
+describe('I can invite a member @page-projet-presentation-inviter-partenaire', () => {
   const invitedFullName = 'New Member';
   const invitedEmail = 'new.member@test.fr';
   const inviterFullName = 'Boba collectivité';

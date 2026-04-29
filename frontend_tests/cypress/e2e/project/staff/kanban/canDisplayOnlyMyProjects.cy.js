@@ -1,6 +1,6 @@
 let projectsLength;
 //TODO: Verify when the fixing frontend test environment is done
-describe('I can go to the dashboard and see only my projects', () => {
+describe('I can go to the dashboard and see only my projects @page-kanban-projets', () => {
   beforeEach(() => {
     cy.login('jean');
     cy.visit('/projects/staff/');

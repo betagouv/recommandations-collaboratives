@@ -1,4 +1,4 @@
-describe('I can read only overview page', () => {
+describe('I can read only overview page @page-projet-presentation', () => {
   beforeEach(() => {
     cy.login('conseiller3');
   });

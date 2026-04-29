@@ -2,7 +2,7 @@ import projects from '../../../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
-describe('I can go to administration area of a project and send back an invite for a member', () => {
+describe('I can go to administration area of a project and send back an invite for a member @page-projet-parametres-gestion-invitation', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

@@ -1,4 +1,4 @@
-describe('I can assign new deparments when I edit a resource', () => {
+describe('I can assign new deparments when I edit a resource @acces-ressources', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
