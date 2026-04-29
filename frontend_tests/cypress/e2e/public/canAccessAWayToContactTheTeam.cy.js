@@ -1,4 +1,4 @@
-describe('As a visitor to a recoco site, I can find a way to contact the site team', () => {
+describe('As a visitor to a recoco site, I can find a way to contact the site team @contact-equipe', () => {
   beforeEach(() => {
     cy.visit(`/`);
   });

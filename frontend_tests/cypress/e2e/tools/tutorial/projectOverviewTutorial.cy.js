@@ -3,7 +3,7 @@ import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 const currentProject2 = projects[25];
 
-describe('I can follow the project tutorial', () => {
+describe('I can follow the project tutorial @tutoriel-presentation-projet', () => {
   it('displays the launcher tutorial on the overview window as regional advisor', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);

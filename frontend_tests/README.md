@@ -130,6 +130,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Navigation principale      | `/`                            | Ressources                                         | `// @acces-ressources`                              |      ✅ |
 | Navigation principale      | `/`                            | Notifications                                      | `// @liste-notifications`                           |      ✅ |
 | Navigation principale      | `/`                            | Accès rapide utilisateur                           | `// @acces-rapide-utilisateur`                      |      ✅ |
+| Site public                | `/`                            | Contact équipe (visiteur non connecté)             | `// @contact-equipe`                                |      ✅ |
 | Liste des projets tableau  | `/projects/staff`              | Page                                               | `// @page-kanban-projets`                           |      ✅ |
 | Liste des projets tableau  | `/projects/staff`              | Recherche                                          | `// @recherche-kanban-projets`                      |      ✅ |
 | Liste des projets tableau  | `/projects/staff`              | Déposer projet pour le compte de                   | `// @bouton-deposer-projet`                         |      ❌ |
@@ -142,6 +143,8 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Liste des projets carte    | `/projects/map`                | Recherche                                          | `// @recherche-map-projets`                         |      ❌ |
 | Liste des projets carte    | `/projects/map`                | Création projet                                    | `// @bouton-deposer-projet`                         |      ❌ |
 | Liste des projets carte    | `/projects/map`                | Export CSV                                         | `// @map-projets-export-csv`                        |      ❌ |
+| Tutoriel                   | `/project/{id}`                | Tutoriel présentation projet                       | `// @tutoriel-presentation-projet`                  |      ✅ |
+| Tutoriel                   | `/project/{id}`                | Tutoriel onboarding conseiller                     | `// @tutoriel-onboarding-conseiller`                |      ✅ |
 | Projet                     | `/project/{id}`                | Navigation                                         | `// @navigation-projet`                             |      ✅ |
 | Projet                     | `/project/{id}`                | Raccourci CRM projet                               | `// @bouton-raccourci-crm-staff`                    |      ✅ |
 | Projet                     | `/project/{id}`                | Inviter                                            | `// @bouton-inviter-projet`                         |      ✅ |
@@ -160,6 +163,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Page                                               | `// @page-projet-edl`                               |      ✅ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | CTA complétion                                     | `// @page-projet-edl-completer`                     |      ✅ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Partage                                            | `// @page-projet-edl-partager`                      |      ✅ |
+| Tutoriel                   | `/project/{id}/actions`        | Tutoriel ressource externe                         | `// @tutoriel-ressource-externe`                    |      ✅ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      ✅ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Création                                           | `// @page-projet-recommandations-creation`          |      ✅ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Modification                                       | `// @page-projet-recommandations-modification`      |      ✅ |
@@ -191,6 +195,10 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - Paramètres        | `/project/{id}/administration` | Quitter le projet                                  | `// @page-projet-parametres-quitter-projet`         |      ✅ |
 | Déposer un projet          | `/onboarding/project`          | Page                                               | `// @deposer-projet`                                |      ✅ |
 | Demande compte conseiller  | `/advisor-access-request`      | Demande de compte conseiller                       | `// @demande-compte-conseiller`                     |      ✅ |
+| Connexion                  | `/accounts/login/`             | Connexion (UI et programmatique)                   | `// @connexion`                                     |      ✅ |
+| Inscription                | `/accounts/signup/`            | Inscription utilisateur                            | `// @inscription`                                   |      ✅ |
+| Smoke / transverse         | tous URLs                      | Exploration de toutes les URLs accessibles         | `// @can-explore-all-urls`                          |      ✅ |
+| DSRC (formulaires)         | n/a (composant)                | Validation des formulaires DSRC (test désactivé)   | `// @dsrc-form-validator`                           |      🚧 |
 
 Le code est a positionner dans les fichiers de tests Cypress dans le nom du test pour permettre de retrouver facilement les tests concernés et de les executer selectivement à l'aide du package @cypress/grep.
 
