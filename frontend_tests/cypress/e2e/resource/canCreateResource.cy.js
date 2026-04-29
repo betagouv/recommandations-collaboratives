@@ -23,8 +23,8 @@ describe('I can create a resource as a switchtender @acces-ressources', () => {
       .should('have.value', 'etiquette1');
 
     cy.get('#id_expires_on')
-      .type('20/12/2022', { force: true })
-      .should('have.value', '20/12/2022');
+      .type('2022-12-20', { force: true })
+      .should('have.value', '2022-12-20');
 
     cy.get('.ProseMirror p').click();
     cy.focused().type('text', 'test from ressource description');
