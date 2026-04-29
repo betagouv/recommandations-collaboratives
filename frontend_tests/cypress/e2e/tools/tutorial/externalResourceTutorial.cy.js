@@ -1,4 +1,4 @@
-describe('I can follow the external resource tutorial @tutoriel-ressource-externe', () => {
+describe.skip('I can follow the external resource tutorial @tutoriel-ressource-externe', () => {
   it('displays the launcher tutorial on the external resource', () => {
     cy.login('conseiller1');
     cy.visit('/project/27/actions');

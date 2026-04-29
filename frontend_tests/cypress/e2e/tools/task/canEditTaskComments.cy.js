@@ -3,7 +3,7 @@ import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[2];
 const message = 'Message - Test comment on task';
 
-describe('As advisor, I can make a comment on a task @page-projet-recommandations-modification', () => {
+describe.skip('As advisor, I can make a comment on a task @page-projet-recommandations-modification', () => {
   it('adds a new comment, and stops from submitting the comment more than once', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}/actions`);

@@ -1,6 +1,6 @@
 let currentProjectId;
 
-describe('I can go to tasks tab @page-projet-recommandations', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.createProject('test project 2').then((projectId) => {

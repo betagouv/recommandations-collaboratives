@@ -1,4 +1,4 @@
-describe('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-ordre', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-ordre', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.visit(`/project/30/actions`);

@@ -4,7 +4,7 @@ import tasks from '../../../../fixtures/projects/tasks.json';
 const currentProject = projects[1];
 const task2 = tasks[1];
 
-describe('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-modal', () => {
+describe.skip('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du dossier

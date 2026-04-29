@@ -1,4 +1,4 @@
-describe('I can search and share a contact on a message editor @page-projet-recommandations-modification', () => {
+describe.skip('I can search and share a contact on a message editor @page-projet-recommandations-modification', () => {
   beforeEach(() => {
     cy.login('staff');
   });

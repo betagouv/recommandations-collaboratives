@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-suppression', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-suppression', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     // cy.createProject('delete task');

@@ -120,6 +120,8 @@ Légende :
 - ❌ : pas encore utilisé
 - 🚧 : partiellement utilisé
 - ✅ : positionné sur tout les tests concernés
+- ⏭️ : tous les tests du tag sont désactivés (`describe.skip`)
+- ✅⏭️ : tag couvert mais au moins un test associé est désactivé (`describe.skip`)
 
 Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du code.
 
@@ -129,7 +131,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Navigation principale      | `/`                            | Projets à examiner                                 | `// @acces-moderation`                              |      ✅ |
 | Navigation principale      | `/`                            | Ressources                                         | `// @acces-ressources`                              |      ✅ |
 | Navigation principale      | `/`                            | Notifications                                      | `// @liste-notifications`                           |      ✅ |
-| Navigation principale      | `/`                            | Accès rapide utilisateur                           | `// @acces-rapide-utilisateur`                      |      ✅ |
+| Navigation principale      | `/`                            | Accès rapide utilisateur                           | `// @acces-rapide-utilisateur`                      |    ✅⏭️ |
 | Site public                | `/`                            | Contact équipe (visiteur non connecté)             | `// @contact-equipe`                                |      ✅ |
 | Liste des projets tableau  | `/projects/staff`              | Page                                               | `// @page-kanban-projets`                           |      ✅ |
 | Liste des projets tableau  | `/projects/staff`              | Recherche                                          | `// @recherche-kanban-projets`                      |      ✅ |
@@ -156,24 +158,24 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - Présentation      | `/project/{id}/overview`       | Résumé projet saisine                              | `// @page-projet-presentation-resume-saisine`       |      ✅ |
 | Projet - Présentation      | `/project/{id}/overview`       | Activité du projet                                 | `// @page-projet-presentation-activite`             |      ❌ |
 | Projet - Présentation      | `/project/{id}/overview`       | Tags projet                                        | `// @page-projet-presentation-tags`                 |      ✅ |
-| Projet - Présentation      | `/project/{id}/overview`       | Modal localisation projet                          | `// @page-projet-presentation-localisation`         |      ✅ |
+| Projet - Présentation      | `/project/{id}/overview`       | Modal localisation projet                          | `// @page-projet-presentation-localisation`         |    ✅⏭️ |
 | Projet - Présentation      | `/project/{id}/overview`       | Inviter partenaire (ancien collectivité)           | `// @page-projet-presentation-inviter-partenaire`   |      ✅ |
 | Projet - Présentation      | `/project/{id}/overview`       | Inviter dans l'équipe de suivi (ancien conseiller) | `// @page-projet-presentation-inviter-suivie`       |      ✅ |
 | Projet - Diagnostic        | `/project/{id}/overview`       | Marquer le diagnostic comme fait                   | `// @page-projet-presentation-mark-diagnostic-done` |      ✅ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Page                                               | `// @page-projet-edl`                               |      ✅ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | CTA complétion                                     | `// @page-projet-edl-completer`                     |      ✅ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Partage                                            | `// @page-projet-edl-partager`                      |      ✅ |
-| Tutoriel                   | `/project/{id}/actions`        | Tutoriel ressource externe                         | `// @tutoriel-ressource-externe`                    |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Création                                           | `// @page-projet-recommandations-creation`          |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Modification                                       | `// @page-projet-recommandations-modification`      |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Passer en brouillon                                | `// @page-projet-recommandations-brouillon`         |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Suppression                                        | `// @page-projet-recommandations-suppression`       |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Changement ordre recommandation                    | `// @page-projet-recommandations-ordre`             |      ✅ |
+| Tutoriel                   | `/project/{id}/actions`        | Tutoriel ressource externe                         | `// @tutoriel-ressource-externe`                    |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Création                                           | `// @page-projet-recommandations-creation`          |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Modification                                       | `// @page-projet-recommandations-modification`      |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Passer en brouillon                                | `// @page-projet-recommandations-brouillon`         |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Suppression                                        | `// @page-projet-recommandations-suppression`       |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Changement ordre recommandation                    | `// @page-projet-recommandations-ordre`             |      ⏭️ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Etiquette non lu                                   | `// @page-projet-recommandations-etiquette-non-lue` |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Modal - Echange                                    | `// @page-projet-recommandations-modal`             |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Status (En cours, faite, non applicable)           | `// @page-projet-recommandations-status`            |      ✅ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Bandeau recos non lues                             | `// @page-projet-recommandations-bandeau-non-lue`   |      ✅ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Modal - Echange                                    | `// @page-projet-recommandations-modal`             |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Status (En cours, faite, non applicable)           | `// @page-projet-recommandations-status`            |      ⏭️ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Bandeau recos non lues                             | `// @page-projet-recommandations-bandeau-non-lue`   |      ⏭️ |
 | Projet - Conversations     | `/project/{id}/conversations`  | Page                                               | `// @page-projet-conversations`                     |      ✅ |
 | Projet - Conversations     | `/project/{id}/conversations`  | Nouveau message                                    | `// @page-projet-conversations-nouveau-message`     |      ✅ |
 | Projet - Fichier           | `/project/{id}/documents`      | Page                                               | `// @page-projet-fichier`                           |      ✅ |
@@ -198,7 +200,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Connexion                  | `/accounts/login/`             | Connexion (UI et programmatique)                   | `// @connexion`                                     |      ✅ |
 | Inscription                | `/accounts/signup/`            | Inscription utilisateur                            | `// @inscription`                                   |      ✅ |
 | Smoke / transverse         | tous URLs                      | Exploration de toutes les URLs accessibles         | `// @can-explore-all-urls`                          |      ✅ |
-| DSRC (formulaires)         | n/a (composant)                | Validation des formulaires DSRC (test désactivé)   | `// @dsrc-form-validator`                           |      🚧 |
+| DSRC (formulaires)         | n/a (composant)                | Validation des formulaires DSRC (test désactivé)   | `// @dsrc-form-validator`                           |      ⏭️ |
 
 Le code est a positionner dans les fichiers de tests Cypress dans le nom du test pour permettre de retrouver facilement les tests concernés et de les executer selectivement à l'aide du package @cypress/grep.
 
