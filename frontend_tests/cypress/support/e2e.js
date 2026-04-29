@@ -30,5 +30,12 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   return false;
 });
 
+// Neutralise le bandeau de consentement (composant Consent.js : le banner est masqué
+// dès qu'un cookie dont le nom contient "cookie_consent" est présent). Sans ce
+// pré-set, le bandeau couvre les inputs et fait échouer cy.type().
+beforeEach(() => {
+  cy.setCookie('cookie_consent', 'accepted', { domain: 'example.localhost' });
+});
+
 const registerCypressGrep = require('@cypress/grep');
 registerCypressGrep();
