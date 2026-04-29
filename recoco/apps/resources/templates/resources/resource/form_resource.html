@@ -40,6 +40,7 @@
                             class="fr-btn fr-btn--tertiary fr-mr-1w">Sauvegarder en brouillon</button>
                     <button type="submit"
                             @click.prevent="resourceFormData.status = 2; onSubmit()"
+                            data-test-id="publish-resource-btn"
                             class="fr-btn fr-btn--primary fr-mr-1w">Sauvegarder et publier</button>
                 </div>
                 {% include "resources/resource/modal_resource.html" %}
