@@ -403,5 +403,23 @@
       "project": 30,
       "site": 1
     }
+  },
+  {
+    "model": "projects.projectswitchtender",
+    "pk": 28,
+    "fields": {
+      "switchtender": 2,
+      "project": 20,
+      "site": 1
+    }
+  },
+  {
+    "model": "projects.projectswitchtender",
+    "pk": 29,
+    "fields": {
+      "switchtender": 2,
+      "project": 21,
+      "site": 1
+    }
   }
 ]
