@@ -469,3 +469,16 @@ Cypress.Commands.add('shareContact', (name) => {
     force: true,
   });
 });
+
+/**
+ * type text in tiptap editor.
+ *
+ * @function typeInTiptapEditor
+ * @memberof Cypress.Commands
+ * @param {string} text - The text to type in the tiptap editor.
+ */
+Cypress.Commands.add('typeInTiptapEditor', (text) => {
+  cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(text, {
+    force: true,
+  });
+});
