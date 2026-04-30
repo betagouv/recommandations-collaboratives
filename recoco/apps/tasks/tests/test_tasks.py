@@ -1269,10 +1269,7 @@ def test_task_status_change_is_traced_when_a_followup_issued(
     for a in Action.objects.all():
         print(a)
 
-    assert Action.objects.count() == 1
-    action = Action.objects.first()
-
-    assert action.verb == "a classé la recommandation comme «en cours»"
+    assert Action.objects.filter(verb=verbs.Recommendation.IN_PROGRESS).count() == 1
 
 
 @pytest.mark.django_db

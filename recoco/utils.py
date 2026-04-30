@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
-from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -24,7 +23,7 @@ from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.http import HttpResponseBadRequest
-from sesame.tokens import create_token
+from sesame.utils import get_parameters
 
 
 def make_site_slug(site: Site):
@@ -140,12 +139,7 @@ def build_absolute_url(path, auto_login_user=None, site=None):
             url = urlunparse(
                 parsed_url._replace(
                     query=urlencode(
-                        params
-                        | {
-                            getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
-                                create_token(user=auto_login_user)
-                            ]
-                        },
+                        params | get_parameters(auto_login_user),
                         doseq=True,
                     )
                 )
