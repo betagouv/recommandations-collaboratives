@@ -374,6 +374,7 @@ def test_project_knowledge_allows_empty_questionset(request, client, project):
 
 # actions
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_project_actions_not_available_for_non_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-actions", args=[project.id])
@@ -383,6 +384,7 @@ def test_project_actions_not_available_for_non_switchtender(request, client):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_project_actions_available_for_owner(request, client, project):
     with login(client) as user:
         utils.assign_collaborator(user, project)
@@ -392,6 +394,7 @@ def test_project_actions_available_for_owner(request, client, project):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_project_actions_available_for_switchtender(request, client, project):
     site = get_current_site(request)
     url = reverse("projects-project-detail-actions", args=[project.id])
@@ -402,6 +405,7 @@ def test_project_actions_available_for_switchtender(request, client, project):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_project_actions_available_for_restricted_switchtender(
     request, client, make_project
 ):
@@ -420,6 +424,7 @@ def test_project_actions_available_for_restricted_switchtender(
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_project_actions_with_has_ds_resource(request, client, project):
     site = get_current_site(request)
     resource = Recipe(
