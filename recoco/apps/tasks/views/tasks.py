@@ -470,6 +470,18 @@ def presuggest_task(request, project_id):
 
 
 @login_required
+def exploration_ia_task(request, project_id):
+    """Exploration IA task"""
+    project = get_object_or_404(
+        project_models.Project, sites=request.site, pk=project_id
+    )
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
+
+    return render(request, "tasks/tasks/exploration_ia.html", locals())
+
+
+@login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
 

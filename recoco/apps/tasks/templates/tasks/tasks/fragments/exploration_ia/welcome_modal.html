@@ -1,0 +1,81 @@
+<div x-show="welcomeModal.isOpen"
+     class="exploration-ia-modal-overlay"
+     @click.self="closeWelcomeModal()"
+     @keydown.escape.window="welcomeModal.isOpen && closeWelcomeModal()"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     data-test-id="exploration-ia-welcome-modal"
+     style="display: none">
+    <div class="exploration-ia-modal"
+         @click.stop
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="exploration-ia-welcome-title">
+        <div class="exploration-ia-modal__header">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <div class="flex-grow-1 fr-pr-2w">
+                    <div class="d-flex align-items-center gap-2 fr-mb-1w">
+                        <span class="fr-badge fr-badge--sm fr-badge--purple-glycine">
+                            <span class="fr-icon-sparkling-2-line fr-icon--sm fr-mr-1v"
+                                  aria-hidden="true"></span>
+                            Bienvenue
+                        </span>
+                    </div>
+                    <h2 id="exploration-ia-welcome-title" class="fr-text--lg fr-mb-0">Exploration assistée des ressources</h2>
+                </div>
+                <button @click="closeWelcomeModal()"
+                        class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm"
+                        aria-label="Fermer la modale d'accueil"
+                        data-test-id="exploration-ia-welcome-modal-close-btn">
+                    <span class="fr-icon-close-line" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+        <div class="exploration-ia-modal__body">
+            <p class="fr-text--md fr-mb-3w">
+                Cet outil vous propose d'explorer des ressources et des formulations qui pourraient devenir des recommandations sur votre dossier, grâce à l'intelligence artificielle.
+                Sélectionnez tout ce qui vous semble pertinent, vous pourrez créer des recommandations à partir de ces éléments à l'étape 3.
+            </p>
+            <p class="fr-text--md fr-text--bold fr-mb-2w">Comment ça se passe ?</p>
+            <ol class="fr-mb-3w">
+                <li class="fr-mb-2w">
+                    <strong>Étape 1 — Recherche initiale :</strong>
+                    formulez votre besoin en langage naturel. L'IA analyse le contexte du dossier
+                    et vous propose une réponse synthétique appuyée sur des sources documentaires (recommandations et ressources sur ce portail).
+                    Sélectionnez les proposition de recommandation les plus utiles.
+                </li>
+                <li class="fr-mb-2w">
+                    <strong>Étape 2 — Exploration élargie :</strong>
+                    à partir de vos sélections, l'outil vous propose d'autres ressources
+                    fréquemment recommandées dans des contextes similaires.
+                </li>
+                <li>
+                    <strong>Étape 3 — Synthèse :</strong>
+                    retrouvez l'ensemble des proposition de recommandation et ressources retenues, prêtes à être transformées
+                    en recommandations pour votre projet.
+                </li>
+            </ol>
+            <div class="fr-callout fr-callout--blue-ecume fr-mb-0">
+                <p class="fr-callout__text fr-mb-0">
+                    <span class="fr-icon-information-line fr-mr-1v" aria-hidden="true"></span>
+                    Vous gardez le contrôle à chaque étape : rien n'est ajouté à votre projet
+                    sans votre validation.
+                </p>
+            </div>
+        </div>
+        <div class="exploration-ia-modal__footer">
+            <div class="d-flex justify-content-end align-items-center w-100">
+                <button @click="closeWelcomeModal()"
+                        class="fr-btn fr-btn--primary fr-btn--sm"
+                        data-test-id="exploration-ia-welcome-modal-start-btn">
+                    <span class="fr-icon-arrow-right-line fr-mr-1v" aria-hidden="true"></span>
+                    Commencer l'exploration
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

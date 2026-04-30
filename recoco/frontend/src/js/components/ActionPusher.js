@@ -143,6 +143,9 @@ Alpine.data('ActionPusher', () => {
           this.setIntent(this.results[0]);
         }
       }
+
+      const pushTypeFromParams = params.get('push_type');
+      if (pushTypeFromParams) this.push_type = pushTypeFromParams;
     },
 
     async getResources() {

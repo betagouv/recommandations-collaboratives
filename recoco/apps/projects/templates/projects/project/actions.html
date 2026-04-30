@@ -1,6 +1,7 @@
 {% extends "projects/project/detail.html" %}
 {% load static %}
 {% load humanize %}
+{% load waffle_tags %}
 {% load gravatar %}
 {% load django_vite %}
 {% load guardian_tags %}
@@ -41,42 +42,46 @@
                         Vous pouvez examiner les recommandations suggérées automatiquement pour ce dossier, pour éventuellement les adresser au demandeur.
                     </p>
                     {% if advising or is_staff %}
+                        <div class="d-flex">
+                            {% flag "ia_exploration" %}
+                            <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                               class="fr-btn fr-btn--secondary fr-mr-2v fr-icon-lightbulb-line fr-btn--icon-left">Assistant de création de recommandations</a>
+                        {% endflag %}
                         <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
                            class="fr-btn"
                            data-test-id="see-suggest-task-button">Consulter les recommandations suggérées</a>
-                    {% else %}
-                        <button class="fr-btn"
-                                data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside"
-                                aria-expanded="false"
-                                aria-controls="select-observer-or-advisor">
-                            Rejoindre ce dossier pour l'aiguiller
-                        </button>
-                    {% endif %}
-                </div>
+                    </div>
+                {% else %}
+                    <button class="fr-btn"
+                            data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside"
+                            aria-expanded="false"
+                            aria-controls="select-observer-or-advisor">Rejoindre ce dossier pour l'aiguiller</button>
+                {% endif %}
             </div>
         </div>
-    {% elif not is_switchtender and project.tasks.published.count == 0 %}
-        <div class="bg-light fr-p-5w rounded-2 fr-m-5v">
-            <div class="d-flex">
-                <img width="135"
-                     height="135"
-                     class="fr-mr-4w"
-                     src="{% static 'svg/empty-state.svg' %}">
-                <div>
-                    <h3 class="size-20px fw-bold fr-mb-0">Vous n’avez pas encore de recommandations</h3>
-                    <p class="fw-normal font-size-14px fr-mb-2w">
-                        Nos conseiller·es vous proposeront tout d'abord un échange de vive voix, puis vous recommanderont des actions à entreprendre dans cet espace.
-                    </p>
-                    <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}"
-                       class="fr-btn"
-                       data-test-id="see-suggest-task-button">Aller à la conversation</a>
-                </div>
+    </div>
+{% elif not is_switchtender and project.tasks.published.count == 0 %}
+    <div class="bg-light fr-p-5w rounded-2 fr-m-5v">
+        <div class="d-flex">
+            <img width="135"
+                 height="135"
+                 class="fr-mr-4w"
+                 src="{% static 'svg/empty-state.svg' %}">
+            <div>
+                <h3 class="size-20px fw-bold fr-mb-0">Vous n’avez pas encore de recommandations</h3>
+                <p class="fw-normal font-size-14px fr-mb-2w">
+                    Nos conseiller·es vous proposeront tout d'abord un échange de vive voix, puis vous recommanderont des actions à entreprendre dans cet espace.
+                </p>
+                <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}"
+                   class="fr-btn"
+                   data-test-id="see-suggest-task-button">Aller à la conversation</a>
             </div>
         </div>
-    {% else %}
-        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" %}
-    {% endif %}
-    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
-    {% include "projects/project/onboarding_tutorial.html" %}
+    </div>
+{% else %}
+    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" %}
+{% endif %}
+{% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
+{% include "projects/project/onboarding_tutorial.html" %}
 {% endblock project_detail %}
