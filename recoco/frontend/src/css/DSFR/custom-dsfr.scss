@@ -1027,6 +1027,18 @@ a.fr-text-inverted--grey {
   transition: none;
 }
 
+.custom-external-link::after {
+  background-color: transparent;
+  content: '';
+  display: inline-block;
+  height: unset;
+  margin-left: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
+  vertical-align: unset;
+  width: unset;
+}
+
 /* ¯¯¯¯¯ *\
   Buttons
 \* ˍˍˍˍˍ */
