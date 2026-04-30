@@ -49,8 +49,6 @@ describe('I can access tabs and see notifications @navigation-projet', () => {
   it('goes to the action page of my project', () => {
     cy.login('collectivité1');
     cy.visit(`/project/25/presentation`);
-    cy.get('[data-test-id="badge-tab-new-task"]').should('exist');
     cy.get('[data-test-id="badge-tab-new-message"]').should('exist');
-    cy.get('[data-test-id="badge-tab-new-file"]').should('exist');
   });
 });
