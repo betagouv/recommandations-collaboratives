@@ -16,8 +16,14 @@ function MenuNotifications(notificationNumber, listNofification) {
     initNewNotification(notificationIndex) {
       this.isNotificationShown[notificationIndex] = true;
     },
-    async clickConsummeNotificationAndRedirect(notificationId, targetUrl) {
-      await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
+    async clickConsummeNotificationAndRedirect(
+      notificationId,
+      targetUrl,
+      conversationContext
+    ) {
+      if (!conversationContext) {
+        await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
+      }
       // redirect to the notification target
       window.open(`${window.location.origin}${targetUrl}`, '_blank');
     },
