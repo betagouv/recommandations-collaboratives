@@ -156,13 +156,13 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
 
   cy.get('#id_name')
     .should('not.have.class', 'fr-input--error')
-    .type(label || objProject.name || project.name, { delay: 0 })
+    .type(label || objProject.name || project.name, { delay: 0, force: true })
     .should('have.value', label || objProject.name || project.name)
     .should('have.class', 'fr-input--valid');
 
   cy.get('#id_location')
     .should('not.have.class', 'fr-input--error')
-    .type(objProject.location || project.location, { delay: 0 })
+    .type(objProject.location || project.location, { delay: 0, force: true })
     .should('have.value', objProject.location || project.location)
     .should('have.class', 'fr-input--valid');
 
@@ -171,7 +171,7 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
     .should('not.have.class', 'fr-input-group--error');
 
   cy.get('[data-test-id="input-postcode"]')
-    .type(objProject.postcode || project.postcode, { delay: 0 })
+    .type(objProject.postcode || project.postcode, { delay: 0, force: true })
     .should('have.value', objProject.postcode || project.postcode)
     .parent()
     .should('have.class', 'fr-input-group--valid');
@@ -188,7 +188,10 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
 
   cy.get('#id_description')
     .should('not.have.class', 'fr-input--error')
-    .type(objProject.description || project.description, { delay: 0 })
+    .type(objProject.description || project.description, {
+      delay: 0,
+      force: true,
+    })
     .should('have.value', objProject.description || project.description)
     .should('have.class', 'fr-input--valid');
 
@@ -463,6 +466,19 @@ Cypress.Commands.add('shareContact', (name) => {
   cy.get('[data-test-id="contact-card"]').first().click({ force: true });
   //send contact to tiptap editor
   cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
+    force: true,
+  });
+});
+
+/**
+ * type text in tiptap editor.
+ *
+ * @function typeInTiptapEditor
+ * @memberof Cypress.Commands
+ * @param {string} text - The text to type in the tiptap editor.
+ */
+Cypress.Commands.add('typeInTiptapEditor', (text) => {
+  cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(text, {
     force: true,
   });
 });

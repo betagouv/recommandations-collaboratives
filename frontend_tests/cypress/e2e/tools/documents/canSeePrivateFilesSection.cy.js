@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('Private files section visibility on documents page', () => {
+describe('Private files section visibility on documents page @page-projet-fichier', () => {
   it('advisor can see the private files section', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}/documents`);

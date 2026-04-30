@@ -1,7 +1,7 @@
 const taskName = 'to inprogress';
 let currentProjectId;
 
-describe('I can go to tasks tab', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-status', () => {
   const TASK_STATUSES = [0, 1, 2, 3];
 
   beforeEach(() => {

@@ -1,4 +1,4 @@
-describe('I can access documentation', () => {
+describe('I can access documentation @acces-rapide-utilisateur', () => {
   it('displays as staff member', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.get("[data-test-id='open-dropdown-profil-option-button']").click({

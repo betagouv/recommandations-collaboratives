@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 let currentProject = projects[9];
 
-describe('I can go to overview tab', () => {
+describe('I can go to overview tab @page-projet-presentation', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);

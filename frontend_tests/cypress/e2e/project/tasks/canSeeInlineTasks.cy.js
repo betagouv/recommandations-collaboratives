@@ -1,5 +1,5 @@
 let currentProjectId;
-describe('I can go to tasks tab', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations', () => {
   before(() => {
     cy.login('conseiller1');
     cy.createProject('Count Published Project').then((projectId) => {

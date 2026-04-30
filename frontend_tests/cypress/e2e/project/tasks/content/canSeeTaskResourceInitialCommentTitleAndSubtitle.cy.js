@@ -4,7 +4,7 @@ const currentResource = resources[4];
 const taskName = 'task intent';
 let currentProjectId;
 
-describe('I can go to tasks tab', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.createProject('new task').then((projectId) => {

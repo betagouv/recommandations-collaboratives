@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 import projectView from '../../../support/views/project';
 
 const ownerEmail = 'bob@test.fr';
-describe('As staff, I can see project email reminders', () => {
+describe('As staff, I can see project email reminders @page-projet-presentation-rappel-email', () => {
   it('Displays no reminder message on projects with no scheduled emails', () => {
     const currentProject = projects[19];
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour

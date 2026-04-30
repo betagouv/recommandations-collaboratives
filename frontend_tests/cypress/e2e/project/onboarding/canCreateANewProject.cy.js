@@ -1,4 +1,4 @@
-describe('I can create a new project as a new user', () => {
+describe('I can create a new project as a new user @deposer-projet', () => {
   const projectInfo = {
     name: 'Test Project',
     location: '123 Test Street',

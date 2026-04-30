@@ -1,4 +1,4 @@
-describe('I can read only public notes', () => {
+describe('I cannot access conversation without join project @page-projet-conversations', () => {
   beforeEach(() => {
     cy.login('conseiller3');
   });
@@ -6,8 +6,9 @@ describe('I can read only public notes', () => {
   it('cant goes to public notes ', () => {
     cy.visit(`/project/29/`);
 
-    cy.get('[data-test-id="project-navigation-conversations"]').should(
-      'be.disabled'
+    cy.get('[data-test-id="project-navigation-conversations-new"]').should(
+      'have.attr',
+      'disabled'
     );
   });
 });

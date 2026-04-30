@@ -1,6 +1,6 @@
 import users from '../../fixtures/users/users.json';
 
-describe('The Login Page', () => {
+describe('The Login Page @connexion', () => {
   let currentUser = {};
 
   beforeEach(() => {

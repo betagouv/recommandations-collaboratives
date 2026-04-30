@@ -3,7 +3,7 @@ import projectView from '../../../support/views/project';
 
 const currentProject = projects[21];
 
-describe(`As non referent project member, I can see a project's active status`, () => {
+describe(`As non referent project member, I can see a project's active status @page-projet-presentation`, () => {
   before(() => {
     // First: login as owner and deactivate project
     cy.login('collectivité1');

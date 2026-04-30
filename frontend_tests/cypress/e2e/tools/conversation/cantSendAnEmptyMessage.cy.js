@@ -3,7 +3,7 @@ import editor from '../../../support/tools/editor';
 
 const currentProject = projects[1];
 
-describe("I can't send an empty message", () => {
+describe("I can't send an empty message @page-projet-conversations-nouveau-message", () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

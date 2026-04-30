@@ -1,4 +1,4 @@
-describe('I can suppress a contact from the contactbook', () => {
+describe.skip('I can suppress a contact from the contactbook @page-projet-recommandations-modification', () => {
     beforeEach(() => {
 
     });

@@ -1,4 +1,4 @@
-describe('I can go to overview tab and check invitation project member button', () => {
+describe('I can go to overview tab and check invitation project member button @page-projet-presentation-inviter-partenaire', () => {
   it('shows disabled button to invite new project member', () => {
     cy.login('national');
     cy.visit('/project/1/presentation');

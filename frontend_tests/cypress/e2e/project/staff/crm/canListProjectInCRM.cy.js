@@ -2,7 +2,7 @@ import projects from '../../../../fixtures/projects/projects.json';
 const projectCommune3Length = projects.filter(
   (project) => project.fields.commune === 3
 ).length;
-describe('I can go to CRM and list projects', () => {
+describe('I can go to CRM and list projects @bouton-raccourci-crm-staff', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/crm/project`);

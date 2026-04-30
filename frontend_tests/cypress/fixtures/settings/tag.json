@@ -38,7 +38,7 @@
     "pk": 1,
     "fields": {
       "object_id": 1,
-      "content_type_id": 2,
+      "content_type_id": 7,
       "tag_id": 1
     }
   },
@@ -47,7 +47,7 @@
     "pk": 2,
     "fields": {
       "object_id": 1,
-      "content_type_id": 2,
+      "content_type_id": 7,
       "tag_id": 2
     }
   }

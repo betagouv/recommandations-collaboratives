@@ -3,7 +3,7 @@ import projectView from '../../../../support/views/project';
 
 const currentProject = projects[17];
 
-describe('As site staff, I can quit a project', () => {
+describe('As site staff, I can quit a project @page-projet-parametres-quitter-projet', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);

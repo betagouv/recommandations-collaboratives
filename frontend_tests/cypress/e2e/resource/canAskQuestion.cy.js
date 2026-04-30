@@ -1,4 +1,4 @@
-describe('I can ask a question on a resource', () => {
+describe('I can ask a question on a resource @acces-ressources', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

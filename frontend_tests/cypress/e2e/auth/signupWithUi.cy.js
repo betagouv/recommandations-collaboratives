@@ -1,4 +1,4 @@
-describe('The Signup Page', () => {
+describe('The Signup Page @inscription', () => {
   const userToSignup = {
     '[name=first_name]': 'Signupuser',
     '[name=last_name]': 'Successful',

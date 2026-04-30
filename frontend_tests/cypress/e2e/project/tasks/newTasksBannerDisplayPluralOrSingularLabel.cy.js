@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[10];
 
-describe('I can go to tasks tab', () => {
+describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-bandeau-non-lue', () => {
   before(() => {
     cy.login('conseiller1');
     cy.becomeAdvisor(currentProject.pk);

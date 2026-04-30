@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
-describe('I can access and use public notes', () => {
+describe('I can access and use public notes @page-projet-conversations', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

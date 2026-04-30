@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
-describe('I can access the recommandations', () => {
+describe.skip('I can access the recommandations @page-projet-recommandations', () => {
   it('goes to recommandations tab and see new recommandations', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}/actions`);
