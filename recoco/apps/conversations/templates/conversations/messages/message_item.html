@@ -1,4 +1,5 @@
 <div class="observed-element"
+     :class="{'has-notif': element.unread }"
      :data-element-id="element.id"
      :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type, charNum: getNumCharInMessage(element)})">
     <div class="message-item"

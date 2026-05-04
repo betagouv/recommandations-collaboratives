@@ -145,6 +145,14 @@ Alpine.data('NotificationEater', (projectId) => {
           conversationsMessageMarkAsReadUrl(this.projectId, message.id)
         );
 
+        /**
+         * DEBUG ONLY
+         */
+        messageElement.classList.remove('has-notif');
+        /**
+         * DEBUG ONLY
+         */
+
         messageElement.setAttribute(
           'data-notifications',
           JSON.stringify({
