@@ -24,33 +24,28 @@ describe('I can assign some contacts when I create a resource @acces-ressources'
       .type('etiquette1', { force: true })
       .should('have.value', 'etiquette1');
 
-    cy.get('#id_contacts-input').focus();
-    cy.get('#id_contacts-list').children().first('p').click({ force: true });
+    cy.get('#search-contact-input')
+    .type('lala', { force: true })
+    .should('have.value', 'lala');
+    cy.get('[data-test-id="contact-card-component"]').first().click({ force: true });
+    cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({ force: true });
 
-    cy.get('#id_contacts-input').focus();
-    cy.get('#id_contacts-list')
-      .children()
-      .eq('1')
-      .children()
-      .first()
-      .click({ force: true });
+    cy.wait(500);
 
-    cy.get('#id_contacts-input').focus();
-    cy.get('#id_contacts-list')
-      .children()
-      .eq('2')
-      .children()
-      .first()
-      .click({ force: true });
+    cy.get('#search-contact-input')
+    .type('lili', { force: true })
+    .should('have.value', 'lili');
+    cy.get('[data-test-id="contact-card-component"]').contains('lili').click({ force: true });
+    cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({ force: true });
 
     cy.get('#id_expires_on')
-      .type('20/12/2022', { force: true })
-      .should('have.value', '20/12/2022');
+      .type('2022-12-20', { force: true })
+      .should('have.value', '2022-12-20');
 
     cy.get('.ProseMirror p').click();
     cy.focused().type('text', 'contenu de la ressource de test');
 
-    cy.get('[type="submit"]').click({ force: true });
+    cy.get('[data-test-id="publish-resource-btn"]').click({ force: true });
 
     cy.url().should('include', '/ressource/');
 
@@ -59,6 +54,5 @@ describe('I can assign some contacts when I create a resource @acces-ressources'
 
     cy.contains(contacts[1].fields.first_name);
     cy.contains(contacts[2].fields.first_name);
-    cy.contains(contacts[3].fields.first_name);
   });
 });

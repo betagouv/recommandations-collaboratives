@@ -36,7 +36,7 @@ Example usage in parent:
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% endif %}
-    <div x-data="User()">
+    <div x-data="User()" data-test-id="contact-card-component">
         <template x-if="typeof contact !== 'undefined' && contact">
             <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %} {% if full_width %}contact-card-light{% endif %}"
                  :class="{'active': isOpenDeleteContact}"
