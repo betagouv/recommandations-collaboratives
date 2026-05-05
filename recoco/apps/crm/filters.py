@@ -42,9 +42,9 @@ class UserFilter(django_filters.FilterSet):
 
     ROLE_CHOICES = [
         (1, "Conseiller·ère"),
-        (2, "Équipe"),
+        (2, "Staff"),
         (3, "Administrateur·rice"),
-        (4, "Autres"),
+        (4, "Demandeur"),
     ]
 
     username = django_filters.CharFilter(
