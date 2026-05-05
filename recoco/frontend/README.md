@@ -109,6 +109,12 @@ yarn e2e:parallel   # exécution parallèle (2 threads)
 
 Un rapport HTML est généré dans `cypress/reports/` après chaque exécution headless.
 
+## Autres commandes
+
+- `yarn e2e:django-server` : Initialiser un serveur de test Django et une base données de test et les différentes fixtures.
+- `yarn e2e:django-update-permissions` : Mise à jour des permissions des utilisateurs
+- `yarn e2e:frontend-server` : Mise à disposition des statics et composants JS
+
 #### Philosophie
 
 Lors de l'ajout d'une fonctionnalité ou d'une modification, créer le test E2E s'il n'existe pas, ou mettre à jour l'existant. Avant de pousser son code, lancer les tests pour détecter d'éventuelles régressions.
