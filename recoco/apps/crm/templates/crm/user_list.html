@@ -17,7 +17,7 @@
     {% include "crm/fragments/navigation.html" with users=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Utilisateurs' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div x-data="Crm" class="d-flex fr-px-0 crm">
+    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm">
         <form method="get"
               action="{% url 'crm-user-list' %}"
               class="w-100 d-flex flex-column justify-content-start project-list-crm">
@@ -49,15 +49,12 @@
                                 @focus="focused = true"
                                 @blur="focused = false"
                                 onchange="this.form.submit()">
-                            <option value="" {% if not users.form.data.role %}selected{% endif %}>Tou·te·s</option>
-                            <option value="3"
-                                    {% if users.form.data.role == "3" %}selected{% endif %}>Admin</option>
-                            <option value="2"
-                                    {% if users.form.data.role == "2" %}selected{% endif %}>Staff</option>
-                            <option value="1"
-                                    {% if users.form.data.role == "1" %}selected{% endif %}>Conseiller·e</option>
-                            <option value="4"
-                                    {% if users.form.data.role == "4" %}selected{% endif %}>Demandeur</option>
+                            {% for value, label in users.form.role.field.choices %}
+                                <option value="{{ value }}"
+                                        {% if not value and not users.form.data.role %}selected
+                                        {% elif value and users.form.data.role == value|stringformat:"s" %}selected
+                                        {% endif %}>{{ label }}</option>
+                            {% endfor %}
                         </select>
                         <svg xmlns="http://www.w3.org/2000/svg"
                              class="departments-selector__chevron"
@@ -80,87 +77,87 @@
                     {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" show_count_label=True %}
                 </div>
             </div>
-            <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
-                <table class="project-table w-100">
-                    <caption class="fr-ml-2v">
-                        {% with users.qs.count as users_count %}
-                            {% if users_count > 0 %}
-                                {% if not has_active_filter and users_count > max_users_without_filter %}
-                                    {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }} — utilisez les filtres pour affiner
-                                {% else %}
-                                    {{ users_count }} résultat{{ users_count|pluralize }}
-                                {% endif %}
-                            {% else %}
-                                Aucun résultat
-                            {% endif %}
-                        {% endwith %}
-                    </caption>
-                    <colgroup>
-                        <col class="col--medium">
-                        <col class="col--medium">
-                        <col class="col--large">
-                        <col class="col--large">
-                        <col class="col--medium">
-                        <col class="col--small">
-                        <col class="col--medium">
-                        <col class="col--medium">
-                    </colgroup>
-                    <thead class="project-table__thead">
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Prénom</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Organisation</th>
-                            <th scope="col">Statut</th>
-                            <th scope="col">Dossiers</th>
-                            <th scope="col" class="text-ellipsis">Dernière connexion</th>
-                            <th scope="col">Inscription</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for crm_user in display_qs %}
-                            <tr>
-                                <td class="text-ellipsis">
-                                    <a class="fr-link project-table__project-name"
-                                       href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.last_name }}</a>
-                                </td>
-                                <td>{{ crm_user.first_name }}</td>
-                                <td class="text-ellipsis" title="{{ crm_user.email }}">{{ crm_user.email }}</td>
-                                <td class="text-ellipsis">
-                                    {% if crm_user.profile.organization %}
-                                        <a class="fr-link"
-                                           href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">{{ crm_user.profile.organization.name }}</a>
-                                    {% endif %}
-                                </td>
-                                <td class="project-table__status">
-                                    {% if not crm_user.is_active %}
-                                        <span class="fr-badge fr-badge--error fr-badge--no-icon">Désactivé</span>
-                                    {% elif crm_user.is_admin %}
-                                        <span class="fr-badge fr-badge--error fr-badge--no-icon">Admin</span>
-                                    {% elif crm_user.is_staff_member %}
-                                        <span class="fr-badge fr-badge--info fr-badge--no-icon">Staff</span>
-                                    {% elif crm_user.is_advisor %}
-                                        <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">Conseiller·e</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ crm_user.member_count|add:crm_user.switchtender_count }}</td>
-                                <td>
-                                    {% if crm_user.profile.previous_activity_at %}
-                                        {{ crm_user.profile.previous_activity_at|date:"d/m/Y" }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-                                <td>{{ crm_user.date_joined|date:"d/m/Y" }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="8">-- Aucun résultat --</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </form>
+        <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
+            <table class="project-table w-100">
+                <caption class="fr-ml-2v">
+                    {% with users.qs.count as users_count %}
+                        {% if users_count > 0 %}
+                            {% if not has_active_filter and users_count > max_users_without_filter %}
+                                {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }} — utilisez les filtres pour affiner
+                            {% else %}
+                                {{ users_count }} résultat{{ users_count|pluralize }}
+                            {% endif %}
+                        {% else %}
+                            Aucun résultat
+                        {% endif %}
+                    {% endwith %}
+                </caption>
+                <colgroup>
+                    <col class="col--medium">
+                    <col class="col--medium">
+                    <col class="col--large">
+                    <col class="col--large">
+                    <col class="col--medium">
+                    <col class="col--small">
+                    <col class="col--medium">
+                    <col class="col--medium">
+                </colgroup>
+                <thead class="project-table__thead">
+                    <tr>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Organisation</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Dossiers</th>
+                        <th scope="col" class="text-ellipsis">Dernière connexion</th>
+                        <th scope="col">Inscription</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for crm_user in display_qs %}
+                        <tr>
+                            <td class="text-ellipsis">
+                                <a class="fr-link project-table__project-name"
+                                    href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.last_name }}</a>
+                            </td>
+                            <td>{{ crm_user.first_name }}</td>
+                            <td class="text-ellipsis" title="{{ crm_user.email }}">{{ crm_user.email }}</td>
+                            <td class="text-ellipsis">
+                                {% if crm_user.profile.organization %}
+                                    <a class="fr-link"
+                                        href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">{{ crm_user.profile.organization.name }}</a>
+                                {% endif %}
+                            </td>
+                            <td class="project-table__status">
+                                {% if not crm_user.is_active %}
+                                    <span class="fr-badge fr-badge--error fr-badge--no-icon">Désactivé</span>
+                                {% elif crm_user.is_admin %}
+                                    <span class="fr-badge fr-badge--error fr-badge--no-icon">Admin</span>
+                                {% elif crm_user.is_staff_member %}
+                                    <span class="fr-badge fr-badge--info fr-badge--no-icon">Staff</span>
+                                {% elif crm_user.is_advisor %}
+                                    <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">Conseiller·e</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ crm_user.member_count|add:crm_user.switchtender_count }}</td>
+                            <td>
+                                {% if crm_user.profile.previous_activity_at %}
+                                    {{ crm_user.profile.previous_activity_at|date:"d/m/Y" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ crm_user.date_joined|date:"d/m/Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8">-- Aucun résultat --</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock content %}
