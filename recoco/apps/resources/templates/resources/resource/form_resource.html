@@ -268,7 +268,8 @@
                                     <div class="position-relative d-flex justify-content-end">
                                         <span class="fr-icon-delete-line top-right-corner cursor-pointer"
                                               aria-label="supprimer contact"
-                                              @click="suppressContact(contact)"></span>
+                                              @click="suppressContact(contact)"
+                                              data-test-id="button-delete-contact"></span>
                                     </div>
                                     {% include "tools/contacts/contact_card.html" with full_width=true %}
                                 </div>
