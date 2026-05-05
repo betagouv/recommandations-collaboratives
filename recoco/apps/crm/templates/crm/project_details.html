@@ -24,9 +24,9 @@
         <div class="project-crm-left-col position-relative">
             <div class="position-absolute top-0 end-0 fr-p-2w">
                 <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-eye-line"
-                   href="{% url 'projects-project-detail' project.pk %}"></a>
+                   href="{% url 'projects-project-detail' project.pk %}">Voir la page du dossier</a>
                 <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line"
-                   href="{% url 'crm-project-update' project.pk %}"></a>
+                   href="{% url 'crm-project-update' project.pk %}">Modifier le dossier</a>
             </div>
             <!-- Project info -->
             <div class="d-flex flex-column fr-p-5v">
@@ -43,7 +43,7 @@
                 <!-- Created at -->
                 <span class="project-crm__project-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">Déposé le {{ project.created_on|date:"j F Y" }}</span>
                 <!-- Number of message in conv -->
-                <span class="project-crm__project-information fr-icon-chat-2-line fr-icon--sm fr-mb-1v">{{ conversation_stats.messages_count|length }} message{{ conversation_stats.messages_count|length|pluralize:"s" }}</span>
+                <span class="project-crm__project-information fr-icon-chat-2-line fr-icon--sm fr-mb-1v">{{ conversation_stats.messages_count }} message{{ conversation_stats.messages_count|pluralize:"s" }}</span>
                 <!-- Number of participants in conv -->
                 <span class="project-crm__project-information fr-icon-user-line fr-icon--sm fr-mb-1v">{{ conversation_stats.participants_count }} participant{{ conversation_stats.participants_count|pluralize:"s" }}</span>
                 <!-- Number of reco in conv -->
@@ -62,7 +62,7 @@
                 <span class="project-crm__project-information fr-icon-mail fr-icon--sm">
                     {% with project.next_reminder as next_reminder %}
                         {% if next_reminder %}
-                            Prochaine rappel le {{ next_reminder }}
+                            Prochain rappel le {{ next_reminder }}
                         {% else %}
                             Aucun rappel programmé
                         {% endif %}
@@ -72,7 +72,7 @@
             <!-- Client team -->
             <div>
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="project-crm__section-title">Equipe demandeur</span>
+                    <span class="project-crm__section-title">Équipe demandeur</span>
                 </div>
                 {% for member in project.members.all %}
                     <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
@@ -92,7 +92,7 @@
             <!-- Advisor team -->
             <div>
                 <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="project-crm__section-title">Equipe conseil</span>
+                    <span class="project-crm__section-title">Équipe conseil</span>
                 </div>
                 {% regroup project.switchtenders.all by profile.organization as grouped_st %}
                 {% for group in grouped_st %}
@@ -168,7 +168,6 @@
                     {% include "crm/note.html" with get_user_profile=True %}
                 {% endfor %}
             </section>
-            {% comment %} TODO  {% endcomment %}
             <!-- Activity timeline -->
             <section class="w-100">
                 <h3 class="project-crm__section-title">Activité du dossier</h3>

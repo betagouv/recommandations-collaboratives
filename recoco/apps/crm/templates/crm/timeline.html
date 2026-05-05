@@ -29,11 +29,11 @@
                                     {{ action.action_object.last_name|default:"" }}
                                 </a>
                             {% elif action.action_object.email %}
-                            <span>
-                                {{ action.action_object.first_name|default:action.action_object.email }}
-                                {{ action.action_object.last_name|default:"" }}
-                            </span>
-                        {% endif %}
+                                <span>
+                                    {{ action.action_object.first_name|default:action.action_object.email }}
+                                    {{ action.action_object.last_name|default:"" }}
+                                </span>
+                            {% endif %}
                             {% if action.action_object.feed_label %}
                                 <a href="{{ action.action_object.get_absolute_url }}" class="fr-ml-1v">{{ action.action_object.feed_label }}</a>
                             {% endif %}
@@ -45,17 +45,15 @@
                                     <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                 </span>
                             {% endif %}
-                            <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
                         </div>
                         {% if action.action_object.comment %}
                             <div class="border fr-p-2v rounded bg-white w-100">
-                                "{{ action.action_object.comment }}" à propos de <a href=" {{ action.action_object.task.get_absolute_url }}">{{
-                            notification.action_object.task }}</a>
-                        </div>
-                    {% endif %}
-                </div>
-            </li>
-        {% endif %}
+                                "{{ action.action_object.comment }}" à propos de <a href=" {{ action.action_object.task.get_absolute_url }}">{{ action.action_object.task }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endif %}
+        {% endfor %}
     {% endfor %}
-{% endfor %}
 </ul>

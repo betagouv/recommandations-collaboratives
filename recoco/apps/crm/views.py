@@ -826,7 +826,7 @@ def project_details(request, project_id):
     project_ct = ContentType.objects.get_for_model(Project)
 
     conversation_stats = {
-        "messages_count": Message.not_deleted.filter(project=project),
+        "messages_count": Message.not_deleted.filter(project=project).count(),
         "participants_count": project.members.count() + project.switchtenders.count(),
         "recommendations_count": RecommendationNode.objects.filter(
             message__project=project, message__deleted=None

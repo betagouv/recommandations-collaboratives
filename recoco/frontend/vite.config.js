@@ -232,7 +232,7 @@ const config = {
         bannerProjectMultiportalStyles: resolve(
           './src/js/styles/banner-project-multiportal.css.js'
         ),
-        crmNoteStyles: resolve('.src/js/styles/crm-note.css.js'),
+        crmNoteStyles: resolve('./src/js/styles/crm-note.css.js'),
       },
       output: {
         chunkFileNames: undefined,

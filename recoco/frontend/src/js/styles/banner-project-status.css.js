@@ -1,1 +1,1 @@
-import '../../css/crm/bannerProjectSatus.scss';
+import '../../css/crm/bannerProjectStatus.scss';
