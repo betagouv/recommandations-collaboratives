@@ -94,12 +94,22 @@ DATABASES = {
 - `recoco/settings/e2e_tests.py` : configuration Django pour les tests E2E (DEBUG, reCAPTCHA bypass, Celery eager, port Vite 3001).
 - `recoco/settings/e2e_tests_permissions.py` : configuration utilisée par `update_permissions` lors du run des tests.
 
-#### Lancer les tests
+#### Installation de l'environnement de tests
 
 > ⚠️ S'assurer d'être dans son environnement virtuel Django.
 
 ```bash
 yarn install        # une seule fois
+npx cypress install # permet d'installer Cypress sur la machine
+```
+
+> ℹ️ si besoin d'aide pour Cypress [documentation Cypress](https://docs.cypress.io/app/get-started/install-cypress)
+
+#### Lancer les tests
+
+> ⚠️ S'assurer d'être dans son environnement virtuel Django.
+
+```bash
 yarn e2e            # exécution headless (Chrome) — démarre Vite + Django + Cypress
 yarn e2e:ui         # ouvre l'interface graphique Cypress
 yarn e2e:open       # raccourci équivalent à `cypress open`
