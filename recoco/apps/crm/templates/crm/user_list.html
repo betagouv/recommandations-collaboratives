@@ -141,7 +141,7 @@
                                     <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">Conseiller·e</span>
                                 {% endif %}
                             </td>
-                            <td>{{ crm_user.member_count|add:crm_user.switchtender_count }}</td>
+                            <td>{{ crm_user.projects_count }}</td>
                             <td>
                                 {% if crm_user.profile.previous_activity_at %}
                                     {{ crm_user.profile.previous_activity_at|date:"d/m/Y" }}

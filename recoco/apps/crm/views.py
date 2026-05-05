@@ -67,7 +67,12 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.projects.models import Project, Topic
+from recoco.apps.projects.models import (
+    Project,
+    ProjectMember,
+    ProjectSwitchtender,
+    Topic,
+)
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
@@ -488,9 +493,28 @@ def user_list(request):
         User.objects.filter(profile__sites=site, profile__deleted__isnull=True)
         .prefetch_related("profile__organization")
         .annotate(
-            member_count=Count("projectmember__project", distinct=True),
-            switchtender_count=Count(
-                "projects_switchtended_per_site__project", distinct=True
+            projects_count=(
+                Subquery(
+                    Project.objects.filter(
+                        Q(
+                            pk__in=Subquery(
+                                ProjectMember.objects.filter(
+                                    member_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                        | Q(
+                            pk__in=Subquery(
+                                ProjectSwitchtender.objects.filter(
+                                    switchtender_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                    )
+                    .distinct()
+                    .annotate(count=Func(F("id"), function="Count"))
+                    .values("count")
+                )
             ),
             is_advisor=Exists(
                 Group.objects.filter(name=advisor_group_name, user=OuterRef("pk"))
