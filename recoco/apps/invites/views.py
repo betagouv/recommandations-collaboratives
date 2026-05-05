@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
@@ -54,7 +53,7 @@ def invite_accept(request, invite_id):
         pass
 
     if request.method == "POST":
-        form = forms.InviteAcceptForm(request.POST)
+        form = forms.InviteAcceptForm(request.POST, invite=invite, site=current_site)
         user = None
 
         if existing_account:
@@ -63,61 +62,49 @@ def invite_accept(request, invite_id):
             user = request.user
 
         # New account
-        else:
+        elif request.user.is_authenticated:
             # we shouldn't be logged in at this point
-            if request.user.is_authenticated:
-                return HttpResponseForbidden()
+            return HttpResponseForbidden()
 
-            if form.is_valid():
-                user = auth_models.User.objects.create(
-                    username=invite.email,
-                    email=invite.email,
-                    first_name=form.cleaned_data.get("first_name"),
-                    last_name=form.cleaned_data.get("last_name"),
+        elif form.is_valid():
+            user = form.save()
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+        else:
+            # Form invalid for new account: re-render with errors
+            return render(request, "invites/invite_details.html", locals())
+
+        if not user:
+            return redirect(reverse("invites-invite-details", args=(invite.pk,)))
+
+        # user now has access to site
+        user.profile.sites.add(current_site)
+
+        # Now, grant the user her new rights
+        if invite.role == "SWITCHTENDER":
+            if assign_advisor(user, project, current_site):
+                projects_signals.project_switchtender_joined.send(
+                    sender=request.user, project=project
+                )
+        elif invite.role == "OBSERVER":
+            if assign_observer(user, project, current_site):
+                projects_signals.project_observer_joined.send(
+                    sender=request.user, project=project
+                )
+        else:
+            if assign_collaborator(user, project):
+                projects_signals.project_member_joined.send(
+                    sender=request.user, project=project
+                )
+            elif project.owner == user:
+                projects_signals.project_owner_joined.send(
+                    sender=request.user, project=project
                 )
 
-                org_name = form.cleaned_data.get("organization")
-                organization = addressbook_models.Organization.get_or_create(org_name)
-                organization.sites.add(request.site)
+        invite.accepted_on = timezone.now()
+        invite.save()
 
-                user.profile.organization = organization
-                user.profile.organization_position = form.cleaned_data.get("position")
-
-                user.profile.save()
-
-                login(
-                    request, user, backend="django.contrib.auth.backends.ModelBackend"
-                )
-
-        if user:
-            # user now has access to site
-            user.profile.sites.add(current_site)
-
-            # Now, grant the user her new rights
-            if invite.role == "SWITCHTENDER":
-                if assign_advisor(user, project, current_site):
-                    projects_signals.project_switchtender_joined.send(
-                        sender=request.user, project=project
-                    )
-            elif invite.role == "OBSERVER":
-                if assign_observer(user, project, current_site):
-                    projects_signals.project_observer_joined.send(
-                        sender=request.user, project=project
-                    )
-            else:
-                if assign_collaborator(user, project):
-                    projects_signals.project_member_joined.send(
-                        sender=request.user, project=project
-                    )
-                elif project.owner == user:
-                    projects_signals.project_owner_joined.send(
-                        sender=request.user, project=project
-                    )
-
-            invite.accepted_on = timezone.now()
-            invite.save()
-
-            return redirect(project.get_absolute_url())
+        return redirect(project.get_absolute_url())
 
     return redirect(reverse("invites-invite-details", args=(invite.pk,)))
 
@@ -179,6 +166,6 @@ def invite_details(request, invite_id):
                 + reverse("invites-invite-details", args=(invite.pk,))
             )
 
-    form = forms.InviteAcceptForm(request.GET or None)
+    form = forms.InviteAcceptForm(request.GET or None, invite=invite, site=request.site)
 
     return render(request, "invites/invite_details.html", locals())

@@ -21,6 +21,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
 
+from ...conversations import models as conversation_models
 from .. import models
 
 
@@ -193,12 +194,16 @@ def test_upload_file_available_for_project_collaborators(
 
     assert response.status_code == 302
 
-    document = models.Document.objects.all()[0]
+    document = models.Document.objects.first()
     assert document.project == project
     assert document.description == data["description"]
     assert document.uploaded_by == user
     assert not document.private
     assert document.the_file is not None
+
+    msg = conversation_models.Message.objects.first()
+    assert msg.posted_by == user
+    assert msg.nodes.first().document == document
 
 
 @pytest.mark.django_db
@@ -229,9 +234,7 @@ def test_upload_document_is_either_link_or_file(client, request, project):
 
 
 @pytest.mark.django_db
-def test_upload_file_does_not_trigger_notifications(
-    client, request, project, good_file
-):
+def test_upload_file_trigger_msg_trace_notif(client, request, project, good_file):
     data = {"description": "this is some content", "the_file": good_file}
 
     other_user = baker.make(auth_models.User)
@@ -247,10 +250,12 @@ def test_upload_file_does_not_trigger_notifications(
     assert response.status_code == 302
 
     document = models.Document.objects.all()[0]
+    msg = document.documentnode_set.first().message
 
-    assert action_object_stream(document).count() == 1
+    assert action_object_stream(msg).count() == 1
+    assert action_object_stream(document).count() == 0
     assert user.notifications.count() == 0
-    assert other_user.notifications.count() == 0
+    assert other_user.notifications.count() == 1
 
 
 @pytest.mark.django_db

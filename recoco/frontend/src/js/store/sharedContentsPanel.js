@@ -1,5 +1,18 @@
 import Alpine from 'alpinejs';
 
+const TAB_HASHES = {
+  recommendations: 'actions',
+  files: 'files',
+  'draft-recommendations': 'drafts',
+};
+
+function replaceUrlHash(hash) {
+  const url = hash
+    ? `${window.location.pathname}${window.location.search}#${hash}`
+    : `${window.location.pathname}${window.location.search}`;
+  window.history.replaceState(null, '', url);
+}
+
 Alpine.store('sharedContentsPanel', {
   isOpen: false,
   activeTab: 'recommendations', // 'recommendations' | 'files' | 'draft-recommendations'
@@ -20,6 +33,8 @@ Alpine.store('sharedContentsPanel', {
 
     // Prevent body scroll when panel is open
     document.body.style.overflow = 'hidden';
+
+    replaceUrlHash(TAB_HASHES[this.activeTab]);
   },
 
   close() {
@@ -27,11 +42,16 @@ Alpine.store('sharedContentsPanel', {
 
     // Restore body scroll
     document.body.style.overflow = '';
+
+    replaceUrlHash(null);
   },
 
   switchTab(tab) {
     this.activeTab = tab;
     this.lastActiveTab = tab;
+    if (this.isOpen) {
+      replaceUrlHash(TAB_HASHES[tab]);
+    }
   },
 
   setRecommendations(recommendations) {
@@ -63,10 +83,12 @@ Alpine.store('sharedContentsPanel', {
   /**
    * Close the panel but mark that we want to re-open it when the detail panel closes
    * Used when navigating from shared contents list to recommendation detail
+   * Does not clear the URL hash since the detail panel will set its own (#action-{id}).
    */
   closeForDetail() {
     this.shouldReopenOnDetailClose = true;
-    this.close();
+    this.isOpen = false;
+    document.body.style.overflow = '';
   },
 
   /**

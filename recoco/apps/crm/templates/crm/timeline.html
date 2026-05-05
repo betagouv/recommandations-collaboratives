@@ -31,11 +31,16 @@
                         <span class="verb">
                             <strong>{{ action.verb }}</strong>
                         </span>
-                        {% if action.action_object.email %}
+                        {% if action.action_object.email and action.action_object_content_type.model == "user" %}
                             <a href="{% url 'crm-user-details' action.action_object.pk %}">
                                 {{ action.action_object.first_name|default:action.action_object.email }}
                                 {{ action.action_object.last_name|default:"" }}
                             </a>
+                        {% elif action.action_object.email %}
+                            <span>
+                                {{ action.action_object.first_name|default:action.action_object.email }}
+                                {{ action.action_object.last_name|default:"" }}
+                            </span>
                         {% endif %}
                         {% if action.action_object.feed_label %}
                                     <a href="{{ action.action_object.get_absolute_url }}">

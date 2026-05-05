@@ -61,15 +61,15 @@ class TestMaterializedView(BaseClassTestMixin):
         view.set_cursor(mock_cursor)
         view.create()
 
-        assert mock_cursor.execute.call_args_list == [
+        expected = [
             call(sql="CREATE SCHEMA IF NOT EXISTS metrics;"),
             call(
                 sql="CREATE MATERIALIZED VIEW IF NOT EXISTS metrics.view_test_django_qs AS"
-                + ' ( SELECT "projects_project"."id", "django_site"."domain" AS "site_domain", COUNT("tasks_task"."id") AS "task_count" FROM "projects_project"'
+                + ' ( SELECT "projects_project"."id" AS "id", "django_site"."domain" AS "site_domain", COUNT("tasks_task"."id") AS "task_count" FROM "projects_project"'
                 + ' LEFT OUTER JOIN "projects_projectsite" ON ("projects_project"."id" = "projects_projectsite"."project_id")'
                 + ' LEFT OUTER JOIN "django_site" ON ("projects_projectsite"."site_id" = "django_site"."id")'
                 + ' LEFT OUTER JOIN "tasks_task" ON ("projects_project"."id" = "tasks_task"."project_id")'
-                + ' WHERE "projects_project"."deleted" IS NULL GROUP BY "projects_project"."id", 2 ) WITH NO DATA;',
+                + ' WHERE "projects_project"."deleted" IS NULL GROUP BY 1, 2 ) WITH NO DATA;',
                 params=(),
             ),
             call(
@@ -79,6 +79,10 @@ class TestMaterializedView(BaseClassTestMixin):
                 sql="CREATE INDEX IF NOT EXISTS task_count_idx ON metrics.view_test_django_qs (task_count);"
             ),
         ]
+        for fn_call, expected_call in zip(
+            mock_cursor.execute.call_args_list, expected, strict=True
+        ):
+            assert fn_call == expected_call
 
     def test_create_for_site(self, settings, stub_site):
         view = MaterializedView.from_spec(
