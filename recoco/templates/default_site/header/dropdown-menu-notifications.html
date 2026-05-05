@@ -23,13 +23,13 @@
                         x-init='initNewNotification(`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)'
                         x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                         x-transition.duration.400ms>
-                        <a :href="getNotificationLink({% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})" target="_blank" @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, {% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %}, {conversationContext:
-                            {% if "message" in notification.verb %}
-                                true
-                            {% else %}
-                                false
-                            {% endif %}
-                        })" class="stretched-link custom-external-link"></a>
+                        {% if notification.verb == verbs.Recommendation.COMMENTED %}
+                            {% include "header/dropdown-menu-notification-link.html" with notification_url=notification.action_object.task.get_absolute_url %}
+                        {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %}
+                            {% include "header/dropdown-menu-notification-link.html" with notification_url=notification.target.get_absolute_url|add:"connaissance" %}
+                        {% else %}
+                            {% include "header/dropdown-menu-notification-link.html" with notification_url=notification.action_object.get_absolute_url %}
+                        {% endif %}
                         {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_deactivate=True user_activity=False disable_links=True %}
                         {% if notification.verb == verbs.Project.VALIDATED %}
                             <div class="notification__project">{{ notification.target }}</div>

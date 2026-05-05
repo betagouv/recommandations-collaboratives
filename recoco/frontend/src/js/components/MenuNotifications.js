@@ -17,15 +17,35 @@ function MenuNotifications(notificationNumber, listNofification) {
       this.isNotificationShown[notificationIndex] = true;
     },
     async clickConsummeNotificationAndRedirect(
+      event,
       notificationId,
       targetUrl,
-      conversationContext
+      { conversationContext } = {}
     ) {
-      if (!conversationContext) {
-        await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
+      // Logic when user want to open it in another window
+      const isModifierClick =
+        event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1;
+
+      if (isModifierClick) {
+        if (!conversationContext) {
+          api
+            .patch(notificationsMarkAsReadByIdUrl(notificationId), {})
+            .catch(() => {});
+        }
+        return;
       }
-      // redirect to the notification target
-      window.open(`${window.location.origin}${targetUrl}`, '_blank');
+
+      event.preventDefault();
+      if (!conversationContext) {
+        try {
+          await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
+        } catch (e) {
+          this.showToast(
+            'Erreur lors de la mise à jour de la notification. Merci de réessayer plus tard.'
+          );
+        }
+      }
+      window.location.href = `${window.location.origin}${targetUrl}`;
     },
     getNotificationLink(targetUrl) {
       return `${window.location.origin}${targetUrl}`;
