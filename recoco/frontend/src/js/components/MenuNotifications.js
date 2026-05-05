@@ -20,7 +20,7 @@ function MenuNotifications(notificationNumber, listNofification) {
       event,
       notificationId,
       targetUrl,
-      { conversationContext } = {}
+      { conversationContext } = { conversationContext: false }
     ) {
       // Logic when user want to open it in another window
       const isModifierClick =
