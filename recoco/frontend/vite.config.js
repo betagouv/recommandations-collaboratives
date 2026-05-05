@@ -103,9 +103,6 @@ const config = {
         ResourceCategoryFilter: resolve(
           './src/js/components/ResourceCategoryFilter.js'
         ),
-        DepartmentsFilterWrapper: resolve(
-          './src/js/components/DepartmentsFilterWrapper.js'
-        ),
         departmentsSelector: resolve(
           './src/js/styles/departments-selector.css.js'
         ),
@@ -225,7 +222,6 @@ const config = {
           './src/js/styles/resource-preview-panel.css.js'
         ),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
-        userListCrm: resolve('./src/js/apps/CRM/userListCrm.js'),
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),
@@ -238,6 +234,7 @@ const config = {
         ),
         noteCrmStyles: resolve('./src/js/styles/note-crm.css.js'),
         cardCrmStyles: resolve('./src/js/styles/card-crm.css.js'),
+        GravatarCache: resolve('./src/js/components/GravatarCache.js'),
       },
       output: {
         chunkFileNames: undefined,
