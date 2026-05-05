@@ -6,7 +6,7 @@ const domElements = {
   // TipTap Editor
   EDITOR: '[data-test-id="tiptap-editor"]',
   EDITOR_CONTENT: '[data-test-id="tiptap-editor-content"] .ProseMirror',
-  EDITOR_BUTTON_SUBMIT_EDIT: '[data-test-id="button-submit-edit"]',
+  EDITOR_BUTTON_SUBMIT: '[data-test-id="send-message-conversation"]',
   EDITOR_BUTTON_SUBMIT_NEW_COMMENT: '[data-test-id="button-submit-new"]',
 };
 
@@ -36,15 +36,8 @@ class Editor {
   /**
    * @param {*} disabled = 'be.disabled' if the submit button should be disabled
    */
-  checkSubmitComment(disabled = 'not.be.disabled') {
-    cy.get(this.dom.EDITOR_BUTTON_SUBMIT_NEW_COMMENT).should(disabled);
-  }
-
-  /**
-   * @param {*} disabled = 'be.disabled' if the submit button should be disabled
-   */
-  checkSubmitComment(disabled = 'not.be.disabled') {
-    cy.get(this.dom.EDITOR_BUTTON_SUBMIT_EDIT).click(disabled);
+  checkSubmitButton(disabled = 'not.be.disabled') {
+    cy.get(this.dom.EDITOR_BUTTON_SUBMIT).should(disabled);
   }
 }
 

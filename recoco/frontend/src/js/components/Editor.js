@@ -399,7 +399,8 @@ Alpine.data(
         // unused variable hasMessage but necessary to force reactivity
         const hasMessage = this.$store?.editor.currentMessage !== '';
         const isEditorEmpty = !editor.state.doc.textContent.trim().length;
-        const hasContact = this.selectedContact !== null;
+        const hasContact =
+          this.selectedContact !== null && this.selectedContact !== '';
         const hasFile = this.selectedFile !== null;
 
         const hasFileCards = editor.state.doc.descendants((node) => {

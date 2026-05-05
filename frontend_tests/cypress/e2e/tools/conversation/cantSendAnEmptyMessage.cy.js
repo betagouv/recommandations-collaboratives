@@ -6,43 +6,20 @@ const currentProject = projects[1];
 describe("I can't send an empty message @page-projet-conversations-nouveau-message", () => {
   beforeEach(() => {
     cy.login('conseiller1');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
   });
 
-  it('shows a disabled send message button', () => {
-    cy.visit(`/project/${currentProject.pk}/conversations`);
+  it('enable and disables the send message if I erase my message (empty message)', () => {
+    editor.checkSubmitButton('be.disabled');
 
-    cy.get('[data-test-id="send-message-conversation"]').should(
-      'have.attr',
-      'disabled'
-    );
-  });
-
-  it('enables the send message if I type a message', () => {
-    cy.visit(`/project/${currentProject.pk}/conversations`);
+    cy.wait(500);
 
     editor.writeMessage(`new message`);
 
-    cy.get('[data-test-id="send-message-conversation"]').should(
-      'not.have.attr',
-      'disabled'
-    );
-  });
-
-  it('disables the send message if I erase my message (empty message)', () => {
-    cy.visit(`/project/${currentProject.pk}/conversations`);
-
-    editor.writeMessage(`new message`);
-
-    cy.get('[data-test-id="send-message-conversation"]').should(
-      'not.have.attr',
-      'disabled'
-    );
+    editor.checkSubmitButton('not.be.disabled');
 
     editor.clear();
 
-    cy.get('[data-test-id="send-message-conversation"]').should(
-      'have.attr',
-      'disabled'
-    );
+    editor.checkSubmitButton('be.disabled');
   });
 });
