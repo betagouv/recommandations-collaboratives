@@ -2,7 +2,7 @@
 {% load crm_tags %}
 {% load django_vite %}
 {% block js %}
-    {% vite_asset 'js/styles/crm-note.css.js' %}
+    {% vite_asset 'js/styles/note-crm.css.js' %}
 {% endblock js %}
 <div class="crm__note-container {% if get_user_profile and note.related and note.content_type == user_ct %}crm__note--linked{% endif %}">
     {% if get_user_profile and note.related and note.content_type == user_ct %}
