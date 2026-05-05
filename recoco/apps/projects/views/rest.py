@@ -20,7 +20,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -65,20 +65,19 @@ from ..serializers import (
 ########################################################################
 
 
-class ProjectDetail(APIView):
+class ProjectDetail(
+    RetrieveAPIView
+):  # NB : interfaces are not completely respected due to legacy, cf #2077
     """Retrieve a project"""
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProjectSerializer
     filter_backends = [DefaultNoDeletedFilter]
 
     def get_object(self, pk):
         try:
             return (
-                models.Project.all_on_site.with_site_status()
-                .select_related(
-                    "commune__department__region",
-                )
-                .prefetch_related(
+                self.filter_queryset(self.get_queryset()).prefetch_related(
                     Prefetch(
                         "switchtenders",
                         User.objects.select_related(
@@ -106,6 +105,11 @@ class ProjectDetail(APIView):
             ).get(pk=pk)
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
+
+    def get_queryset(self):
+        return models.Project.all_on_site.with_site_status().select_related(
+            "commune__department__region",
+        )
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
