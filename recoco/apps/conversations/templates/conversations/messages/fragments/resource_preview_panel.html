@@ -34,7 +34,7 @@ Managed by Alpine store: $store.resourcePreviewPanel
                                    overflow: hidden"
                             scrolling="no"
                             @load="$el.style.height = $el.contentDocument.body.scrollHeight + 'px'"
-                            :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.messageId)"></iframe>
+                            :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.recommendation.id)"></iframe>
                 </div>
             </template>
             <template x-if="!$store.resourcePreviewPanel.recommendation?.resource">

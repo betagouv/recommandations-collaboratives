@@ -94,6 +94,5 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 # Démarches simplifiées
 DS_AUTOLOAD_SCHEMA = False
-DS_AUTOCREATE_FOLDER = False
 
 # eof

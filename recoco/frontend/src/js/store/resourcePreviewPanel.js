@@ -1,5 +1,12 @@
 import Alpine from 'alpinejs';
 
+function replaceUrlHash(hash) {
+  const url = hash
+    ? `${window.location.pathname}${window.location.search}#${hash}`
+    : `${window.location.pathname}${window.location.search}`;
+  window.history.replaceState(null, '', url);
+}
+
 document.addEventListener('alpine:init', () => {
   Alpine.store('resourcePreviewPanel', {
     isOpen: false,
@@ -32,6 +39,8 @@ document.addEventListener('alpine:init', () => {
 
       // Prevent body scroll when panel is open
       document.body.style.overflow = 'hidden';
+
+      replaceUrlHash(`action-${recommendation.id}`);
     },
 
     close() {
@@ -42,6 +51,8 @@ document.addEventListener('alpine:init', () => {
 
       // Restore body scroll
       document.body.style.overflow = '';
+
+      replaceUrlHash(null);
     },
 
     scrollToMessage() {

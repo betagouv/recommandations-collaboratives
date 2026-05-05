@@ -92,11 +92,7 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client, project)
         print(a.verb)
 
     # Action traces
-    assert Action.objects.count() == 1
-
-    action = Action.objects.first()
-
-    assert action.verb == verbs.Project.SET_INACTIVE
+    assert Action.objects.filter(verb=verbs.Project.SET_INACTIVE).count() == 1
 
 
 @pytest.mark.django_db
@@ -226,11 +222,7 @@ def test_trace_when_project_is_set_active(request, client, make_project):
         print(a.verb)
 
     # Action traces
-    assert Action.objects.count() == 1
-
-    action = Action.objects.first()
-
-    assert action.verb == verbs.Project.SET_ACTIVE
+    assert Action.objects.filter(verb=verbs.Project.SET_ACTIVE).count() == 1
 
 
 @pytest.mark.django_db

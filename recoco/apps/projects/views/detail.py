@@ -11,6 +11,7 @@ from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Prefetch
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -21,6 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
+from recoco.apps.resources.models import Resource
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -203,9 +205,18 @@ def project_knowledge(request, project_id=None):
 def project_actions(request, project_id=None):
     """Action page for given project"""
 
+    # we test to remove this part so we keep the code but redirect to new interface
+    url = (
+        reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
+    )
+    return redirect(url)
+
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
+        .prefetch_related(
+            "tasks", Prefetch("tasks__resource", Resource.objects.with_ds_annotations())
+        )
         .select_related("commune__department"),
         pk=project_id,
     )
