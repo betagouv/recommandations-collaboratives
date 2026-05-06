@@ -23,6 +23,7 @@
 {% block js %}
     {% vite_asset 'js/styles/user-crm.css.js' %}
     {% vite_asset 'js/styles/project-card-crm.css.js' %}
+    {% vite_asset 'js/styles/banner-user-status.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% block content %}
@@ -51,14 +52,10 @@
             <!-- User info -->
             <div class="d-flex flex-column fr-p-5v">
                 <!-- Badges -->
-                 {% if crm_user.is_staff or crm_user_is_advisor %}
+                {% if crm_user.is_staff or crm_user_is_advisor %}
                     <div class="d-flex flex-wrap gap-1 fr-mb-2v">
-                        {% if crm_user.is_staff %}
-                            <span class="user-crm__badges">⭐️ Staff</span>
-                        {% endif %}
-                        {% if crm_user_is_advisor %}
-                            <span class="user-crm__badges user-crm__badges--advisor">Conseiller</span>
-                        {% endif %}
+                        {% if crm_user.is_staff %}<span class="user-crm__badges">⭐️ Staff</span>{% endif %}
+                        {% if crm_user_is_advisor %}<span class="user-crm__badges user-crm__badges--advisor">Conseiller</span>{% endif %}
                     </div>
                 {% endif %}
                 <!-- Name -->
@@ -77,7 +74,8 @@
                 {% if crm_user_is_advisor %}
                     <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-3v">Départements :
                         {% for dpt in crm_user.profile.departments.all %}
-                            {{ dpt.code }}{% if not forloop.last %},{% endif %}
+                            {{ dpt.code }}
+                            {% if not forloop.last %},{% endif %}
                         {% empty %}
                             France entière
                         {% endfor %}
@@ -85,112 +83,110 @@
                 {% endif %}
                 <!-- Email -->
                 {% if crm_user.email %}
-                    <span class="user-crm__user-information--link fr-icon-link fr-icon--sm {% if crm_user.profile.phone_no %}fr-mb-1v{% else %}fr-mb-3v{% endif %}"><a href="mailto:{{ crm_user.email }}">{{ crm_user.email }}</a>
-                    </span>
-                {% endif %}
-                <!-- Phone -->
-                {% if crm_user.profile.phone_no %}
-                    <span class="user-crm__user-information--link fr-icon-phone-line fr-icon--sm fr-mb-3v">
-                        <a href="tel:{{ crm_user.profile.phone_no }}">{{ crm_user.profile.phone_no|format_phone }}</a>
-                    </span>
-                {% endif %}
-                <!-- Last activity -->
-                {% if crm_user.profile.previous_activity_at %}
-                    <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière activité il y a {{ crm_user.profile.previous_activity_at|timesince }}</span>
-                {% endif %}
-                <!-- Last login -->
-                {% if crm_user.last_login %}
-                    <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière connexion il y a {{ crm_user.last_login|timesince }}</span>
-                {% endif %}
-                <!-- Next reminder (non-advisor, non-staff only) -->
-                {% if next_user_reminder %}
-                    <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel le {{ next_user_reminder.deadline|date:"j F Y" }}</span>
-                {% endif %}
+                <span class="user-crm__user-information--link fr-icon-link fr-icon--sm {% if crm_user.profile.phone_no %}fr-mb-1v{% else %}fr-mb-3v{% endif %}"><a href="mailto:{{ crm_user.email }}">{{ crm_user.email }}</a>
+            </span>
+        {% endif %}
+        <!-- Phone -->
+        {% if crm_user.profile.phone_no %}
+            <span class="user-crm__user-information--link fr-icon-phone-line fr-icon--sm fr-mb-3v">
+                <a href="tel:{{ crm_user.profile.phone_no }}">{{ crm_user.profile.phone_no|format_phone }}</a>
+            </span>
+        {% endif %}
+        <!-- Last activity -->
+        {% if crm_user.profile.previous_activity_at %}
+            <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière activité il y a {{ crm_user.profile.previous_activity_at|timesince }}</span>
+        {% endif %}
+        <!-- Last login -->
+        {% if crm_user.last_login %}
+            <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière connexion il y a {{ crm_user.last_login|timesince }}</span>
+        {% endif %}
+        <!-- Next reminder (non-advisor, non-staff only) -->
+        {% if next_user_reminder %}
+            <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel le {{ next_user_reminder.deadline|date:"j F Y" }}</span>
+        {% endif %}
+    </div>
+    <!-- Dossiers conseillés -->
+    {% if crm_user_is_advisor %}
+        <div>
+            <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
+                <span class="user-crm__section-title">Dossiers conseillés</span>
             </div>
-            <!-- Dossiers conseillés -->
-            {% if crm_user_is_advisor %}
-                <div>
-                    <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
-                        <span class="user-crm__section-title">Dossiers conseillés</span>
+            {% for st in crm_user.projects_switchtended_per_site.all %}
+                <div class="user-crm__section-container fr-px-3w fr-py-2w">
+                    {% include "crm/fragments/project/project_card.html" with project=st.project %}
+                </div>
+            {% empty %}
+                <div class="fr-px-3w fr-py-2w">
+                    <span class="fr-text--sm text-muted">Aucun dossier conseillé</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Autre dossiers -->
+    {% with crm_user.projectmember_set.all as memberships %}
+        {% if memberships %}
+            <div>
+                <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="user-crm__section-title">Autre dossiers</span>
+                </div>
+                {% for membership in memberships %}
+                    <div class="user-crm__section-container fr-px-3w fr-py-2w">
+                        {% include "crm/fragments/project/project_card.html" with project=membership.project %}
                     </div>
-                    {% for st in crm_user.projects_switchtended_per_site.all %}
-                        <div class="user-crm__section-container fr-px-3w fr-py-2w">
-                            {% include "crm/fragments/project/project_card.html" with project=st.project %}
-                        </div>
-                    {% empty %}
-                        <div class="fr-px-3w fr-py-2w">
-                            <span class="fr-text--sm text-muted">Aucun dossier conseillé</span>
-                        </div>
-                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+<!-- Right column -->
+<div class="user-crm-right-col">
+    <!-- Banner account status -->
+    {% if not crm_user.is_active %}
+        <div class="user-banner user-banner--paused">
+            {% if crm_user.profile.disabled %}
+                <p class="fr-m-0 font-size-14px">Cet utilisateur a été désactivé.</p>
+                <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="user-banner__btn user-banner__btn--white">Réactiver le compte utilisateur</button>
+                </form>
+            {% elif crm_user.profile.deleted %}
+                <p class="fr-m-0 font-size-14px">
+                    Ce compte a été supprimé. La personne ne peut plus se connecter à {{ request.site.name }}.
+                </p>
+            {% else %}
+                <p class="fr-m-0 font-size-14px">Ce compte est inactif.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+    <!-- Notes section -->
+    {% if not crm_user.profile.deleted %}
+        <section class="w-100">
+            <div class="user-crm__section-title-container no-border">
+                <h3 class="user-crm__section-title">Notes</h3>
+                <a class="fr-btn fr-btn--primary fr-btn--sm"
+                   href="{% url 'crm-user-note-create' crm_user.pk %}">Ajouter une note</a>
+            </div>
+            <!-- Empty state -->
+            {% if not notes.all and not sticky_notes.all %}
+                <div class="fr-p-3w text-center text-muted">
+                    <p class="fr-text--sm">Aucune note pour cet utilisateur</p>
                 </div>
             {% endif %}
-            <!-- Autre dossiers -->
-            {% with crm_user.projectmember_set.all as memberships %}
-                {% if memberships %}
-                    <div>
-                        <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
-                            <span class="user-crm__section-title">Autre dossiers</span>
-                        </div>
-                        {% for membership in memberships %}
-                            <div class="user-crm__section-container fr-px-3w fr-py-2w">
-                                {% include "crm/fragments/project/project_card.html" with project=membership.project %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
-        </div>
-        <!-- Right column -->
-        <div class="user-crm-right-col">
-            <!-- Banner account status -->
-            {% if not crm_user.is_active %}
-                {% if crm_user.profile.disabled %}
-                    <div class="d-flex justify-content-between align-items-center fr-alert fr-alert--info fr-mb-2w fr-px-3w fr-py-2w">
-                        <span>Cet utilisateur a été désactivé.</span>
-                        <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="fr-btn fr-btn--sm">Réactiver le compte utilisateur</button>
-                        </form>
-                    </div>
-                {% elif crm_user.profile.deleted %}
-                    <div class="fr-alert fr-alert--error fr-mb-2w">
-                        <p>Ce compte a été supprimé. La personne ne peut plus se connecter à {{ request.site.name }}.</p>
-                    </div>
-                {% else %}
-                    <div class="fr-alert fr-alert--warning fr-mb-2w">
-                        <p>Ce compte est inactif.</p>
-                    </div>
-                {% endif %}
-            {% endif %}
-            <!-- Notes section -->
-            {% if not crm_user.profile.deleted %}
-                <section class="w-100">
-                    <div class="user-crm__section-title-container no-border">
-                        <h3 class="user-crm__section-title">Notes</h3>
-                        <a class="fr-btn fr-btn--primary fr-btn--sm"
-                           href="{% url 'crm-user-note-create' crm_user.pk %}">Ajouter une note</a>
-                    </div>
-                    <!-- Empty state -->
-                    {% if not notes.all and not sticky_notes.all %}
-                        <div class="fr-p-3w text-center text-muted">
-                            <p class="fr-text--sm">Aucune note pour cet utilisateur</p>
-                        </div>
-                    {% endif %}
-                    <!-- Pinned notes -->
-                    {% for note in sticky_notes.all %}
-                        {% include "crm/note.html" with pinned=True %}
-                    {% endfor %}
-                    <!-- Notes list -->
-                    {% for note in notes.all %}
-                        {% include "crm/note.html" %}
-                    {% endfor %}
-                </section>
-            {% endif %}
-            <!-- Activity timeline -->
-            <section class="w-100">
-                <h3 class="user-crm__section-title">Activité de l'utilisateur</h3>
-                {% include "crm/timeline.html" %}
-            </section>
-        </div>
-    </div>
+            <!-- Pinned notes -->
+            {% for note in sticky_notes.all %}
+                {% include "crm/note.html" with pinned=True %}
+            {% endfor %}
+            <!-- Notes list -->
+            {% for note in notes.all %}
+                {% include "crm/note.html" %}
+            {% endfor %}
+        </section>
+    {% endif %}
+    <!-- Activity timeline -->
+    <section class="w-100">
+        <h3 class="user-crm__section-title">Activité de l'utilisateur</h3>
+        {% include "crm/timeline.html" %}
+    </section>
+</div>
+</div>
 {% endblock content %}
