@@ -132,3 +132,8 @@
 .fr-icon-people::before {
   mask-image: url(../assets/people.svg);
 }
+
+.fr-icon-hat-and-glasses::after,
+.fr-icon-hat-and-glasses::before {
+  mask-image: url(../assets/hat-and-glasses.svg);
+}
