@@ -14,7 +14,8 @@ input.searchbar-input--with-button {
 .correct-position {
   position: absolute;
   left: 10px;
-  top: 5px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .correct-position::before {
