@@ -13,7 +13,28 @@
     {% vite_asset 'js/styles/crm-results.css.js' %}
 {% endblock js %}
 {% block content %}
-    <div class="crm-results"></div>
+    <div class="crm-results">
+        <!-- CRM Navbar -->
+        {% include "crm/fragments/navigation.html" %}
+        <!-- Breadcrumb -->
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: `Recherche` } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+        <!-- Result count -->
+        <h3 class="d-flex align-items-center fr-px-5v">
+            {% if search_results|length == 0 %}
+                <span>Aucun résultat pour "{{ query }}"</span>
+            {% elif search_results|length > 0 %}
+                <span>{{ search_results|length }} résultat{{ search_results|length|pluralize }} pour "{{ query }}"</span>
+            {% endif %}
+        </h3>
+        <!-- Searchbar -->
+        <!-- Filter result type -->
+        <!-- Result - Project type -->
+        <!-- Result - Orga type -->
+        <!-- Result - User type -->
+        <!-- Result - Orga type -->
+        <!-- Result - Note type -->
+    </div>
     {% comment %} <div x-data="Crm" class="d-flex fr-px-0">
         <aside class="w-25 crm-aside">
             <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
