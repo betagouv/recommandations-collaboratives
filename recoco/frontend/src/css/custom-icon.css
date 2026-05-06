@@ -123,16 +123,6 @@
   mask-image: url(../assets/pushpin-line.svg);
 }
 
-.fr-icon-mail::after,
-.fr-icon-mail::before {
-  mask-image: url(../assets/mail.svg);
-}
-
-.fr-icon-people::after,
-.fr-icon-people::before {
-  mask-image: url(../assets/people.svg);
-}
-
 .fr-icon-hat-and-glasses::after,
 .fr-icon-hat-and-glasses::before {
   mask-image: url(../assets/hat-and-glasses.svg);
