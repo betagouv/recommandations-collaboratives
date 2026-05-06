@@ -1,2 +1,8 @@
 .crm-results {
+  &__title {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 150%; /* 36px */
+  }
 }
