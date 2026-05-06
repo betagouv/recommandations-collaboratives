@@ -225,6 +225,7 @@ const config = {
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),
+        crmResults: resolve('./src/js/styles/crm-results.css.js'),
       },
       output: {
         chunkFileNames: undefined,

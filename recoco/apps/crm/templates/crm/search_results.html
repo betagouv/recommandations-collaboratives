@@ -10,12 +10,13 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/styles/crm-results.css.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0">
+    <div class="crm-results"></div>
+    {% comment %} <div x-data="Crm" class="d-flex fr-px-0">
         <aside class="w-25 crm-aside">
-            <div x-ref="sidebar"
-                 class="d-flex flex-column justify-content-start crm-sticky">
+            <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
                 {% include "crm/back_button.html" %}
                 {% include "crm/search.html" %}
             </div>
@@ -38,5 +39,5 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 {% endblock content %}
