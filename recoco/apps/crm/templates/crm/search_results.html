@@ -20,23 +20,56 @@
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: `Recherche` } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
         <!-- Result count -->
-        <h2 class="crm-results__title fr-px-5v">
-            {% if search_results|length == 0 %}
-                <span>Aucun résultat pour "{{ query }}"</span>
-            {% elif search_results|length > 0 %}
-                <span>{{ search_results|length }} résultat{{ search_results|length|pluralize }} pour "{{ query }}"</span>
-            {% endif %}
-        </h2>
-        <!-- Searchbar -->
-        <div class="fr-px-5v">
-            {% include "crm/fragments/general_search_input.html" with padding_icon_class="fr-pl-5w" padding_class="fr-py-3v" width_class="w-100" init_value=query %}
+        <div class="crm-results__container">
+            <h2 class="crm-results__title fr-m-0 fr-mt-1w">
+                {% if search_results|length == 0 %}
+                    <span>Aucun résultat pour "{{ query }}"</span>
+                {% elif search_results|length > 0 %}
+                    <span>{{ search_results|length }} résultat{{ search_results|length|pluralize }} pour "{{ query }}"</span>
+                {% endif %}
+            </h2>
+            <!-- Searchbar -->
+            <div class="fr-mt-2w">
+                {% include "crm/fragments/general_search_input.html" with padding_icon_class="fr-pl-5w" padding_class="fr-py-3v" width_class="w-100" init_value=query %}
+            </div>
+            <!-- Filter result type -->
+            <fieldset class="fr-segmented fr-mt-2w">
+                <legend class="fr-segmented__legend crm-results__filter-legend">Filtrer les résulats:</legend>
+                <div class="fr-segmented__elements">
+                    <div class="fr-segmented__element">
+                        <input value="all" type="radio" id="segmented-all" name="segmented" checked>
+                        <label class="fr-label" for="segmented-all">Tout ({{ search_results|length }})</label>
+                    </div>
+                    <div class="fr-segmented__element">
+                        <input value="projects"
+                               type="radio"
+                               id="segmented-projects"
+                               name="segmented">
+                        <label class="fr-label" for="segmented-projects">Dossiers ({{ search_results|length }})</label>
+                    </div>
+                    <div class="fr-segmented__element">
+                        <input value="users" type="radio" id="segmented-users" name="segmented">
+                        <label class="fr-label" for="segmented-users">Utilisateurs ({{ search_results|length }})</label>
+                    </div>
+                    <div class="fr-segmented__element">
+                        <input value="organizations"
+                               type="radio"
+                               id="segmented-organizations"
+                               name="segmented">
+                        <label class="fr-label" for="segmented-organizations">Organisations ({{ search_results|length }})</label>
+                    </div>
+                    <div class="fr-segmented__element">
+                        <input value="notes" type="radio" id="segmented-notes" name="segmented">
+                        <label class="fr-label" for="segmented-notes">Note ({{ search_results|length }})</label>
+                    </div>
+                </div>
+            </fieldset>
+            <!-- Result - Project type -->
+            <!-- Result - Orga type -->
+            <!-- Result - User type -->
+            <!-- Result - Orga type -->
+            <!-- Result - Note type -->
         </div>
-        <!-- Filter result type -->
-        <!-- Result - Project type -->
-        <!-- Result - Orga type -->
-        <!-- Result - User type -->
-        <!-- Result - Orga type -->
-        <!-- Result - Note type -->
     </div>
     {% comment %} <div x-data="Crm" class="d-flex fr-px-0">
         <aside class="w-25 crm-aside">

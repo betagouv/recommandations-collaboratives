@@ -1,8 +1,21 @@
 .crm-results {
+  &__container {
+    padding: 0 1.25rem;
+  }
   &__title {
     color: var(--light-text-default-grey, #3a3a3a);
     font-size: 1.5rem;
     font-weight: 700;
     line-height: 150%; /* 36px */
+  }
+
+  &__filter-legend {
+    color: var(--light-text-active-grey, #161616);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 20px;
+    align-items: center;
+    margin-bottom: 0;
+    margin-right: 10px;
   }
 }
