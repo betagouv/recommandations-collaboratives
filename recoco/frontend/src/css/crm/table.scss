@@ -1,3 +1,23 @@
+.crm-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #6a6af4;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  cursor: default;
+
+  &--overflow {
+    background-color: #e3e3fd;
+    color: #3a3a3a;
+  }
+}
+
 .crm {
   .project-table,
   .resource-table {

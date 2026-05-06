@@ -34,6 +34,7 @@ from django.core.exceptions import BadRequest
 from django.db import transaction
 from django.db.models import (
     Count,
+    Exists,
     ExpressionWrapper,
     F,
     FloatField,
@@ -865,6 +866,9 @@ def project_update(request, project_id=None):
             if "statistics" in form.cleaned_data:
                 project.exclude_stats = not form.cleaned_data["statistics"]
             project.save()
+            next_url = request.POST.get("next", "")
+            if next_url and next_url.startswith("/"):
+                return redirect(next_url)
     else:
         form = forms.CRMProjectForm(
             initial={
@@ -1137,10 +1141,12 @@ def crm_list_recommendation_without_resources(request):
     return render(request, "crm/reco_without_resources.html", locals())
 
 
-def make_low_reach_project_query(request):
-    site_config = request.site_config
+def make_low_reach_project_query(
+    request, days=15, status_filter="no_reaction", mine_only=False, search_q=""
+):
+    cutoff_date = datetime.now() - timedelta(days=days)
 
-    return (
+    qs = (
         Project.on_site.filter(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
@@ -1170,26 +1176,61 @@ def make_low_reach_project_query(request):
             reco_read_ratio=ExpressionWrapper(
                 Cast(F("reco_read"), FloatField()) / F("reco_total") * Value(100.0),
                 output_field=FloatField(),
-            ),  # Pc of unread reco
+            ),
             last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
             last_public_msg_at=Max(
                 "notes__created_on",
                 filter=Q(notes__public=True, notes__created_by__in=F("members__id")),
             ),
+            has_task_status=Exists(
+                Task.objects.filter(
+                    project=OuterRef("pk"),
+                    public=True,
+                    deleted__isnull=True,
+                ).exclude(status=Task.PROPOSED)
+            ),
         )
-        .exclude(reco_read_ratio__gte=99.9)  # Not interested if everything was read
-        .exclude(
-            last_reco_at__lte=datetime.now()
-            - timedelta(days=site_config.reminder_interval)
-        )
-        .order_by(
-            "reco_read_ratio",
-            "last_members_activity_at",
-            "last_reco_at",
-            "last_public_msg_at",
-        )
-        .distinct()
+        .filter(last_members_activity_at__lte=cutoff_date)
     )
+
+    # has_reaction: member sent a message, or any reco has a non-default status
+    has_reaction_filter = Q(last_public_msg_at__isnull=False) | Q(has_task_status=True)
+
+    if status_filter == "low_read":
+        # Recos non lues: ≤1 reco opened AND no sign of engagement
+        qs = qs.filter(reco_read__lte=1).exclude(has_reaction_filter)
+    else:
+        # Aucune réaction (default): no engagement regardless of read count
+        qs = qs.exclude(has_reaction_filter)
+
+    if mine_only:
+        qs = qs.filter(switchtenders=request.user)
+
+    if search_q:
+        qs = qs.filter(
+            Q(name__icontains=search_q) | Q(commune__name__icontains=search_q)
+        )
+
+    return qs.order_by("-last_members_activity_at").distinct()
+
+
+def _parse_low_reach_params(request):
+    """Extract and validate filter params from request GET for low-reach views."""
+    try:
+        days = int(request.GET.get("days", 15))
+    except ValueError:
+        days = 15
+    if days not in (15, 30, 60, 90):
+        days = 15
+
+    status_filter = request.GET.get("status", "no_reaction")
+    if status_filter not in ("low_read", "no_reaction"):
+        status_filter = "no_reaction"
+
+    mine_only = bool(request.GET.get("mine"))
+    search_q = request.GET.get("q", "").strip()
+
+    return days, status_filter, mine_only, search_q
 
 
 @login_required
@@ -1197,11 +1238,27 @@ def crm_list_projects_with_low_reach(request):
     """List projects that don't get a good impact"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    search_form = forms.CRMSearchForm()
+    days, status_filter, mine_only, search_q = _parse_low_reach_params(request)
 
-    low_reach_projects = make_low_reach_project_query(request)
+    low_reach_projects = make_low_reach_project_query(
+        request,
+        days=days,
+        status_filter=status_filter,
+        mine_only=mine_only,
+        search_q=search_q,
+    )
 
-    return render(request, "crm/projects_low_reach.html", locals())
+    return render(
+        request,
+        "crm/projects_low_reach.html",
+        {
+            "low_reach_projects": low_reach_projects,
+            "days": days,
+            "status_filter": status_filter,
+            "mine_only": mine_only,
+            "search_q": search_q,
+        },
+    )
 
 
 @login_required
@@ -1209,53 +1266,84 @@ def crm_projects_with_low_reach_as_csv(request):
     """Export projects that don't get a good impact in CSV"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    low_reach_projects = make_low_reach_project_query(request)
+    days, status_filter, mine_only, search_q = _parse_low_reach_params(request)
+
+    low_reach_projects = make_low_reach_project_query(
+        request,
+        days=days,
+        status_filter=status_filter,
+        mine_only=mine_only,
+        search_q=search_q,
+    ).prefetch_related("projectmember_set__member__profile__organization")
 
     today = datetime.today().date()
 
-    content_disposition = (
-        f'attachment; filename="projets-a-faible-repondant-{today}.csv"'
-    )
     response = HttpResponse(
         content_type="text/csv",
         headers={
-            "Content-Disposition": content_disposition,
+            "Content-Disposition": f'attachment; filename="projets-a-relancer-{today}.csv"'
         },
     )
 
     writer = csv.writer(response, quoting=csv.QUOTE_ALL)
     writer.writerow(
         [
-            "name",
-            "location",
+            "nom_dossier",
+            "commune",
             "insee",
-            "inactive_since",
-            "advisors",
-            "reco_access_pc",
-            "reco_read",
-            "reco_total",
-            "last_member_activity",
-            "last_reco_at",
-            "last_public_msg_at",
+            "conseillers",
+            "recos_lues",
+            "recos_total",
+            "derniere_activite",
+            "derniere_reco",
+            "statut",
+            "referent_prenom",
+            "referent_nom",
+            "referent_organisation",
+            "referent_telephone",
+            "referent_email",
+            "referent_fonction",
         ]
     )
 
     for project in low_reach_projects:
+        project_status = (
+            "RECOS NON LUES" if project.reco_read <= 1 else "AUCUNE RÉACTION"
+        )
+        owner = project.owner
+        if owner:
+            profile = getattr(owner, "profile", None)
+            referent_first = owner.first_name
+            referent_last = owner.last_name
+            referent_org = (
+                str(profile.organization) if profile and profile.organization else ""
+            )
+            referent_phone = (
+                str(profile.phone_no) if profile and profile.phone_no else ""
+            )
+            referent_email = owner.email
+            referent_position = profile.organization_position if profile else ""
+        else:
+            referent_first = referent_last = referent_org = ""
+            referent_phone = referent_email = referent_position = ""
+
         writer.writerow(
             [
                 project.name,
                 project.commune.name,
                 project.commune.insee,
-                project.inactive_since,
-                ",".join(
-                    [advisor.get_full_name() for advisor in project.switchtenders.all()]
-                ),
-                project.reco_read_ratio,
+                ", ".join(a.get_full_name() for a in project.switchtenders.all()),
                 project.reco_read,
                 project.reco_total,
                 project.last_members_activity_at,
-                project.last_reco_at,
-                project.last_public_msg_at,
+                project.last_reco_at or "",
+                project_status,
+                referent_first,
+                referent_last,
+                referent_org,
+                referent_phone,
+                referent_email,
+                referent_position,
             ]
         )
 
