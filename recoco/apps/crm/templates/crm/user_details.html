@@ -54,11 +54,10 @@
                  {% if crm_user.is_staff or crm_user_is_advisor %}
                     <div class="d-flex flex-wrap gap-1 fr-mb-2v">
                         {% if crm_user.is_staff %}
-                            <span class="badge"
-                                style="background-color: #f0a500; color: #000;">+ Staff</span>
+                            <span class="user-crm__badges">⭐️ Staff</span>
                         {% endif %}
                         {% if crm_user_is_advisor %}
-                            <span class="badge bg-success">Conseiller</span>
+                            <span class="user-crm__badges user-crm__badges--advisor">Conseiller</span>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -72,11 +71,11 @@
                 {% endif %}
                 <!-- Organization -->
                 {% if crm_user.profile.organization %}
-                    <span class="user-crm__user-information fr-icon-building-line fr-icon--sm fr-mb-1v">{{ crm_user.profile.organization.name }}</span>
+                    <span class="user-crm__user-information fr-icon-people fr-icon--sm {% if crm_user_is_advisor %}fr-mb-1v{% else %}fr-mb-3v{% endif %}">{{ crm_user.profile.organization.name }}</span>
                 {% endif %}
                 <!-- Departments (if advisor) -->
                 {% if crm_user_is_advisor %}
-                    <span class="user-crm__user-information fr-icon-map-pin-2-line fr-icon--sm fr-mb-1v">Départements :
+                    <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-3v">Départements :
                         {% for dpt in crm_user.profile.departments.all %}
                             {{ dpt.code }}{% if not forloop.last %},{% endif %}
                         {% empty %}
@@ -86,12 +85,12 @@
                 {% endif %}
                 <!-- Email -->
                 {% if crm_user.email %}
-                    <span class="user-crm__user-information fr-icon-mail-line fr-icon--sm fr-mb-1v"><a href="mailto:{{ crm_user.email }}">{{ crm_user.email }}</a>
+                    <span class="user-crm__user-information--link fr-icon-link fr-icon--sm {% if crm_user.profile.phone_no %}fr-mb-1v{% else %}fr-mb-3v{% endif %}"><a href="mailto:{{ crm_user.email }}">{{ crm_user.email }}</a>
                     </span>
                 {% endif %}
                 <!-- Phone -->
                 {% if crm_user.profile.phone_no %}
-                    <span class="user-crm__user-information fr-icon-phone-line fr-icon--sm fr-mb-1v">
+                    <span class="user-crm__user-information--link fr-icon-phone-line fr-icon--sm fr-mb-3v">
                         <a href="tel:{{ crm_user.profile.phone_no }}">{{ crm_user.profile.phone_no|format_phone }}</a>
                     </span>
                 {% endif %}
@@ -103,9 +102,8 @@
                 {% if crm_user.last_login %}
                     <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière connexion il y a {{ crm_user.last_login|timesince }}</span>
                 {% endif %}
-                <!-- Notifications & reminders links -->
-                <a class="user-crm__user-information fr-icon-notification-3-line fr-icon--sm fr-mb-1v fr-link--sm"
-                   href="{% url 'crm-user-notifications' crm_user.pk %}">prochain rappel</a>
+                <!-- Next reminders -->
+                <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel</span>
             </div>
             <!-- Dossiers conseillés -->
             {% if crm_user_is_advisor %}

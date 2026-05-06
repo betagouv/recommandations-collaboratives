@@ -3,6 +3,24 @@
       width: 30%;
     }
 
+    &__badges {
+        display: flex;
+        height: 26px;
+        padding: 4px 8px;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        border-radius: 1px;
+        background: var(--dark-background-flat-warning, #FC5D00);
+        color: var(--light-text-inverted-grey, #FFF);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 18px; /* 150% */
+        &--advisor {
+            background: var(--dark-background-flat-success, #27A658);
+        }
+    }
+
     &__user-name {
       color: var(--light-text-default-grey, #3a3a3a);
       font-size: 18px;
@@ -35,9 +53,23 @@
       font-size: 12px;
       font-weight: 400;
       line-height: 150%; /* 18px */
+      &--link {
+        overflow: hidden;
+        color: var(--light-background-action-high-blue-france, #000091);
+        text-overflow: ellipsis;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 150%; /* 18px */
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+      }
     }
 
-    &__user-information::before {
+    &__user-information::before, &__user-information--link::before {
       margin-right: 4px;
     }
 
