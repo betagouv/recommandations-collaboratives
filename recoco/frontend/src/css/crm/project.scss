@@ -79,7 +79,7 @@
     }
   }
 
-  &__timeline-date {
+  .timeline__date {
     color: var(--light-neutral-grey-625, #929292);
     font-size: 12px;
     font-style: italic;
@@ -113,7 +113,7 @@
     align-items: center;
     gap: 4px;
     &-text {
-      color: var(--light-text-inverted-grey, #FFF);
+      color: var(--light-text-inverted-grey, #fff);
       font-size: 10px;
       font-weight: 700;
       line-height: 18px; /* 180% */
