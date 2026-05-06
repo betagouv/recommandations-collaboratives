@@ -9,8 +9,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  &--draft,
-  &--paused {
+  &--desactivated {
     background: var(--light-background-flat-info, #0063cb);
     .user-banner__btn {
       border-radius: 1px;
@@ -23,11 +22,6 @@
         color: var(--light-text-default-info, #0063cb);
       }
     }
-  }
-  &--rejected,
-  &--deleted,
-  &--predraft {
-    background: var(--dark-text-mention-grey, #929292);
   }
   a {
     color: inherit;

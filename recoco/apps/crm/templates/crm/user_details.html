@@ -142,7 +142,7 @@
 <div class="user-crm-right-col">
     <!-- Banner account status -->
     {% if not crm_user.is_active %}
-        <div class="user-banner user-banner--paused">
+        <div class="user-banner user-banner--desactivated">
             {% if crm_user.profile.disabled %}
                 <p class="fr-m-0 font-size-14px">Cet utilisateur a été désactivé.</p>
                 <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
