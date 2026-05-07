@@ -11,11 +11,23 @@
 
   &__filter-legend {
     color: var(--light-text-active-grey, #161616);
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-weight: 400;
     line-height: 20px;
     align-items: center;
     margin-bottom: 0;
     margin-right: 10px;
+  }
+
+  &__filter-element input + label {
+    font-size: 1rem;
+  }
+
+  &__group-title {
+    color: var(--light-text-disabled-grey, #929292);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 22px;
+    text-transform: uppercase;
   }
 }

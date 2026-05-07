@@ -29,29 +29,29 @@
                 {% endif %}
             </h2>
             <!-- Searchbar -->
-            <div class="fr-mt-2w">
-                {% include "crm/fragments/general_search_input.html" with padding_icon_class="fr-pl-5w" padding_class="fr-py-3v" width_class="w-100" init_value=query %}
+            <div class="fr-mt-2w position-relative">
+                {% include "projects/project/fragments/search_bar.html" with padding_icon_class="fr-pl-5w" padding_class="fr-py-3v" value=query %}
             </div>
             <!-- Filter result type -->
             <fieldset class="fr-segmented fr-mt-2w">
                 <legend class="fr-segmented__legend crm-results__filter-legend">Filtrer les résulats:</legend>
                 <div class="fr-segmented__elements">
-                    <div class="fr-segmented__element">
+                    <div class="fr-segmented__element crm-results__filter-element">
                         <input value="all" type="radio" id="segmented-all" name="segmented" checked>
                         <label class="fr-label" for="segmented-all">Tout ({{ search_results|length }})</label>
                     </div>
-                    <div class="fr-segmented__element">
+                    <div class="fr-segmented__element crm-results__filter-element">
                         <input value="projects"
                                type="radio"
                                id="segmented-projects"
                                name="segmented">
                         <label class="fr-label" for="segmented-projects">Dossiers ({{ grouped_search_results.projects.items|length }})</label>
                     </div>
-                    <div class="fr-segmented__element">
+                    <div class="fr-segmented__element crm-results__filter-element">
                         <input value="users" type="radio" id="segmented-users" name="segmented">
                         <label class="fr-label" for="segmented-users">Utilisateurs ({{ grouped_search_results.users.items|length }})</label>
                     </div>
-                    <div class="fr-segmented__element">
+                    <div class="fr-segmented__element crm-results__filter-element">
                         <input value="organizations"
                                type="radio"
                                id="segmented-organizations"
