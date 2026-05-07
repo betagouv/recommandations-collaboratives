@@ -55,7 +55,26 @@ Alpine.store('sharedContentsPanel', {
   },
 
   setRecommendations(recommendations) {
-    this.recommendations = recommendations;
+    this.recommendations = [...recommendations].sort((a, b) => {
+      const dateA = new Date(a.messageCreated);
+      const dateB = new Date(b.messageCreated);
+      const dayA = new Date(
+        dateA.getFullYear(),
+        dateA.getMonth(),
+        dateA.getDate()
+      ).getTime();
+      const dayB = new Date(
+        dateB.getFullYear(),
+        dateB.getMonth(),
+        dateB.getDate()
+      ).getTime();
+      // Different day : descendant order
+      if (dayA !== dayB) {
+        return dayB - dayA;
+      }
+      // Same day : ascendant order
+      return dateA.getTime() - dateB.getTime();
+    });
   },
 
   setFiles(files) {
