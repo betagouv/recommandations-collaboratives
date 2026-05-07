@@ -179,6 +179,44 @@ def crm_search(request):
 
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
+        # Code by Claude
+        grouped_search_results = OrderedDict(
+            (
+                (
+                    "projects",
+                    {"label": "Dossier", "label_plural": "Dossiers", "items": []},
+                ),
+                (
+                    "users",
+                    {
+                        "label": "Utilisateur",
+                        "label_plural": "Utilisateurs",
+                        "items": [],
+                    },
+                ),
+                (
+                    "organizations",
+                    {
+                        "label": "Organisation",
+                        "label_plural": "Organisations",
+                        "items": [],
+                    },
+                ),
+                ("notes", {"label": "Note", "label_plural": "Notes", "items": []}),
+            )
+        )
+
+        for entry in search_results:
+            obj = entry.object
+            if isinstance(obj, (Project, models.ProjectAnnotations)):
+                grouped_search_results["projects"]["items"].append(entry)
+            elif isinstance(obj, User):
+                grouped_search_results["users"]["items"].append(entry)
+            elif isinstance(obj, Organization):
+                grouped_search_results["organizations"]["items"].append(entry)
+            elif isinstance(obj, models.Note):
+                grouped_search_results["notes"]["items"].append(entry)
+
     return render(request, "crm/search_results.html", locals())
 
 

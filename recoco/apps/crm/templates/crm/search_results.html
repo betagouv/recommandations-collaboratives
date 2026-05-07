@@ -45,30 +45,40 @@
                                type="radio"
                                id="segmented-projects"
                                name="segmented">
-                        <label class="fr-label" for="segmented-projects">Dossiers ({{ search_results|length }})</label>
+                        <label class="fr-label" for="segmented-projects">Dossiers ({{ grouped_search_results.projects.items|length }})</label>
                     </div>
                     <div class="fr-segmented__element">
                         <input value="users" type="radio" id="segmented-users" name="segmented">
-                        <label class="fr-label" for="segmented-users">Utilisateurs ({{ search_results|length }})</label>
+                        <label class="fr-label" for="segmented-users">Utilisateurs ({{ grouped_search_results.users.items|length }})</label>
                     </div>
                     <div class="fr-segmented__element">
                         <input value="organizations"
                                type="radio"
                                id="segmented-organizations"
                                name="segmented">
-                        <label class="fr-label" for="segmented-organizations">Organisations ({{ search_results|length }})</label>
+                        <label class="fr-label" for="segmented-organizations">
+                            Organisations ({{ grouped_search_results.organizations.items|length }})
+                        </label>
                     </div>
                     <div class="fr-segmented__element">
                         <input value="notes" type="radio" id="segmented-notes" name="segmented">
-                        <label class="fr-label" for="segmented-notes">Note ({{ search_results|length }})</label>
+                        <label class="fr-label" for="segmented-notes">Notes ({{ grouped_search_results.notes.items|length }})</label>
                     </div>
                 </div>
             </fieldset>
-            <!-- Result - Project type -->
-            <!-- Result - Orga type -->
-            <!-- Result - User type -->
-            <!-- Result - Orga type -->
-            <!-- Result - Note type -->
+            <!-- Result - Project type, User type, Orga type, Note type -->
+            {% for group_key, group in grouped_search_results.items %}
+                {% if group.items|length > 0 %}
+                    <h3 class="crm-results__group-title fr-mt-4w fr-mb-2w">
+                        {{ group.items|length }} {{ group.label|lower }}{{ group.items|length|pluralize:"s" }}
+                    </h3>
+                    <ul class="list-group">
+                        {% for result in group.items %}
+                            <li class="list-group-item mb-4">{% search_result_item result %}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
     {% comment %} <div x-data="Crm" class="d-flex fr-px-0">
