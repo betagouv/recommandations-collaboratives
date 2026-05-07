@@ -10,27 +10,28 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/styles/project-low-reach.css.js' %}
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with projects=True %}
     <div x-data="{ breadcrumbs: { links: [{ url: '{% url 'crm-site-dashboard' %}', title: 'Admin' }, { url: '{% url 'crm-project-list' %}', title: 'Dossiers' }], current: 'Dossiers à relancer' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div class="fr-container-fluid fr-px-5v fr-pb-5v crm">
-        <div class="d-flex justify-content-between align-items-start fr-mt-3w fr-mb-3w flex-wrap"
-             style="gap: 1rem;">
+        <div class="d-flex justify-content-between align-items-start fr-mt-3w fr-mb-3w flex-wrap">
             <div>
                 <a href="{% url 'crm-project-list' %}"
-                   class="fr-link fr-fi-arrow-left-line fr-link--icon-left fr-mb-2w d-inline-block">
+                   class="fr-link fr-mb-1w d-inline-block font-size-12px">
+                   <span class="fr-icon-arrow-left-s-line fr-icon--sm"></span>
                     Retour à tous les dossiers
                 </a>
                 <h1 class="fr-h2 fr-mb-0">
                     {{ low_reach_projects.count }} Dossier{{ low_reach_projects.count|pluralize }} à relancer
                 </h1>
             </div>
-            <div class="fr-callout fr-callout--blue-ecume" style="max-width: 420px; margin: 0;">
-                <p class="fr-callout__text fr-text--sm fr-mb-0">
+            <div class="project-low-reach__notice-banner">
+                <p class="project-low-reach__notice-banner-text">
                     Vous trouverez ici tous les projets qui n'ont pas eu d'activité de la part des demandeurs sur la période sélectionnée.
-                    Vous êtes perdus&nbsp;? <a href="#" class="fr-link">Allez lire la doc&nbsp;!</a>
+                    Vous êtes perdus&nbsp;? <a href="#" class="project-low-reach__notice-banner-link">Allez lire la doc&nbsp;!</a>
                 </p>
             </div>
         </div>

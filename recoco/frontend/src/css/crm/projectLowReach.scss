@@ -1,0 +1,38 @@
+.project-low-reach {
+    // Styles for the low reach project table
+    &__notice-banner {
+        border-radius: 2px;
+        background: #EEE;
+        display: flex;
+        width: 600px;
+        padding: 8px 24px;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+     &__notice-banner-text {
+        color: var(--light-text-default-grey, #3A3A3A);
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 150%; /* 18px */
+        margin: 0;
+     }
+     &__notice-banner-link {
+        color: var(--light-text-title-blue-france, #000091);
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 150%;
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        text-decoration-skip-ink: none;
+        text-decoration-thickness: auto;
+        text-underline-offset: auto;
+        text-underline-position: from-font;
+    }
+    &__title {
+        color: var(--light-text-default-grey, #3A3A3A);
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 150%; /* 36px */
+    }
+}
