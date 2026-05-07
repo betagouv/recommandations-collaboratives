@@ -4,7 +4,7 @@
 <ul class="hide-ul-style fr-mt-1w">
     {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
     {% for date_group in actions_by_date %}
-        <li class="project-crm__timeline-date">le {{ date_group.grouper }}</li>
+        <li class="timeline__date">le {{ date_group.grouper }}</li>
         {% for action in date_group.list %}
             {% if action.verb == verbs.Project.INVITATION %}
                 {% include "crm/fragments/action_invite.html" %}

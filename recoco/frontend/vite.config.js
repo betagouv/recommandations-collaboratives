@@ -229,6 +229,9 @@ const config = {
         bannerProjectStatusStyle: resolve(
           './src/js/styles/banner-project-status.css.js'
         ),
+        bannerUserStatusStyle: resolve(
+          './src/js/styles/banner-user-status.css.js'
+        ),
         bannerProjectMultiportalStyles: resolve(
           './src/js/styles/banner-project-multiportal.css.js'
         ),

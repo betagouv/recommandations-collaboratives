@@ -1,30 +1,76 @@
-.project-crm {
+.user-crm {
   &-left-col {
     width: 30%;
   }
 
-  &__project-name {
+  &__badges {
+    display: flex;
+    height: 26px;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 1px;
+    background: var(--dark-background-flat-warning, #fc5d00);
+    color: var(--light-text-inverted-grey, #fff);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px; /* 150% */
+    &--advisor {
+      background: var(--dark-background-flat-success, #27a658);
+    }
+  }
+
+  &__user-name {
     color: var(--light-text-default-grey, #3a3a3a);
     font-size: 18px;
     font-weight: 700;
     line-height: 150%; /* 27px */
   }
 
-  &__project-org {
+  &__user-org {
     color: var(--light-text-mention-grey, #666);
     font-size: 16px;
     font-weight: 400;
     line-height: 150%; /* 24px */
   }
 
-  &__project-information {
+  &__actions-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    &--style {
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--light-text-mention-grey, #666);
+      box-shadow: none;
+      color: var(--light-text-mention-grey, #666) !important;
+    }
+  }
+
+  &__user-information {
     color: var(--light-text-mention-grey, #666);
     font-size: 12px;
     font-weight: 400;
     line-height: 150%; /* 18px */
+    &--link {
+      overflow: hidden;
+      color: var(--light-background-action-high-blue-france, #000091);
+      text-overflow: ellipsis;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 150%; /* 18px */
+      text-decoration-line: underline;
+      text-decoration-style: solid;
+      text-decoration-skip-ink: none;
+      text-decoration-thickness: auto;
+      text-underline-offset: auto;
+      text-underline-position: from-font;
+    }
   }
 
-  &__project-information::before {
+  &__user-information::before,
+  &__user-information--link::before {
     margin-right: 4px;
   }
 
