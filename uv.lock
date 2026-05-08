@@ -1286,6 +1286,19 @@ ua = [
 ]
 
 [[package]]
+name = "django-stubs-ext"
+version = "6.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fb/e6/5dcdaa785ec3eed5fc196c7e68fb7ad9d9fe6d5acccea4690e65f2546417/django_stubs_ext-6.0.3.tar.gz", hash = "sha256:3307d42132bc295d5744de6276bc5fdf6896efc70f891e21c0ae8bdf529d2762", size = 6663, upload-time = "2026-04-18T15:10:53.667Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/fa/0a3a05c29d6295dbd52fa3cb4047a95de11ba4f2696072d6f3f2c1e6f370/django_stubs_ext-6.0.3-py3-none-any.whl", hash = "sha256:9e4105955419ae310d7da9cfd808e039d4dae3092c628f021057bb4f2c237f8f", size = 10354, upload-time = "2026-04-18T15:10:52.395Z" },
+]
+
+[[package]]
 name = "django-tagging"
 version = "0.5.0"
 source = { git = "https://github.com/nextories/django-tagging.git?rev=bug%2Fusage_for_model_with_filters_none#56b8898cb999b8b94b68f01819b8f4a85a447312" }
@@ -1300,6 +1313,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/10/eb/269501702e231b552f68d813d0a07ac1ea81fd25a3c92fb0f249818f0f39/django-taggit-5.0.1.tar.gz", hash = "sha256:edcd7db1e0f35c304e082a2f631ddac2e16ef5296029524eb792af7430cab4cc", size = 60372, upload-time = "2023-10-29T11:57:20.124Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/18/94a45c8c50592d5cf7d73a9111053917c3684fda031c988041396bb3e588/django_taggit-5.0.1-py3-none-any.whl", hash = "sha256:a0ca8a28b03c4b26c2630fd762cb76ec39b5e41abf727a7b66f897a625c5e647", size = 61141, upload-time = "2023-10-29T11:56:57.954Z" },
+]
+
+[[package]]
+name = "django-tasks"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-stubs-ext" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/86/d2/09aa8cac81e5eb1719bed0fdfa865501e739a384830772a01954dc59e192/django_tasks-0.7.0.tar.gz", hash = "sha256:499f80d1a051566443cfa88a300d8b03435af7fc5708cad4d8da6d285614f739", size = 29581, upload-time = "2025-04-27T17:02:58.462Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/e2/1079d177654bd3d4200040d031e9e42831fab532ac4ea8354db15b3280b5/django_tasks-0.7.0-py3-none-any.whl", hash = "sha256:8a8d64f2dc6e29ac2f45092d90e2dd82dc1dca100dfe3a4f2ce1209db99f3527", size = 39970, upload-time = "2025-04-27T17:02:57.181Z" },
 ]
 
 [[package]]
@@ -2167,19 +2194,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0f/d3/5ff936d8319ac86b9c409f1501b07c426e6ad41966fedace9ef1b966e23f/kombu-5.5.4.tar.gz", hash = "sha256:886600168275ebeada93b888e831352fe578168342f0d1d5833d88ba0d847363", size = 461992, upload-time = "2025-06-01T10:19:22.281Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ef/70/a07dcf4f62598c8ad579df241af55ced65bed76e42e45d3c368a6d82dbc1/kombu-5.5.4-py3-none-any.whl", hash = "sha256:a12ed0557c238897d8e518f1d1fdf84bd1516c5e305af2dacd85c2015115feb8", size = 210034, upload-time = "2025-06-01T10:19:20.436Z" },
-]
-
-[[package]]
-name = "l18n"
-version = "2021.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytz" },
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ff/9c/13d732e16e8fbdef7e68f4f339f3b86618430d4003c7ffe82e15bf925d7c/l18n-2021.3.tar.gz", hash = "sha256:1956e890d673d17135cc20913253c154f6bc1c00266c22b7d503cc1a5a42d848", size = 50712, upload-time = "2021-11-12T09:32:36.255Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/e7/dfa82d0bb2b314950e457a755463b429090127ffc0ab9d8d14ef4563ad44/l18n-2021.3-py3-none-any.whl", hash = "sha256:78495d1df95b6f7dcc694d1ba8994df709c463a1cbac1bf016e1b9a5ce7280b9", size = 51534, upload-time = "2021-11-12T09:32:34.296Z" },
 ]
 
 [[package]]
@@ -3685,7 +3699,7 @@ requires-dist = [
     { name = "sib-api-v3-sdk", specifier = ">=7.6.0" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "urllib3", specifier = ">=2.6.3" },
-    { name = "wagtail", specifier = "==6.3.8" },
+    { name = "wagtail", specifier = "==7.0.7" },
 ]
 
 [package.metadata.requires-dev]
@@ -4727,7 +4741,7 @@ wheels = [
 
 [[package]]
 name = "wagtail"
-version = "6.3.8"
+version = "7.0.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyascii" },
@@ -4737,10 +4751,10 @@ dependencies = [
     { name = "django-modelcluster" },
     { name = "django-permissionedforms" },
     { name = "django-taggit" },
+    { name = "django-tasks" },
     { name = "django-treebeard" },
     { name = "djangorestframework" },
     { name = "draftjs-exporter" },
-    { name = "l18n" },
     { name = "laces" },
     { name = "openpyxl" },
     { name = "pillow" },
@@ -4748,9 +4762,9 @@ dependencies = [
     { name = "telepath" },
     { name = "willow", extra = ["heif"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/db/70e02e8e86a6ea186365c0978de3677c455b4b67c6f346ae9353e3423df6/wagtail-6.3.8.tar.gz", hash = "sha256:9c7695457f18e7a6e7815ffbc0d64be0ecb956ed896eaf107df8b5768648a7f2", size = 6644553, upload-time = "2026-03-03T15:52:12.485Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/2f/ccc30da7f8d229f33dd819394bcdb85d4f59cbf37e0b8c213dd941d3d24a/wagtail-7.0.7.tar.gz", hash = "sha256:11bda16fc6bc532daa341a9c9f55f5e06990483c6f592b73a0b1bf202d255065", size = 6680030, upload-time = "2026-05-05T14:16:51.466Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dd/82/fe591421beb91c29173806777db5bedb59ed1b8ca4d6d8caf4dd9522d204/wagtail-6.3.8-py3-none-any.whl", hash = "sha256:cbe241055234a3dac0f4ae73992cd0519340ab66c2bc4077257929d392ec19b2", size = 9131605, upload-time = "2026-03-03T15:52:06.557Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/5a/404d8164619b2654e2eb19840c61770702ca85504c20bb66fee53c9314a1/wagtail-7.0.7-py3-none-any.whl", hash = "sha256:3131c7e991a12a5266d26853b26b3e3958d7ea634dd1b3da71632cbe14b7e912", size = 9153804, upload-time = "2026-05-05T14:16:45.127Z" },
 ]
 
 [[package]]
