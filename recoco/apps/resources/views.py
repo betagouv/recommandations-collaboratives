@@ -356,6 +356,11 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
                 .distinct()
             )
 
+        context["pending_patch"] = models.ResourceRevisionMeta.objects.filter(
+            resource=resource,
+            status=models.ResourceRevisionMeta.PENDING,
+        ).first()
+
         return context
 
     def get_queryset(self) -> QuerySet[models.Resource]:
