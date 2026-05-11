@@ -19,7 +19,7 @@ variables to pass :
        name="{{ name|default:'query' }}"
        data-cy="search-bar-project"
        class="placeholder-position searchbar-input{% if show_search_button %} searchbar-input--with-button{% endif %}"
-       placeholder="{{ placeholder|default:"Rechercher" }}"
+       placeholder="{{ placeholder|default:'Rechercher' }}"
        {% if value %}value="{{ value }}"{% endif %}
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>

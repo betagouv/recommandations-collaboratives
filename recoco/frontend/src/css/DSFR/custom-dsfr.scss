@@ -562,6 +562,9 @@ form > p {
 .no-underline {
   text-decoration: none !important;
 }
+.no-outline {
+  outline: none !important;
+}
 
 .fr-link--underline .text-underline {
   text-decoration: underline !important;
