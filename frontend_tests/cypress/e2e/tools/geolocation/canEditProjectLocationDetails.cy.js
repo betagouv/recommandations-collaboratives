@@ -9,7 +9,7 @@ import projectLocation from '../../../support/tools/geolocation';
 let currentProject;
 const projectOwner = 'bob';
 const address = '12 Rue Edouard Vaillant';
-describe('I can edit the location details of a project on the project knowledge tab', () => {
+describe('I can edit the location details of a project on the project knowledge tab @page-projet-presentation-localisation', () => {
   beforeEach(() => {
     cy.visit('/');
   });

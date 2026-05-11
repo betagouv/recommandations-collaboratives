@@ -20,7 +20,7 @@ from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.contrib.sites.models import Site
@@ -31,6 +31,7 @@ from django.core.exceptions import BadRequest
 from django.db import transaction
 from django.db.models import (
     Count,
+    Exists,
     ExpressionWrapper,
     F,
     FloatField,
@@ -64,7 +65,13 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.projects.models import Document, Project, Topic
+from recoco.apps.projects.models import (
+    Document,
+    Project,
+    ProjectMember,
+    ProjectSwitchtender,
+    Topic,
+)
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
@@ -475,13 +482,64 @@ def organization_details(request, organization_id):
 def user_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered users
-    users = filters.UserFilter(
-        request.GET,
-        queryset=User.objects.filter(
-            profile__sites=request.site, profile__deleted__isnull=True
-        ).prefetch_related("profile__organization"),
+    site = request.site
+    advisor_group_name = make_group_name_for_site("advisor", site)
+    staff_group_name = make_group_name_for_site("staff", site)
+    admin_group_name = make_group_name_for_site("admin", site)
+    selected_departments = request.GET.getlist("departments")
+
+    base_qs = (
+        User.objects.filter(profile__sites=site, profile__deleted__isnull=True)
+        .prefetch_related("profile__organization")
+        .annotate(
+            projects_count=(
+                Subquery(
+                    Project.objects.filter(
+                        Q(
+                            pk__in=Subquery(
+                                ProjectMember.objects.filter(
+                                    member_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                        | Q(
+                            pk__in=Subquery(
+                                ProjectSwitchtender.objects.filter(
+                                    switchtender_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                    )
+                    .distinct()
+                    .annotate(count=Func(F("id"), function="Count"))
+                    .values("count")
+                )
+            ),
+            is_advisor=Exists(
+                Group.objects.filter(name=advisor_group_name, user=OuterRef("pk"))
+            ),
+            is_staff_member=Exists(
+                Group.objects.filter(name=staff_group_name, user=OuterRef("pk"))
+            ),
+            is_admin=Exists(
+                Group.objects.filter(name=admin_group_name, user=OuterRef("pk"))
+            ),
+        )
     )
+
+    users = filters.UserFilter(request.GET, queryset=base_qs)
+
+    has_active_filter = any(
+        [
+            request.GET.get("username"),
+            request.GET.get("role"),
+            selected_departments,
+            request.GET.get("inactive"),
+        ]
+    )
+
+    max_users_without_filter = 25
+    display_qs = users.qs if has_active_filter else users.qs[:max_users_without_filter]
 
     # required by default on crm
     search_form = forms.CRMSearchForm()

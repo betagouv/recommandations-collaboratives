@@ -2,7 +2,7 @@ import projects from '../../../../fixtures/projects/projects.json';
 
 const currentProject = projects[2];
 
-describe("I can't change topics of a project I don't advise", () => {
+describe("I can't change topics of a project I don't advise @page-projet-presentation-thematique", () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

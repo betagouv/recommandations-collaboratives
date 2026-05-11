@@ -1,4 +1,4 @@
-describe('I can assign some deparments when I create a resource', () => {
+describe('I can assign some deparments when I create a resource @acces-ressources', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
@@ -22,32 +22,24 @@ describe('I can assign some deparments when I create a resource', () => {
       .type('etiquette1', { force: true })
       .should('have.value', 'etiquette1');
 
-    cy.get('#id_departments-input').focus();
-    cy.get('#id_departments-list').children().first('p').click({ force: true });
-
-    cy.get('#id_departments-input').focus();
-    cy.get('#id_departments-list')
-      .children()
-      .eq('1')
-      .children()
-      .first()
-      .click({ force: true });
+    cy.get('#select-list-input').click();
+    cy.get('label').contains('Département de test').click({ force: true });
+    cy.get('label').contains('Département de test numéro 2').click({ force: true });
 
     cy.get('#id_expires_on')
-      .type('20/12/2022', { force: true })
-      .should('have.value', '20/12/2022');
+      .type('2022-12-20', { force: true });
 
     cy.get('.ProseMirror p').click();
     cy.focused().type('text', 'contenu de la ressource de test');
 
-    cy.get('[type="submit"]').click({ force: true });
+    cy.get('[data-test-id="publish-resource-btn"]').click({ force: true });
 
     cy.url().should('include', '/ressource/');
 
     cy.contains('Ressource de test');
     cy.contains('résumé de la ressource de test');
 
-    cy.contains('Cette ressource est disponible dans les régions suivantes :');
+    cy.contains('Cette ressource est disponible dans les départements suivants :');
     cy.contains('Département de test');
     cy.contains('Département de test numéro 2');
   });

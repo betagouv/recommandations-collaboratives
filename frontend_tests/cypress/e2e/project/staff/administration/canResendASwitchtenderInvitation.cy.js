@@ -4,7 +4,7 @@ import users from '../../../../fixtures/users/users.json';
 const currentProject = projects[1];
 const userToInvite = users[3];
 
-describe('I can go to administration area of a project and send back an invite for a switchtender', () => {
+describe('I can go to administration area of a project and send back an invite for a switchtender @page-projet-parametres-gestion-invitation', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

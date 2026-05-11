@@ -1,7 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can see and update an advisor note', () => {
+describe('I can see and update an advisor note @page-projet-presentation-note-interne', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

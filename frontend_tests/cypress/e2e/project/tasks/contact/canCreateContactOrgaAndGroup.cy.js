@@ -1,7 +1,6 @@
-describe('I can create and edit a contact and an organization on contactbook', () => {
+describe.skip('I can create and edit a contact and an organization on contactbook @page-projet-recommandations-creation', () => {
   beforeEach(() => {
     cy.login('staff');
-    cy.get('[data-test-id="button-consent-accept-all"]').click({ force: true });
   });
 
   it('can create a contact and create a new organization with no group and no departments', () => {

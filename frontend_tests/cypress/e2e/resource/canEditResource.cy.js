@@ -9,10 +9,10 @@ const resource = {
     name: 'Département de test numéro 2',
   },
   tags: 'etiquette1',
-  expires_on: '20/12/2022',
+  expires_on: '2022-12-20',
 };
 
-describe('I can edit a resource as a staff', () => {
+describe('I can edit a resource as a staff @acces-ressources', () => {
   it('edits a resource', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/ressource/1/');
@@ -44,7 +44,7 @@ describe('I can edit a resource as a staff', () => {
       .type(resource.expires_on, { force: true })
       .should('have.value', resource.expires_on);
 
-    cy.get('[type="submit"]').click({ force: true });
+    cy.get('[data-test-id="publish-resource-btn"]').click({ force: true });
 
     cy.url().should('include', '/ressource/');
 

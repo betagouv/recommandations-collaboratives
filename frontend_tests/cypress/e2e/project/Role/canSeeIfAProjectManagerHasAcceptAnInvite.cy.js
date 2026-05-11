@@ -1,4 +1,4 @@
-describe('I can go to a project and see if the main collaborator has accepted the invitation', () => {
+describe('I can go to a project and see if the main collaborator has accepted the invitation @changement-role-projet', () => {
 
   it('can see if the main colloborator has accepted the invitation or not', () => {
     cy.login('jean');
