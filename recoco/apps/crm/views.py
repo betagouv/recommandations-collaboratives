@@ -59,12 +59,12 @@ from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
-from recoco.apps.conversations.models import DocumentNode, Message, RecommendationNode
+from recoco.apps.conversations.models import Message, RecommendationNode
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.projects.models import Project, Topic
+from recoco.apps.projects.models import Document, Project, Topic
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
@@ -843,9 +843,7 @@ def project_details(request, project_id):
         "recommendations_count": RecommendationNode.objects.filter(
             message__project=project, message__deleted=None
         ).count(),
-        "documents_count": DocumentNode.objects.filter(
-            message__project=project, message__deleted=None
-        ).count(),
+        "documents_count": Document.objects.filter(project=project).count(),
     }
 
     participants = project.members.all()
