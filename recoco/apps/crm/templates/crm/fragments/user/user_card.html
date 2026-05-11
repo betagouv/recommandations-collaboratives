@@ -10,7 +10,7 @@
              :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
              data-gravatar-key="{{ user.email }}-18"
              alt="">
-        <span class="crm-user-card__name{% if not user.is_active %}-inactive{% endif %}"><a href="{% url 'crm-user-details' user.pk %}">{{ user.get_full_name }}</a></span>
+        <span class="crm-user-card__name{% if not user.is_active %}-inactive{% endif %}"><a href="{% url 'crm-user-details' user.pk %}">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %}</a></span>
     </div>
     <div class="d-flex">
         {% if user.profile.organization.name %}

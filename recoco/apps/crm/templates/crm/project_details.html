@@ -71,11 +71,11 @@
             </div>
             <!-- Client team -->
             <div>
-                <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
+                <div class="project-crm__section-title-container fr-px-2w fr-py-1w">
                     <span class="project-crm__section-title">Équipe demandeur</span>
                 </div>
                 {% for member in project.members.all %}
-                    <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
+                    <div class="project-crm__section-container fr-px-2w fr-py-1w position-relative">
                         {% include "crm/fragments/user/user_card.html" with user=member %}
                         {% if not member.is_active %}
                             <div class="project-crm__inactive-member">
@@ -84,25 +84,25 @@
                         {% endif %}
                     </div>
                 {% empty %}
-                    <div class="project-crm__section-container fr-px-3w fr-py-2w position-relative">
+                    <div class="project-crm__section-container fr-px-2w fr-py-1w position-relative">
                         <span class="font-size-12px">Aucun demandeur ou partenaire</span>
                     </div>
                 {% endfor %}
             </div>
             <!-- Advisor team -->
             <div>
-                <div class="project-crm__section-title-container fr-px-3w fr-py-2w">
+                <div class="project-crm__section-title-container fr-px-2w fr-py-1w">
                     <span class="project-crm__section-title">Équipe conseil</span>
                 </div>
                 {% regroup project.switchtenders.all by profile.organization as grouped_st %}
                 {% for group in grouped_st %}
                     {% for switchtender in group.list %}
-                        <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                        <div class="project-crm__section-container fr-px-2w fr-py-1w">
                             {% include "crm/fragments/user/user_card.html" with user=switchtender %}
                         </div>
                     {% endfor %}
                 {% empty %}
-                    <div class="project-crm__section-container fr-px-3w fr-py-2w">
+                    <div class="project-crm__section-container fr-px-2w fr-py-1w">
                         <span class="font-size-12px">Aucun participant</span>
                     </div>
                 {% endfor %}
