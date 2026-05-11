@@ -78,7 +78,7 @@ dependencies = [
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
     "tqdm>=4.67.1",
-    "urllib3>=2.6.3",
+    "urllib3>=2.7.0",
     "wagtail==7.0.7",
 ]
 
