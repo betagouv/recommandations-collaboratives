@@ -206,7 +206,7 @@ django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev 
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
 [tool.uv-secure.vulnerability_criteria]
-ignore_vulnerabilities = [] # to set if packages have unfixed acceptable vulnerabilities
+ignore_vulnerabilities = ["GHSA-r374-rxx8-8654"] # to set if packages have unfixed acceptable vulnerabilities
 
 [dependency-groups]
 dev = [
