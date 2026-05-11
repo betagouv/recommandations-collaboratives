@@ -469,9 +469,9 @@ distlib==0.3.9 \
     --hash=sha256:47f8c22fd27c27e25a65601af709b38e4f0a45ea4fc2e710f65755fa8caaaf87 \
     --hash=sha256:a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403
     # via virtualenv
-django==5.2.13 \
-    --hash=sha256:5788fce61da23788a8ce6f02583765ab060d396720924789f97fa42119d37f7a \
-    --hash=sha256:a31589db5188d074c63f0945c3888fad104627dfcc236fb2b97f71f89da33bc4
+django==5.2.14 \
+    --hash=sha256:58a63ba841662e5c686b57ba1fec52ddd68c0b93bd96ac3029d55728f00bf8a2 \
+    --hash=sha256:6f712143bd3064310d1f50fac859c3e9a274bdcfc9595339853be7779297fc76
     # via
     #   django-activity-stream
     #   django-admin-csvexport
@@ -504,7 +504,9 @@ django==5.2.13 \
     #   django-reversion
     #   django-reversion-compare
     #   django-sesame
+    #   django-stubs-ext
     #   django-taggit
+    #   django-tasks
     #   django-treebeard
     #   django-vite
     #   django-waffle
@@ -677,6 +679,10 @@ django-sesame==3.2.3 \
     --hash=sha256:09977a1c55bdbcce0a024c712c4d683e1a69543a217626ffa1d5f7ef7ebffc58 \
     --hash=sha256:5da0210a57a8f48dd61a6c8125e61121403042ed000c96187e4188a8241496d6
     # via recoco
+django-stubs-ext==6.0.3 \
+    --hash=sha256:3307d42132bc295d5744de6276bc5fdf6896efc70f891e21c0ae8bdf529d2762 \
+    --hash=sha256:9e4105955419ae310d7da9cfd808e039d4dae3092c628f021057bb4f2c237f8f
+    # via django-tasks
 django-tagging @ git+https://github.com/nextories/django-tagging.git@56b8898cb999b8b94b68f01819b8f4a85a447312
     # via recoco
 django-taggit==5.0.1 \
@@ -685,6 +691,10 @@ django-taggit==5.0.1 \
     # via
     #   recoco
     #   wagtail
+django-tasks==0.7.0 \
+    --hash=sha256:499f80d1a051566443cfa88a300d8b03435af7fc5708cad4d8da6d285614f739 \
+    --hash=sha256:8a8d64f2dc6e29ac2f45092d90e2dd82dc1dca100dfe3a4f2ce1209db99f3527
+    # via wagtail
 django-treebeard==4.7.1 \
     --hash=sha256:846e462904b437155f76e04907ba4e48480716855f88b898df4122bdcfbd6e98 \
     --hash=sha256:995c7120153ab999898fe3043bbdcd8a0fc77cc106eb94de7350e9d02c885135
@@ -979,9 +989,9 @@ jupyter-lsp==2.3.0 \
     --hash=sha256:458aa59339dc868fb784d73364f17dbce8836e906cd75fd471a325cba02e0245 \
     --hash=sha256:e914a3cb2addf48b1c7710914771aaf1819d46b2e5a79b0f917b5478ec93f34f
     # via jupyterlab
-jupyter-server==2.17.0 \
-    --hash=sha256:c38ea898566964c888b4772ae1ed58eca84592e88251d2cfc4d171f81f7e99d5 \
-    --hash=sha256:e8cb9c7db4251f51ed307e329b81b72ccf2056ff82d50524debde1ee1870e13f
+jupyter-server==2.18.0 \
+    --hash=sha256:568b27bce4320a53c3eebf1bdcbee9acf48a8ab7f66ec83d900ca9909d4fb770 \
+    --hash=sha256:69a5397a039d689da81a45955f9b23e95ee167f6d8a8d64372fb616f2aac650a
     # via
     #   jupyter-lsp
     #   jupyterlab
@@ -1014,10 +1024,6 @@ kombu==5.5.4 \
     --hash=sha256:886600168275ebeada93b888e831352fe578168342f0d1d5833d88ba0d847363 \
     --hash=sha256:a12ed0557c238897d8e518f1d1fdf84bd1516c5e305af2dacd85c2015115feb8
     # via celery
-l18n==2021.3 \
-    --hash=sha256:1956e890d673d17135cc20913253c154f6bc1c00266c22b7d503cc1a5a42d848 \
-    --hash=sha256:78495d1df95b6f7dcc694d1ba8994df709c463a1cbac1bf016e1b9a5ce7280b9
-    # via wagtail
 laces==0.1.2 \
     --hash=sha256:3218e09c1889ae5cf3fc7a82f5bb63ec0c7879889b6a9760bfc42323c694b84d \
     --hash=sha256:980cdaf9a31e883a2b8198132e2388931a4eb8814f5bfa5d8bba13ff9f657b7c
@@ -1184,9 +1190,9 @@ metabase-api==3.4 \
     --hash=sha256:073d87e543faa49f127c576c7525ce0352703ea2db3d45d420cbec000a0d1bff \
     --hash=sha256:1d213c79c4aa638b5b85c8389bda412d04260d7e25d1c8861090bf1304cb036c
     # via recoco
-mistune==3.1.3 \
-    --hash=sha256:1a32314113cff28aa6432e99e522677c8587fd83e3d51c29b82a52409c842bd9 \
-    --hash=sha256:a7035c21782b2becb6be62f8f25d3df81ccb4d6fa477a6525b15af06539f02a0
+mistune==3.2.1 \
+    --hash=sha256:78cdb0ba5e938053ccf63651b352508d2efa9411dc8810bfb05f2dc5140c0048 \
+    --hash=sha256:7c8e5501d38bac1582e067e46c8343f17d57ea1aaa735823f3aba1fd59c88a28
     # via nbconvert
 model-bakery==1.20.4 \
     --hash=sha256:30ad372604f326a1ba9f949bad9d0f85e6a510db4ef6a0b07be2d6bd7485008b \
@@ -1654,7 +1660,6 @@ python3-openid==3.2.0 \
 pytz==2025.2 \
     --hash=sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3 \
     --hash=sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00
-    # via l18n
 pywin32==310 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32' \
     --hash=sha256:126298077a9d7c95c53823934f000599f66ec9296b09167810eb24875f32689c \
     --hash=sha256:19ec5fc9b1d51c4350be7bb00760ffce46e6c95eaf2f0b2f1150657b1a43c582 \
@@ -2071,7 +2076,6 @@ six==1.17.0 \
     #   django-clone
     #   django-rest-polymorphic
     #   html5lib
-    #   l18n
     #   python-dateutil
     #   rfc3339-validator
     #   sib-api-v3-sdk
@@ -2255,6 +2259,8 @@ typing-extensions==4.14.0 \
     --hash=sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af
     # via
     #   anyio
+    #   django-stubs-ext
+    #   django-tasks
     #   domdf-python-tools
     #   ipython
     #   psycopg
@@ -2333,9 +2339,9 @@ w3lib==2.3.1 \
     --hash=sha256:5c8ac02a3027576174c2b61eb9a2170ba1b197cae767080771b6f1febda249a4 \
     --hash=sha256:9ccd2ae10c8c41c7279cd8ad4fe65f834be894fe7bfdd7304b991fd69325847b
     # via requests-html
-wagtail==6.3.8 \
-    --hash=sha256:9c7695457f18e7a6e7815ffbc0d64be0ecb956ed896eaf107df8b5768648a7f2 \
-    --hash=sha256:cbe241055234a3dac0f4ae73992cd0519340ab66c2bc4077257929d392ec19b2
+wagtail==7.0.7 \
+    --hash=sha256:11bda16fc6bc532daa341a9c9f55f5e06990483c6f592b73a0b1bf202d255065 \
+    --hash=sha256:3131c7e991a12a5266d26853b26b3e3958d7ea634dd1b3da71632cbe14b7e912
     # via recoco
 wcmatch==8.5.2 \
     --hash=sha256:17d3ad3758f9d0b5b4dedc770b65420d4dac62e680229c287bf24c9db856a478 \
