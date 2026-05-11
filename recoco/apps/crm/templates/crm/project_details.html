@@ -62,7 +62,7 @@
                 <span class="project-crm__project-information fr-icon-mail fr-icon--sm">
                     {% with project.next_reminder as next_reminder %}
                         {% if next_reminder %}
-                            Prochain rappel le {{ next_reminder }}
+                            Prochain rappel le {{ next_reminder.deadline|date:"j F Y" }}
                         {% else %}
                             Aucun rappel programmé
                         {% endif %}
