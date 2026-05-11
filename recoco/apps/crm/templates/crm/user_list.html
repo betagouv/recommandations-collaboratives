@@ -123,7 +123,10 @@
                                     href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.last_name }}</a>
                             </td>
                             <td>{{ crm_user.first_name }}</td>
-                            <td class="text-ellipsis" title="{{ crm_user.email }}">{{ crm_user.email }}</td>
+                            <td class="text-ellipsis" title="{{ crm_user.email }}">
+                                <a class="fr-link project-table__project-name"
+                                    href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.email }}</a>
+                            </td>
                             <td class="text-ellipsis">
                                 {% if crm_user.profile.organization %}
                                     <a class="fr-link"
