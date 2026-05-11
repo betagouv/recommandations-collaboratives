@@ -24,9 +24,19 @@
         <div class="project-crm-left-col position-relative">
             <div class="position-absolute top-0 end-0 fr-p-2w">
                 <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-eye-line"
+                   aria-describedby="tooltip-crm-project-view"
                    href="{% url 'projects-project-detail' project.pk %}">Voir la page du dossier</a>
+                <span class="fr-tooltip fr-placement"
+                      id="tooltip-crm-project-view"
+                      role="tooltip"
+                      aria-hidden="true">voir le projet</span>
                 <a class="fr-btn fr-btn--tertiary-transparent fr-btn--sm fr-icon-pencil-line"
+                   aria-describedby="tooltip-crm-project-edit"
                    href="{% url 'crm-project-update' project.pk %}">Modifier le dossier</a>
+                <span class="fr-tooltip fr-placement"
+                      id="tooltip-crm-project-edit"
+                      role="tooltip"
+                      aria-hidden="true">modifier</span>
             </div>
             <!-- Project info -->
             <div class="d-flex flex-column fr-p-5v">
