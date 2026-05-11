@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[2];
 
-describe('I can have a public url to share', () => {
+describe('I can have a public url to share @page-projet-edl-partager', () => {
   it('goes to share a project page', () => {
     cy.login('collectivité2');
     cy.visit(`/project/${currentProject.pk}/connaissance`);

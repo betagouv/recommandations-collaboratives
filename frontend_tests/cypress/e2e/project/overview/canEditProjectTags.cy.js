@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 let currentProject = projects[9];
 
-describe('I can edit project tags on overview page', () => {
+describe('I can edit project tags on overview page @page-projet-presentation-tags', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/1`);

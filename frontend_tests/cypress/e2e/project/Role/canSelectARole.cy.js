@@ -1,6 +1,6 @@
 import projectView from '../../../support/views/project';
 
-describe('I can go to a project and select my role on it', () => {
+describe('I can go to a project and select my role on it @changement-role-projet', () => {
 
   it('can become observer, advisor or quit project as regional advisor', () => {
     cy.login('jean');

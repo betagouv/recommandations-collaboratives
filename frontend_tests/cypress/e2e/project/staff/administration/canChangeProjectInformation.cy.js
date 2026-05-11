@@ -2,7 +2,7 @@ import projects from '../../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
-describe('I can go to administration area of a project and change general information', () => {
+describe('I can go to administration area of a project and change general information @page-projet-parametres-modifier', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

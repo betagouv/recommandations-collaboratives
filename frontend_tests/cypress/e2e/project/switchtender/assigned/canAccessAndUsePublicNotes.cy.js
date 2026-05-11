@@ -3,7 +3,7 @@ import editor from '../../../../support/tools/editor';
 
 const currentProject = projects[1];
 
-describe('I can access and use public notes', () => {
+describe('I can access and use public notes @page-projet-conversations @page-projet-conversations-nouveau-message', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

@@ -28,10 +28,10 @@
                 <div class="w-100"
                      x-data="MultiSelectRegionDepartment({selected:selectedDepartments, objectsToSelect, displayRegions: '{{ display_regions }}' == 'True'})">
                     {% if not skip_hidden_input %}
-                    <input name="{{ name|default:'departments[]' }}"
-                           type="hidden"
-                           id="{{ id|default:'id_departments' }}"
-                           x-bind:value="selectedValues()">
+                        <input name="{{ name|default:'departments[]' }}"
+                               type="hidden"
+                               id="{{ id|default:'id_departments' }}"
+                               x-bind:value="selectedValues()">
                     {% endif %}
                     <template x-if="!displayRegions">
                         <!-- Select Options -->
@@ -82,13 +82,15 @@
                                             <button type="button"
                                                     x-show="!isOpen()"
                                                     x-on:click="open()"
-                                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none">
+                                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none"
+                                                    data-test-id="open-multiselect">
                                                 <span class="fr-icon-arrow-down-s-line multi-select__dropdown-icon fr-icon--sm"></span>
                                             </button>
                                             <button type="button"
                                                     x-show="isOpen()"
                                                     x-on:click="close()"
-                                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none">
+                                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none"
+                                                    data-test-id="close-multiselect">
                                                 <span class="fr-icon-arrow-up-s-line multi-select__dropdown-icon fr-icon--sm"></span>
                                             </button>
                                         </div>

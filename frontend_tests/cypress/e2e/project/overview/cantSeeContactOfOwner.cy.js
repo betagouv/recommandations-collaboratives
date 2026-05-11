@@ -1,4 +1,4 @@
-describe('I can not see owner contact', () => {
+describe('I can not see owner contact @page-projet-presentation', () => {
   it('display owner contact (as staff)', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/2/presentation`);

@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[2];
 
-describe('I cannot invite a switchtender as a collectivity', () => {
+describe('I cannot invite a switchtender as a collectivity @page-projet-presentation-inviter-suivie', () => {
   beforeEach(() => {
     cy.login('collectivité2');
   });

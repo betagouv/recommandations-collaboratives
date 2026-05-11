@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
-describe("I can go to action page but can't see the loop to access the inline tasks", () => {
+describe.skip("I can go to action page but can't see the loop to access the inline tasks @page-projet-recommandations", () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

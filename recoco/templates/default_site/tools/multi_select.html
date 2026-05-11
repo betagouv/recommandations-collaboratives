@@ -71,15 +71,17 @@
                         <!-- Drop down toogle with icons-->
                         <div {% if no_inside_border %}class="fr-pr-1w d-flex align-items-center"{% else %}class="multi-select__dropdown-icon"{% endif %}>
                             <div type="button"
-                                    x-show="!isOpen()"
-                                    x-on:click="open()"
-                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none fr-pb-0-5v">
+                                 x-show="!isOpen()"
+                                 x-on:click="open()"
+                                 class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none fr-pb-0-5v"
+                                 data-test-id="open-multiselect-tool">
                                 <span class="fr-icon-arrow-down-s-line fr-icon--sm"></span>
                             </div>
                             <div type="button"
-                                    x-show="isOpen()"
-                                    x-on:click="close()"
-                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none">
+                                 x-show="isOpen()"
+                                 x-on:click="close()"
+                                 class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none"
+                                 data-test-id="close-multiselect-tool">
                                 <span class="fr-icon-arrow-up-s-line fr-icon--sm"></span>
                             </div>
                         </div>

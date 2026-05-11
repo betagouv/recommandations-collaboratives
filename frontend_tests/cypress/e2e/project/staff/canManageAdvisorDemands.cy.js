@@ -1,4 +1,4 @@
-describe('I can go to the dashboard and see the pending demand for advising, and manage one', () => {
+describe('I can go to the dashboard and see the pending demand for advising, and manage one @demande-compte-conseiller', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
