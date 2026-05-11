@@ -61,6 +61,9 @@
                                          :data-test-id="`board-targetable-${index}`">
                                         <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
                                             <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
+                                            <p x-text="board.totalCount"
+                                               class="kanban-column__project-count fr-m-0"
+                                               title="Nombre total de dossiers dans la colonne"></p>
                                         </div>
                                         <div class="kanban-column__content"
                                              @scroll="onColumnScroll($event, board)">
@@ -100,8 +103,7 @@
                                                                     <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-danger"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                                 </template>
                                                                 <div class="kanban-card__project-container fr-mb-2v">
-                                                                    <span class="kanban-card__project-name project-link"
-                                                                          x-text="t.name"></span>
+                                                                    <span class="kanban-card__project-name project-link" x-text="t.name"></span>
                                                                     <template x-if="t.owner?.profile?.organization">
                                                                         <span class="kanban-card__project-organization"
                                                                               x-text="t.owner.profile.organization.name"></span>
