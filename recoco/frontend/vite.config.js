@@ -229,6 +229,19 @@ const config = {
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),
+        projectCrmStyles: resolve('./src/js/styles/project-crm.css.js'),
+        bannerProjectStatusStyle: resolve(
+          './src/js/styles/banner-project-status.css.js'
+        ),
+        bannerUserStatusStyle: resolve(
+          './src/js/styles/banner-user-status.css.js'
+        ),
+        bannerProjectMultiportalStyles: resolve(
+          './src/js/styles/banner-project-multiportal.css.js'
+        ),
+        noteCrmStyles: resolve('./src/js/styles/note-crm.css.js'),
+        cardCrmStyles: resolve('./src/js/styles/card-crm.css.js'),
+        GravatarCache: resolve('./src/js/components/GravatarCache.js'),
       },
       output: {
         chunkFileNames: undefined,
