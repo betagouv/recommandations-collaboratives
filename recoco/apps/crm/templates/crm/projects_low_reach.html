@@ -39,43 +39,49 @@
             <div class="w-100 position-relative">
                 {% include "projects/project/fragments/search_bar.html" with name="q" value=search_q placeholder="Rechercher parmi les dossiers" show_search_button=True %}
             </div>
-            <div class="d-flex align-items-center" style="gap: 0.5rem;">
-                <label class="fr-label fr-mb-0"
-                       for="days-filter"
-                       style="white-space: nowrap;">Dernière activité :</label>
-                <select class="fr-select fr-select--sm fr-mb-0"
+            <div class="d-flex align-items-center gap-2">
+                <label class="fr-label fr-mb-0 text-nowrap description-help-text"
+                       for="days-filter">Dernière activité :</label>
+                <select class="fr-select fr-select--sm fr-mt-0 project-low-reach__select w-auto important-description-help-text"
                         id="days-filter"
                         name="days"
-                        onchange="this.form.submit()"
-                        style="width: auto;">
+                        onchange="this.form.submit()">
                     <option value="15" {% if days == 15 %}selected{% endif %}>Plus de 15 jours</option>
                     <option value="30" {% if days == 30 %}selected{% endif %}>Plus de 30 jours</option>
                     <option value="60" {% if days == 60 %}selected{% endif %}>Plus de 60 jours</option>
                     <option value="90" {% if days == 90 %}selected{% endif %}>Plus de 90 jours</option>
                 </select>
             </div>
-            <div class="d-flex align-items-center" style="gap: 0.5rem;">
-                <label class="fr-label fr-mb-0"
-                       for="status-filter"
-                       style="white-space: nowrap;">Statut :</label>
-                <select class="fr-select fr-select--sm fr-mb-0"
-                        id="status-filter"
-                        name="status"
-                        onchange="this.form.submit()"
-                        style="width: auto;">
-                    <option value="no_reaction"
-                            {% if status_filter == 'no_reaction' %}selected{% endif %}
-                            title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">
-                        AUCUNE RÉACTION
-                    </option>
-                    <option value="low_read"
-                            {% if status_filter == 'low_read' %}selected{% endif %}
-                            title="Aucune ou une seule recommandation a été lue">
-                        RECOS NON LUES
-                    </option>
-                </select>
+            <div class="d-flex align-items-center gap-2">
+                <label class="fr-label fr-mb-0 text-nowrap description-help-text"
+                       for="status-filter">Statut :</label>
+                <div class="project-low-reach__status-wrapper">
+                    <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' %}warning{% else %}info{% endif %}">
+                        {% if status_filter == 'low_read' %}RECOS NON LUES{% else %}AUCUNE RÉACTION{% endif %}
+                    </span>
+                    <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
+                          aria-hidden="true"></span>
+                    <select class="fr-select fr-select--sm project-low-reach__status-select-hidden"
+                            id="status-filter"
+                            name="status"
+                            onchange="this.form.submit()">
+                        <option value="no_reaction"
+                                class="font-size-12px"
+                                {% if status_filter == 'no_reaction' %}selected{% endif %}
+                                title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">
+                            Aucune réaction
+                        </option>
+                        <option value="low_read"
+                                class="font-size-12px"
+                                {% if status_filter == 'low_read' %}selected{% endif %}
+                                title="Aucune ou une seule recommandation a été lue">
+                            Recos non lues
+                        </option>
+                    </select>
+                </div>
             </div>
-            <div class="fr-toggle fr-toggle--sm" x-data style="white-space: nowrap;">
+            <div class="fr-toggle fr-toggle--sm" x-data>
+                <label class="fr-toggle__label text-nowrap" for="mine-only-toggle">Uniquement mes projets</label>
                 <input class="fr-toggle__input"
                        type="checkbox"
                        id="mine-only-toggle"
@@ -83,7 +89,6 @@
                        value="1"
                        {% if mine_only %}checked{% endif %}
                        @change="$el.closest('form').submit()">
-                <label class="fr-toggle__label" for="mine-only-toggle">Uniquement mes projets</label>
             </div>
             <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
                class="fr-btn fr-btn--primary fr-btn--sm"

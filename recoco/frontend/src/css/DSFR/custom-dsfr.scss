@@ -998,6 +998,13 @@ a.fr-text-inverted--grey {
   line-height: 150% !important; /* 18px */
 }
 
+.important-description-help-text {
+  color: var(--light-text-default-grey, #3A3A3A);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px; /* 150% */
+}
+
 .fr-label-rework {
   color: var(--light-text-default-grey, #3a3a3a);
   font-size: 12px;
