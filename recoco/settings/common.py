@@ -566,6 +566,7 @@ DJANGO_WEBHOOK = {
         "survey.Answer",
         "taggit.TaggedItem",
         "tasks.Task",
+        "home.UserProfile",
     ],
     "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
     "USE_CACHE": False,
