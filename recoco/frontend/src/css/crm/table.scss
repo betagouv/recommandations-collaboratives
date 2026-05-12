@@ -39,7 +39,10 @@
     }
     // Largeurs des colonnes via colgroup
     col {
-      &.col-xl {
+      &.col--xxl {
+        width: 30%;
+      }
+      &.col--xl {
         width: 25%;
       }
       &.col--large {
@@ -48,10 +51,16 @@
       &.col--medium {
         width: 15%;
       }
+      &.col--ms {
+        width: 13%;
+      }
       &.col--small {
         width: 10%;
       }
       &.col--xs {
+        width: 8%;
+      }
+      &.col--xxs {
         width: 5%;
       }
       &.col--fixed-180 {
