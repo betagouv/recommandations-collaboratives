@@ -35,20 +35,9 @@
                 </p>
             </div>
         </div>
-        <form method="get"
-              class="d-flex align-items-center flex-wrap fr-mb-3w"
-              style="gap: 1rem;">
-            <div class="flex-grow-1" style="min-width: 200px; max-width: 380px;">
-                <div class="fr-search-bar fr-search-bar--sm" role="search">
-                    <label class="fr-label" for="low-reach-search">Rechercher</label>
-                    <input class="fr-input"
-                           placeholder="Rechercher parmi les dossiers"
-                           type="search"
-                           id="low-reach-search"
-                           name="q"
-                           value="{{ search_q }}">
-                    <button class="fr-btn" type="submit" title="Rechercher">Rechercher</button>
-                </div>
+        <form method="get" class="d-flex align-items-center gap-4 fr-mb-3w">
+            <div class="w-100 position-relative">
+                {% include "projects/project/fragments/search_bar.html" with name="q" value=search_q placeholder="Rechercher parmi les dossiers" show_search_button=True %}
             </div>
             <div class="d-flex align-items-center" style="gap: 0.5rem;">
                 <label class="fr-label fr-mb-0"
