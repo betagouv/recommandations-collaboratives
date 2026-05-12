@@ -39,6 +39,9 @@
     }
     // Largeurs des colonnes via colgroup
     col {
+      &.col-xl {
+        width: 25%;
+      }
       &.col--large {
         width: 20%;
       }
@@ -47,6 +50,9 @@
       }
       &.col--small {
         width: 10%;
+      }
+      &.col--xs {
+        width: 5%;
       }
       &.col--fixed-180 {
         min-width: 180px;
