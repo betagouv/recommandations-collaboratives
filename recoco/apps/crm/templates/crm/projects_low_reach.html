@@ -56,7 +56,8 @@
                 <label class="fr-label fr-mb-0 text-nowrap description-help-text"
                        for="status-filter">Statut :</label>
                 <div class="project-low-reach__status-wrapper">
-                    <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' %}warning{% else %}info{% endif %}">
+                    <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' %}warning{% else %}info{% endif %}"
+                          title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% else %}Pas de statut sur reco, de message du demandeur ou de tag d'impact{% endif %}">
                         {% if status_filter == 'low_read' %}RECOS NON LUES{% else %}AUCUNE RÉACTION{% endif %}
                     </span>
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
@@ -80,8 +81,7 @@
                     </select>
                 </div>
             </div>
-            <div class="fr-toggle fr-toggle--sm" x-data>
-                <label class="fr-toggle__label text-nowrap" for="mine-only-toggle">Uniquement mes projets</label>
+            <div class="fr-toggle fr-toggle--sm fr-toggle--label-left" x-data>
                 <input class="fr-toggle__input"
                        type="checkbox"
                        id="mine-only-toggle"
@@ -89,10 +89,10 @@
                        value="1"
                        {% if mine_only %}checked{% endif %}
                        @change="$el.closest('form').submit()">
+                <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes projets</label>
             </div>
             <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
-               class="fr-btn fr-btn--primary fr-btn--sm"
-               style="white-space: nowrap;">
+               class="fr-btn fr-btn--primary fr-btn--sm text-nowrap">
                 Télécharger en CSV
             </a>
         </form>

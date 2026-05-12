@@ -100,4 +100,10 @@
         appearance: none;
         -webkit-appearance: none;
     }
+
+    &__label {
+        color: var(--light-text-mention-grey, #666) !important;
+        font-size: 12px !important;
+         font-weight: 400;
+     }
 }

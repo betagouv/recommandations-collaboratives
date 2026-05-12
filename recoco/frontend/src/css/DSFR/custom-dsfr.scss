@@ -992,7 +992,7 @@ a.fr-text-inverted--grey {
 }
 
 .description-help-text {
-  color: var(--light-text-mention-grey, #666);
+  color: var(--light-text-mention-grey, #666) !important;
   font-size: 12px !important;
   font-weight: 400;
   line-height: 150% !important; /* 18px */
