@@ -28,6 +28,7 @@ from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.core.exceptions import BadRequest
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
     Count,
@@ -1324,11 +1325,25 @@ def crm_list_projects_with_low_reach(request):
         search_q=search_q,
     )
 
+    total_count = low_reach_projects.count()
+
+    paginator = Paginator(low_reach_projects, 25)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
+    base_qs = request.GET.copy()
+    base_qs.pop("page", None)
+    base_querystring = base_qs.urlencode()
+
     return render(
         request,
         "crm/projects_low_reach.html",
         {
-            "low_reach_projects": low_reach_projects,
+            "low_reach_projects": page_obj.object_list,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "total_count": total_count,
+            "base_querystring": base_querystring,
             "days": days,
             "status_filter": status_filter,
             "mine_only": mine_only,
