@@ -105,7 +105,7 @@
                     <col class="col--small">
                     <col class="col--xs">
                     <col class="col--ms">
-                    <col>
+                    <col class="col--small col--fixed-180">
                 </colgroup>
                 <thead class="project-table__thead">
                     <tr>
@@ -157,18 +157,17 @@
                             </td>
                             <td>
                                 {% if project.reco_read <= 1 %}
-                                    <span class="fr-badge fr-badge--warning fr-badge--no-icon"
+                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--warning"
                                           title="Aucune ou une seule recommandation a été lue">RECOS NON LUES</span>
                                 {% else %}
-                                    <span class="fr-badge fr-badge--info fr-badge--no-icon"
+                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--info"
                                           title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">AUCUNE RÉACTION</span>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="project-low-reach__actions">
                                 {# Inclure / Exclure des statistiques #}
                                 <form method="post"
-                                      action="{% url 'crm-project-update' project.pk %}"
-                                      style="display:inline;">
+                                      action="{% url 'crm-project-update' project.pk %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                     {% if not project.muted %}
@@ -191,8 +190,7 @@
                                 </form>
                                 {# Activer / Désactiver les notifications #}
                                 <form method="post"
-                                      action="{% url 'crm-project-update' project.pk %}"
-                                      style="display:inline;">
+                                      action="{% url 'crm-project-update' project.pk %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
                                     {% if not project.exclude_stats %}
