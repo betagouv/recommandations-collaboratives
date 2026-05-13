@@ -1228,7 +1228,6 @@ def make_low_reach_project_query(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
         )
-        .exclude(exclude_stats=True)
         .prefetch_related(
             "tasks",
             "notes",
