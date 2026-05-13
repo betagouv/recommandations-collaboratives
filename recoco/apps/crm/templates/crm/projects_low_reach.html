@@ -165,7 +165,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <strong{% if project.reco_read <= project.reco_total %} class="text-red-light"{% endif %}>{{ project.reco_read }}</strong>&nbsp;/&nbsp;{{ project.reco_total }}
+                                <strong{% if project.reco_read|add:project.reco_read <= project.reco_total %} class="text-red-light"{% endif %}>{{ project.reco_read }}</strong>&nbsp;/&nbsp;{{ project.reco_total }}
                             </td>
                             <td>
                                 {% if project.reco_read <= 1 %}
