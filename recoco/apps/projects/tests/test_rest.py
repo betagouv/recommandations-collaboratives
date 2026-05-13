@@ -456,7 +456,6 @@ def test_project_list_staff_dont_see_deleted_if_not_asked(
         response = api_client.get(url)
         assert response.status_code == 200
         assert len(response.data["results"]) == 0
-    pass
 
 
 @pytest.mark.django_db
@@ -468,7 +467,11 @@ def test_project_list_not_staff_cant_see_deleted(
         response = api_client.get(f"{url}?with-deleted=1")
         assert response.status_code == 200
         assert len(response.data["results"]) == 0
-    pass
+
+
+########################################################################
+# get project details
+########################################################################
 
 
 @pytest.mark.django_db
@@ -480,7 +483,6 @@ def test_project_detail_staff_can_see_deleted_if_asked(
         response = api_client.get(f"{url}?with-deleted=1")
         assert response.status_code == 200
         assert response.data["id"] == project_deleted.id
-    pass
 
 
 @pytest.mark.django_db
@@ -491,7 +493,6 @@ def test_project_detail_staff_dont_see_deleted_if_not_asked(
     with login(api_client, is_staff=True, groups=["example_com_staff"]):
         response = api_client.get(f"{url}")
         assert response.status_code == 404
-    pass
 
 
 @pytest.mark.django_db
@@ -502,12 +503,6 @@ def test_project_detail_not_staff_cant_see_deleted(
     with login(api_client):
         response = api_client.get(f"{url}?with-deleted=1")
         assert response.status_code == 404
-    pass
-
-
-########################################################################
-# get project details
-########################################################################
 
 
 @pytest.mark.django_db
