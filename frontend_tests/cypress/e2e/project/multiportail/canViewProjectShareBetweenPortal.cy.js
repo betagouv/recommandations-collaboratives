@@ -1,4 +1,4 @@
-describe('Project share between portal', () => {
+describe('Project share between portal @page-projet-presentation', () => {
   it('display share by and with portal on kanban', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects');

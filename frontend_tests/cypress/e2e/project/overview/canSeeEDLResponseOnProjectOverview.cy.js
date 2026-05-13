@@ -2,7 +2,7 @@ import project from '../../../fixtures/projects/project.json';
 
 const projectName = 'New project onboarding answer';
 let projetId;
-describe('I can see onboarding answer on the overview tab', () => {
+describe('I can see onboarding answer on the overview tab @page-projet-presentation', () => {
   before(() => {
     cy.login('collectivité1');
     cy.createProject(projectName).then((projectId) => {

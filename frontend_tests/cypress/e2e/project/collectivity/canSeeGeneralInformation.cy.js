@@ -4,7 +4,7 @@ import users from '../../../fixtures/users/users.json';
 const currentProject = projects[1];
 const currentUser = users[4];
 
-describe('I can see general informations', () => {
+describe('I can see general informations @page-projet-presentation', () => {
   beforeEach(() => {
     cy.login(currentUser.fields.first_name.toLowerCase());
   });

@@ -1,4 +1,4 @@
-describe('I can follow the onboarding advisor tutorial as an advisor or staff', () => {
+describe('I can follow the onboarding advisor tutorial as an advisor or staff @tutoriel-onboarding-conseiller', () => {
 
     it('should not display the tutorial when a collectivity is on a project presentation page', () => {
         cy.login('collectivité1');

@@ -1,5 +1,5 @@
 let projectsLength;
-describe('I can go to the dashboard and search for project', () => {
+describe('I can go to the dashboard and search for project @recherche-kanban-projets', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects');

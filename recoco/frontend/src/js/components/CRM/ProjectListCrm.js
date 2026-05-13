@@ -253,13 +253,15 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   projectStatusColor(status) {
     switch (status) {
       case 'PRE_DRAFT':
+        return 'fr-badge--warning';
       case 'DRAFT':
         return 'fr-badge--new';
       case 'TO_PROCESS':
       case 'STUCK':
         return 'fr-badge--info';
-      case 'READY':
       case 'IN_PROGRESS':
+        return 'fr-badge--green-menthe';
+      case 'READY':
       case 'DONE':
         return 'fr-badge--success-lighter';
       case 'REJECTED':

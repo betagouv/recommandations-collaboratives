@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can access private notes tab in a project as a switchtender', () => {
+describe('I can access private notes tab in a project as a switchtender @navigation-projet @page-projet-espace-conseiller', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });

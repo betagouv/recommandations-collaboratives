@@ -1,4 +1,4 @@
-describe('I can see CTA on survey page', () => {
+describe('I can see CTA on survey page @page-projet-edl-completer', () => {
   it('should display CTA as collectivity', () => {
     cy.login('collectivité1');
     cy.visit(`/project/2/connaissance`);

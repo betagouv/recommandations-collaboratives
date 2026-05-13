@@ -42,9 +42,9 @@ class UserFilter(django_filters.FilterSet):
 
     ROLE_CHOICES = [
         (1, "Conseiller·ère"),
-        (2, "Équipe"),
+        (2, "Staff"),
         (3, "Administrateur·rice"),
-        (4, "Autres"),
+        (4, "Demandeur"),
     ]
 
     username = django_filters.CharFilter(
@@ -64,6 +64,7 @@ class UserFilter(django_filters.FilterSet):
     departments = django_filters.ModelMultipleChoiceFilter(
         label="Départements conseillés",
         field_name="profile__departments",
+        to_field_name="code",
         queryset=geomatics_models.Department.objects.all(),
     )
 

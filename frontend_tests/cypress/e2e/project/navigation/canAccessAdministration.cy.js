@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can access administration tab in a project as staff', () => {
+describe('I can access administration tab in a project as staff @navigation-projet @page-projet-parametres', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

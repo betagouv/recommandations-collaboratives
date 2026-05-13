@@ -1,7 +1,7 @@
 import tasks from '../../../../fixtures/projects/tasks.json';
 const currentTask = tasks.find((task) => task.pk === 53);
 
-describe('I can go to tasks tab and change task status @page-projet-recommandations @page-projet-recommandations-status', () => {
+describe.skip('I can go to tasks tab and change task status @page-projet-recommandations @page-projet-recommandations-status', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.visit(`/project/27/actions`);

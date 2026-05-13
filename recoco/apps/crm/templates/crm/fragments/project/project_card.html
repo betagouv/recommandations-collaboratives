@@ -1,0 +1,9 @@
+<div class="crm-project-card d-flex flex-column">
+    <span class="crm-project-card__name"><a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a></span>
+    {% if project.commune %}
+        <span class="crm-project-card__org fr-icon-people fr-icon--sm fr-btn--icon-left">{{ project.commune }}</span>
+    {% endif %}
+    {% if project.next_reminder %}
+        <span class="crm-project-card__org fr-icon-mail fr-icon--sm fr-btn--icon-left">Prochain rappel le {{ project.next_reminder.deadline }}</span>
+    {% endif %}
+</div>
