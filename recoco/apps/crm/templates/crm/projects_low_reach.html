@@ -165,22 +165,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
-                                        title="Voir le dossier dans le CRM">
-                                    <a href="{% url 'crm-project-details' project.pk %}"
-                                       class="stretched-link">Voir</a>
-                                </button>
-                                <button class="fr-btn fr-btn--sm fr-icon-external-link-line fr-btn--tertiary-no-outline position-relative"
-                                        title="Ouvrir la page publique du dossier">
-                                    <a href="{% url 'projects-project-detail' project.pk %}"
-                                       target="_blank"
-                                       class="stretched-link">Ouvrir</a>
-                                </button>
-                                <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
-                                        title="Modifier le dossier">
-                                    <a href="{% url 'crm-project-update' project.pk %}"
-                                       class="stretched-link">Modifier</a>
-                                </button>
+                                {# Inclure / Exclure des statistiques #}
                                 <form method="post"
                                       action="{% url 'crm-project-update' project.pk %}"
                                       style="display:inline;">
@@ -189,12 +174,63 @@
                                     {% if not project.muted %}
                                         <input type="hidden" name="notifications" value="on">
                                     {% endif %}
-                                    <button type="submit"
-                                            class="fr-btn fr-btn--sm fr-icon-close-circle-line fr-btn--tertiary-no-outline"
-                                            title="Exclure ce dossier du tableau de relance">
-                                        Exclure
-                                    </button>
+                                    {% if project.exclude_stats %}
+                                        <input type="hidden" name="statistics" value="on">
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Inclure dans les statistiques">
+                                            Inclure dans les statistiques
+                                        </button>
+                                    {% else %}
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Exclure des statistiques">
+                                            Exclure des statistiques
+                                        </button>
+                                    {% endif %}
                                 </form>
+                                {# Activer / Désactiver les notifications #}
+                                <form method="post"
+                                      action="{% url 'crm-project-update' project.pk %}"
+                                      style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    {% if not project.exclude_stats %}
+                                        <input type="hidden" name="statistics" value="on">
+                                    {% endif %}
+                                    {% if project.muted %}
+                                        <input type="hidden" name="notifications" value="on">
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Activer les notifications">
+                                            Activer les notifications
+                                        </button>
+                                    {% else %}
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Désactiver les notifications">
+                                            Désactiver les notifications
+                                        </button>
+                                    {% endif %}
+                                </form>
+                                <!-- Go to project page -->
+                                <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
+                                        title="Accéder à la page du dossier">
+                                    <a :href="'{% url 'projects-project-detail' 0 %}'.replace('0', project.id)"
+                                    class="stretched-link">Accéder à la page du dossier</a>
+                                </button>
+                                {# Éditer #}
+                                <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
+                                        title="Éditer le dossier">
+                                    <a href="{% url 'crm-project-update' project.pk %}"
+                                       class="stretched-link">Éditer</a>
+                                </button>
+                                {# Supprimer #}
+                                <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
+                                        title="Supprimer le dossier">
+                                    <a href="{% url 'crm-project-delete' project.pk %}"
+                                       class="stretched-link">Supprimer</a>
+                                </button>
                             </td>
                         </tr>
                     {% empty %}
