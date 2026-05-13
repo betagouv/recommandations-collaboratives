@@ -122,24 +122,31 @@
                     {% for project in low_reach_projects %}
                         <tr>
                             <td>
-                                <a class="fr-link project-table__project-name"
-                                   href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a>
+                                <a class="fr-link project-table__project-name text-wrap"
+                                   href="{% url 'crm-project-details' project.pk %}">
+                                    {% if project.owner.profile.organization %}
+                                        {{ project.owner.profile.organization.name }}
+                                    {% else %}
+                                        &mdash;
+                                    {% endif %}
+                                </a>
                                 <br>
-                                <span class="fr-text--sm fr-text-mention--grey">{{ project.commune }}</span>
+                                <span class="fr-text--sm fr-text-mention--grey font-size-12px text-wrap">{{ project.name }}</span>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center flex-wrap" style="gap: 0.25rem;">
+                                <div class="d-flex align-items-center flex-wrap gap-1">
                                     {% for advisor in project.switchtenders.all %}
                                         {% if forloop.counter <= 3 %}
-                                            <span class="crm-avatar"
-                                                  title="{{ advisor.get_full_name }} — {{ advisor.profile.organization }}">
-                                                {{ advisor.first_name|slice:":1"|upper }}{{ advisor.last_name|slice:":1"|upper }}
+                                            <span class="crm-avatar text-wrap"
+                                                  title="{{ advisor.get_full_name }} — {{ advisor.profile.organization }} avatar">
+                                                  {{ advisor.first_name|slice:":1"|upper }}{{ advisor.last_name|slice:":1"|upper }}
                                             </span>
+                                            <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
                                         {% endif %}
                                     {% endfor %}
                                     {% with advisor_count=project.switchtenders.count %}
                                         {% if advisor_count > 3 %}
-                                            <span class="crm-avatar crm-avatar--overflow">+{{ advisor_count|add:"-3" }}</span>
+                                            <span class="crm-avatar crm-avatar--overflow text-wrap">+{{ advisor_count|add:"-3" }}</span>
                                         {% endif %}
                                     {% endwith %}
                                 </div>
