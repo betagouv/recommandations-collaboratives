@@ -2,6 +2,7 @@
 {% load static %}
 {% load django_vite %}
 {% load humanize %}
+{% load gravatar %}
 {% block title %}
     Dossiers à relancer - CRM
 {% endblock title %}
@@ -10,6 +11,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/user.js' %}
     {% vite_asset 'js/styles/project-low-reach.css.js' %}
 {% endblock js %}
 {% block content %}
@@ -137,16 +139,19 @@
                                 <div class="d-flex align-items-center flex-wrap gap-1">
                                     {% for advisor in project.switchtenders.all %}
                                         {% if forloop.counter <= 3 %}
-                                            <span class="crm-avatar text-wrap"
-                                                  title="{{ advisor.get_full_name }} — {{ advisor.profile.organization }} avatar">
-                                                  {{ advisor.first_name|slice:":1"|upper }}{{ advisor.last_name|slice:":1"|upper }}
-                                            </span>
-                                            <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
+                                            <div x-data="User()" class="d-flex align-items-center">
+                                                <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
+                                                     :src='gravatar_url("{{ advisor.email }}", 18, "{{ advisor.first_name }}" + " " + "{{ advisor.last_name }}", stringToColor("{{ advisor.email }}") )'
+                                                     :style="{ '--current-bg-color': stringToColor('{{ advisor.email }}') }"
+                                                     data-gravatar-key="{{ advisor.email }}-18"
+                                                     alt="">
+                                                <span class="project-low-reach__user-name"><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }}</a></span>
+                                            </div>
                                         {% endif %}
                                     {% endfor %}
                                     {% with advisor_count=project.switchtenders.count %}
                                         {% if advisor_count > 3 %}
-                                            <span class="crm-avatar crm-avatar--overflow text-wrap">+{{ advisor_count|add:"-3" }}</span>
+                                            <span class="crm-avatar crm-avatar--overflow">+{{ advisor_count|add:"-3" }}</span>
                                         {% endif %}
                                     {% endwith %}
                                 </div>

@@ -116,4 +116,11 @@
             margin: 0;
         }
     }
+
+    &__user-name {
+        color: var(--light-text-title-grey, #161616);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 150%; /* 18px */
+    }
 }
