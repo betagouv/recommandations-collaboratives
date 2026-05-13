@@ -48,6 +48,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
@@ -944,7 +945,11 @@ def project_update(request, project_id=None):
                 project.exclude_stats = not form.cleaned_data["statistics"]
             project.save()
             next_url = request.POST.get("next", "")
-            if next_url and next_url.startswith("/"):
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
                 return redirect(next_url)
     else:
         form = forms.CRMProjectForm(
