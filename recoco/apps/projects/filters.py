@@ -69,13 +69,18 @@ class ProjectSiteStatusFilter(BaseFilterBackend):
         return queryset
 
 
+def request_show_deleted_projects(request):
+    # TODO for review : is this a proper permission ? now grist has staff permission. Alternative is to give
+    # it admin role, to hardcode reference to the user, to manually give it specific permissions
+    # or to create a role to which we manually give permissions
+    return not (
+        request.GET.get("with-deleted", None)
+        and has_perm(request.user, "delete_projects", request.site)
+    )
+
+
 class DefaultNoDeletedFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        # TODO for review : is this a proper permission ? now grist has staff permission. Alternative is to give
-        # it admin role, to hardcode reference to the user, to manually give it specific permissions
-        # or to create a role to which we manually give permissions
-        if not request.GET.get("with-deleted", None) or has_perm(
-            request.user, "sites.delete_projects"
-        ):
+        if request_show_deleted_projects(request):
             queryset = queryset.filter(deleted=None)
         return queryset
