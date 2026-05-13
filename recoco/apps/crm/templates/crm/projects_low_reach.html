@@ -137,19 +137,17 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center flex-wrap gap-1">
-                                    {% for advisor in project.switchtenders.all %}
-                                        {% if forloop.counter <= 3 %}
-                                            <div x-data="User()" class="d-flex align-items-center">
-                                                <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
-                                                     :src='gravatar_url("{{ advisor.email }}", 18, "{{ advisor.first_name }}" + " " + "{{ advisor.last_name }}", stringToColor("{{ advisor.email }}") )'
-                                                     :style="{ '--current-bg-color': stringToColor('{{ advisor.email }}') }"
-                                                     data-gravatar-key="{{ advisor.email }}-18"
-                                                     alt="">
-                                                <span class="project-low-reach__user-name"><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }}</a></span>
-                                            </div>
-                                        {% endif %}
+                                    {% for advisor in project.switchtenders.all|slice:":3" %}
+                                        <div x-data="User()" class="d-flex align-items-center">
+                                            <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
+                                                    :src='gravatar_url("{{ advisor.email }}", 18, "{{ advisor.first_name }}" + " " + "{{ advisor.last_name }}", stringToColor("{{ advisor.email }}") )'
+                                                    :style="{ '--current-bg-color': stringToColor('{{ advisor.email }}') }"
+                                                    data-gravatar-key="{{ advisor.email }}-18"
+                                                    alt="">
+                                            <span class="project-low-reach__user-name"><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }}</a></span>
+                                        </div>
                                     {% endfor %}
-                                    {% with advisor_count=project.switchtenders.count %}
+                                    {% with advisor_count=project.switchtenders.all|length %}
                                         {% if advisor_count > 3 %}
                                             <span class="crm-avatar crm-avatar--overflow">+{{ advisor_count|add:"-3" }}</span>
                                         {% endif %}
@@ -224,23 +222,17 @@
                                     {% endif %}
                                 </form>
                                 <!-- Go to project page -->
-                                <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
-                                        title="Accéder à la page du dossier">
-                                    <a :href="'{% url 'projects-project-detail' 0 %}'.replace('0', project.id)"
-                                    class="stretched-link">Accéder à la page du dossier</a>
-                                </button>
+                                <a href="{% url 'projects-project-detail' project.id %}"
+                                    class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline stretched-link"
+                                    title="Accéder à la page du dossier">Accéder à la page du dossier</a>
                                 {# Éditer #}
-                                <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
-                                        title="Éditer le dossier">
-                                    <a href="{% url 'crm-project-update' project.pk %}"
-                                       class="stretched-link">Éditer</a>
-                                </button>
+                                <a href="{% url 'crm-project-update' project.pk %}"
+                                    class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline stretched-link"
+                                    title="Éditer le dossier">Éditer</a>
                                 {# Supprimer #}
-                                <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
-                                        title="Supprimer le dossier">
-                                    <a href="{% url 'crm-project-delete' project.pk %}"
-                                       class="stretched-link">Supprimer</a>
-                                </button>
+                                <a href="{% url 'crm-project-delete' project.pk %}"
+                                    class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline stretched-link"
+                                    title="Supprimer le dossier">Supprimer</a>
                             </td>
                         </tr>
                     {% empty %}
