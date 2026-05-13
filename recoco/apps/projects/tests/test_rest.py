@@ -501,7 +501,7 @@ def test_project_detail_not_staff_cant_see_deleted(
     url = reverse("projects-detail", args=[project_deleted.id])
     with login(api_client):
         response = api_client.get(f"{url}?with-deleted=1")
-        assert response.status_code == 403
+        assert response.status_code == 404
     pass
 
 
