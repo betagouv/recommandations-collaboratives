@@ -69,7 +69,7 @@ class ProjectSiteStatusFilter(BaseFilterBackend):
         return queryset
 
 
-def request_show_deleted_projects(request):
+def request_hide_deleted_projects(request):
     # TODO for review : is this a proper permission ? now grist has staff permission. Alternative is to give
     # it admin role, to hardcode reference to the user, to manually give it specific permissions
     # or to create a role to which we manually give permissions
@@ -81,6 +81,6 @@ def request_show_deleted_projects(request):
 
 class DefaultNoDeletedFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        if request_show_deleted_projects(request):
+        if request_hide_deleted_projects(request):
             queryset = queryset.filter(deleted=None)
         return queryset

@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
-from recoco.apps.projects.filters import request_show_deleted_projects
+from recoco.apps.projects.filters import request_hide_deleted_projects
 from recoco.apps.projects.models import Project
 from recoco.apps.survey.models import Answer, Question, Session
 from recoco.apps.survey.serializers import (
@@ -17,7 +17,7 @@ from recoco.rest_api.permissions import IsStaffForSite
 
 def projects_not_deleted_by_default(request):
     queryset = Project.all_on_site.for_user(request.user)
-    if request_show_deleted_projects(request):
+    if request_hide_deleted_projects(request):
         queryset = queryset.filter(deleted=None)
     return queryset
 
