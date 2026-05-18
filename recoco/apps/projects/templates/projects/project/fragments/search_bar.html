@@ -13,9 +13,7 @@ variables to pass :
 
 {% endcomment %}
 {% load django_vite %}
-{% block js %}
-    {% vite_asset 'js/styles/projects-searchbar.css.js' %}
-{% endblock js %}
+{% vite_asset 'js/styles/projects-searchbar.css.js' %}
 <input x-ref="search_bar"
        type="search"
        name="{{ name|default:'query' }}"

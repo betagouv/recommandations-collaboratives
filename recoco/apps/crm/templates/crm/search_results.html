@@ -30,55 +30,63 @@
             </h2>
             <!-- Searchbar -->
             <div class="fr-mt-2w position-relative">
-                {% include "projects/project/fragments/search_bar.html" with padding_icon_class="fr-pl-5w" padding_class="fr-py-3v" value=query %}
+                <form method="get"
+                      action="{% url 'crm-search' %}"
+                      class="d-flex align-items-center justify-content-end">
+                    {% include "projects/project/fragments/search_bar.html" with padding_icon_class="fr-pl-5w" padding_class="fr-py-3v" value=query %}
+                </form>
             </div>
-            <!-- Filter result type -->
-            <fieldset class="fr-segmented fr-mt-2w">
-                <legend class="fr-segmented__legend crm-results__filter-legend">Filtrer les résulats:</legend>
-                <div class="fr-segmented__elements">
-                    <div class="fr-segmented__element crm-results__filter-element">
-                        <input value="all" type="radio" id="segmented-all" name="segmented" checked>
-                        <label class="fr-label" for="segmented-all">Tout ({{ search_results|length }})</label>
+            {% if is_empty_result %}
+                {% include "crm/fragments/empty_state.html" %}
+            {% else %}
+                <!-- Filter result type -->
+                <fieldset class="fr-segmented fr-mt-2w">
+                    <legend class="fr-segmented__legend crm-results__filter-legend">Filtrer les résulats:</legend>
+                    <div class="fr-segmented__elements">
+                        <div class="fr-segmented__element crm-results__filter-element">
+                            <input value="all" type="radio" id="segmented-all" name="segmented" checked>
+                            <label class="fr-label" for="segmented-all">Tout ({{ search_results|length }})</label>
+                        </div>
+                        <div class="fr-segmented__element crm-results__filter-element">
+                            <input value="projects"
+                                   type="radio"
+                                   id="segmented-projects"
+                                   name="segmented">
+                            <label class="fr-label" for="segmented-projects">Dossiers ({{ grouped_search_results.projects.items|length }})</label>
+                        </div>
+                        <div class="fr-segmented__element crm-results__filter-element">
+                            <input value="users" type="radio" id="segmented-users" name="segmented">
+                            <label class="fr-label" for="segmented-users">Utilisateurs ({{ grouped_search_results.users.items|length }})</label>
+                        </div>
+                        <div class="fr-segmented__element crm-results__filter-element">
+                            <input value="organizations"
+                                   type="radio"
+                                   id="segmented-organizations"
+                                   name="segmented">
+                            <label class="fr-label" for="segmented-organizations">
+                                Organisations ({{ grouped_search_results.organizations.items|length }})
+                            </label>
+                        </div>
+                        <div class="fr-segmented__element crm-results__filter-element">
+                            <input value="notes" type="radio" id="segmented-notes" name="segmented">
+                            <label class="fr-label" for="segmented-notes">Notes ({{ grouped_search_results.notes.items|length }})</label>
+                        </div>
                     </div>
-                    <div class="fr-segmented__element crm-results__filter-element">
-                        <input value="projects"
-                               type="radio"
-                               id="segmented-projects"
-                               name="segmented">
-                        <label class="fr-label" for="segmented-projects">Dossiers ({{ grouped_search_results.projects.items|length }})</label>
-                    </div>
-                    <div class="fr-segmented__element crm-results__filter-element">
-                        <input value="users" type="radio" id="segmented-users" name="segmented">
-                        <label class="fr-label" for="segmented-users">Utilisateurs ({{ grouped_search_results.users.items|length }})</label>
-                    </div>
-                    <div class="fr-segmented__element crm-results__filter-element">
-                        <input value="organizations"
-                               type="radio"
-                               id="segmented-organizations"
-                               name="segmented">
-                        <label class="fr-label" for="segmented-organizations">
-                            Organisations ({{ grouped_search_results.organizations.items|length }})
-                        </label>
-                    </div>
-                    <div class="fr-segmented__element crm-results__filter-element">
-                        <input value="notes" type="radio" id="segmented-notes" name="segmented">
-                        <label class="fr-label" for="segmented-notes">Notes ({{ grouped_search_results.notes.items|length }})</label>
-                    </div>
-                </div>
-            </fieldset>
-            <!-- Result - Project type, User type, Orga type, Note type -->
-            {% for group_key, group in grouped_search_results.items %}
-                {% if group.items|length > 0 %}
-                    <h3 class="crm-results__group-title fr-mt-4w fr-mb-2w">
-                        {{ group.items|length }} {{ group.label|lower }}{{ group.items|length|pluralize:"s" }}
-                    </h3>
-                    <ul class="list-group">
-                        {% for result in group.items %}
-                            <li class="list-group-item mb-4">{% search_result_item result %}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endfor %}
+                </fieldset>
+                <!-- Result - Project type, User type, Orga type, Note type -->
+                {% for group_key, group in grouped_search_results.items %}
+                    {% if group.items|length > 0 %}
+                        <h3 class="crm-results__group-title fr-mt-4w fr-mb-2w">
+                            {{ group.items|length }} {{ group.label|lower }}{{ group.items|length|pluralize:"s" }}
+                        </h3>
+                        <ul class="list-group">
+                            {% for result in group.items %}
+                                <li class="list-group-item mb-4">{% search_result_item result %}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
     {% comment %} <div x-data="Crm" class="d-flex fr-px-0">

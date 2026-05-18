@@ -1,0 +1,5 @@
+{% load django_vite %}
+{% vite_asset 'js/styles/crm-empty-state.css.js' %}
+<div class="crm-empty fr-mt-2w">
+    <p class="fr-mb-0">{{ text|default:"Aucun résultat pour votre recherche" }}</p>
+</div>

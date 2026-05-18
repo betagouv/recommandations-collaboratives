@@ -211,6 +211,11 @@ def crm_search(request):
             )
         )
 
+        if len(search_results):
+            is_empty_result = False
+        else:
+            is_empty_result = True
+
         for entry in search_results:
             obj = entry.object
             if isinstance(obj, (Project, models.ProjectAnnotations)):
