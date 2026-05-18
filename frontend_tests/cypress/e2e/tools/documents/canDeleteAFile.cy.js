@@ -2,7 +2,7 @@ import documents from '../../../fixtures/documents/documents.json';
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can delete a file on the document tab', () => {
+describe('I can delete a file on the document tab @page-projet-fichier-supprimer', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

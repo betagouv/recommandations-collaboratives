@@ -1,4 +1,4 @@
-describe('I can access the Dashboard Page with a non UI login', () => {
+describe('I can access the Dashboard Page with a non UI login @connexion', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

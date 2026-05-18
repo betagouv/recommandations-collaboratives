@@ -1,6 +1,6 @@
 import { DsrcFormValidator } from '../../support/dsrc/forms.tools.js';
 
-describe.skip('DsrcFormValidatorTest', () => {
+describe.skip('DsrcFormValidatorTest @dsrc-form-validator', () => {
   // The prefix used in data-test selectors: the selectors are generated in the `forms.py` during form initialization, and are rendered in the template files
   const fieldPrefix = 'sample_';
   const dataTestPrefix = `dsrc_test_${fieldPrefix}`;

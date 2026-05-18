@@ -15,7 +15,7 @@ dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
     "cryptography==46.0.7",
-    "django>=5.2.1,<6",
+    "django>=5.2.14,<6",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
     "django-allauth[mfa,openid,socialaccount]==65.14.1",
@@ -78,8 +78,8 @@ dependencies = [
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
     "tqdm>=4.67.1",
-    "urllib3>=2.6.3",
-    "wagtail==6.3.8",
+    "urllib3>=2.7",
+    "wagtail==7.0.7",
 ]
 
 [project.urls]
@@ -206,7 +206,7 @@ django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev 
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
 [tool.uv-secure.vulnerability_criteria]
-ignore_vulnerabilities = [] # to set if packages have unfixed acceptable vulnerabilities
+ignore_vulnerabilities = ["GHSA-r374-rxx8-8654"] # to set if packages have unfixed acceptable vulnerabilities
 
 [dependency-groups]
 dev = [

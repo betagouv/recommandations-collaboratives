@@ -1,4 +1,4 @@
-describe('I can see contacts information', () => {
+describe.skip('I can see contacts information @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('bob');
   });

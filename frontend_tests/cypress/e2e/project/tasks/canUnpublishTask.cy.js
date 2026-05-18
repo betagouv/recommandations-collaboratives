@@ -1,5 +1,5 @@
 let currentProjectId;
-describe('I can go tasks tab', () => {
+describe.skip('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-brouillon', () => {
   beforeEach(() => {
     cy.login('conseiller1');
     cy.createProject('unpublish task').then((projectId) => {

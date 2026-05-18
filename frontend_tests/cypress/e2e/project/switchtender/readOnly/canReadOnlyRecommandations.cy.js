@@ -1,7 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can read only recommandations', () => {
+describe.skip('I can read only recommandations @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller2');
   });

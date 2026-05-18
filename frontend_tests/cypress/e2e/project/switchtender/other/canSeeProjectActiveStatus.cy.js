@@ -3,7 +3,7 @@ import projectView from '../../../../support/views/project';
 
 const currentProject = projects[17];
 
-describe(`As project advisor, I can see a project's active status`, () => {
+describe(`As project advisor, I can see a project's active status @page-projet-presentation`, () => {
   before(() => {
     // First: login as owner and deactivate project
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour

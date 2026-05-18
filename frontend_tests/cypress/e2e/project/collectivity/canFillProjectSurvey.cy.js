@@ -3,7 +3,7 @@ import file from '../../../fixtures/documents/file.json';
 
 const currentProject = projects[1];
 
-describe('I can fill a project survey @critical', () => {
+describe('I can fill a project survey @critical @page-projet-edl', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });

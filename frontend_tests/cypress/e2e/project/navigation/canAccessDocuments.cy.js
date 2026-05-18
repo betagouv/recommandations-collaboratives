@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can access documents tab in a project', () => {
+describe('I can access documents tab in a project @navigation-projet @page-projet-fichier', () => {
   it('goes to the documents page of my project as a member', () => {
     cy.login('collectivité1');
     cy.visit(`/project/${currentProject.pk}`);

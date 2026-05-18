@@ -4,7 +4,7 @@ import users from '../../../../fixtures/users/users.json';
 const currentProject = projects[1];
 const userToInvite = users[6];
 
-describe('I can go to administration area of a project and invite a member', () => {
+describe('I can go to administration area of a project and invite a member @page-projet-parametres-gestion-utilisateur', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });

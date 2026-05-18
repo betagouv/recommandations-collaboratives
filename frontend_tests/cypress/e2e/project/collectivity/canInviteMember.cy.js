@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[2];
 
-describe('I can invite a member', () => {
+describe('I can invite a member @page-projet-presentation-inviter-partenaire', () => {
   const invitedFullName = 'New Member';
   const invitedEmail = 'new.member@test.fr';
   const inviterFullName = 'Boba collectivité';
@@ -38,10 +38,6 @@ describe('I can invite a member', () => {
   it('can see a notification of the invitation on the project activity feed', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
-    cy.get('[data-test-id="fr-consent-banner"]')
-      .find('[data-test-id="button-consent-accept-all"]')
-      .click({ force: true })
-      .wait(300);
     cy.get('[data-test-id="project-activity-link"]').click({ force: true });
     cy.get('[data-test-id="project-activity-tracking-staff"]')
       .find('[data-test-id="project-activity-notification"]')

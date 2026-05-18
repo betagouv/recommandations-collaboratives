@@ -6,7 +6,7 @@ import projectLocation from '../../../support/tools/geolocation';
  */
 let currentProject;
 const projectOwner = 'bob';
-describe.skip('I can see the location of a project on the project overview', () => {
+describe.skip('I can see the location of a project on the project overview @page-projet-presentation-localisation', () => {
   it(`displays a marker of the project coordinates if project coordinates are set`, () => {
     currentProject = projects[15];
     cy.login(projectOwner);

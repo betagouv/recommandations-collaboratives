@@ -1,7 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
-describe('I can invite a switchtender as a regional actor', () => {
+describe('I can invite a switchtender as a regional actor @page-projet-presentation-inviter-suivie', () => {
   beforeEach(() => {
     cy.login('conseiller3');
   });
