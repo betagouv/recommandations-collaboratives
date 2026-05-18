@@ -32,4 +32,53 @@
     line-height: 22px;
     text-transform: uppercase;
   }
+
+  &__project {
+    border-radius: 2px;
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    padding: 8px;
+    color: var(--light-text-title-grey, #161616);
+    font-size: 12px;
+    line-height: 18px; /* 150% */
+    &-orga {
+      font-weight: 700;
+    }
+
+    &-name {
+      font-weight: 400;
+    }
+    &-status {
+      &-list {
+        display: inline;
+      }
+      &-item {
+        border-radius: 1px;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 150%;
+      }
+      &--paused,
+      &--deleted,
+      &--rejected,
+      &--stuck,
+      &--done {
+        background: var(--light-background-disabled-grey, #e5e5e5);
+        color: var(--light-text-default-grey, #3a3a3a);
+      }
+      &--predraft {
+        background: var(--dark-background-flat-warning, #fc5d00);
+        color: var(--light-text-inverted-grey, #fff);
+      }
+      &--inprogress {
+        background: var(--dark-background-flat-success, #27a658);
+        color: var(--light-text-inverted-grey, #fff);
+      }
+      &--draft {
+        background: var(--light-background-flat-info, #0063cb);
+
+        color: var(--light-text-inverted-grey, #fff);
+      }
+    }
+  }
 }

@@ -79,9 +79,9 @@
                         <h3 class="crm-results__group-title fr-mt-4w fr-mb-2w">
                             {{ group.items|length }} {{ group.label|lower }}{{ group.items|length|pluralize:"s" }}
                         </h3>
-                        <ul class="list-group">
+                        <ul class="hide-ul-style">
                             {% for result in group.items %}
-                                <li class="list-group-item mb-4">{% search_result_item result %}</li>
+                                <li class="fr-mb-3v">{% search_result_item result %}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
