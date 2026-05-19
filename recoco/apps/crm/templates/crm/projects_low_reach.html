@@ -232,16 +232,13 @@
                  class="fr-pagination fr-mt-3w"
                  aria-label="Pagination">
                 <ul class="fr-pagination__list justify-content-center">
-                    <li>
-                        {% if page_obj.has_previous %}
+                    {% if page_obj.has_previous %}
+                        <li>
                             <a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label"
                                href="?{% if base_querystring %}{{ base_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}"
                                title="Page précédente">Page précédente</a>
-                        {% else %}
-                            <span class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label fr-pagination__link--disabled"
-                                  aria-disabled="true">Page précédente</span>
-                        {% endif %}
-                    </li>
+                        </li>
+                    {% endif %}
                     {% for i in page_obj.paginator.page_range %}
                         {% if i == 1 or i == page_obj.paginator.num_pages or i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
                             <li>
@@ -265,16 +262,13 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    <li>
-                        {% if page_obj.has_next %}
+                    {% if page_obj.has_next %}
+                        <li>
                             <a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label"
                                href="?{% if base_querystring %}{{ base_querystring }}&{% endif %}page={{ page_obj.next_page_number }}"
                                title="Page suivante">Page suivante</a>
-                        {% else %}
-                            <span class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label fr-pagination__link--disabled"
-                                  aria-disabled="true">Page suivante</span>
-                        {% endif %}
-                    </li>
+                        </li>
+                    {% endif %}
                 </ul>
             </nav>
         {% endif %}
