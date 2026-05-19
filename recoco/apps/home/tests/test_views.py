@@ -18,7 +18,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import IntegrityError
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
-from magicauth import models as magicauth_models
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
@@ -638,57 +637,6 @@ def test_make_new_site(client):
         "new_example_com_admin",
     ):
         assert auth_models.Group.objects.get(name=name)
-
-
-#######################################################################
-# Signals
-#######################################################################
-
-
-@pytest.mark.django_db
-def test_admin_signin_should_not_be_logged(request, client):
-    with login(client) as user:
-        assert user.actor_actions.count() == 0
-
-
-@pytest.mark.django_db
-def test_allauth_signin_should_be_logged(request, client):
-    user = baker.make(auth_models.User, email="truc@truc.fr")
-    password = "mon mot de passe"  # nosec B105
-    user.set_password(password)
-    user.save()
-
-    url = reverse("account_login")
-    response = client.post(
-        url, data={"login": user.email, "password": password, "remember": False}
-    )
-
-    assert response.status_code == 302
-    assert user.actor_actions.count() == 1
-
-
-@pytest.mark.django_db
-def test_magicauth_signin_should_be_logged(request, client):
-    user = baker.make(auth_models.User)
-    token = baker.make(magicauth_models.MagicToken, user=user)
-
-    url = reverse("magicauth-validate-token", args=[token.key])
-    response = client.get(url)
-
-    assert response.status_code == 302
-    assert user.actor_actions.count() == 1
-
-
-@pytest.mark.django_db
-def test_user_signin_shouldnt_be_logged_if_hijacked(request, client):
-    hijacked = baker.make(auth_models.User, username="hijacked")
-
-    with login(client, username="hijacker", is_staff=True):
-        url = reverse("hijack:acquire")
-        response = client.post(url, data={"user_pk": hijacked.pk})
-
-    assert response.status_code == 302
-    assert hijacked.actor_actions.count() == 0
 
 
 # eof

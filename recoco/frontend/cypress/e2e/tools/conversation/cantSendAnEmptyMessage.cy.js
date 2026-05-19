@@ -9,7 +9,7 @@ describe("I can't send an empty message @page-projet-conversations-nouveau-messa
     cy.visit(`/project/${currentProject.pk}/conversations`);
   });
 
-  it('enable and disables the send message if I erase my message (empty message)', () => {
+  it('enables and disables the send message if I erase my message (empty message)', () => {
     editor.checkSubmitButton('be.disabled');
 
     cy.wait(500);
