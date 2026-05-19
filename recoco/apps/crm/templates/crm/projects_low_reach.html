@@ -177,29 +177,6 @@
                                 {% endif %}
                             </td>
                             <td class="project-low-reach__actions">
-                                {# Inclure / Exclure des statistiques #}
-                                <form method="post"
-                                      action="{% url 'crm-project-update' project.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                    {% if not project.muted %}
-                                        <input type="hidden" name="notifications" value="on">
-                                    {% endif %}
-                                    {% if project.exclude_stats %}
-                                        <input type="hidden" name="statistics" value="on">
-                                        <button type="submit"
-                                                class="fr-btn fr-btn--sm fr-icon-line-chart-off-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Inclure dans les statistiques">
-                                            Inclure dans les statistiques
-                                        </button>
-                                    {% else %}
-                                        <button type="submit"
-                                                class="fr-btn fr-btn--sm fr-icon-line-chart-on-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Exclure des statistiques">
-                                            Exclure des statistiques
-                                        </button>
-                                    {% endif %}
-                                </form>
                                 {# Activer / Désactiver les notifications #}
                                 <form method="post"
                                       action="{% url 'crm-project-update' project.pk %}">
