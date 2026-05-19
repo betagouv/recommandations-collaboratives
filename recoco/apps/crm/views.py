@@ -1409,8 +1409,13 @@ def crm_projects_with_low_reach_as_csv(request):
     )
 
     for project in low_reach_projects:
+        # Same rule as the HTML table badge: "recos non lues" only when
+        # no reco read, or a single reco read but more than 2 recos sent.
         project_status = (
-            "RECOS NON LUES" if project.reco_read <= 1 else "AUCUNE RÉACTION"
+            "RECOS NON LUES"
+            if project.reco_read == 0
+            or (project.reco_read == 1 and project.reco_total > 2)
+            else "AUCUNE RÉACTION"
         )
         owner = project.owner
         if owner:
