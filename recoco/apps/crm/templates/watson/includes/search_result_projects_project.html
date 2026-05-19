@@ -1,4 +1,5 @@
-<div class="crm-results__project position-relative">
+<div class="crm-results__project position-relative"
+     :class="{'crm-results__project--deactivated' : '{{ obj.status }}' == 'REJECTED' || '{{ obj.deleted }}' != 'None' }">
     <div class="fr-mb-1v">
         <a href="{% url 'crm-project-details' obj.pk %}" class="stretched-link">
             <!--Project orga-->

@@ -13,7 +13,7 @@
     {% vite_asset 'js/styles/crm-results.css.js' %}
 {% endblock js %}
 {% block content %}
-    <div class="crm-results">
+    <div class="crm-results" x-data="{displaying : 'all'}">
         <!-- CRM Navbar -->
         {% include "crm/fragments/navigation.html" %}
         <!-- Breadcrumb -->
@@ -44,31 +44,50 @@
                     <legend class="fr-segmented__legend crm-results__filter-legend">Filtrer les résulats:</legend>
                     <div class="fr-segmented__elements">
                         <div class="fr-segmented__element crm-results__filter-element">
-                            <input value="all" type="radio" id="segmented-all" name="segmented" checked>
+                            <input value="all"
+                                   type="radio"
+                                   id="segmented-all"
+                                   name="segmented"
+                                   autocomplete="off"
+                                   x-model="displaying">
                             <label class="fr-label" for="segmented-all">Tout ({{ search_results|length }})</label>
                         </div>
                         <div class="fr-segmented__element crm-results__filter-element">
                             <input value="projects"
                                    type="radio"
                                    id="segmented-projects"
-                                   name="segmented">
+                                   name="segmented"
+                                   autocomplete="off"
+                                   x-model="displaying">
                             <label class="fr-label" for="segmented-projects">Dossiers ({{ grouped_search_results.projects.items|length }})</label>
                         </div>
                         <div class="fr-segmented__element crm-results__filter-element">
-                            <input value="users" type="radio" id="segmented-users" name="segmented">
+                            <input value="users"
+                                   type="radio"
+                                   id="segmented-users"
+                                   name="segmented"
+                                   autocomplete="off"
+                                   x-model="displaying">
                             <label class="fr-label" for="segmented-users">Utilisateurs ({{ grouped_search_results.users.items|length }})</label>
                         </div>
                         <div class="fr-segmented__element crm-results__filter-element">
                             <input value="organizations"
                                    type="radio"
                                    id="segmented-organizations"
-                                   name="segmented">
+                                   name="segmented"
+                                   autocomplete="off"
+                                   x-model="displaying">
                             <label class="fr-label" for="segmented-organizations">
                                 Organisations ({{ grouped_search_results.organizations.items|length }})
                             </label>
                         </div>
                         <div class="fr-segmented__element crm-results__filter-element">
-                            <input value="notes" type="radio" id="segmented-notes" name="segmented">
+                            <input value="notes"
+                                   type="radio"
+                                   id="segmented-notes"
+                                   name="segmented"
+                                   autocomplete="off"
+                                   x-model="displaying">
                             <label class="fr-label" for="segmented-notes">Notes ({{ grouped_search_results.notes.items|length }})</label>
                         </div>
                     </div>
@@ -76,14 +95,16 @@
                 <!-- Result - Project type, User type, Orga type, Note type -->
                 {% for group_key, group in grouped_search_results.items %}
                     {% if group.items|length > 0 %}
-                        <h3 class="crm-results__group-title fr-mt-4w fr-mb-2w">
-                            {{ group.items|length }} {{ group.label|lower }}{{ group.items|length|pluralize:"s" }}
-                        </h3>
-                        <ul class="hide-ul-style">
-                            {% for result in group.items %}
-                                <li class="fr-mb-3v">{% search_result_item result %}</li>
-                            {% endfor %}
-                        </ul>
+                        <div x-show="['all' , '{{ group_key }}'].includes(displaying)">
+                            <h3 class="crm-results__group-title fr-mt-4w fr-mb-2w">
+                                {{ group.items|length }} {{ group.label }}{{ group.items|length|pluralize:"s" }}
+                            </h3>
+                            <ul class="hide-ul-style">
+                                {% for result in group.items %}
+                                    <li class="fr-mb-3v">{% search_result_item result %}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     {% endif %}
                 {% endfor %}
             {% endif %}
