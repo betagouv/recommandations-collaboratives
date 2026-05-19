@@ -34,7 +34,8 @@
   }
 
   &__project,
-  &__organization {
+  &__organization,
+  &__note {
     border-radius: 2px;
     border: 1px solid var(--light-border-default-grey, #e5e5e5);
     padding: 8px;
@@ -47,8 +48,28 @@
       background: var(--light-background-alt-grey, #f6f6f6);
     }
 
-    &-orga {
+    &-orga,
+    &-title {
       font-weight: 700;
+    }
+
+    &-wrapper {
+      height: 24px;
+      overflow: hidden;
+      color: var(--light-text-default-grey, #3a3a3a);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 400;
+      line-height: 150%; /* 18px */
+      p,
+      li {
+        font-size: 12px;
+        margin-bottom: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        // font-size: 12px;
+      }
     }
 
     &-name {
@@ -93,8 +114,5 @@
       font-weight: 400;
       line-height: 150%; /* 15px */
     }
-  }
-
-  &__organization {
   }
 }
