@@ -12,17 +12,6 @@
                 <span class="crm-results__organization-status-item crm-results__organization-status--deleted">Supprimé</span>
             {% endif %}
         </div>
-        {% comment %} Keep it until the design team decision {% endcomment %}
-        {% comment %} {% if obj.departments.all %}
-            <div class="list-unstyled d-flex fr-pt-2v align-items-center flex-wrap div-specific-fontsize">
-                {% for dpt in obj.departments.all %}
-                    <span class="fr-mr-1v crm-region-tag">
-                        <span>{{ dpt.name }}</span>
-                        <strong>({{ dpt.code }})</strong>
-                    </span>
-                {% endfor %}
-            </div>
-        {% endif %} {% endcomment %}
     </div>
     <div class="crm-results__organization-info">
         <!--Member-->
