@@ -1,34 +1,46 @@
 <div class="crm-results__project position-relative">
-    <a href="{% url 'crm-project-details' obj.pk %}" class="stretched-link">
-        <!--Project orga-->
-        <span class="crm-results__project-orga">{{ obj.owner.profile.organization.name }}</span>
-        <!--Project name-->
-        <span class="crm-results__project-name">{{ obj.name }}</span>
-    </a>
-    <!--Status-->
-    <div class="crm-results__project-status-list fr-ml-3v">
-        {% if obj.inactive_since %}
-            <span class="crm-results__project-status-item crm-results__project-status--paused">En pause</span>
-        {% endif %}
-        {% if obj.deleted %}
-            <span class="crm-results__project-status-item crm-results__project-status--deleted">Supprimé</span>
-        {% elif obj.status == 'REJECTED' %}
-            <span class="crm-results__project-status-item crm-results__project-status--rejected">Rejeté à la modération</span>
-        {% elif obj.status == 'PRE_DRAFT' %}
-            <span class="crm-results__project-status-item crm-results__project-status--predraft">Dossier incomplet</span>
-        {% elif obj.status == 'IN_PROGRESS' %}
-            <span class="crm-results__project-status-item crm-results__project-status--inprogress">En cours</span>
-        {% elif obj.status == 'DRAFT' %}
-            <span class="crm-results__project-status-item crm-results__project-status--draft">A traiter</span>
-        {% elif obj.status == 'STUCK' %}
-            <span class="crm-results__project-status-item crm-results__project-status--stuck">Bloqué</span>
-        {% elif obj.status == 'DONE' %}
-            <span class="crm-results__project-status-item crm-results__project-status--done">Traité</span>
-        {% endif %}
+    <div class="fr-mb-1v">
+        <a href="{% url 'crm-project-details' obj.pk %}" class="stretched-link">
+            <!--Project orga-->
+            <span class="crm-results__project-orga">{{ obj.owner.profile.organization.name }}</span>
+            <!--Project name-->
+            <span class="crm-results__project-name">{{ obj.name }}</span>
+        </a>
+        <!--Status-->
+        <div class="crm-results__project-status-list fr-ml-3v">
+            {% if obj.inactive_since %}
+                <span class="crm-results__project-status-item crm-results__project-status--paused">En pause</span>
+            {% endif %}
+            {% if obj.deleted %}
+                <span class="crm-results__project-status-item crm-results__project-status--deleted">Supprimé</span>
+            {% elif obj.status == 'REJECTED' %}
+                <span class="crm-results__project-status-item crm-results__project-status--rejected">Rejeté à la modération</span>
+            {% elif obj.status == 'PRE_DRAFT' %}
+                <span class="crm-results__project-status-item crm-results__project-status--predraft">Dossier incomplet</span>
+            {% elif obj.status == 'IN_PROGRESS' %}
+                <span class="crm-results__project-status-item crm-results__project-status--inprogress">En cours</span>
+            {% elif obj.status == 'DRAFT' %}
+                <span class="crm-results__project-status-item crm-results__project-status--draft">A traiter</span>
+            {% elif obj.status == 'STUCK' %}
+                <span class="crm-results__project-status-item crm-results__project-status--stuck">Bloqué</span>
+            {% elif obj.status == 'DONE' %}
+                <span class="crm-results__project-status-item crm-results__project-status--done">Traité</span>
+            {% endif %}
+        </div>
     </div>
-    <!--Portal-->
-    <!--Commune-->
-    <!--Update date-->
+    <div class="crm-results__project-info">
+        <!--Portal-->
+        <!--Commune-->
+        <span class="fr-mr-3v">
+            <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
+            {{ obj.commune.name }}
+        </span>
+        <!--Update date-->
+        <span>
+            <span class="fr-icon-calendar-event-line fr-icon--sm" aria-hidden="true"></span>
+            mis à jour le {{ obj.updated_on|date:"j F Y" }}
+        </span>
+    </div>
 </div>
 {% comment %} {% load static %}
 <div class="d-flex align-items-center">
