@@ -1382,11 +1382,11 @@ def crm_projects_with_low_reach_as_csv(request):
 
     today = datetime.today().date()
 
+    content_disposition = f'attachment; filename="projets-a-relancer-{today}.csv"'
+
     response = HttpResponse(
         content_type="text/csv",
-        headers={
-            "Content-Disposition": f'attachment; filename="projets-a-relancer-{today}.csv"'
-        },
+        headers={"Content-Disposition": content_disposition},
     )
 
     writer = csv.writer(response, quoting=csv.QUOTE_ALL)
