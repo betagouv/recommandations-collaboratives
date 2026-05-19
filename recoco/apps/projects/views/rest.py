@@ -72,6 +72,7 @@ class ProjectDetail(
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserProjectSerializer
+    # todo filter should not be necessary after cleaning recoco_sync 2122
     filter_backends = [DefaultNoDeletedFilter]
 
     def get_object(self, pk):
@@ -107,6 +108,7 @@ class ProjectDetail(
             raise Http404 from exc
 
     def get_queryset(self):
+        # todo all_on_site should not be necessary after cleaning recoco_sync 2122
         return models.Project.all_on_site.with_site_status().select_related(
             "commune__department__region",
         )
@@ -152,11 +154,13 @@ class ProjectList(ListAPIView):
         DepartmentsFilter,
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
+        # todo filter should not be necessary after cleaning recoco_sync 2122
         DefaultNoDeletedFilter,
     ]
 
     def get_queryset(self):
         return (
+            # todo all_on_site should not be necessary after cleaning recoco_sync 2122
             models.Project.all_on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
             .annotate(

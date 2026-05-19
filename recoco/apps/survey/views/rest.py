@@ -15,6 +15,7 @@ from recoco.apps.survey.serializers import (
 from recoco.rest_api.permissions import IsStaffForSite
 
 
+# todo all_on_site and function should not be necessary after #2122
 def projects_not_deleted_by_default(request):
     queryset = Project.all_on_site.for_user(request.user)
     if request_hide_deleted_projects(request):
@@ -23,6 +24,7 @@ def projects_not_deleted_by_default(request):
 
 
 class SessionFilterSet(filters_drf.FilterSet):
+    # todo projects_not_deleted_by_default should not be necessary after #2122
     project_id = ModelChoiceFilter(queryset=projects_not_deleted_by_default)
 
     class Meta:
@@ -37,6 +39,7 @@ class SessionView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
+        # todo projects_not_deleted_by_default should not be necessary after #2122
         project_ids = projects_not_deleted_by_default(self.request).values_list(
             "id", flat=True
         )
@@ -49,6 +52,7 @@ class SessionAnswersView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
+        # todo projects_not_deleted_by_default should not be necessary after #2122
         project_ids = projects_not_deleted_by_default(self.request).values_list(
             "id", flat=True
         )

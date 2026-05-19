@@ -26,6 +26,7 @@ class WebhookSignalListener(SignalListener):
             return []
         if isinstance(instance, Task):
             return [instance.site.id]
+        # todo should not be necessary after #2124 as grist will have the info directly from project update
         if isinstance(instance, UserProfile):
             return list(
                 instance.user.projectmember_set.filter(is_owner=True)
@@ -60,6 +61,7 @@ class WebhookSignalListener(SignalListener):
             return TaskWebhookSerializer(instance, **kwargs).data
         if isinstance(instance, Task):
             return TaskWebhookSerializer(instance, **kwargs).data
+        # todo should not be necessary after #2124 as grist will have the info directly from project update
         if isinstance(instance, UserProfile):
             return UserWebhookSerializer(instance.user, **kwargs).data
 

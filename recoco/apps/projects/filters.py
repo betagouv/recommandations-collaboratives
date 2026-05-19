@@ -70,9 +70,7 @@ class ProjectSiteStatusFilter(BaseFilterBackend):
 
 
 def request_hide_deleted_projects(request):
-    # TODO for review : is this a proper permission ? now grist has staff permission. Alternative is to give
-    # it admin role, to hardcode reference to the user, to manually give it specific permissions
-    # or to create a role to which we manually give permissions
+    # TODO should not be necessary after #2122
     return not (
         request.GET.get("with-deleted", None)
         and has_perm(request.user, "delete_projects", request.site)

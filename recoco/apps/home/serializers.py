@@ -41,6 +41,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileSerializer(read_only=True, many=False)
 
 
+# todo should not be necessary when orga is duplicated to project (#2124)
 class UserWebhookSerializer(serializers.ModelSerializer):
     class Meta:
         model = auth_models.User
