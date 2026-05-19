@@ -33,13 +33,20 @@
     text-transform: uppercase;
   }
 
-  &__project {
+  &__project,
+  &__organization {
     border-radius: 2px;
     border: 1px solid var(--light-border-default-grey, #e5e5e5);
     padding: 8px;
     color: var(--light-text-title-grey, #161616);
     font-size: 12px;
     line-height: 18px; /* 150% */
+    &--deactivated {
+      border: 1px solid var(--light-border-default-grey, #e5e5e5);
+      color: var(--light-text-disabled-grey, #929292);
+      background: var(--light-background-alt-grey, #f6f6f6);
+    }
+
     &-orga {
       font-weight: 700;
     }
@@ -86,5 +93,8 @@
       font-weight: 400;
       line-height: 150%; /* 15px */
     }
+  }
+
+  &__organization {
   }
 }

@@ -189,25 +189,23 @@ def crm_search(request):
             (
                 (
                     "projects",
-                    {"label": "Dossier", "label_plural": "Dossiers", "items": []},
+                    {"label": "dossier", "items": []},
                 ),
                 (
                     "users",
                     {
-                        "label": "Utilisateur",
-                        "label_plural": "Utilisateurs",
+                        "label": "utilisateur",
                         "items": [],
                     },
                 ),
                 (
                     "organizations",
                     {
-                        "label": "Organisation",
-                        "label_plural": "Organisations",
+                        "label": "organisation",
                         "items": [],
                     },
                 ),
-                ("notes", {"label": "Note", "label_plural": "Notes", "items": []}),
+                ("notes", {"label": "note", "items": []}),
             )
         )
 
@@ -216,6 +214,10 @@ def crm_search(request):
         else:
             is_empty_result = True
 
+        # Code by Claude
+        organization_ct = ContentType.objects.get_for_model(Organization)
+
+        # Code by Claude
         for entry in search_results:
             obj = entry.object
             if isinstance(obj, (Project, models.ProjectAnnotations)):
@@ -223,6 +225,24 @@ def crm_search(request):
             elif isinstance(obj, User):
                 grouped_search_results["users"]["items"].append(entry)
             elif isinstance(obj, Organization):
+                org_user_ids = list(
+                    User.objects.filter(
+                        profile__in=obj.registered_profiles.all(),
+                        profile__sites=site,
+                    ).values_list("id", flat=True)
+                )
+                obj.members_count = len(org_user_ids)
+                obj.projects_count = (
+                    Project.on_site.filter(
+                        Q(members__in=org_user_ids) | Q(switchtenders__in=org_user_ids)
+                    )
+                    .distinct()
+                    .count()
+                )
+                obj.notes_count = models.Note.on_site.filter(
+                    object_id=obj.pk,
+                    content_type=organization_ct,
+                ).count()
                 grouped_search_results["organizations"]["items"].append(entry)
             elif isinstance(obj, models.Note):
                 grouped_search_results["notes"]["items"].append(entry)
