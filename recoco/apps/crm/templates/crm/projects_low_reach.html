@@ -48,10 +48,11 @@
                         id="days-filter"
                         name="days"
                         onchange="this.form.submit()">
+                    <option value="0" {% if days == 0 %}selected{% endif %}>Tout</option>
                     <option value="15" {% if days == 15 %}selected{% endif %}>Plus de 15 jours</option>
                     <option value="30" {% if days == 30 %}selected{% endif %}>Plus de 30 jours</option>
-                    <option value="60" {% if days == 60 %}selected{% endif %}>Plus de 60 jours</option>
                     <option value="90" {% if days == 90 %}selected{% endif %}>Plus de 90 jours</option>
+                    <option value="180" {% if days == 180 %}selected{% endif %}>Plus de 6 mois</option>
                 </select>
             </div>
             <div class="d-flex align-items-center gap-2">

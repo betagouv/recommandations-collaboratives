@@ -1226,8 +1226,6 @@ def crm_list_recommendation_without_resources(request):
 def make_low_reach_project_query(
     request, days=15, status_filter="no_reaction", mine_only=False, search_q=""
 ):
-    cutoff_date = datetime.now() - timedelta(days=days)
-
     qs = (
         Project.on_site.filter(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
@@ -1272,8 +1270,12 @@ def make_low_reach_project_query(
                 ).exclude(status=Task.PROPOSED)
             ),
         )
-        .filter(last_members_activity_at__lte=cutoff_date)
     )
+
+    # days == 0 means "Tout" (no time filter on last members activity)
+    if days:
+        cutoff_date = datetime.now() - timedelta(days=days)
+        qs = qs.filter(last_members_activity_at__lte=cutoff_date)
 
     # has_reaction: member sent a message, or any reco has a non-default status
     has_reaction_filter = Q(last_public_msg_at__isnull=False) | Q(has_task_status=True)
@@ -1302,7 +1304,8 @@ def _parse_low_reach_params(request):
         days = int(request.GET.get("days", 15))
     except ValueError:
         days = 15
-    if days not in (15, 30, 60, 90):
+    # 0 == "Tout" (no time filter), others are "plus de N jours"
+    if days not in (0, 15, 30, 90, 180):
         days = 15
 
     status_filter = request.GET.get("status", "no_reaction")
