@@ -17,11 +17,12 @@ platforms:
 legal:
   license: AGPL-3.0-or-later
 maintenance:
-  # TODO: confirm the maintenance type (`internal`, `contract`, or `community`)
-  type: community
-  contacts:
-    # TODO: add at least one maintainer (name plus email or affiliation)
-    - name: TODO
+  type: contract
+  contractor:
+    - name: Recommendations Collaboratives
+      until: 2026-12-31
+      email: recommandations-collaboratives\x64beta.gouv.fr
+      website: https://beta.gouv.fr/startups/recommandations-collaboratives.html
 localisation:
   localisationReady: false
   availableLanguages:
