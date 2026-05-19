@@ -5,7 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.utils import timezone
 
-from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.home.models import SiteConfiguration, UserProfile
 
 
 class CurrentSiteConfigurationMiddleware:
@@ -46,9 +46,11 @@ class PreviousActivityMiddleware:
             )
         ):
             try:
-                request.user.profile.previous_activity_at = now
-                request.user.profile.previous_activity_site = request.site
-                request.user.profile.save()
+                # update() rather than save() so that signals are not sent
+                UserProfile.objects.filter(pk=request.user.pk).update(
+                    previous_activity_at=now,
+                    previous_activity_site=request.site,
+                )
             except Exception as e:
                 sentry_sdk.capture_exception(e)
 

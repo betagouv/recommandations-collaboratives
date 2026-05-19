@@ -430,9 +430,79 @@ def test_project_list_search_filter_is_cumulative(request, api_client):
     assert len(response.data["results"]) == 1
 
 
+@pytest.fixture
+def project_deleted(request, make_project):
+    """Create a project on the current site with status READY"""
+    yield make_project(status="READY", deleted=timezone.now())
+
+
+@pytest.mark.django_db
+def test_project_list_staff_can_see_deleted_if_asked(
+    request, api_client, current_site, project_deleted
+):
+    url = reverse("projects-list")
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(f"{url}?with-deleted=1")
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 1
+
+
+@pytest.mark.django_db
+def test_project_list_staff_dont_see_deleted_if_not_asked(
+    request, api_client, current_site, project_deleted
+):
+    url = reverse("projects-list")
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 0
+
+
+@pytest.mark.django_db
+def test_project_list_not_staff_cant_see_deleted(
+    request, api_client, current_site, project_deleted
+):
+    url = reverse("projects-list")
+    with login(api_client):
+        response = api_client.get(f"{url}?with-deleted=1")
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 0
+
+
 ########################################################################
 # get project details
 ########################################################################
+
+
+@pytest.mark.django_db
+def test_project_detail_staff_can_see_deleted_if_asked(
+    request, api_client, current_site, project_deleted
+):
+    url = reverse("projects-detail", args=[project_deleted.id])
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(f"{url}?with-deleted=1")
+        assert response.status_code == 200
+        assert response.data["id"] == project_deleted.id
+
+
+@pytest.mark.django_db
+def test_project_detail_staff_dont_see_deleted_if_not_asked(
+    request, api_client, current_site, project_deleted
+):
+    url = reverse("projects-detail", args=[project_deleted.id])
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(f"{url}")
+        assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_project_detail_not_staff_cant_see_deleted(
+    request, api_client, current_site, project_deleted
+):
+    url = reverse("projects-detail", args=[project_deleted.id])
+    with login(api_client):
+        response = api_client.get(f"{url}?with-deleted=1")
+        assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -549,6 +619,9 @@ def check_project_content(project, data):
         "advisors_note",
         "exclude_stats",
         "muted",
+        "deleted",
+        "orga_owner",
+        "topics",
     ]
     assert set(data.keys()) == set(expected)
 
