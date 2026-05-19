@@ -44,11 +44,11 @@
             <a href="{{ note.get_absolute_url }}#note-{{ note.pk }}">
                 <span class="fr-mr-3v">
                     {% if note.related.name %}
-                        <span class="fr-icon-team-line fr-icon--sm" aria-hidden="true"></span>
+                        <span class="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
                         <span>{{ note.related.name }}</span>
                     {% endif %}
                     {% if note.related.get_full_name %}
-                        <span class="fr-icon-user-line fr-icon--sm" aria-hidden="true"></span>
+                        <span class="fr-icon-user-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
                         <span>{{ note.related.get_full_name }}</span>
                     {% endif %}
                 </span>

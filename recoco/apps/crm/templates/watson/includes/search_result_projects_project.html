@@ -46,12 +46,14 @@
         {% endif %}
         <!--Commune-->
         <span class="fr-mr-3v">
-            <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
+            <span class="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v"
+                  aria-hidden="true"></span>
             {{ obj.commune.name }}
         </span>
         <!--Update date-->
         <span>
-            <span class="fr-icon-calendar-event-line fr-icon--sm" aria-hidden="true"></span>
+            <span class="fr-icon-calendar-event-line fr-icon--sm fr-mr-1v"
+                  aria-hidden="true"></span>
             mis à jour le {{ obj.updated_on|date:"j F Y" }}
         </span>
     </div>

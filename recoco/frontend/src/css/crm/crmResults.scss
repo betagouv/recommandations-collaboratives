@@ -37,19 +37,94 @@
   &__organization,
   &__note,
   &__user {
-    border-radius: 2px;
-    border: 1px solid var(--light-border-default-grey, #e5e5e5);
     padding: 8px;
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    border-radius: 2px;
     color: var(--light-text-title-grey, #161616);
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 18px; /* 150% */
-    &--deactivated {
-      border: 1px solid var(--light-border-default-grey, #e5e5e5);
-      color: var(--light-text-disabled-grey, #929292);
-      background: var(--light-background-alt-grey, #f6f6f6);
+  }
+
+  &__project--deactivated,
+  &__user--deactivated {
+    background: var(--light-background-alt-grey, #f6f6f6);
+    color: var(--light-text-disabled-grey, #929292);
+  }
+
+  &__project-info,
+  &__organization-info,
+  &__note-info,
+  &__user-info {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.625rem;
+    font-weight: 400;
+    line-height: 150%; /* 15px */
+  }
+
+  &__project-name,
+  &__organization-name {
+    font-weight: 400;
+  }
+
+  // Statuts (liste + pastille + variante "deleted") — project, organization & user
+  &__project-status-list,
+  &__organization-status-list,
+  &__user-status-list {
+    display: inline;
+  }
+
+  &__project-status-item,
+  &__organization-status-item,
+  &__user-status-item {
+    padding: 2px 6px;
+    border-radius: 1px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 150%;
+  }
+
+  &__project-status--deleted,
+  &__organization-status--deleted,
+  &__user-status--deleted {
+    background: var(--light-background-disabled-grey, #e5e5e5);
+    color: var(--light-text-default-grey, #3a3a3a);
+  }
+
+  &__project {
+    &-orga {
+      font-weight: 700;
     }
 
-    &-orga,
+    &-status {
+      &--paused,
+      &--rejected,
+      &--stuck,
+      &--done {
+        background: var(--light-background-disabled-grey, #e5e5e5);
+        color: var(--light-text-default-grey, #3a3a3a);
+      }
+
+      &--predraft,
+      &--inprogress,
+      &--draft {
+        color: var(--light-text-inverted-grey, #fff);
+      }
+
+      &--predraft {
+        background: var(--dark-background-flat-warning, #fc5d00);
+      }
+
+      &--inprogress {
+        background: var(--dark-background-flat-success, #27a658);
+      }
+
+      &--draft {
+        background: var(--light-background-flat-info, #0063cb);
+      }
+    }
+  }
+
+  &__note {
     &-title {
       font-weight: 700;
     }
@@ -58,72 +133,31 @@
       height: 24px;
       overflow: hidden;
       color: var(--light-text-default-grey, #3a3a3a);
-      text-overflow: ellipsis;
-      white-space: nowrap;
       font-weight: 400;
       line-height: 150%; /* 18px */
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
       p,
       li {
-        font-size: 12px;
+        font-size: 0.75rem;
+        overflow: hidden;
         margin-bottom: 0;
         text-overflow: ellipsis;
-        overflow: hidden;
         white-space: nowrap;
-        // font-size: 12px;
       }
-    }
-
-    &-name {
-      font-weight: 400;
-    }
-    &-status {
-      &-list {
-        display: inline;
-      }
-      &-item {
-        border-radius: 1px;
-        padding: 2px 6px;
-        font-size: 10px;
-        font-weight: 700;
-        line-height: 150%;
-      }
-      &--paused,
-      &--deleted,
-      &--rejected,
-      &--stuck,
-      &--done {
-        background: var(--light-background-disabled-grey, #e5e5e5);
-        color: var(--light-text-default-grey, #3a3a3a);
-      }
-      &--predraft {
-        background: var(--dark-background-flat-warning, #fc5d00);
-        color: var(--light-text-inverted-grey, #fff);
-      }
-      &--inprogress {
-        background: var(--dark-background-flat-success, #27a658);
-        color: var(--light-text-inverted-grey, #fff);
-      }
-      &--draft {
-        background: var(--light-background-flat-info, #0063cb);
-
-        color: var(--light-text-inverted-grey, #fff);
-      }
-    }
-    &-info {
-      color: var(--light-text-mention-grey, #666);
-      font-size: 10px;
-      font-weight: 400;
-      line-height: 150%; /* 15px */
     }
   }
+
   &__user {
     &-name {
       font-weight: 700;
     }
+
     &-phone,
     &-email {
       color: var(--light-background-action-high-blue-france, #000091);
-      font-size: 10px;
+      font-size: 0.625rem;
       font-weight: 400;
       line-height: 150%; /* 15px */
       text-decoration-line: underline;

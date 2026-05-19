@@ -16,7 +16,7 @@
             <!--Orga-->
             <a href="{% url 'crm-organization-details' obj.profile.organization.pk %}">
                 <span class="fr-mr-3v">
-                    <span class="fr-icon-team-line fr-icon--sm" aria-hidden="true"></span>
+                    <span class="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
                     {{ obj.profile.organization.name }}
                 </span>
             </a>
@@ -24,13 +24,13 @@
         {% if obj.is_active %}
             {% if obj.email %}
                 <span class="fr-mr-3v crm-results__user-email">
-                    <a href="mailto:{{ obj.email }}"><span class="fr-icon-link fr-icon--sm" aria-hidden="true"></span>{{ obj.email }}</a>
+                    <a href="mailto:{{ obj.email }}"><span class="fr-icon-link fr-icon--sm fr-mr-1v" aria-hidden="true"></span>{{ obj.email }}</a>
                 </span>
             {% endif %}
             {% if obj.profile.phone_no %}
                 <span class="fr-mr-3v crm-results__user-phone">
                     <a href="tel:+{{ obj.profile.phone_no }}">
-                        <span class="fr-icon-phone-line fr-icon--sm" aria-hidden="true"></span>
+                        <span class="fr-icon-phone-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
                     {{ obj.profile.phone_no }}</a>
                 </span>
             {% endif %}

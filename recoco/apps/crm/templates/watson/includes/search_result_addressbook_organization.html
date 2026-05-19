@@ -15,17 +15,18 @@
     <div class="crm-results__organization-info">
         <!--Member-->
         <span class="fr-mr-3v">
-            <span class="fr-icon-team-line fr-icon--sm" aria-hidden="true"></span>
+            <span class="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
             {{ obj.members_count }} membre{{ obj.members_count|pluralize }}
         </span>
         <!--Projects-->
         <span class="fr-mr-3v">
-            <span class="fr-icon-briefcase-line fr-icon--sm" aria-hidden="true"></span>
+            <span class="fr-icon-briefcase-line fr-icon--sm fr-mr-1v"
+                  aria-hidden="true"></span>
             {{ obj.projects_count }} dossier{{ obj.projects_count|pluralize }}
         </span>
         <!--Notes-->
         <span>
-            <span class="fr-icon-edit-line fr-icon--sm" aria-hidden="true"></span>
+            <span class="fr-icon-edit-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
             {{ obj.notes_count }} note{{ obj.notes_count|pluralize }}
         </span>
     </div>
