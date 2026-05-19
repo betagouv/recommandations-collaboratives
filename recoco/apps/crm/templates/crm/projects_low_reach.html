@@ -168,7 +168,7 @@
                                 <strong{% if project.reco_read|add:project.reco_read <= project.reco_total %} class="text-red-light"{% endif %}>{{ project.reco_read }}</strong>&nbsp;/&nbsp;{{ project.reco_total }}
                             </td>
                             <td>
-                                {% if project.reco_read <= 1 and not project.reco_total == 1 or project.reco_read <= 1 and project.reco_read == 0 %}
+                                {% if project.reco_read == 0 or project.reco_read == 1 and project.reco_total > 2 %}
                                     <span class="project-low-reach__status-badge project-low-reach__status-badge--warning"
                                           title="Aucune ou une seule recommandation a été lue">RECOS NON LUES</span>
                                 {% else %}

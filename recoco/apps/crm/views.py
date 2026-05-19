@@ -1280,13 +1280,11 @@ def make_low_reach_project_query(
     has_reaction_filter = Q(last_public_msg_at__isnull=False) | Q(has_task_status=True)
 
     if status_filter == "low_read":
-        # Recos non lues: ≤1 reco opened AND no sign of engagement.
-        # A project with a single reco that has been read (1/1) is fully
-        # read, so it must not be counted as "recos non lues".
-        qs = (
-            qs.filter(reco_read__lte=1)
-            .exclude(reco_total=1, reco_read=1)
-            .exclude(has_reaction_filter)
+        # Recos non lues, AND no sign of engagement:
+        #  - no reco read at all, OR
+        #  - a single reco read but more than 2 recos sent.
+        qs = qs.filter(Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)).exclude(
+            has_reaction_filter
         )
     else:
         # Aucune réaction (default): no engagement regardless of read count
