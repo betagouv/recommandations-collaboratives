@@ -1,12 +1,12 @@
 <div class="crm-results__project position-relative">
     <a href="{% url 'crm-project-details' obj.pk %}" class="stretched-link">
         <!--Project orga-->
-        <span class="crm-results__project-orga">{{ obj.org_name }}</span>
+        <span class="crm-results__project-orga">{{ obj.owner.profile.organization.name }}</span>
         <!--Project name-->
         <span class="crm-results__project-name">{{ obj.name }}</span>
     </a>
     <!--Status-->
-    <div class="crm-results__project-status-list">
+    <div class="crm-results__project-status-list fr-ml-3v">
         {% if obj.inactive_since %}
             <span class="crm-results__project-status-item crm-results__project-status--paused">En pause</span>
         {% endif %}
