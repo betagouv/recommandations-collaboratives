@@ -156,7 +156,7 @@ unfixable = ["ALL"]
 fixable = ["I"]
 exclude = [
     "docs/*",
-    "frontend_tests/*",
+    "recoco/frontend/cypress/*",
     "node_modules/*",
     "notebooks/*",
     "sql/*",
