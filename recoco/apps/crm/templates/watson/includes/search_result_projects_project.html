@@ -30,6 +30,19 @@
     </div>
     <div class="crm-results__project-info">
         <!--Portal-->
+        {% if request.site != obj.project_sites.origin.site %}
+            <span class="fr-mr-3v">
+                {% if obj.project_sites.origin.site.configuration.logo_small %}
+                    <img src="{{ obj.project_sites.origin.site.configuration.logo_small.url }}"
+                         width="16px"
+                         height="auto"
+                         alt="Logo {{ obj.project_sites.origin.site.name }}" />
+                {% else %}
+                    <span class="fr-icon-window-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                {% endif %}
+                provient de {{ obj.project_sites.origin.site.name }}
+            </span>
+        {% endif %}
         <!--Commune-->
         <span class="fr-mr-3v">
             <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
@@ -42,26 +55,3 @@
         </span>
     </div>
 </div>
-{% comment %} {% load static %}
-<div class="d-flex align-items-center">
-    <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-    </svg>
-    <div class="d-flex align-items-center">
-        {% if obj.deleted %}
-            <a href="{% url 'crm-project-details' obj.pk %}" class="text-decoration-line-through">{{ obj.name }}</a>
-        {% elif obj.inactive_since %}
-            <a href="{% url 'crm-project-details' obj.pk %}">[EN PAUSE] {{ obj.name }}</a>
-        {% else %}
-            <a href="{% url 'crm-project-details' obj.pk %}">{{ obj.name }}</a>
-        {% endif %}
-        <span class="fr-mr-2v fr-ml-2v">|</span>
-        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt-fill" />
-        </svg>
-        {{ obj.commune }} ({{ obj.commune.postal }})
-    </div>
-</div>
-<div class="fr-mt-1v d-flex small">
-    {% for tag in obj.tags.all %}<span class="fr-mx-1v badge rounded-pill bg-dark">{{ tag }}</span>{% endfor %}
-</div> {% endcomment %}
