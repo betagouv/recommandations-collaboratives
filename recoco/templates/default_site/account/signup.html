@@ -19,6 +19,7 @@
 {% block js %}
     {% vite_asset 'js/styles/home-auth.css.js' %}
     {% vite_asset 'js/styles/account-login.css.js' %}
+    {% vite_asset 'js/styles/background-override.css.js' %}
 {% endblock js %}
 {% block head_title %}
     {% trans "Signup" %}
@@ -33,7 +34,7 @@
             {% endif %}
         {% endwith %}
         <hr />
-        <div class="fr-form-group fr-mt-14v">
+        <div class="fr-form-group fr-m-7w">
             <fieldset class="d-flex flex-column align-items-center justify-content-center">
                 <h4 class="fr-mb-3w d-block ">Vous avez déjà un compte chez nous ?</h4>
                 <div class="fr-fieldset__content text-center">
