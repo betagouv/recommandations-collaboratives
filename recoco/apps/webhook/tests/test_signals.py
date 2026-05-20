@@ -143,6 +143,9 @@ def serialized_project(project, organization):
         "advisors_note": None,
         "exclude_stats": False,
         "muted": False,
+        "deleted": None,
+        "orga_owner": "",
+        "topics": [],
     }
 
 
