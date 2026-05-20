@@ -250,6 +250,9 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "owner": format_owner(data),
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,
+            "advisors_note": data.advisors_note,
+            "deleted": data.deleted,
+            "topics": [t.name for t in data.topics.all()],
         }
 
 
