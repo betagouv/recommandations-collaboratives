@@ -140,12 +140,7 @@ Alpine.store('sharedContentsPanel', {
           this.draftRecommendations[indexRecommendation],
         ];
         Alpine.store('app').displayToastMessage({
-          message: `L'ordre des brouillons a été modifié`,
-          timeout: 3000,
-          type: ToastType.success,
-        });
-        Alpine.store('app').displayToastMessage({
-          message: `L'ordre des brouillons a été modifié`,
+          message: `L'ordre des brouillons a été sauvegardé`,
           timeout: 3000,
           type: ToastType.success,
         });
