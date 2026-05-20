@@ -253,6 +253,11 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "advisors_note": data.advisors_note,
             "deleted": data.deleted,
             "topics": [t.name for t in data.topics.all()],
+            "orga_owner": (
+                data.owner.profile.organization.name
+                if data.owner and data.owner.profile.organization
+                else ""
+            ),
         }
 
 
