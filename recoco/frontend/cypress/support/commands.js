@@ -145,80 +145,109 @@ Cypress.Commands.add('declineCookies', () => {
  * @param {string} label - The label for the new project.
  * @param {Object} [objProject=project] - Optional project object with additional details.
  */
-Cypress.Commands.add('createProject', (label, objProject = project) => {
-  cy.visit('/');
+Cypress.Commands.add(
+  'createProject',
+  (
+    label,
+    objProject = project,
+    isSignupRequired = false,
+    userToSignup = {}
+  ) => {
+    cy.visit('/');
 
-  cy.get('[data-test-id="button-need-help"]')
-    .contains('Solliciter')
-    .click({ force: true });
+    cy.get('[data-test-id="button-need-help"]')
+      .contains('Solliciter')
+      .click({ force: true });
 
-  cy.url().should('include', '/onboarding/project');
+    cy.url().should('include', '/onboarding/project');
 
-  cy.get('#id_name')
-    .should('not.have.class', 'fr-input--error')
-    .type(label || objProject.name || project.name, { delay: 0, force: true })
-    .should('have.value', label || objProject.name || project.name)
-    .should('have.class', 'fr-input--valid');
-
-  cy.get('#id_location')
-    .should('not.have.class', 'fr-input--error')
-    .type(objProject.location || project.location, { delay: 0, force: true })
-    .should('have.value', objProject.location || project.location)
-    .should('have.class', 'fr-input--valid');
-
-  cy.get('[data-test-id="input-postcode"]')
-    .parent()
-    .should('not.have.class', 'fr-input-group--error');
-
-  cy.get('[data-test-id="input-postcode"]')
-    .type(objProject.postcode || project.postcode, { delay: 0, force: true })
-    .should('have.value', objProject.postcode || project.postcode)
-    .parent()
-    .should('have.class', 'fr-input-group--valid');
-
-  cy.get('[data-test-id="select-city"]')
-    .should('not.have.class', 'fr-select-group--error')
-    .focus();
-
-  cy.get('[data-test-id="select-city"]')
-    .should('contain.text', projectCommune.fields.name)
-    .should('have.value', projectCommune.fields.insee)
-    .parent()
-    .should('have.class', 'fr-select-group--valid');
-
-  cy.get('#id_description')
-    .should('not.have.class', 'fr-input--error')
-    .type(objProject.description || project.description, {
-      delay: 0,
-      force: true,
-    })
-    .should('have.value', objProject.description || project.description)
-    .should('have.class', 'fr-input--valid');
-
-  // Handle captcha
-  cy.document().then((doc) => {
-    const iframe = doc.getElementById('id_captcha').querySelector('iframe');
-    const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-    innerDoc.querySelector('.recaptcha-checkbox').click();
-    cy.wait(400);
-  });
-
-  cy.get('button[type="submit"]').click().should('be.disabled');
-
-  cy.url().should('include', '/onboarding/summary');
-
-  cy.url().then((url) => {
-    const idMatch = url.match(/\/onboarding\/summary\/(\d+)$/);
-
-    if (idMatch) {
-      const id = idMatch[1];
-      cy.log(`L'ID récupéré est : ${id}`);
-      cy.wrap(id).as('projectId');
-    } else {
-      throw new Error("ID non trouvé dans l'URL");
+    cy.get('#id_name')
+      .should('not.have.class', 'fr-input--error')
+      .type(label || objProject.name || project.name, { delay: 0, force: true })
+      .should('have.value', label || objProject.name || project.name)
+      .should('have.class', 'fr-input--valid');
+    if (isSignupRequired) {
+      cy.get('#id_email')
+        .should('not.have.class', 'fr-input--error')
+        .type(userToSignup['[name=email]'], { delay: 0, force: true })
+        .should('have.value', userToSignup['[name=email]'])
+        .should('have.class', 'fr-input--valid');
     }
-  });
-});
+    cy.get('#id_location')
+      .should('not.have.class', 'fr-input--error')
+      .type(objProject.location || project.location, { delay: 0, force: true })
+      .should('have.value', objProject.location || project.location)
+      .should('have.class', 'fr-input--valid');
+
+    cy.get('[data-test-id="input-postcode"]')
+      .parent()
+      .should('not.have.class', 'fr-input-group--error');
+
+    cy.get('[data-test-id="input-postcode"]')
+      .type(objProject.postcode || project.postcode, { delay: 0, force: true })
+      .should('have.value', objProject.postcode || project.postcode)
+      .parent()
+      .should('have.class', 'fr-input-group--valid');
+
+    cy.get('[data-test-id="select-city"]')
+      .should('not.have.class', 'fr-select-group--error')
+      .focus();
+
+    cy.get('[data-test-id="select-city"]')
+      .should('contain.text', projectCommune.fields.name)
+      .should('have.value', projectCommune.fields.insee)
+      .parent()
+      .should('have.class', 'fr-select-group--valid');
+
+    cy.get('#id_description')
+      .should('not.have.class', 'fr-input--error')
+      .type(objProject.description || project.description, {
+        delay: 0,
+        force: true,
+      })
+      .should('have.value', objProject.description || project.description)
+      .should('have.class', 'fr-input--valid');
+
+    // Handle captcha
+    cy.document().then((doc) => {
+      const iframe = doc.getElementById('id_captcha').querySelector('iframe');
+      const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      innerDoc.querySelector('.recaptcha-checkbox').click();
+      cy.wait(400);
+    });
+
+    cy.get('button[type="submit"]').click().should('be.disabled');
+
+    if (isSignupRequired) {
+      cy.url().should('include', '/onboarding/signup');
+      for (const key in userToSignup) {
+        if (Object.prototype.hasOwnProperty.call(userToSignup, key)) {
+          if (key != '[name=email]') {
+            const element = userToSignup[key];
+            cy.get(key).type(element, { delay: 0 });
+          }
+        }
+      }
+      cy.get('[type=submit]').click();
+
+      cy.url().should('include', 'onboarding/summary');
+    }
+
+    cy.url().should('include', '/onboarding/summary');
+
+    cy.url().then((url) => {
+      const idMatch = url.match(/\/onboarding\/summary\/(\d+)$/);
+
+      if (idMatch) {
+        const id = idMatch[1];
+        cy.log(`L'ID récupéré est : ${id}`);
+        cy.wrap(id).as('projectId');
+      } else {
+        throw new Error("ID non trouvé dans l'URL");
+      }
+    });
+  }
+);
 
 /**
  * Joins as an advisor if not already an advisor.
