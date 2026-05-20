@@ -347,7 +347,16 @@ class ResourceRevisionMeta(models.Model):
         on_delete=models.CASCADE,
         related_name="patches",
     )
+    MODIFICATION = "modification"
+    CREATION = "creation"
+
+    KIND_CHOICES = (
+        (MODIFICATION, "Modification"),
+        (CREATION, "Création"),
+    )
+
     status = models.IntegerField(choices=STATUS_CHOICES, default=PENDING)
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=MODIFICATION)
     proposed_by = models.ForeignKey(
         auth.User,
         on_delete=models.SET_NULL,

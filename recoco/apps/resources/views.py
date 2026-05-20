@@ -158,6 +158,20 @@ def resource_search(request):
         "task_recommendations"
     )
 
+    pending_patches_count = 0
+    pending_creations_count = 0
+    if has_perm(request.user, "manage_resources", request.site):
+        pending_qs = models.ResourceRevisionMeta.objects.filter(
+            status=models.ResourceRevisionMeta.PENDING,
+            resource__in=models.Resource.on_site.all(),
+        )
+        pending_patches_count = pending_qs.filter(
+            kind=models.ResourceRevisionMeta.MODIFICATION
+        ).count()
+        pending_creations_count = pending_qs.filter(
+            kind=models.ResourceRevisionMeta.CREATION
+        ).count()
+
     return render(
         request,
         "resources/resource/list.html",
@@ -168,6 +182,8 @@ def resource_search(request):
                 if request.user.is_authenticated
                 else []
             ),
+            "pending_patches_count": pending_patches_count,
+            "pending_creations_count": pending_creations_count,
             **locals(),
         },
     )

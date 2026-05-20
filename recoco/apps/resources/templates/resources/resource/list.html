@@ -26,6 +26,22 @@
          class="col-12 fr-p-3w fr-mx-auto">
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
+        {% if pending_patches_count or pending_creations_count %}
+            <div class="flag blue fr-mb-3w d-flex align-items-center justify-content-start">
+                <span class="title-info text-blue text-uppercase fr-my-0 fr-mr-2w">Modération</span>
+                <p class="text-info-custom text-blue fr-my-0">
+                    <a href="{% url 'resources-patches-list' %}">
+                        {% if pending_patches_count and pending_creations_count %}
+                            {{ pending_patches_count }} proposition{{ pending_patches_count|pluralize }} de modification et {{ pending_creations_count }} demande{{ pending_creations_count|pluralize }} de création en attente de relecture.
+                        {% elif pending_patches_count %}
+                            {{ pending_patches_count }} proposition{{ pending_patches_count|pluralize }} de modification en attente de relecture.
+                        {% else %}
+                            {{ pending_creations_count }} demande{{ pending_creations_count|pluralize }} de création en attente de relecture.
+                        {% endif %}
+                    </a>
+                </p>
+            </div>
+        {% endif %}
         <div class="d-flex justify-content-between align-items-center fr-mb-2w">
             <h1 class=" align-items-center fr-mb-2w">
                 {{ resources_count }} ressource{{ resources_count|pluralize }} {% if query or categories or limit_areas %}<span class="fw-400">trouvée{{ resources_count|pluralize }} pour {% if query %}"<em>{{ query }}</em>"{% if categories or limit_areas %},{% endif %}{% endif %}{% if categories %} {% if categories|length == 1 %}la catégorie{% else %}les catégories{% endif%} <em>{{ categories|join:', ' }}</em> {% if limit_areas %}et {% endif %}{% endif %}{% if limit_areas %}{% if limit_areas|length == 1 %}le département {{ limit_areas }}{% else %}{{ limit_areas|length }} départements{% endif %}{% endif %}.</span>{% endif %}

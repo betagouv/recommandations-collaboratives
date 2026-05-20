@@ -157,6 +157,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 revision=version.revision,
                 resource=resource,
                 proposed_by=request.user,
+                kind=ResourceRevisionMeta.CREATION,
             )
         return meta
 
@@ -203,6 +204,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 revision=pending_version.revision,
                 resource=resource,
                 proposed_by=request.user,
+                kind=ResourceRevisionMeta.MODIFICATION,
             )
 
             # Revert the live object to its state before the proposal
