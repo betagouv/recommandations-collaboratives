@@ -244,6 +244,7 @@ const config = {
         GravatarCache: resolve('./src/js/components/GravatarCache.js'),
         userCrmStyles: resolve('./src/js/styles/user-crm.css.js'),
         projectCardCrmStyles: resolve('./src/js/styles/project-card-crm.css.js'),
+        projectLowReachStyles: resolve('./src/js/styles/project-low-reach.css.js'),
       },
       output: {
         chunkFileNames: undefined,
