@@ -50,7 +50,7 @@
     "htmx.org": "^2.0.4",
     "idb": "^8.0.3",
     "intro.js": "^7.0.1",
-    "js-cookie": "^3.0.1",
+    "js-cookie": "^3.0.7",
     "leaflet": "^1.9.1",
     "leaflet-control-geocoder": "^2.4.0",
     "leaflet-providers": "^1.13.0",
