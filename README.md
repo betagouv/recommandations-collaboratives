@@ -218,7 +218,7 @@ yarn test
 
 #### Bout en bout
 
-Merci de trouver la documentation de tests front end [ici](./frontend_tests/README.md).
+Merci de trouver la documentation de tests front end [ici](./recoco/frontend/README.md).
 
 ### Tests Back End
 

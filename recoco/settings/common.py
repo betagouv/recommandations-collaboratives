@@ -566,6 +566,8 @@ DJANGO_WEBHOOK = {
         "survey.Answer",
         "taggit.TaggedItem",
         "tasks.Task",
+        # todo should not be necessary after #2124 as grist will have the info directly from project update
+        "home.UserProfile",
     ],
     "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
     "USE_CACHE": False,

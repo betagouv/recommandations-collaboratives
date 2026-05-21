@@ -156,7 +156,7 @@ unfixable = ["ALL"]
 fixable = ["I"]
 exclude = [
     "docs/*",
-    "frontend_tests/*",
+    "recoco/frontend/cypress/*",
     "node_modules/*",
     "notebooks/*",
     "sql/*",
@@ -206,7 +206,12 @@ django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev 
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
 [tool.uv-secure.vulnerability_criteria]
-ignore_vulnerabilities = ["GHSA-r374-rxx8-8654"] # to set if packages have unfixed acceptable vulnerabilities
+# to set if packages have unfixed acceptable vulnerabilities
+ignore_vulnerabilities = [
+    "GHSA-r374-rxx8-8654", # low impact no fix
+    "PYSEC-2025-183", # no fix alias 'CVE-2025-45768'
+    "PYSEC-2026-89" # supposedly fixed in 3.8.1 in this alias 'GHSA-5wmx-573v-2qwq' otherwise unclear
+]
 
 [dependency-groups]
 dev = [

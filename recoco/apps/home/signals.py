@@ -11,7 +11,7 @@ from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from recoco import verbs
@@ -42,8 +42,12 @@ def post_signup_workflow(sender, request, user, **kwargs):
     pass
 
 
-@receiver(post_save, sender=UserProfile)
+@receiver(pre_save, sender=UserProfile)
 def watch_organisation_to_understand_mystery(instance: UserProfile, **kwargs):
+    previous = UserProfile.objects.filter(id=instance.id).first()
+    if previous and previous.organization == instance.organization:
+        return
+
     if getattr(instance.organization, "id", None) == 781:
         text = (
             f"User {instance.user.id} was assigned to mysterious organization 'Mairie'"

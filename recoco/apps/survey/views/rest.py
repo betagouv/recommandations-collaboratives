@@ -1,22 +1,46 @@
+from django_filters import ModelChoiceFilter
+from django_filters import rest_framework as filters_drf
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
+from recoco.apps.projects.filters import request_hide_deleted_projects
 from recoco.apps.projects.models import Project
+from recoco.apps.survey.models import Answer, Question, Session
+from recoco.apps.survey.serializers import (
+    AnswerSerializer,
+    QuestionSerializer,
+    SessionSerializer,
+)
 from recoco.rest_api.permissions import IsStaffForSite
 
-from ..models import Answer, Question, Session
-from ..serializers import AnswerSerializer, QuestionSerializer, SessionSerializer
+
+# todo all_on_site and function should not be necessary after #2122
+def projects_not_deleted_by_default(request):
+    queryset = Project.all_on_site.for_user(request.user)
+    if request_hide_deleted_projects(request):
+        queryset = queryset.filter(deleted=None)
+    return queryset
+
+
+class SessionFilterSet(filters_drf.FilterSet):
+    # todo projects_not_deleted_by_default should not be necessary after #2122
+    project_id = ModelChoiceFilter(queryset=projects_not_deleted_by_default)
+
+    class Meta:
+        model = Session
+        fields = ["project_id"]
 
 
 class SessionView(ListAPIView):
     serializer_class = SessionSerializer
     permission_classes = [IsAuthenticated]
-    filterset_fields = ["project_id"]
+    filterset_class = SessionFilterSet
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        project_ids = Project.on_site.for_user(self.request.user).values_list(
+        # todo projects_not_deleted_by_default should not be necessary after #2122
+        project_ids = projects_not_deleted_by_default(self.request).values_list(
             "id", flat=True
         )
         return Session.objects.filter(project__in=project_ids)
@@ -28,7 +52,8 @@ class SessionAnswersView(ListAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        project_ids = Project.on_site.for_user(self.request.user).values_list(
+        # todo projects_not_deleted_by_default should not be necessary after #2122
+        project_ids = projects_not_deleted_by_default(self.request).values_list(
             "id", flat=True
         )
         try:
