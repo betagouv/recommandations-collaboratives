@@ -217,6 +217,8 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+MAGICAUTH_DEFAULT_AUTHENTICATION_BACKEND = "django.contrib.auth.backends.ModelBackend"
+
 # GUARDIAN
 GUARDIAN_USER_OBJ_PERMS_MODEL = "home.UserObjectPermissionOnSite"
 GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
