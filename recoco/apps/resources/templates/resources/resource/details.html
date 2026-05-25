@@ -18,6 +18,9 @@
 {% endblock og_description %}
 {% block js %}
     {% vite_asset 'js/styles/resources.css.js' %}
+    {% if resource_sidebar_panels %}
+        {% vite_asset 'js/apps/resourceDetails.js' %}
+    {% endif %}
 {% endblock js %}
 {% block css %}
     <style type="text/css">
@@ -166,6 +169,9 @@
                     {% include "resources/resource/fragments/project_used.html" %}
                 {% endif %}
             </div>
+            {% for panel in resource_sidebar_panels %}
+                {{ panel|safe }}
+            {% endfor %}
         </div>
     </div>
 {% endblock content %}

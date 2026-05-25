@@ -45,6 +45,7 @@ const config = {
         advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),
         auth: resolve('./src/js/apps/auth.js'),
         projectDetails: resolve('./src/js/apps/projectDetails.js'),
+        resourceDetails: resolve('./src/js/apps/resourceDetails.js'),
         projectShare: resolve('./src/js/apps/projectShare.js'),
         projectAdministration: resolve(
           './src/js/apps/projectAdministration.js'
