@@ -16,6 +16,7 @@ Documentation de Recommandations Collaboratives
    permissions.rst
    workflows.rst
    js_components.rst
+   plugins.rst
 
 
 

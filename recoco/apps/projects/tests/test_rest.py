@@ -157,10 +157,6 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "tags",
         "exclude_stats",
         "muted",
-        "topics",
-        "advisors_note",
-        "deleted",
-        "orga_owner",
     ]
     assert set(data.keys()) == set(expected)
 

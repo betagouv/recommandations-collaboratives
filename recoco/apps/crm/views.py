@@ -65,6 +65,7 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
+from recoco.apps.plugins.manager import get_plugin_manager
 from recoco.apps.projects.models import (
     Document,
     Project,
@@ -204,6 +205,12 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
 
     def get_object(self, queryset=None):
         return self.request.site.configuration
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pm = get_plugin_manager()
+        context["registered_plugins"] = {name for name, _ in pm.list_name_plugin()}
+        return context
 
     def form_valid(self, form):
         # Invalidate cache for CRISP token

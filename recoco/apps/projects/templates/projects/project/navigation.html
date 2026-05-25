@@ -36,7 +36,23 @@
                         </label>
                     </div>
                 {% endif %}
-                {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
+                {% for plugin_tab in plugin_tabs %}
+                    <div class="fr-segmented__element">
+                        <input value="plugin-0"
+                               type="radio"
+                               id="segmented-control-overview"
+                               name="segmented-control-project"
+                               @click="window.location='{% url plugin_tab.0 project.pk %}'">
+
+                        <label class="fr-label" for="segmented-control-survey">
+                            <a class="stretched-link"
+                               href="{% url plugin_tab.0 project.pk %}">{{  plugin_tab.1 }}
+                            </a>
+                        </label>
+                    </div>
+                {% endfor %}
+
+                         {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
                     <div class="fr-segmented__element"
                          :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage==2}">
                         <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage==2">
