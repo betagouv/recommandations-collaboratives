@@ -372,6 +372,177 @@ raises ``NoReverseMatch``, so guard it with a check on ``enabled_plugins``:
     {% endif %}
 
 
+REST API
+========
+
+Plugins can expose their own DRF API endpoints under the core ``/api/`` prefix
+without touching ``recoco/rest_api/urls.py``.
+
+Declare a ``rest_urls_module`` attribute on the plugin class pointing to a
+module that contains a standard ``urlpatterns`` list:
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    class GiphyPlugin:
+        urls_module = "plugin_giphy.urls"
+        rest_urls_module = "plugin_giphy.rest_urls"   # ← new
+
+.. code-block:: python
+
+    # plugin_giphy/rest_urls.py
+    from django.urls import path
+    from .rest_api import GiphySearchAPIView
+
+    urlpatterns = [
+        path("giphy/search/", GiphySearchAPIView.as_view(), name="plugin-giphy-search"),
+    ]
+
+The core's ``recoco/rest_api/urls.py`` discovers all installed plugins that
+carry ``rest_urls_module`` at import time and appends their patterns to the
+global ``urlpatterns``.  The resulting endpoint is served under ``/api/``:
+
+.. code-block:: text
+
+    /api/giphy/search/   →  GiphySearchAPIView
+
+
+Frontend (Vite / Alpine)
+========================
+
+Plugins can ship their own JavaScript — including npm dependencies — without
+modifying the core frontend's ``package.json`` or ``vite.config.js``.
+
+Plugin package layout
+---------------------
+
+Add a ``package.json`` at the plugin repo root.  The ``recocoPlugin.viteEntries``
+field maps Vite entry names to JS file paths relative to the **plugin package
+directory**:
+
+.. code-block:: json
+
+    {
+      "name": "plugin-giphy",
+      "private": true,
+      "recocoPlugin": {
+        "viteEntries": {
+          "giphySearch": "js/giphySearch.js"
+        }
+      },
+      "dependencies": {
+        "some-npm-lib": "^1.0.0"
+      }
+    }
+
+Install the plugin's own npm deps once:
+
+.. code-block:: bash
+
+    cd /path/to/plugin-giphy
+    npm install
+
+Writing the Alpine controller
+-----------------------------
+
+Place the entry file at the path declared in ``viteEntries``.  Register Alpine
+data objects with ``Alpine.data()``:
+
+.. code-block:: javascript
+
+    // plugin_giphy/js/giphySearch.js
+    import Alpine from 'alpinejs';
+    import htmx from 'htmx.org';
+
+    window.htmx = htmx;   // make htmx available to HTMX-powered templates
+
+    function GiphySearch() {
+      return {
+        query: '',
+        results: [],
+        async search() { /* ... */ },
+      };
+    }
+
+    Alpine.data('GiphySearch', GiphySearch);
+
+The plugin entry can import packages from its own ``node_modules/`` (Node's
+module resolution walks up the directory tree and finds them there) as well
+as packages from the core frontend's ``node_modules/`` (Alpine, Leaflet,
+lodash, etc.).
+
+Generating Vite entry proxies
+------------------------------
+
+Before building or starting the Vite dev server, run:
+
+.. code-block:: bash
+
+    python manage.py collect_plugin_vite_entries
+
+This command:
+
+1. Discovers all installed plugins that declare ``vite_entries`` on their
+   plugin class (matching the keys in ``package.json`` ``recocoPlugin.viteEntries``).
+2. Writes a thin proxy file for each entry into
+   ``recoco/frontend/src/js/plugins/`` — e.g.
+   ``src/js/plugins/giphySearch.js`` containing::
+
+       import '/abs/path/to/plugin_giphy/js/giphySearch.js';
+
+3. Writes ``recoco/frontend/plugin-entries.json`` mapping entry name →
+   proxy path relative to the Vite source root.
+
+Both generated artefacts are gitignored; they must be regenerated whenever a
+plugin is installed or removed.
+
+The core ``vite.config.js`` reads ``plugin-entries.json`` at build time and
+adds the proxy files as named Vite inputs automatically — no manual edits
+required.
+
+Loading the bundle in a template
+----------------------------------
+
+Use ``{% vite_asset %}`` with the proxy path (always under ``js/plugins/``):
+
+.. code-block:: html+django
+
+    {% block js %}
+        {{ block.super }}
+        {% vite_asset 'js/plugins/giphySearch.js' %}
+    {% endblock js %}
+
+The manifest key that ``django-vite`` looks up is the path relative to the
+Vite ``root`` (``src/``), i.e. ``js/plugins/giphySearch.js``.
+
+Summary of the full workflow
+-----------------------------
+
+.. code-block:: text
+
+    ┌───────────────────────────────────────────────────────────────┐
+    │ Plugin repo                                                   │
+    │  package.json  →  recocoPlugin.viteEntries                   │
+    │  plugin.py     →  vite_entries = {"giphySearch": "js/..."}   │
+    │  js/giphySearch.js  (Alpine controller, own npm deps)        │
+    └────────────────────────────┬──────────────────────────────────┘
+                                 │  python manage.py collect_plugin_vite_entries
+                                 ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │ Core repo  (recoco/frontend/)                                 │
+    │  plugin-entries.json              (gitignored, generated)    │
+    │  src/js/plugins/giphySearch.js    (gitignored, proxy file)   │
+    │  vite.config.js  reads plugin-entries.json automatically     │
+    └───────────────────────────────────────────────────────────────┘
+                                 │  npm run build / npm run dev
+                                 ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │ Output                                                        │
+    │  dist/  contains the built plugin bundle                      │
+    │  {% vite_asset 'js/plugins/giphySearch.js' %}                │
+    └───────────────────────────────────────────────────────────────┘
+
+
 Activation
 ==========
 
@@ -387,7 +558,16 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
     python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
 
-4. In the Django admin, edit the ``SiteConfiguration`` for the target site:
+4. If the plugin ships JavaScript, install its npm deps and generate Vite proxies::
+
+    cd /path/to/plugin-giphy && npm install
+    cd /path/to/recoco && python manage.py collect_plugin_vite_entries
+
+5. Rebuild the frontend::
+
+    cd recoco/frontend && npm run build
+
+6. In the Django admin, edit the ``SiteConfiguration`` for the target site:
 
    - Set ``schema_name`` to ``tenant_paris``.
    - Add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list.

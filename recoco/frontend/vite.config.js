@@ -1,4 +1,19 @@
+import { readFileSync } from 'fs';
 import { resolve } from 'path';
+
+function discoverPluginEntries() {
+  try {
+    const json = readFileSync(resolve('./plugin-entries.json'), 'utf-8');
+    const entries = JSON.parse(json);
+    const result = {};
+    for (const [name, relPath] of Object.entries(entries)) {
+      result[name] = resolve('./src', relPath);
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
 
 const config = {
   plugins: [],
@@ -245,6 +260,7 @@ const config = {
         GravatarCache: resolve('./src/js/components/GravatarCache.js'),
         userCrmStyles: resolve('./src/js/styles/user-crm.css.js'),
         projectCardCrmStyles: resolve('./src/js/styles/project-card-crm.css.js'),
+        ...discoverPluginEntries(),
       },
       output: {
         chunkFileNames: undefined,
