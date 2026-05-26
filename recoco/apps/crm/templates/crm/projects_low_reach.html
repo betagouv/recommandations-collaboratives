@@ -62,7 +62,7 @@
                 <div class="project-low-reach__status-wrapper">
                     <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' %}warning{% else %}info{% endif %}"
                           title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% else %}Pas de statut sur reco, de message du demandeur ou de tag d'impact{% endif %}">
-                        {% if status_filter == 'low_read' %}RECOS NON LUES{% else %}AUCUNE RÉACTION{% endif %}
+                        {% if status_filter == 'low_read' %}Recos non lues{% else %}Aucune réaction{% endif %}
                     </span>
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
                           aria-hidden="true"></span>
@@ -113,13 +113,13 @@
                 </colgroup>
                 <thead class="project-table__thead">
                     <tr>
-                        <th scope="col">DOSSIER</th>
-                        <th scope="col">CONSEILLERS</th>
-                        <th scope="col">DERNIÈRE ACT.</th>
-                        <th scope="col">DERNIÈRE RECO.</th>
-                        <th scope="col">RECOS LUES</th>
-                        <th scope="col">STATUT</th>
-                        <th scope="col">ACTIONS</th>
+                        <th scope="col">Dossier</th>
+                        <th scope="col">Conseillers</th>
+                        <th scope="col">Dernière act.</th>
+                        <th scope="col">Dernière reco.</th>
+                        <th scope="col">Recos lues</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -170,10 +170,10 @@
                             <td>
                                 {% if project.reco_read == 0 or project.reco_read == 1 and project.reco_total > 2 %}
                                     <span class="project-low-reach__status-badge project-low-reach__status-badge--warning"
-                                          title="Aucune ou une seule recommandation a été lue">RECOS NON LUES</span>
+                                          title="Aucune ou une seule recommandation a été lue">Recos non lues</span>
                                 {% else %}
                                     <span class="project-low-reach__status-badge project-low-reach__status-badge--info"
-                                          title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">AUCUNE RÉACTION</span>
+                                          title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">Aucune réaction</span>
                                 {% endif %}
                             </td>
                             <td>
