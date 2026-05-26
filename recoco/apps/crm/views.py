@@ -725,15 +725,11 @@ def user_details(request, user_id):
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     actions = (
-        (
-            crm_user.actor_actions.exclude(
-                verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
-            )
-            | crm_user.action_object_actions.all()
+        crm_user.actor_actions.exclude(
+            verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
         )
-        .prefetch_related("actor", "action_object", "target")
-        .order_by("-timestamp")[:50]
-    )
+        | crm_user.action_object_actions.all()
+    ).order_by("-timestamp")[:50]
 
     user_ct = ContentType.objects.get_for_model(User)
 
