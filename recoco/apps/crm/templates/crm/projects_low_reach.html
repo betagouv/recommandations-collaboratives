@@ -61,7 +61,7 @@
                        for="status-filter">Statut :</label>
                 <div class="project-low-reach__status-wrapper">
                     <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' %}warning{% else %}info{% endif %}"
-                          title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% else %}Pas de statut sur reco, de message du demandeur ou de tag d'impact{% endif %}">
+                          title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% else %}Pas de statut sur recomandation, de message du demandeur ou de tag d'impact{% endif %}">
                         {% if status_filter == 'low_read' %}Recos non lues{% else %}Aucune réaction{% endif %}
                     </span>
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
@@ -189,14 +189,12 @@
                                         {% if project.muted %}
                                             <input type="hidden" name="notifications" value="on">
                                             <button type="submit"
-                                                    class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative"
-                                                    title="Activer les notifications">
+                                                    class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative">
                                                 Activer les notifications
                                             </button>
                                         {% else %}
                                             <button type="submit"
-                                                    class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative"
-                                                    title="Désactiver les notifications">
+                                                    class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative">
                                                 Désactiver les notifications
                                             </button>
                                         {% endif %}
