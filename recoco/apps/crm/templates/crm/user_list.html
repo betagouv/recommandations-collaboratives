@@ -71,11 +71,15 @@
                         </svg>
                     </div>
                 </div>
-                <div x-data="DepartmentsFilterWrapper({{ selected_departments|default:'[]' }})"
-                     @selected-departments="selectedCodes = normalize($event.detail)"
+                <div x-data="DepartmentsFilterWrapper({{ selected_departments|default:'[]' }}, {{ all_departments_selected|yesno:'true,false' }})"
+                     @is-select-all-departments="onSelectAll($event.detail)"
+                     @selected-departments="onSelected($event.detail)"
                      @user-close-selector="$nextTick(() => $el.closest('form').submit())">
                     <template x-for="code in selectedCodes" :key="code">
-                        <input type="hidden" name="departments" :value="code">
+                        <input type="hidden" name="departments" :value="code" :disabled="allSelected">
+                    </template>
+                    <template x-if="allSelected">
+                        <input type="hidden" name="all_departments_selected" value="1">
                     </template>
                     {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" show_count_label=True %}
                 </div>

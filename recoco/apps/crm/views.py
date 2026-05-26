@@ -487,6 +487,7 @@ def user_list(request):
     staff_group_name = make_group_name_for_site("staff", site)
     admin_group_name = make_group_name_for_site("admin", site)
     selected_departments = request.GET.getlist("departments")
+    all_departments_selected = request.GET.get("all_departments_selected") == "1"
 
     base_qs = (
         User.objects.filter(profile__sites=site, profile__deleted__isnull=True)
@@ -527,7 +528,7 @@ def user_list(request):
         )
     )
 
-    users = filters.UserFilter(request.GET, queryset=base_qs)
+    users = filters.UserFilter(request.GET, queryset=base_qs, request=request)
 
     has_active_filter = any(
         [

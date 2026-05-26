@@ -66,6 +66,7 @@ class UserFilter(django_filters.FilterSet):
         field_name="profile__departments",
         to_field_name="code",
         queryset=geomatics_models.Department.objects.all(),
+        method="departments_filter",
     )
 
     inactive = django_filters.BooleanFilter(
@@ -99,6 +100,17 @@ class UserFilter(django_filters.FilterSet):
         if name != "inactive" or not value:
             return queryset
         return queryset.filter(is_active=False)
+
+    def departments_filter(self, queryset, name, value):
+        # "Tout sélectionner" send the info `all_departments_selected=1` :
+        # it skips the dept filter.
+        if self.request and self.request.GET.get("all_departments_selected") == "1":
+            return queryset
+        if not value:
+            return queryset
+        if len(value) >= geomatics_models.Department.objects.count():
+            return queryset
+        return queryset.filter(profile__departments__in=value).distinct()
 
     def role_filter(self, queryset, name, value):
         """Filter user having the provided role or all if role is unknown"""
