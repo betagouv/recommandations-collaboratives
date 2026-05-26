@@ -1265,7 +1265,6 @@ def make_low_reach_project_query(
                 Task.objects.filter(
                     project=OuterRef("pk"),
                     public=True,
-                    deleted__isnull=True,
                 ).exclude(status=Task.PROPOSED)
             ),
         )
