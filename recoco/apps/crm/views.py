@@ -1294,7 +1294,9 @@ def make_low_reach_project_query(
 
     if search_q:
         qs = qs.filter(
-            Q(name__icontains=search_q) | Q(commune__name__icontains=search_q)
+            Q(name__icontains=search_q)
+            | Q(commune__name__icontains=search_q)
+            | Q(members__profile__organization__name__icontains=search_q)
         )
 
     return qs.order_by("-last_members_activity_at").distinct()
