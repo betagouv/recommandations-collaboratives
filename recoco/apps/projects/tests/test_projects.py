@@ -370,6 +370,20 @@ def test_project_knowledge_allows_empty_questionset(request, client, project):
     assert response.status_code == 200
 
 
+# actions (legacy URL — redirect to conversations tab with action panel open)
+@pytest.mark.django_db
+def test_project_actions_redirects_to_conversations(request, client, project):
+    url = reverse("projects-project-detail-actions", args=[project.id])
+    expected = (
+        reverse("projects-project-detail-conversations", args=[project.id]) + "#actions"
+    )
+    with login(client) as user:
+        utils.assign_collaborator(user, project)
+        response = client.get(url)
+    assert response.status_code == 302
+    assert response.url == expected
+
+
 # conversations
 @pytest.mark.django_db
 def test_project_conversations_not_available_for_unprivileged_user(request, client):
