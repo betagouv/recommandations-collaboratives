@@ -96,7 +96,6 @@ class PushTypeActionForm(forms.Form):
     )
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)
-    next = forms.CharField(required=False)
     project = forms.ModelChoiceField(
         queryset=projects_models.Project.objects.none(),
         empty_label="(Veuillez sélectionner un dossier)",
@@ -181,7 +180,6 @@ class UpdateTaskForm(forms.ModelForm):
 
     content = MarkdownxFormField(required=False)
     topic_name = forms.CharField(required=False)
-    next = forms.CharField(required=False)
 
     class Meta:
         model = models.Task
