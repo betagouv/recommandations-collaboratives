@@ -23,7 +23,6 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         ? JSON.parse(projectContext[key].textContent)
         : '';
     }
-    debugger;
 
     this.$store.explorationIA.setup({ ...config, projectContext });
     this.$watch('$store.explorationIA.currentPhase', () => {
