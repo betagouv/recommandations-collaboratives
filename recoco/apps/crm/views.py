@@ -729,7 +729,7 @@ def user_details(request, user_id):
             verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
         )
         | crm_user.action_object_actions.all()
-    )
+    ).order_by("-timestamp")[:50]
 
     user_ct = ContentType.objects.get_for_model(User)
 
