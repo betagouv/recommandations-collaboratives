@@ -1416,10 +1416,12 @@ def crm_projects_with_low_reach_as_csv(request):
             referent_first = owner.first_name
             referent_last = owner.last_name
             referent_org = (
-                str(profile.organization) if profile and profile.organization else ""
+                profile.organization.name if profile and profile.organization else ""
             )
             referent_phone = (
-                str(profile.phone_no) if profile and profile.phone_no else ""
+                profile.phone_no.as_international
+                if profile and profile.phone_no
+                else ""
             )
             referent_email = owner.email
             referent_position = profile.organization_position if profile else ""
