@@ -14,7 +14,7 @@
 {% block content %}
     <div class="fr-container fr-container--fluid fr-my-md-14v">
         <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-8">
                 <div class="fr-container fr-px-md-0 fr-py-10v fr-py-md-14v">
                     <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
                         <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
@@ -45,7 +45,6 @@
                                            name="{{ form.email.name }}"
                                            value="{{ form.email.value|default:'' }}"
                                            autocomplete="email"
-                                           placeholder="nom."
                                            required />
                                     {% for error in form.email.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
                                 </div>
