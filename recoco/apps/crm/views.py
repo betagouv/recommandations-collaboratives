@@ -1380,26 +1380,25 @@ def crm_projects_with_low_reach_as_csv(request):
         headers={"Content-Disposition": content_disposition},
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "nom_dossier",
-            "commune",
-            "insee",
-            "conseillers",
-            "recos_lues",
-            "recos_total",
-            "derniere_activite",
-            "derniere_reco",
-            "statut",
-            "referent_prenom",
-            "referent_nom",
-            "referent_organisation",
-            "referent_telephone",
-            "referent_email",
-            "referent_fonction",
-        ]
-    )
+    fieldnames = [
+        "nom_dossier",
+        "commune",
+        "insee",
+        "conseillers",
+        "recos_lues",
+        "recos_total",
+        "derniere_activite",
+        "derniere_reco",
+        "statut",
+        "referent_prenom",
+        "referent_nom",
+        "referent_organisation",
+        "referent_telephone",
+        "referent_email",
+        "referent_fonction",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for project in low_reach_projects:
         # Same rule as the HTML table badge: "recos non lues" only when
@@ -1430,23 +1429,25 @@ def crm_projects_with_low_reach_as_csv(request):
             referent_phone = referent_email = referent_position = ""
 
         writer.writerow(
-            [
-                project.name,
-                project.commune.name,
-                project.commune.insee,
-                ", ".join(a.get_full_name() for a in project.switchtenders.all()),
-                project.reco_read,
-                project.reco_total,
-                project.last_members_activity_at,
-                project.last_reco_at or "",
-                project_status,
-                referent_first,
-                referent_last,
-                referent_org,
-                referent_phone,
-                referent_email,
-                referent_position,
-            ]
+            {
+                "nom_dossier": project.name,
+                "commune": project.commune.name,
+                "insee": project.commune.insee,
+                "conseillers": ", ".join(
+                    a.get_full_name() for a in project.switchtenders.all()
+                ),
+                "recos_lues": project.reco_read,
+                "recos_total": project.reco_total,
+                "derniere_activite": project.last_members_activity_at,
+                "derniere_reco": project.last_reco_at or "",
+                "statut": project_status,
+                "referent_prenom": referent_first,
+                "referent_nom": referent_last,
+                "referent_organisation": referent_org,
+                "referent_telephone": referent_phone,
+                "referent_email": referent_email,
+                "referent_fonction": referent_position,
+            }
         )
 
     return response
@@ -1559,28 +1560,27 @@ def crm_list_topics_as_csv(request):
         },
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "topic",
-            "usage_count",
-            "usage_count_by_project",
-            "usage_count_by_task",
-            "project_ids",
-            "reco_ids",
-        ]
-    )
+    fieldnames = [
+        "topic",
+        "usage_count",
+        "usage_count_by_project",
+        "usage_count_by_task",
+        "project_ids",
+        "reco_ids",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for name, usage in topics.items():
         writer.writerow(
-            [
-                name,
-                usage[0],
-                usage[1],
-                usage[2],
-                [project.pk for project in usage[3]],
-                [task.pk for task in usage[4]],
-            ]
+            {
+                "topic": name,
+                "usage_count": usage[0],
+                "usage_count_by_project": usage[1],
+                "usage_count_by_task": usage[2],
+                "project_ids": [project.pk for project in usage[3]],
+                "reco_ids": [task.pk for task in usage[4]],
+            }
         )
 
     return response
@@ -1632,25 +1632,24 @@ def project_list_by_tags_as_csv(request):
         },
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "tag",
-            "usage_count",
-            "project_ids",
-            "project_names",
-        ]
-    )
+    fieldnames = [
+        "tag",
+        "usage_count",
+        "project_ids",
+        "project_names",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for tag in tags:
         projects = Project.on_site.filter(tags__name=tag.name).order_by("name")
         writer.writerow(
-            [
-                tag.name,
-                tag.project__count,
-                list(projects.values_list(flat=True)),
-                ", ".join([f'"{p.name}"' for p in projects]),
-            ]
+            {
+                "tag": tag.name,
+                "usage_count": tag.project__count,
+                "project_ids": list(projects.values_list(flat=True)),
+                "project_names": ", ".join([f'"{p.name}"' for p in projects]),
+            }
         )
 
     return response
