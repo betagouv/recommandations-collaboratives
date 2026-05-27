@@ -184,7 +184,21 @@ def crm_search(request):
 
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
-        # Code by Claude
+        # Used to remove duplicate project also found in ProjectAnnotation
+        project_ids = {
+            entry.object.pk
+            for entry in search_results
+            if isinstance(entry.object, Project)
+        }
+        search_results = [
+            entry
+            for entry in search_results
+            if not (
+                isinstance(entry.object, models.ProjectAnnotations)
+                and entry.object.project_id in project_ids
+            )
+        ]
+
         grouped_search_results = OrderedDict(
             (
                 (
@@ -209,15 +223,11 @@ def crm_search(request):
             )
         )
 
-        if len(search_results):
-            is_empty_result = False
-        else:
-            is_empty_result = True
+        is_empty_result = not search_results
 
-        # Code by Claude
+        # Count of Orga CRM note
         organization_ct = ContentType.objects.get_for_model(Organization)
 
-        # Code by Claude
         for entry in search_results:
             obj = entry.object
             if isinstance(obj, (Project, models.ProjectAnnotations)):
@@ -225,13 +235,11 @@ def crm_search(request):
             elif isinstance(obj, User):
                 grouped_search_results["users"]["items"].append(entry)
             elif isinstance(obj, Organization):
-                org_user_ids = list(
-                    User.objects.filter(
-                        profile__in=obj.registered_profiles.all(),
-                        profile__sites=site,
-                    ).values_list("id", flat=True)
-                )
-                obj.members_count = len(org_user_ids)
+                org_user_ids = User.objects.filter(
+                    profile__in=obj.registered_profiles.all(),
+                    profile__sites=site,
+                ).values("id")
+                obj.members_count = org_user_ids.count()
                 obj.projects_count = (
                     Project.on_site.filter(
                         Q(members__in=org_user_ids) | Q(switchtenders__in=org_user_ids)
