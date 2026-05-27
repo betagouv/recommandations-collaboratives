@@ -1340,10 +1340,6 @@ def crm_list_projects_with_low_reach(request):
     page_number = request.GET.get("page") or 1
     page_obj = paginator.get_page(page_number)
 
-    base_qs = request.GET.copy()
-    base_qs.pop("page", None)
-    base_querystring = base_qs.urlencode()
-
     return render(
         request,
         "crm/projects_low_reach.html",
@@ -1352,7 +1348,6 @@ def crm_list_projects_with_low_reach(request):
             "page_obj": page_obj,
             "paginator": paginator,
             "total_count": total_count,
-            "base_querystring": base_querystring,
             "days": days,
             "status_filter": status_filter,
             "mine_only": mine_only,

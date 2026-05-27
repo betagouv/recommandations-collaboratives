@@ -233,7 +233,7 @@
                     {% if page_obj.has_previous %}
                         <li>
                             <a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label"
-                               href="?{% if base_querystring %}{{ base_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                               href="{% querystring page=page_obj.previous_page_number %}"
                                title="Page précédente">Page précédente</a>
                         </li>
                     {% endif %}
@@ -246,7 +246,7 @@
                                        title="Page {{ i }}">{{ i }}</a>
                                 {% else %}
                                     <a class="fr-pagination__link"
-                                       href="?{% if base_querystring %}{{ base_querystring }}&{% endif %}page={{ i }}"
+                                       href="{% querystring page=i %}"
                                        title="Page {{ i }}">{{ i }}</a>
                                 {% endif %}
                             </li>
@@ -263,7 +263,7 @@
                     {% if page_obj.has_next %}
                         <li>
                             <a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label"
-                               href="?{% if base_querystring %}{{ base_querystring }}&{% endif %}page={{ page_obj.next_page_number }}"
+                               href="{% querystring page=page_obj.next_page_number %}"
                                title="Page suivante">Page suivante</a>
                         </li>
                     {% endif %}
