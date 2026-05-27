@@ -19,18 +19,44 @@
                           aria-hidden="true"></span>
                 </button>
             </div>
-            <!-- Mode lecture -->
-            <p x-show="!$store.explorationIA.isEditingContext"
-               class="fr-callout__text fr-mt-1w"
-               x-text="$store.explorationIA.projectContext"></p>
-            <!-- Mode édition -->
-            <div x-show="$store.explorationIA.isEditingContext" class="fr-mt-1w">
-                <textarea x-model="$store.explorationIA.projectContext"
-                          class="fr-input"
-                          rows="4"
-                          placeholder="Décrivez le contexte de votre projet..."
-                          data-test-id="exploration-ia-context-input"></textarea>
-                <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA à mieux comprendre votre projet.</p>
+            <div>
+                <p class="fr-callout__text fr-mt-1w">
+                    <span class="fw-700">Nom</span>
+                    :
+                    <span x-text="$store.explorationIA.projectContext.name"></span>
+                </p>
+                <p class="fr-callout__text fr-mt-1w">
+                    <span class="fw-700">Localisation</span>
+                    :
+                    <span x-text="$store.explorationIA.projectContext.location"></span>
+                    (<span x-text="$store.explorationIA.projectContext.postal"></span>)
+                </p>
+                <template x-if="$store.explorationIA.projectContext.tags">
+                    <p class="fr-callout__text fr-mt-1w">
+                        <span class="fw-700">Tags</span>
+                        :
+                        <template x-for="tag in $store.explorationIA.projectContext.tags">
+                            <span x-text="tag.name+' '"></span>
+                        </template>
+                    </p>
+                </template>
+                <!-- Mode lecture -->
+                <div x-show="!$store.explorationIA.isEditingContext">
+                    <p class="fr-callout__text fr-mt-1w">
+                        <span class="fw-700">Description</span>
+                        :
+                        <span x-text="$store.explorationIA.projectContext.description"></span>
+                    </p>
+                </div>
+                <!-- Mode édition -->
+                <div x-show="$store.explorationIA.isEditingContext" class="fr-mt-1w">
+                    <textarea x-model="$store.explorationIA.projectContext.description"
+                              class="fr-input"
+                              rows="4"
+                              placeholder="Décrivez le contexte de votre projet..."
+                              data-test-id="exploration-ia-context-input"></textarea>
+                    <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA à mieux comprendre votre projet.</p>
+                </div>
             </div>
         </div>
         <template x-if="$store.explorationIA.currentPhase < 2">
@@ -53,7 +79,8 @@
                             :disabled="$store.explorationIA.isLoading || !$store.explorationIA.searchQuery.trim()"
                             data-test-id="exploration-ia-search-btn">
                         <span x-show="!$store.explorationIA.isLoading">Rechercher</span>
-                        <span x-show="$store.explorationIA.isLoading" class="spinner-border spinner-border-sm"></span>
+                        <span x-show="$store.explorationIA.isLoading"
+                              class="spinner-border spinner-border-sm"></span>
                     </button>
                 </div>
             </div>

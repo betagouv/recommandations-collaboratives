@@ -9,9 +9,22 @@ import Alpine from 'alpinejs';
  */
 Alpine.data('ExplorationIA', (config = {}) => ({
   init() {
-    // contexte projet sérialisé en JSON pour éviter les injections JS via le nom du projet ou de la commune.
-    const contextEl = document.getElementById('exploration-ia-context');
-    const projectContext = contextEl ? JSON.parse(contextEl.textContent) : '';
+    const projectContext = {
+      name: document.getElementById('project-name'),
+      description: document.getElementById('project-description'),
+      location: document.getElementById('project-commune-name'),
+      postal: document.getElementById('project-commune-postal'),
+      department: document.getElementById('project-department-code'),
+      region: document.getElementById('project-region'),
+      tags: document.getElementById('project-tags'),
+    };
+    for (const key in projectContext) {
+      projectContext[key] = projectContext[key]
+        ? JSON.parse(projectContext[key].textContent)
+        : '';
+    }
+    debugger;
+
     this.$store.explorationIA.setup({ ...config, projectContext });
     this.$watch('$store.explorationIA.currentPhase', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });

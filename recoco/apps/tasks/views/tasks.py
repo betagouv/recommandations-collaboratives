@@ -475,6 +475,7 @@ def exploration_ia_task(request, project_id):
     project = get_object_or_404(
         project_models.Project, sites=request.site, pk=project_id
     )
+    project_tags = list(project.tags.values("name"))
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 

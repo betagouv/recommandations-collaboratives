@@ -18,6 +18,7 @@ Alpine.store('explorationIA', {
   projectId: null,
   siteId: null,
   projectContext: '',
+  projectContextDisplayed: '',
   isEditingContext: false,
 
   // === PHASES ===
@@ -60,6 +61,10 @@ Alpine.store('explorationIA', {
     this.projectId = config.projectId ?? null;
     this.siteId = config.siteId ?? null;
     this.projectContext = config.projectContext || '';
+    console.log(config.projectContext);
+    this.projectContextDisplayed = Object.entries(config.projectContext)
+      .map((x) => x[1])
+      .join('. ');
   },
 
   // ============================================================
@@ -75,9 +80,25 @@ Alpine.store('explorationIA', {
     this.error = null;
 
     try {
-      const data = await askLLM(this.searchQuery.trim(), this.projectContext, {
-        siteId: this.siteId,
-      });
+      const context = {
+        'Nom du projet': this.projectContext.name,
+        Localisation: this.projectContext.location
+          ? `${this.projectContext.location} (${this.projectContext.postal})`
+          : '',
+        Département: this.projectContext.department || '',
+        Région: this.projectContext.region || '',
+        'Demande initiale': this.projectContext.description,
+        'Thématiques identifiées': this.projectContext.tags
+          .map((x) => x.name)
+          .join(', '),
+      };
+      const data = await askLLM(
+        this.searchQuery.trim(),
+        JSON.stringify(context),
+        {
+          siteId: this.siteId,
+        }
+      );
       this.answerChunks = data.answer_chunks || [];
       this.citations = data.citations || [];
       this.foundAnswer = data.found_answer || false;
@@ -513,7 +534,9 @@ Alpine.store('explorationIA', {
    * peut comporter des sélections de chunks (transitions 1 → 2 et 2 → 3).
    */
   recordSelectedItems() {
-    const existingLabels = new Set(this.allSelectedItems.map((item) => item.id));
+    const existingLabels = new Set(
+      this.allSelectedItems.map((item) => item.id)
+    );
     this.selectedChunks.forEach((index) => {
       const chunk = this.answerChunks[index];
       if (!chunk || !chunk.sources) return;
