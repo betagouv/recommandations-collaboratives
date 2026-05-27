@@ -65,7 +65,7 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.plugins.manager import get_plugin_manager
+from recoco.apps.plugins.manager import get_plugin_manager, get_tenant_hook
 from recoco.apps.projects.models import (
     Document,
     Project,
@@ -879,8 +879,13 @@ def project_list(request):
         .order_by("name")
     )
 
+    plugin_columns = get_tenant_hook(request).hook.crm_project_list_columns(
+        request=request
+    )
+
     context = {
         "regions": list(RegionSerializer(region_queryset, many=True).data),
+        "plugin_columns": plugin_columns,
     }
 
     return render(request, "crm/project_list.html", context)

@@ -228,7 +228,7 @@ class ProjectForListSerializer(BaseSerializerMixin):
         commune = data.commune
         commune_data = format_commune(commune)
 
-        return {
+        result = {
             "id": data.id,
             "name": data.name,
             "description": data.description,
@@ -251,6 +251,11 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,
         }
+
+        for field_name in self.context.get("plugin_extra_fields", []):
+            result[field_name] = getattr(data, field_name, None)
+
+        return result
 
 
 class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):

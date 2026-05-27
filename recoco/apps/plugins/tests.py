@@ -2,12 +2,15 @@ from unittest.mock import Mock, patch
 
 import pluggy
 import pytest
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
+from django.urls import reverse
 from model_bakery import baker
 
 from recoco.apps.home.models import SiteConfiguration
+from recoco.utils import login
 
-from .hooks import ProjectSpec
+from .hooks import CrmSpec, ProjectSpec
 from .manager import get_tenant_hook
 from .middlewares import TenantPluginSchemaMiddleware
 from .routers import TenantPluginRouter
@@ -230,3 +233,137 @@ def test_migrate_tenant_command_logic():
 
             # Check migrate was called with correct app
             mock_migrate.assert_called_with("migrate", "my_app", verbosity=1)
+
+
+# ---------------------------------------------------------------------------
+# CRM hook extension points
+# ---------------------------------------------------------------------------
+
+FAKE_PLUGIN_NAME = "fake_crm_plugin"
+
+
+def make_crm_plugin_manager(plugin):
+    """Build a plugin manager registered with CrmSpec and the given plugin."""
+    pm = pluggy.PluginManager("recoco")
+    pm.add_hookspecs(ProjectSpec)
+    pm.add_hookspecs(CrmSpec)
+    pm.register(plugin, name=FAKE_PLUGIN_NAME)
+    return pm
+
+
+class FakeCrmPlugin:
+    """Minimal plugin that adds a sentinel annotation + field + column."""
+
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_annotations(self, request):
+        from django.db.models import Value
+
+        return {"plugin_sentinel": Value(42)}
+
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_extra_serializer_fields(self, request):
+        return ["plugin_sentinel"]
+
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_columns(self, request):
+        return {
+            "header": "Sentinel",
+            "cell_html": '<td x-text="project.plugin_sentinel"></td>',
+            "col_class": "col--small",
+        }
+
+
+@pytest.fixture
+def site_with_fake_plugin(current_site):
+    return baker.make(
+        SiteConfiguration,
+        site=current_site,
+        enabled_plugins=[FAKE_PLUGIN_NAME],
+    )
+
+
+@pytest.mark.django_db
+class TestCrmProjectListAnnotationsHook:
+    def test_annotation_is_applied_to_queryset(
+        self, request, client, site_with_fake_plugin
+    ):
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"))
+
+        assert response.status_code == 200
+
+    def test_extra_field_appears_in_rest_response(
+        self, request, client, site_with_fake_plugin
+    ):
+        from recoco.apps.projects.models import Project
+
+        current_site = get_current_site(request)
+        project = baker.make(Project)
+        project.project_sites.create(site=current_site, status="READY", is_origin=True)
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"))
+
+        assert response.status_code == 200
+        results = response.json()["results"]
+        assert len(results) > 0
+        assert "plugin_sentinel" in results[0]
+        assert results[0]["plugin_sentinel"] == 42
+
+    def test_extra_field_absent_when_plugin_disabled(
+        self, request, client, current_site
+    ):
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+
+        from recoco.apps.projects.models import Project
+
+        project = baker.make(Project)
+        project.project_sites.create(site=current_site, status="READY", is_origin=True)
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"))
+
+        assert response.status_code == 200
+        results = response.json()["results"]
+        assert len(results) > 0
+        assert "plugin_sentinel" not in results[0]
+
+
+@pytest.mark.django_db
+class TestCrmProjectListColumnsHook:
+    def test_plugin_columns_in_view_context(
+        self, request, client, site_with_fake_plugin
+    ):
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("crm-project-list"))
+
+        assert response.status_code == 200
+        columns = response.context["plugin_columns"]
+        assert len(columns) == 1
+        assert columns[0]["header"] == "Sentinel"
+
+    def test_no_plugin_columns_when_plugin_disabled(
+        self, request, client, current_site
+    ):
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("crm-project-list"))
+
+        assert response.status_code == 200
+        assert response.context["plugin_columns"] == []
