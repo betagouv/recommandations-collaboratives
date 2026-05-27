@@ -325,7 +325,12 @@ def test_low_reach_mine_only_filters_by_switchtender(request, client, make_proje
 
     advisor = baker.make(auth_models.User)
     advisor.profile.sites.add(site)
-    mine.switchtenders.add(advisor)
+    baker.make(
+        projects_models.ProjectSwitchtender,
+        site=site,
+        switchtender=advisor,
+        project=mine,
+    )
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, user=advisor, groups=["example_com_staff"]):
