@@ -103,6 +103,7 @@ Alpine.store('explorationIA', {
       this.citations = data.citations || [];
       this.foundAnswer = data.found_answer || false;
       this.selectedChunks = [];
+      this.invalidatePhase2State();
     } catch (err) {
       this.error = 'Erreur lors de la recherche. Veuillez réessayer.';
       console.error('ExplorationIA search error:', err);
@@ -126,6 +127,7 @@ Alpine.store('explorationIA', {
     } else {
       this.selectedChunks.push(index);
     }
+    this.invalidatePhase2State();
   },
 
   isChunkSelected(index) {
@@ -139,6 +141,17 @@ Alpine.store('explorationIA', {
 
   clearChunkSelection() {
     this.selectedChunks = [];
+    this.invalidatePhase2State();
+  },
+
+  /**
+   * Invalide les données de l'étape 2 lorsqu'on modifie la sélection de l'étape 1,
+   * pour éviter une incohérence entre les ressources retenues et les co-recommandations.
+   */
+  invalidatePhase2State() {
+    this.coRecommendations = [];
+    this.selectedCitationsForStep2 = [];
+    this.selectedCoRecoIds = [];
   },
 
   // === Survol des sources ===
@@ -415,9 +428,6 @@ Alpine.store('explorationIA', {
       if (this.currentPhase === 1) {
         this.recordSelectedItems();
         this.currentPhase = 2;
-        this.answerChunks = [];
-        this.citations = [];
-        this.selectedChunks = [];
       }
 
       Alpine.store('app').displayToastMessage({

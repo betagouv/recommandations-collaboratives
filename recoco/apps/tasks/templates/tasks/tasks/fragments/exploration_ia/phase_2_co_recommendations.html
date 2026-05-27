@@ -137,24 +137,14 @@
             Vous pouvez effectuer une nouvelle recherche ou passer à la synthèse.
         </p>
     </div>
-    <!-- Historique des sélections -->
-    <template x-if="$store.explorationIA.allSelectedItems.length > 0">
-        <div class="fr-mb-3w exploration-ia-history">
-            <h3 class="fr-text--md fr-mb-2w">
-                <span class="fr-icon-history-line fr-mr-1v"></span>
-                Éléments déjà sélectionnés (<span x-text="$store.explorationIA.allSelectedItems.length"></span>)
-            </h3>
-            <div class="exploration-ia-history__tags">
-                <template x-for="item in $store.explorationIA.allSelectedItems" :key="item.id">
-                    <span class="fr-tag fr-tag--sm"
-                          x-text="$store.explorationIA.truncate(item.title, 30)"></span>
-                </template>
-            </div>
-        </div>
-    </template>
     <!-- Actions de phase -->
     <div class="footer-actions d-flex align-items-center justify-content-end fr-py-3w border-top">
         <div class="d-flex gap-2">
+            <button @click="$store.explorationIA.currentPhase = 1"
+                    class="fr-btn fr-btn--tertiary">
+                <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
+                Revenir à l'étape 1
+            </button>
             <button @click="$store.explorationIA.resetExploration()"
                     class="fr-btn fr-btn--secondary">
                 <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
