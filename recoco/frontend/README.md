@@ -112,10 +112,6 @@ npx cypress install # permet d'installer Cypress sur la machine
 ```bash
 yarn e2e            # exécution headless (Chrome) — démarre Vite + Django + Cypress
 yarn e2e:ui         # ouvre l'interface graphique Cypress
-yarn e2e:open       # raccourci équivalent à `cypress open`
-yarn e2e:run        # raccourci équivalent à `cypress run`
-yarn e2e:parallel   # exécution parallèle (2 threads)
-yarn e2e:parallel   # exécution parallèle (2 threads)
 yarn e2e:allUrls    # exécution d'un test rapide des différentes urls du site
 ```
 
