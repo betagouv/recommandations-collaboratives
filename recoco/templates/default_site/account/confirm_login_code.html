@@ -1,1 +1,101 @@
-TODO
+{% extends "base.html" %}
+{% load i18n %}
+{% load django_vite %}
+{% block title %}
+    Saisir mon code de connexion
+{% endblock title %}
+{% block og_title %}
+    Saisir mon code de connexion
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/styles/home-auth.css.js' %}
+    {% vite_asset 'js/styles/account-login.css.js' %}
+    {% vite_asset 'js/apps/auth.js' %}
+{% endblock js %}
+{% block content %}
+    <div class="fr-container fr-container--fluid fr-my-md-14v">
+        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-py-10v fr-py-md-14v">
+                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+                            <h2>Saisir mon code de connexion</h2>
+                            <div class="fr-alert fr-alert--info fr-mb-3w">
+                                <p>
+                                    Un code de connexion à usage unique vient d'être envoyé à <strong>{{ email }}</strong>. Saisissez-le ci-dessous. Ce code expire rapidement.
+                                </p>
+                            </div>
+                            <form method="post" action="{% url 'account_confirm_login_code' %}">
+                                {% csrf_token %}
+                                {% if redirect_field_value %}
+                                    <input type="hidden"
+                                           name="{{ redirect_field_name }}"
+                                           value="{{ redirect_field_value }}" />
+                                {% endif %}
+                                {% if verify_form.non_field_errors %}
+                                    <div class="fr-alert fr-alert--error fr-mb-2w">
+                                        {% for error in verify_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% for field in verify_form %}
+                                    <div class="fr-input-group {% if field.errors %}fr-input-group--error{% endif %}">
+                                        <label class="fr-label" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                            {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
+                                        </label>
+                                        <input class="fr-input {% if field.errors %}fr-input--error{% endif %}"
+                                               type="{{ field.field.widget.input_type|default:'text' }}"
+                                               id="{{ field.id_for_label }}"
+                                               name="{{ field.name }}"
+                                               autocomplete="one-time-code"
+                                               inputmode="numeric"
+                                               {% if field.field.required %}required{% endif %} />
+                                        {% for error in field.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                                    </div>
+                                {% endfor %}
+                                <ul class="fr-btns-group fr-btns-group--inline-md">
+                                    <li>
+                                        <button type="submit" class="fr-btn fr-btn--primary">Valider</button>
+                                    </li>
+                                    {% if cancel_url %}
+                                        <li>
+                                            <a class="fr-btn fr-btn--secondary" href="{{ cancel_url }}">Annuler</a>
+                                        </li>
+                                    {% else %}
+                                        <li>
+                                            <button type="submit"
+                                                    form="logout-from-stage"
+                                                    class="fr-btn fr-btn--secondary">Annuler</button>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </form>
+                            {% if can_resend %}
+                                <form method="post"
+                                      action="{% url 'account_confirm_login_code' %}"
+                                      class="fr-mt-3w">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="resend" />
+                                    {% if redirect_field_value %}
+                                        <input type="hidden"
+                                               name="{{ redirect_field_name }}"
+                                               value="{{ redirect_field_value }}" />
+                                    {% endif %}
+                                    <button type="submit" class="fr-btn fr-btn--tertiary-no-outline">Renvoyer un code</button>
+                                </form>
+                            {% endif %}
+                            {% if not cancel_url %}
+                                <form id="logout-from-stage"
+                                      method="post"
+                                      action="{% url 'account_logout' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'account_login' %}" />
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
