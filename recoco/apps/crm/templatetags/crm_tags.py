@@ -10,13 +10,31 @@ created: 2021-06-29 11:30:42 CEST
 from django import template
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.crm.models import Note
+from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.apps.projects.models import Project
 
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def crm_plugin_tabs(context, min_index, max_index):
+    """Return plugin-defined CRM navigation tabs whose index falls in (min_index, max_index)."""
+    request = context.get("request")
+    if request is None:
+        return []
+    tabs = []
+    for tab in get_tenant_hook(request).hook.crm_navigation_tabs(request=request):
+        if min_index < tab["index"] < max_index:
+            try:
+                tab = {**tab, "url": reverse(tab["url_name"])}
+            except NoReverseMatch:
+                continue
+            tabs.append(tab)
+    return sorted(tabs, key=lambda t: t["index"])
 
 
 @register.simple_tag

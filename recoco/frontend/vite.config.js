@@ -32,6 +32,9 @@ const config = {
   },
   resolve: {
     extensions: ['.js', '.json'],
+    alias: {
+      '@core': resolve('./src'),
+    },
   },
   css: {
     preprocessorOptions: {

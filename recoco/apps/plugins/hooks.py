@@ -19,6 +19,20 @@ class ResourceSpec:
 
 class CrmSpec:
     @hookspec
+    def crm_navigation_tabs(self, request):
+        """Return a tab definition dict to inject into the CRM navigation.
+
+        Keys:
+          label (str)     — display text
+          url_name (str)  — Django URL name (may include namespace, e.g. "myplugin:crm-foo")
+          tab_key (str)   — context variable name that marks this tab as active
+                            (e.g. "realisations" → pass realisations=True in the include)
+          index (int)     — insertion order; builtin tabs use multiples of 10:
+                            Accueil=0, Dossiers=10, Utilisateurs=20, Organisations=30,
+                            Ressources=40, Paramètres=50
+        """
+
+    @hookspec
     def crm_project_list_annotations(self, request):
         """Return a dict of annotation kwargs to add to the CRM project list queryset.
 
