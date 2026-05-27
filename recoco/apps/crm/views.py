@@ -1231,13 +1231,6 @@ def make_low_reach_project_query(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
         )
-        .prefetch_related(
-            "tasks",
-            "notes",
-            "switchtenders__profile__organization",
-            "crm_annotations__tags",
-        )
-        .select_related("commune")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1296,7 +1289,17 @@ def make_low_reach_project_query(
             | Q(members__profile__organization__name__icontains=search_q)
         )
 
-    return qs.order_by("-last_members_activity_at").distinct()
+    return (
+        qs.select_related("commune")
+        .prefetch_related(
+            "tasks",
+            "notes",
+            "switchtenders__profile__organization",
+            "crm_annotations__tags",
+        )
+        .order_by("-last_members_activity_at")
+        .distinct()
+    )
 
 
 def _parse_low_reach_params(request):
