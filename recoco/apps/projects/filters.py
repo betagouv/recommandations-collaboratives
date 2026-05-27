@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.filters import BaseFilterBackend
 
 from recoco.apps.projects.models import Project
+from recoco.utils import has_perm
 
 
 class ProjectActivityFilter(BaseFilterBackend):
@@ -65,4 +66,19 @@ class ProjectSiteStatusFilter(BaseFilterBackend):
         project_site_status = request.GET.getlist("status", None)
         if project_site_status:
             queryset = queryset.filter(project_site_status__in=project_site_status)
+        return queryset
+
+
+def request_hide_deleted_projects(request):
+    # TODO should not be necessary after #2122
+    return not (
+        request.GET.get("with-deleted", None)
+        and has_perm(request.user, "delete_projects", request.site)
+    )
+
+
+class DefaultNoDeletedFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if request_hide_deleted_projects(request):
+            queryset = queryset.filter(deleted=None)
         return queryset

@@ -82,6 +82,7 @@
                         <a class="stretched-link"
                            data-test-id="project-navigation-conversations-new"
                            @click="if ($store.tutorialsEvents?.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
+                           {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %}disabled{% endif %}
                            href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                             {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                                 {% if active_project_conversation_notifications_count %}

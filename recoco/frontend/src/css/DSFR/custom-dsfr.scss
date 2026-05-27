@@ -144,6 +144,12 @@ ul.fr-btns-group {
   padding-left: 0;
 }
 
+.hide-ul-style {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
 /* ¯¯¯ *\
   FORMS
 \* ˍˍˍ */
@@ -542,6 +548,14 @@ form > p {
 }
 
 /* ¯¯¯¯¯ *\
+  BORDER
+\* ˍˍˍˍˍ */
+
+.no-border {
+  border: none !important;
+}
+
+/* ¯¯¯¯¯ *\
   BACKDROP
 \* ˍˍˍˍˍˍ */
 
@@ -562,8 +576,12 @@ form > p {
 .no-underline {
   text-decoration: none !important;
 }
+.no-outline {
+  outline: none !important;
+}
 
-.fr-link--underline .text-underline {
+.fr-link--underline,
+.text-underline {
   text-decoration: underline !important;
 }
 
@@ -681,6 +699,10 @@ form > p {
 
 .fw-400 p {
   font-weight: 400;
+}
+
+.fw-700 {
+  font-weight: 700;
 }
 
 .centered-item {
@@ -904,6 +926,15 @@ a.fr-text-inverted--grey {
     border: none;
     box-shadow: none;
   }
+  &-transparent {
+    border-radius: 2px;
+    border: 1px solid var(--light-text-mention-grey, #666);
+    background: transparent;
+    color: var(--light-text-mention-grey, #666);
+    &:hover {
+      background-color: var(--light-background-default-grey, #eee) !important;
+    }
+  }
   &:not(:disabled):hover {
     background-color: var(--light-background-alt-grey-hover, #e6e6e6);
     background: var(--light-background-alt-grey-hover, #e6e6e6);
@@ -1025,6 +1056,18 @@ a.fr-text-inverted--grey {
 [href] {
   background-image: none;
   transition: none;
+}
+
+.custom-external-link::after {
+  background-color: transparent;
+  content: '';
+  display: inline-block;
+  height: unset;
+  margin-left: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
+  vertical-align: unset;
+  width: unset;
 }
 
 /* ¯¯¯¯¯ *\

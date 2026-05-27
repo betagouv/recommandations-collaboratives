@@ -1,0 +1,16 @@
+import projects from '../../../fixtures/projects/projects.json';
+
+const currentProject = projects[1];
+
+describe('I can go to overview tab @page-projet-presentation', () => {
+  beforeEach(() => {
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
+  });
+
+  it('see the project phone if no project owner phone number', () => {
+    cy.visit(`/project/${currentProject.pk}`);
+
+    //Used to match phone logic returned from django
+    cy.contains(`${currentProject.fields.phone}`);
+  });
+});
