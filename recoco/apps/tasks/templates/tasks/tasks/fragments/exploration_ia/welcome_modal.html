@@ -1,7 +1,8 @@
-<div x-show="welcomeModal.isOpen"
+<div x-data="ExplorationIAWelcomeModal"
+     x-show="isOpen"
      class="exploration-ia-modal-overlay"
-     @click.self="closeWelcomeModal()"
-     @keydown.escape.window="welcomeModal.isOpen && closeWelcomeModal()"
+     @click.self="close()"
+     @keydown.escape.window="isOpen && close()"
      x-transition:enter="transition ease-out duration-200"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
@@ -27,7 +28,7 @@
                     </div>
                     <h2 id="exploration-ia-welcome-title" class="fr-text--lg fr-mb-0">Exploration assistée des ressources</h2>
                 </div>
-                <button @click="closeWelcomeModal()"
+                <button @click="close()"
                         class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm"
                         aria-label="Fermer la modale d'accueil"
                         data-test-id="exploration-ia-welcome-modal-close-btn">
@@ -69,7 +70,7 @@
         </div>
         <div class="exploration-ia-modal__footer">
             <div class="d-flex justify-content-end align-items-center w-100">
-                <button @click="closeWelcomeModal()"
+                <button @click="close()"
                         class="fr-btn fr-btn--primary fr-btn--sm"
                         data-test-id="exploration-ia-welcome-modal-start-btn">
                     <span class="fr-icon-arrow-right-line fr-mr-1v" aria-hidden="true"></span>

@@ -1,0 +1,84 @@
+<template x-if="$store.explorationIA.currentPhase === 1 || $store.explorationIA.currentPhase === 2">
+    <div data-test-id="exploration-ia-search-phase-header">
+        <!-- Contexte du projet -->
+        <div class="fr-callout fr-callout--blue-ecume fr-mb-3w"
+             id="project-context"
+             data-test-id="exploration-ia-project-context">
+            <div class="d-flex justify-content-between align-items-start">
+                <p class="fr-callout__title fr-mb-0">Contexte du projet</p>
+                <button @click="$store.explorationIA.toggleEditContext()"
+                        x-show="$store.explorationIA.currentPhase === 1"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm"
+                        :aria-label="$store.explorationIA.isEditingContext ? 'Terminer la modification' : 'Modifier le contexte'"
+                        data-test-id="exploration-ia-edit-context-btn">
+                    <span x-show="!$store.explorationIA.isEditingContext"
+                          class="fr-icon-edit-line"
+                          aria-hidden="true"></span>
+                    <span x-show="$store.explorationIA.isEditingContext"
+                          class="fr-icon-check-line"
+                          aria-hidden="true"></span>
+                </button>
+            </div>
+            <!-- Mode lecture -->
+            <p x-show="!$store.explorationIA.isEditingContext"
+               class="fr-callout__text fr-mt-1w"
+               x-text="$store.explorationIA.projectContext"></p>
+            <!-- Mode édition -->
+            <div x-show="$store.explorationIA.isEditingContext" class="fr-mt-1w">
+                <textarea x-model="$store.explorationIA.projectContext"
+                          class="fr-input"
+                          rows="4"
+                          placeholder="Décrivez le contexte de votre projet..."
+                          data-test-id="exploration-ia-context-input"></textarea>
+                <p class="fr-hint-text fr-mt-1v">Ce contexte aide l'IA à mieux comprendre votre projet.</p>
+            </div>
+        </div>
+        <template x-if="$store.explorationIA.currentPhase < 2">
+            <!-- Barre de recherche -->
+            <div>
+                <label class="fr-label" for="exploration-search">Commencez par formuler votre besoin sur ce projet</label>
+                <div class="fr-search-bar fr-search-bar--lg fr-mb-3w"
+                     role="search"
+                     data-test-id="exploration-ia-searchbar">
+                    <input class="fr-input"
+                           type="search"
+                           id="exploration-search"
+                           x-model="$store.explorationIA.searchQuery"
+                           @keydown.enter.prevent="$store.explorationIA.performSearch()"
+                           placeholder="Formulez votre besoin sur ce projet. Ex: Quelles aides puis-je avoir pour mettre en place un jardin partagé ?"
+                           :disabled="$store.explorationIA.isLoading"
+                           data-test-id="exploration-ia-search-input">
+                    <button class="fr-btn"
+                            @click="$store.explorationIA.performSearch()"
+                            :disabled="$store.explorationIA.isLoading || !$store.explorationIA.searchQuery.trim()"
+                            data-test-id="exploration-ia-search-btn">
+                        <span x-show="!$store.explorationIA.isLoading">Rechercher</span>
+                        <span x-show="$store.explorationIA.isLoading" class="spinner-border spinner-border-sm"></span>
+                    </button>
+                </div>
+            </div>
+        </template>
+        <template x-if="$store.explorationIA.currentPhase > 1">
+            <p class="exploration-ia__context fr-mb-3w">
+                Recherche initiale : <span x-text="$store.explorationIA.searchQuery"></span>
+            </p>
+        </template>
+        <!-- Message d'erreur -->
+        <div x-show="$store.explorationIA.error"
+             class="fr-alert fr-alert--error fr-mb-3w"
+             data-test-id="exploration-ia-error">
+            <p x-text="$store.explorationIA.error"></p>
+        </div>
+        <!-- Indicateur de chargement -->
+        <div x-show="$store.explorationIA.isLoading || $store.explorationIA.isLoadingCoRecos"
+             class="exploration-ia-loading"
+             data-test-id="exploration-ia-loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="text-secondary fr-mt-2w"
+               x-text="$store.explorationIA.isLoadingCoRecos ? 'Recherche des co-recommandations...' : 'Recherche en cours...'">
+            </p>
+        </div>
+    </div>
+</template>

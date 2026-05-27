@@ -1,0 +1,138 @@
+<div>
+    <!-- Résultats IA (chunks + bibliographie) -->
+    <div x-show="$store.explorationIA.hasAnswerResults() && !$store.explorationIA.isLoading && !($store.explorationIA.currentPhase === 2 && $store.explorationIA.coRecommendations.length > 0)"
+         class="row g-4 fr-mb-3w">
+        <!-- Colonne principale : Réponse -->
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <!-- Header avec actions de sélection -->
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                     x-show="$store.explorationIA.getSelectableChunksCount() > 0">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fr-text--sm text-secondary">
+                            <span x-text="$store.explorationIA.selectedChunks.length"></span> / <span x-text="$store.explorationIA.getSelectableChunksCount()"></span> passage(s) sélectionné(s)
+                        </span>
+                        <template x-if="$store.explorationIA.selectedChunks.length > 0">
+                            <button @click="$store.explorationIA.clearChunkSelection()"
+                                    class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                    title="Désélectionner tout">
+                                <span class="fr-icon-close-line" aria-hidden="true"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Liste des chunks groupés par sous-question -->
+                    <template x-for="(group, groupIdx) in $store.explorationIA.groupedAnswerChunks"
+                              :key="groupIdx">
+                        <div class="exploration-ia-subquestion-group fr-mb-3w">
+                            <div x-show="group.subQuestion"
+                                 class="exploration-ia-subquestion fr-mb-2w">
+                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus exploration-ia-subquestion__badge"
+                                      x-text="'Sous-question ' + (groupIdx + 1) + ' / ' + $store.explorationIA.groupedAnswerChunks.length"></span>
+                                <h4 class="exploration-ia-subquestion__title fr-text--md fr-mb-0">
+                                    <span class="fr-icon-question-line fr-mr-1v" aria-hidden="true"></span>
+                                    <span x-text="group.subQuestion"></span>
+                                </h4>
+                            </div>
+                            <template x-for="item in group.chunks" :key="item.index">
+                                <div class="exploration-ia-chunk"
+                                     :class="{ 'exploration-ia-chunk--with-source': item.chunk.sources && item.chunk.sources.length > 0, 'exploration-ia-chunk--selected': $store.explorationIA.isChunkSelected(item.index) }"
+                                     @click="item.chunk.sources && item.chunk.sources.length > 0 ? $store.explorationIA.toggleChunkSelection(item.index) : null"
+                                     @mouseenter="$store.explorationIA.highlightSources(item.chunk.sources)"
+                                     @mouseleave="$store.explorationIA.clearHighlight()"
+                                     :style="item.chunk.sources && item.chunk.sources.length > 0 ? 'cursor: pointer;' : ''">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="exploration-ia-chunk__checkbox"
+                                             x-show="item.chunk.sources && item.chunk.sources.length > 0">
+                                            <input type="checkbox"
+                                                   class="fr-checkbox"
+                                                   :id="'chunk-select-' + item.index"
+                                                   :checked="$store.explorationIA.isChunkSelected(item.index)"
+                                                   @click.stop
+                                                   @change="$store.explorationIA.toggleChunkSelection(item.index)">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="exploration-ia-chunk__text"
+                                                 x-html="$store.explorationIA.parseMarkdown(item.chunk.text)"></div>
+                                            <div class="exploration-ia-chunk__sources fr-mt-1w"
+                                                 x-show="item.chunk.sources && item.chunk.sources.length > 0">
+                                                <template x-for="sourceLabel in item.chunk.sources" :key="sourceLabel">
+                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
+                                                          x-text="'Source ' + sourceLabel"></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <!-- Colonne secondaire : Bibliographie -->
+        <div class="col-12 col-lg-4">
+            <div class="card exploration-ia-bibliography">
+                <div class="card-header bg-transparent">
+                    <h3 class="fr-text--md fr-mb-0">
+                        <span class="fr-icon-book-2-line fr-mr-1v" aria-hidden="true"></span>
+                        Bibliographie de la réponse
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <template x-for="citation in $store.explorationIA.orderedCitations"
+                              :key="citation.label">
+                        <div class="exploration-ia-citation fr-mb-2w fr-p-2w"
+                             :class="{ 'exploration-ia-citation--highlighted': $store.explorationIA.isSourceHighlighted(citation.label), 'exploration-ia-citation--selected': $store.explorationIA.isSourceSelected(citation.label) }">
+                            <div class="d-flex justify-content-between align-items-start fr-mb-1w">
+                                <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                      x-text="'Source ' + citation.label"></span>
+                                <span class="fr-badge fr-badge--sm fr-badge--no-icon"
+                                      :class="{ 'fr-badge--green-emeraude': citation.source_type.toLocaleLowerCase() === 'resource', 'fr-badge--purple-glycine': citation.source_type.toLocaleLowerCase() === 'recommendation' }"
+                                      x-text="$store.explorationIA.getSourceTypeLabel(citation.source_type.toLocaleLowerCase())"></span>
+                            </div>
+                            <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
+                            <button @click.stop="$store.explorationIA.openResourceModal(citation)"
+                                    class="fr-btn fr-btn--tertiary fr-btn--sm"
+                                    x-show="$store.explorationIA.getCitationUrl(citation)">
+                                <span class="fr-icon-eye-line fr-mr-1v" aria-hidden="true"></span>
+                                Consulter
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Message si pas de résultats -->
+    <div x-show="!$store.explorationIA.hasAnswerResults() && !$store.explorationIA.isLoading && $store.explorationIA.searchQuery.length > 0 && $store.explorationIA.foundAnswer === false"
+         class="fr-callout fr-callout--blue-ecume fr-mb-3w">
+        <p class="fr-callout__title">Aucun résultat trouvé</p>
+        <p class="fr-callout__text">Essayez d'autres mots-clés ou simplifiez votre recherche.</p>
+    </div>
+    <!-- Actions de phase -->
+    <template x-if="$store.explorationIA.currentPhase === 1 && $store.explorationIA.searchQuery.length > 0 && $store.explorationIA.foundAnswer">
+        <div class="footer-actions d-flex align-items-center fr-py-3w border-top"
+             :class="{ 'justify-content-between': $store.explorationIA.selectedChunks.length == 0, 'justify-content-end': $store.explorationIA.selectedChunks.length > 0 }">
+            <div class="exploration-ia-phase-hint"
+                 x-show="$store.explorationIA.selectedChunks.length == 0">
+                <span class="fr-icon-arrow-right-s-line" aria-hidden="true"></span>
+                <span x-text="$store.explorationIA.getPhaseDescription($store.explorationIA.currentPhase)"></span>
+            </div>
+            <div class="d-flex gap-2">
+                <button @click="$store.explorationIA.fetchCoRecommendations()"
+                        :disabled="!$store.explorationIA.hasSelectedResources() || $store.explorationIA.isLoadingCoRecos"
+                        class="fr-btn fr-btn--primary fr-btn--sm fr-btn--icon-left">
+                    <span x-show="!$store.explorationIA.isLoadingCoRecos"
+                          class="fr-icon-lightbulb-line"
+                          aria-hidden="true"></span>
+                    <span x-show="$store.explorationIA.isLoadingCoRecos"
+                          class="spinner-border spinner-border-sm"
+                          aria-hidden="true"></span>
+                    Continuer l'exploration
+                </button>
+            </div>
+        </div>
+    </template>
+</div>

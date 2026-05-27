@@ -1,0 +1,132 @@
+<div>
+    <!-- Résultats de synthèse -->
+    <div>
+        <!-- En-tête avec résumé -->
+        <div class="fr-callout fr-callout--green-emeraude fr-mb-3w">
+            <p class="fr-callout__title">
+                <span class="fr-icon-checkbox-circle-fill fr-mr-1v" aria-hidden="true"></span>
+                Vos <strong x-text="$store.explorationIA.getAllSelectedResources().length"></strong> ressources sont prêtes pour créer vos recommandations.
+            </p>
+        </div>
+        <!-- Ressources sélectionnées (étapes 1 et 2 combinées) -->
+        <div class="exploration-ia-synthesis__section fr-mb-4w"
+             x-show="$store.explorationIA.getAllSelectedResources().length > 0">
+            <h3 class="d-flex align-items-center gap-2 fr-mb-2w">
+                <span class="fr-icon-file-text-line" aria-hidden="true"></span>
+                Ressources sélectionnées
+                <span class="fr-badge fr-badge--sm fr-badge--blue-france"
+                      x-text="$store.explorationIA.getAllSelectedResources().length"></span>
+            </h3>
+            <p class="fr-text--sm text-secondary fr-mb-3w">Toutes les ressources sélectionnées au cours de votre exploration.</p>
+            <div class="d-flex flex-column gap-3">
+                <template x-for="resource in $store.explorationIA.getAllSelectedResources()"
+                          :key="resource.id">
+                    <div class="card exploration-ia-synthesis-card"
+                         :class="{ 'exploration-ia-synthesis-card--co-reco': resource.fromStep === 2 }">
+                        <div class="card-body">
+                            <!-- Header avec bouton créer en haut à droite -->
+                            <div class="d-flex justify-content-between align-items-start fr-mb-3w">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="fr-badge fr-badge--sm"
+                                          :class="{ 'fr-badge--green-emeraude': resource.source_type === 'resource', 'fr-badge--purple-glycine': resource.source_type === 'recommendation' }"
+                                          x-text="resource.source_type === 'resource' ? 'Ressource' : 'Recommandation'"></span>
+                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                          x-show="resource.category"
+                                          x-text="resource.category"></span>
+                                    <span class="fr-badge fr-badge--sm fr-badge--yellow-tournesol"
+                                          x-show="resource.coOccurrenceScore"
+                                          :title="'Score de co-occurrence'">
+                                        <span class="fr-icon-links-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                        <span x-text="resource.coOccurrenceScore"></span>
+                                    </span>
+                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
+                                          x-show="resource.label"
+                                          x-text="'#' + resource.label"></span>
+                                </div>
+                                <template x-if="resource.resource_id">
+                                    <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&resource_id=' + (resource.resource_id || '') + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
+                                       class="fr-btn fr-btn--primary fr-btn--sm"
+                                       target="_blank"
+                                       title="Créer une recommandation à partir de cette ressource">
+                                        <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                        Créer une recommandation
+                                    </a>
+                                </template>
+                                <template x-if="!resource.resource_id">
+                                    <a :href="'{% url 'projects-create-task' %}?project_id={{ project.pk }}&push_type=noresource' + (resource.chunkTexts && resource.chunkTexts.length > 0 ? '&content=' + encodeURIComponent(resource.chunkTexts.join('\n\n')) : '')"
+                                       class="fr-btn fr-btn--primary fr-btn--sm"
+                                       target="_blank"
+                                       title="Créer une recommandation à partir de cette ressource">
+                                        <span class="fr-icon-add-line fr-mr-1v" aria-hidden="true"></span>
+                                        Créer une recommandation
+                                    </a>
+                                </template>
+                            </div>
+                            <!-- Contenu en deux colonnes -->
+                            <div class="row">
+                                <!-- Colonne gauche : Ressource -->
+                                <div class="col-12 col-lg-5">
+                                    <h4 class="card-title fr-text--md fr-mb-2w" x-text="resource.title"></h4>
+                                    <p class="card-text fr-text--sm text-secondary"
+                                       x-html="$store.explorationIA.parseMarkdown($store.explorationIA.truncate(resource.content, 200))">
+                                    </p>
+                                    <!-- Tags -->
+                                    <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <template x-for="(tag, tagIdx) in (resource.tags || []).slice(0, 4)"
+                                                      :key="tagIdx">
+                                                <span class="fr-badge fr-badge--sm fr-badge--grey" x-text="tag.name || tag"></span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <!-- Lien vers la fiche (ouvre la modale) -->
+                                    <div class="fr-mt-2w">
+                                        <button @click="$store.explorationIA.openResourceModal({ resource_id: resource.resource_id, reco_id: resource.reco_id, project_id: resource.project_id, source_type: resource.source_type, title: resource.title, content: resource.content, label: resource.label })"
+                                                class="fr-btn fr-btn--secondary fr-btn--sm"
+                                                type="button"
+                                                x-show="resource.resource_id || (resource.reco_id && resource.project_id)">
+                                            <span class="fr-icon-eye-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                            Voir la fiche complète
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Colonne droite : Texte généré par l'IA -->
+                                <div class="col-12 col-lg-7 fr-mt-3w fr-mt-lg-0"
+                                     x-show="resource.chunkTexts && resource.chunkTexts.length > 0">
+                                    <div class="exploration-ia-synthesis-card__ai-content fr-p-3w rounded">
+                                        <p class="fr-text--sm fr-text--bold fr-mb-2w">
+                                            <span class="fr-icon-lightbulb-line fr-mr-1v" aria-hidden="true"></span>
+                                            Suggestion de contenu pour votre recommandation
+                                        </p>
+                                        <template x-for="(chunkText, idx) in resource.chunkTexts" :key="idx">
+                                            <div class="fr-mb-2w"
+                                                 :class="{ 'fr-pb-2w border-bottom': idx < resource.chunkTexts.length - 1 }">
+                                                <div class="fr-text--sm"
+                                                     x-html="$store.explorationIA.parseMarkdown(chunkText)"></div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <!-- Actions finales -->
+        <div class="d-flex justify-content-end align-items-center fr-py-3w border-top">
+            <div class="d-flex gap-2">
+                <button @click="$store.explorationIA.currentPhase = 2"
+                        class="fr-btn fr-btn--tertiary">
+                    <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
+                    Modifier la sélection
+                </button>
+                <button @click="$store.explorationIA.resetExploration()"
+                        class="fr-btn fr-btn--primary">
+                    <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
+                    Nouvelle exploration
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
