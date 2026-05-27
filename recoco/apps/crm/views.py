@@ -1275,19 +1275,16 @@ def make_low_reach_project_query(
         cutoff_date = datetime.now() - timedelta(days=days)
         qs = qs.filter(last_members_activity_at__lte=cutoff_date)
 
-    # has_reaction: member sent a message, or any reco has a non-default status
-    has_reaction_filter = Q(last_public_msg_at__isnull=False) | Q(has_task_status=True)
+    # A projet has engagement if a member posted a public message,
+    # or if at least one task has a status other than "proposé".
+    has_engagement = Q(last_public_msg_at__isnull=False) | Q(has_task_status=True)
+    qs = qs.exclude(has_engagement)
 
     if status_filter == "low_read":
-        # Recos non lues, AND no sign of engagement:
-        #  - no reco read at all, OR
-        #  - a single reco read but more than 2 recos sent.
-        qs = qs.filter(Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)).exclude(
-            has_reaction_filter
-        )
-    else:
-        # Aucune réaction (default): no engagement regardless of read count
-        qs = qs.exclude(has_reaction_filter)
+        # A project has low read status if no recommendation has been read,
+        # or if only one has been read but there are more than 2 recommendations in total.
+        barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
+        qs = qs.filter(barely_read)
 
     if mine_only:
         qs = qs.filter(switchtenders=request.user)
