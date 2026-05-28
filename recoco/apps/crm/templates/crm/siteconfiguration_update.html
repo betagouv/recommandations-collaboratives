@@ -50,4 +50,18 @@
             </div>
         </div>
     </div>
+    <div class="fr-px-3w fr-py-3w">
+        {% if request.site.configuration.stopped_at == None %}
+            <button class="fr-btn fr-btn--red"
+                    type="button"
+                    aria-controls="siteconfiguration-toggle-stopped-modal"
+                    data-fr-opened="false">Mettre le portail à l'arrêt</button>
+        {% else %}
+            <button class="fr-btn fr-btn--red"
+                    type="button"
+                    aria-controls="siteconfiguration-toggle-stopped-modal"
+                    data-fr-opened="false">Réactiver le portail</button>
+        {% endif %}
+    </div>
+    {% include "crm/siteconfiguration_toggle_stopped_modal.html" %}
 {% endblock content %}
