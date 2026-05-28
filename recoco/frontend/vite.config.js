@@ -243,12 +243,7 @@ const config = {
         cardCrmStyles: resolve('./src/js/styles/card-crm.css.js'),
         GravatarCache: resolve('./src/js/components/GravatarCache.js'),
         userCrmStyles: resolve('./src/js/styles/user-crm.css.js'),
-        projectCardCrmStyles: resolve(
-          './src/js/styles/project-card-crm.css.js'
-        ),
-        backgroundOverride: resolve(
-          './src/js/styles/background-override.css.js'
-        ),
+        projectCardCrmStyles: resolve('./src/js/styles/project-card-crm.css.js'),
       },
       output: {
         chunkFileNames: undefined,

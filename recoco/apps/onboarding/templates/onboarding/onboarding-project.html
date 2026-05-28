@@ -5,7 +5,6 @@
 {% load crispy_forms_tags %}
 {% block js %}
     {% vite_asset 'js/apps/onboarding.js' %}
-    {% vite_asset 'js/styles/background-override.css.js' %}
 {% endblock js %}
 {% block title %}
     Solliciter l'équipe {{ request.site.name }}
@@ -24,7 +23,7 @@
         {% if not is_prefill_step %}
             {% include "onboarding/fragments/email-modal.html" %}
         {% endif %}
-        <div class="banner text-center">
+        <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"
                      width="10%"
