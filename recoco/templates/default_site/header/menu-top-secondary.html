@@ -107,9 +107,11 @@
                         </template>
                         {% flag "enable_submit_new_project" %}
                             {% if not is_switchtender %}
-                                <a class="fr-btn justify-content-center w-100"
-                                data-test-id="create-project"
-                                href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
+                                {% if request.site.configuration.stopped_at == None %}
+                                    <a class="fr-btn justify-content-center w-100"
+                                       data-test-id="create-project"
+                                       href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
+                                {% endif %}
                             {% endif %}
                         {% endflag %}
                     </ul>
