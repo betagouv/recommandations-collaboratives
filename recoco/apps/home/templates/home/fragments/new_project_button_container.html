@@ -1,0 +1,3 @@
+{% if request.site.configuration.stopped_at == None %}
+    {% include "home/fragments/new_project_button.html" %}
+{% endif %}
