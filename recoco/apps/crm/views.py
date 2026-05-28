@@ -363,6 +363,23 @@ def siteconfiguration_tags(request: HttpRequest):
     )
 
 
+@login_required
+@require_http_methods(["POST"])
+def siteconfiguration_toggle_stopped(request: HttpRequest):
+    has_perm_or_403(request.user, "sites.manage_configuration", request.site)
+
+    site_configuration = request.site.configuration
+
+    if request.POST.get("action") == "stop":
+        site_configuration.stopped_at = timezone.now()
+    else:
+        site_configuration.stopped_at = None
+
+    site_configuration.save(update_fields=["stopped_at"])
+
+    return redirect("crm-site-configuration")
+
+
 ########################################################################
 # organizations
 ########################################################################
