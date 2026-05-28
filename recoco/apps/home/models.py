@@ -298,6 +298,13 @@ class SiteConfiguration(models.Model):
         help_text="Liste des plugins activés sur ce portail",
     )
 
+    stopped_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date d'arrêt du portail",
+        help_text="Si renseignée, indique la date à laquelle le portail a été arrêté.",
+    )
+
     def save(self, *args, **kwargs):
         if self.enabled_plugins and not self.schema_name:
             self.schema_name = make_site_slug(self.site)
