@@ -50,6 +50,10 @@ main {
 .portal-stopped-banner {
   top: 65px;
   z-index: 1019;
+
+  &--anonymous {
+    top: 0;
+  }
 }
 
 @media (min-width: 768px) {
