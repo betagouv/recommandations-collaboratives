@@ -1,0 +1,12 @@
+{% if request.site.configuration.stopped_at %}
+    <div class="fr-notice fr-notice--weather-red position-sticky portal-stopped-banner">
+        <div class="fr-container">
+            <div class="fr-notice__body">
+                <p>
+                    <span class="fr-notice__title fr-icon-error-fill fr-uppercase">Site inactif</span>
+                    <span class="fr-notice__desc">Ce service n'est plus en activité. VOus pouvez toutefois accéder à vos anciens dossiers, lorsque vous êtes connecté.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endif %}

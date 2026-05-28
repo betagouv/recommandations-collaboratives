@@ -37,6 +37,7 @@
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "header/menu-top.html" %}
         {% endif %}
+        {% include "header/portal_stopped_banner.html" %}
         <main class="main-content {% if not user.is_authenticated %}public-content{% endif %}">
             <div id="notification"
                  class="toast-notification"
