@@ -601,8 +601,6 @@ django-leaflet==0.32.0 \
     --hash=sha256:013ccb06ee08071caec98a65dffd68ab3694dafce72caff34f3d78f35568ae25 \
     --hash=sha256:a17d8e6cc05dd98e8e543fbf198b81dabbf9f195c222e786d1686aeda91c1aa8
     # via recoco
-django-magicauth @ git+https://github.com/glibersat/django-magicauth@55eab0b91c95012944933b342748540b2c1b31bf
-    # via recoco
 django-markdownx==4.0.7 \
     --hash=sha256:38aa331c2ca0bee218b77f462361b5393e4727962bc6021939c09048363cb6ea \
     --hash=sha256:c1975ae3053481d4c111abd38997a5b5bb89235a1e3215f995d835942925fe7b

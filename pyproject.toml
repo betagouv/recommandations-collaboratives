@@ -33,7 +33,6 @@ dependencies = [
     "django-htmx>=1.22.0",
     "django-json-widget==2.0.1",
     "django-leaflet>=0.31.0",
-    "django-magicauth",
     "django-markdownx==4.0.7",
     "django-model-info>=2024.11.5",
     "django-multisite2>=2.0.1",
@@ -197,7 +196,6 @@ section-order = [
 check-typed-exception = true
 
 [tool.uv.sources]
-django-magicauth = { git = "https://github.com/glibersat/django-magicauth", rev = "55eab0b91c95012944933b342748540b2c1b31bf" }
 django-notifications-hq = { git = "https://github.com/glibersat/django-notifications.git", rev = "feature/sites-framework-dj5" }
 django-activity-stream = { git = "https://github.com/glibersat/django-activity-stream.git", rev = "django4" }
 django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git", rev = "master" }

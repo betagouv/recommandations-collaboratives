@@ -1049,11 +1049,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-magicauth"
-version = "0.11"
-source = { git = "https://github.com/glibersat/django-magicauth?rev=55eab0b91c95012944933b342748540b2c1b31bf#55eab0b91c95012944933b342748540b2c1b31bf" }
-
-[[package]]
 name = "django-markdownx"
 version = "4.0.7"
 source = { registry = "https://pypi.org/simple" }
@@ -3540,7 +3535,6 @@ dependencies = [
     { name = "django-htmx" },
     { name = "django-json-widget" },
     { name = "django-leaflet" },
-    { name = "django-magicauth" },
     { name = "django-markdownx" },
     { name = "django-model-info" },
     { name = "django-multisite2" },
@@ -3653,7 +3647,6 @@ requires-dist = [
     { name = "django-htmx", specifier = ">=1.22.0" },
     { name = "django-json-widget", specifier = "==2.0.1" },
     { name = "django-leaflet", specifier = ">=0.31.0" },
-    { name = "django-magicauth", git = "https://github.com/glibersat/django-magicauth?rev=55eab0b91c95012944933b342748540b2c1b31bf" },
     { name = "django-markdownx", specifier = "==4.0.7" },
     { name = "django-model-info", specifier = ">=2024.11.5" },
     { name = "django-multisite2", specifier = ">=2.0.1" },

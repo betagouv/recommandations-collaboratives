@@ -16,7 +16,6 @@ from actstream import models as action_models
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -93,35 +92,6 @@ def test_project_fails_unknown_sharing_link(request, client):
     url = reverse("projects-project-sharing-link", kwargs={"project_ro_key": "unkown"})
     response = client.get(url)
     assert response.status_code == 404
-
-
-########################################################################
-# login
-########################################################################
-
-
-@pytest.mark.django_db
-@override_settings(DEBUG=True)
-def test_existing_user_receives_email_on_login(client, settings, mailoutbox):  # noqa
-    user = Recipe(auth.User, email="jdoe@example.com").make()
-    url = reverse("magicauth-login")
-
-    response = client.post(url, data={"email": user.email})
-
-    assert response.status_code == 302
-    assert len(mailoutbox) == 1
-    assert user.email in mailoutbox[0].to
-
-
-@pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client, mailoutbox):
-    email = "jdoe@example.com"
-    url = reverse("magicauth-login")
-    response = client.post(url, data={"email": email})
-    assert response.status_code == 302
-    assert auth.User.objects.get(email=email)
-    assert len(mailoutbox) == 1
-    assert email in mailoutbox[0].to
 
 
 ########################################################################

@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.openid_connect",
     "allauth.mfa",
     "guardian",
-    "magicauth",
     "sass_processor",
     "django_vite",
     "markdownx",
@@ -270,16 +269,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email Configuration
 EMAIL_FROM = "Recoco <no-reply@recoco.fr>"
-
-# MagicAuth configuration
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "login-redirect"
-MAGICAUTH_FROM_EMAIL = EMAIL_FROM
-MAGICAUTH_ADAPTER = "recoco.apps.home.adapters.UVMagicauthAdapter"
-MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à votre compte en un clic"
-MAGICAUTH_EMAIL_FIELD = "email"
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
-MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
 
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
