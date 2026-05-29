@@ -247,6 +247,9 @@ const config = {
         projectCardCrmStyles: resolve(
           './src/js/styles/project-card-crm.css.js'
         ),
+        backgroundOverride: resolve(
+          './src/js/styles/background-override.css.js'
+        ),
         emptyStateCrmStyles: resolve('./src/js/styles/crm-empty-state.css.js'),
       },
       output: {
