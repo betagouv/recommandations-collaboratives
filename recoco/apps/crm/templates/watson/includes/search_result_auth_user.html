@@ -1,31 +1,39 @@
-{% load static %}
-<div class="d-flex align-items-center">
-    <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
-    </svg>
-    <span class="d-flex align-items-center">
-        <a href="{% url 'crm-user-details' obj.pk %}"
-           class="{% if not obj.is_active %}text-decoration-line-through{% endif %}">{{ obj.get_full_name|default:obj.username }}</a>
+<div class="crm-results__user {% if not obj.is_active %}crm-results__user--deactivated{% endif %}">
+    <div class="fr-mb-1v position-relative">
+        <a href="{% url 'crm-user-details' obj.pk %}" class="stretched-link">
+            <!--User name-->
+            <span class="crm-results__user-name">{{ obj.get_full_name|default:obj.username }}</span>
+        </a>
+        <!--Status-->
+        <div class="crm-results__user-status-list fr-ml-3v">
+            {% if not obj.is_active %}
+                <span class="crm-results__user-status-item crm-results__user-status--deleted">Supprimé</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="crm-results__user-info">
         {% if obj.profile.organization.name %}
-            <span class="fr-ml-2v fr-mr-2v">|</span>
-            <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
-            </svg>  
-            <a href="{% url 'crm-organization-details' obj.profile.organization.pk %}">{{ obj.profile.organization.name }}</a>
+            <!--Orga-->
+            <a href="{% url 'crm-organization-details' obj.profile.organization.pk %}">
+                <span class="fr-mr-3v">
+                    <span class="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                    {{ obj.profile.organization.name }}
+                </span>
+            </a>
         {% endif %}
-        {% if obj.profile.phone_no %}
-            <span class="fr-ml-2v fr-mr-2v d-block">|</span>
-            <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone-fill" />
-            </svg>  
-            {{ obj.profile.phone_no }}
+        {% if obj.is_active %}
+            {% if obj.email %}
+                <span class="fr-mr-3v crm-results__user-email">
+                    <a href="mailto:{{ obj.email }}"><span class="fr-icon-link fr-icon--sm fr-mr-1v" aria-hidden="true"></span>{{ obj.email }}</a>
+                </span>
+            {% endif %}
+            {% if obj.profile.phone_no %}
+                <span class="fr-mr-3v crm-results__user-phone">
+                    <a href="tel:+{{ obj.profile.phone_no }}">
+                        <span class="fr-icon-phone-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                    {{ obj.profile.phone_no }}</a>
+                </span>
+            {% endif %}
         {% endif %}
-        {% if obj.email %}
-            <span class="fr-ml-2v fr-mr-2v">|</span>
-            <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-fill" />
-            </svg>  
-            {{ obj.email }}
-        {% endif %}
-    </span>
+    </div>
 </div>

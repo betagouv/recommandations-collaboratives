@@ -3,29 +3,31 @@
 Pour que l'icone de loupe s'affiche correctement, il faut que la div englobante de ce composant soit en position relative.
 
 variables to pass :
-- action_search : la fonction à appeler lors de la recherche
-- placeholder : le texte à afficher dans la barre de recherche
+- action_search : la fonction à appeler lors de la recherche (optionnel)
+- placeholder : le texte à afficher dans la barre de recherche (optionnel)
 - x_model : le nom du modèle x-data à lier à la barre de recherche (optionnel)
 - value : la valeur initiale de la barre de recherche (optionnel)
 - show_search_button : afficher un bouton de recherche (optionnel)
+- padding_icon_class : décallage du contenu par rapport à l'icon (optionnel)
+- padding_class : décallage interne (optionnel)
 
 {% endcomment %}
 {% load django_vite %}
-{% block js %}
-    {% vite_asset 'js/styles/projects-searchbar.css.js' %}
-{% endblock js %}
+{% vite_asset 'js/styles/projects-searchbar.css.js' %}
 <input x-ref="search_bar"
        type="search"
        name="{{ name|default:'query' }}"
        data-cy="search-bar-project"
-       class="placeholder-position searchbar-input{% if show_search_button %} searchbar-input--with-button{% endif %}"
-       placeholder="{{ placeholder|default:'Rechercher' }}"
+       class="placeholder-position searchbar-input{% if show_search_button %} searchbar-input--with-button{% endif %} {{ padding_icon_class|default:'' }} {{ padding_class|default:'' }}"
+       placeholder="{{ placeholder|default:"Rechercher" }}"
        {% if value %}value="{{ value }}"{% endif %}
-       @input.debounce.500ms="{{ action_search }}"
+       {% if action_search %}@input.debounce.500ms="{{ action_search }}"{% endif %}
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
 <span class="fr-icon-search-line correct-position" aria-hidden="true"></span>
 {% if show_search_button %}
-<button type="submit" class="searchbar-button fr-btn fr-btn--sm" title="Rechercher">
-    <span class="sr-only">Rechercher</span>
-</button>
+    <button type="submit"
+            class="searchbar-button fr-btn fr-btn--sm"
+            title="Rechercher">
+        <span class="sr-only">Rechercher</span>
+    </button>
 {% endif %}

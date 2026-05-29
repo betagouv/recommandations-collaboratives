@@ -1,19 +1,33 @@
-{% load static %}
-<div class="d-flex">
-    <div>
-        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
-        </svg>
-        <a href="{% url 'crm-organization-details' obj.pk %}">{{ obj.name }}</a>
-        {% if obj.departments.all %}
-            <div class="list-unstyled d-flex fr-pt-2v align-items-center flex-wrap div-specific-fontsize">
-                {% for dpt in obj.departments.all %}
-                    <span class="fr-mr-1v crm-region-tag">
-                        <span>{{ dpt.name }}</span>
-                        <strong>({{ dpt.code }})</strong>
-                    </span>
-                {% endfor %}
-            </div>
-        {% endif %}
+<div class="crm-results__organization position-relative">
+    <div class="fr-mb-1v">
+        <a href="{% url 'crm-organization-details' obj.pk %}"
+           class="stretched-link">
+            <!--Orga name-->
+            <span class="crm-results__organization-name">{{ obj.name }}</span>
+        </a>
+        <!--Status-->
+        <div class="crm-results__organization-status-list fr-ml-3v">
+            {% if obj.deleted %}
+                <span class="crm-results__organization-status-item crm-results__organization-status--deleted">Supprimé</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="crm-results__organization-info">
+        <!--Member-->
+        <span class="fr-mr-3v">
+            <span class="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+            {{ obj.members_count }} membre{{ obj.members_count|pluralize }}
+        </span>
+        <!--Projects-->
+        <span class="fr-mr-3v">
+            <span class="fr-icon-briefcase-line fr-icon--sm fr-mr-1v"
+                  aria-hidden="true"></span>
+            {{ obj.projects_count }} dossier{{ obj.projects_count|pluralize }}
+        </span>
+        <!--Notes-->
+        <span>
+            <span class="fr-icon-edit-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+            {{ obj.notes_count }} note{{ obj.notes_count|pluralize }}
+        </span>
     </div>
 </div>
