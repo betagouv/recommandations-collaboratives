@@ -14,7 +14,6 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics_models
-from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
@@ -33,8 +32,6 @@ def test_low_reach_available_for_staff_users(request, client, make_project):
     url = reverse("crm-list-projects-low-reach")
 
     current_site = get_current_site(request)
-
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
     make_project(current_site)
     make_project(current_site)
@@ -60,8 +57,6 @@ def test_low_reach_as_csv_available_for_staff_users(request, client, make_projec
 
     make_project(current_site)
     make_project(current_site)
-
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
@@ -136,10 +131,7 @@ def test_site_dashboard_hides_other_site_project_notifications(request, client):
 
 
 @pytest.mark.django_db
-def test_low_reach_defaults_to_no_reaction_and_15_days(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
+def test_low_reach_defaults_to_no_reaction_and_15_days(client):
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
@@ -152,10 +144,7 @@ def test_low_reach_defaults_to_no_reaction_and_15_days(request, client):
 
 
 @pytest.mark.django_db
-def test_low_reach_accepts_known_days_filter(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
+def test_low_reach_accepts_known_days_filter(client):
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"days": 90})
@@ -165,10 +154,7 @@ def test_low_reach_accepts_known_days_filter(request, client):
 
 
 @pytest.mark.django_db
-def test_low_reach_falls_back_on_invalid_days(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
+def test_low_reach_falls_back_on_invalid_days(client):
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"days": "not-an-int"})
@@ -178,10 +164,7 @@ def test_low_reach_falls_back_on_invalid_days(request, client):
 
 
 @pytest.mark.django_db
-def test_low_reach_falls_back_on_unknown_status(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
+def test_low_reach_falls_back_on_unknown_status(client):
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"status": "something-else"})
@@ -191,10 +174,7 @@ def test_low_reach_falls_back_on_unknown_status(request, client):
 
 
 @pytest.mark.django_db
-def test_low_reach_search_query_is_stripped(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
+def test_low_reach_search_query_is_stripped(client):
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"q": "  hello  "})
@@ -231,7 +211,6 @@ def test_low_reach_lists_project_with_public_task_and_no_engagement(
     request, client, make_project
 ):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     project = make_project(site, name="VisibleProject")
     _make_old(project)
@@ -248,7 +227,6 @@ def test_low_reach_lists_project_with_public_task_and_no_engagement(
 @pytest.mark.django_db
 def test_low_reach_hides_project_with_task_in_progress(request, client, make_project):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     project = make_project(site, name="EngagedProject")
     _make_old(project)
@@ -272,7 +250,6 @@ def test_low_reach_hides_project_with_task_in_progress(request, client, make_pro
 @pytest.mark.django_db
 def test_low_reach_hides_project_without_public_task(request, client, make_project):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     project = make_project(site, name="EmptyProject")
     _make_old(project)
@@ -290,7 +267,6 @@ def test_low_reach_low_read_filter_keeps_barely_read_only(
     request, client, make_project
 ):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     not_read = make_project(site, name="NotReadProject")
     _make_old(not_read)
@@ -313,7 +289,6 @@ def test_low_reach_low_read_filter_keeps_barely_read_only(
 @pytest.mark.django_db
 def test_low_reach_mine_only_filters_by_switchtender(request, client, make_project):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     mine = make_project(site, name="MineProject")
     _make_old(mine)
@@ -344,7 +319,6 @@ def test_low_reach_mine_only_filters_by_switchtender(request, client, make_proje
 @pytest.mark.django_db
 def test_low_reach_search_matches_project_name(request, client, make_project):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     target = make_project(site, name="UniqueLighthouse")
     _make_old(target)
@@ -366,7 +340,6 @@ def test_low_reach_search_matches_project_name(request, client, make_project):
 @pytest.mark.django_db
 def test_low_reach_days_zero_disables_time_filter(request, client, make_project):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
 
     recent = make_project(site, name="RecentProject")
     _add_public_task(recent, site)
@@ -387,7 +360,6 @@ def test_low_reach_days_zero_disables_time_filter(request, client, make_project)
 @pytest.mark.django_db
 def test_low_reach_csv_uses_french_headers_and_filename(request, client, make_project):
     site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
     commune = baker.make(geomatics_models.Commune, name="Ville", insee="12345")
 
     project = make_project(site, commune=commune)
