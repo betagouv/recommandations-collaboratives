@@ -5,7 +5,6 @@ from actstream import action
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
-from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -28,10 +27,8 @@ def test_low_reach_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_low_reach_available_for_staff_users(request, client, make_project):
+def test_low_reach_available_for_staff_users(current_site, client, make_project):
     url = reverse("crm-list-projects-low-reach")
-
-    current_site = get_current_site(request)
 
     make_project(current_site)
     make_project(current_site)
@@ -50,10 +47,8 @@ def test_low_reach_as_csv_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_low_reach_as_csv_available_for_staff_users(request, client, make_project):
+def test_low_reach_as_csv_available_for_staff_users(current_site, client, make_project):
     url = reverse("crm-projects-low-reach-csv")
-
-    current_site = get_current_site(request)
 
     make_project(current_site)
     make_project(current_site)
@@ -64,9 +59,8 @@ def test_low_reach_as_csv_available_for_staff_users(request, client, make_projec
 
 
 @pytest.mark.django_db
-def test_site_dashboard_shows_project_actions_to_staff(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site])
+def test_site_dashboard_shows_project_actions_to_staff(current_site, client):
+    project = baker.make(projects_models.Project, sites=[current_site])
     action.send(project, verb="Was here", target=project)
 
     other_site = baker.make(site_models.Site)
@@ -85,9 +79,8 @@ def test_site_dashboard_shows_project_actions_to_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_site_dashboard_shows_advisor_request_actions_to_staff(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site])
+def test_site_dashboard_shows_advisor_request_actions_to_staff(current_site, client):
+    project = baker.make(projects_models.Project, sites=[current_site])
     action.send(project, verb=verbs.User.ADVISOR_REQUEST, target=project)
 
     url = reverse("crm-site-dashboard")
@@ -218,13 +211,11 @@ def make_old():
 
 @pytest.mark.django_db
 def test_low_reach_lists_project_with_public_task_and_no_engagement(
-    request, client, make_project, make_old, add_public_task
+    current_site, client, make_project, make_old, add_public_task
 ):
-    site = get_current_site(request)
-
-    project = make_project(site, name="VisibleProject")
+    project = make_project(current_site, name="VisibleProject")
     make_old(project)
-    add_public_task(project, site)
+    add_public_task(project, current_site)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
@@ -236,17 +227,15 @@ def test_low_reach_lists_project_with_public_task_and_no_engagement(
 
 @pytest.mark.django_db
 def test_low_reach_hides_project_with_task_in_progress(
-    request, client, make_project, make_old, add_public_task
+    current_site, client, make_project, make_old, add_public_task
 ):
-    site = get_current_site(request)
-
-    project = make_project(site, name="EngagedProject")
+    project = make_project(current_site, name="EngagedProject")
     make_old(project)
-    add_public_task(project, site)
+    add_public_task(project, current_site)
     baker.make(
         tasks_models.Task,
         project=project,
-        site=site,
+        site=current_site,
         public=True,
         status=tasks_models.Task.INPROGRESS,
     )
@@ -261,11 +250,9 @@ def test_low_reach_hides_project_with_task_in_progress(
 
 @pytest.mark.django_db
 def test_low_reach_hides_project_without_public_task(
-    request, client, make_project, make_old
+    current_site, client, make_project, make_old
 ):
-    site = get_current_site(request)
-
-    project = make_project(site, name="EmptyProject")
+    project = make_project(current_site, name="EmptyProject")
     make_old(project)
 
     url = reverse("crm-list-projects-low-reach")
@@ -278,18 +265,16 @@ def test_low_reach_hides_project_without_public_task(
 
 @pytest.mark.django_db
 def test_low_reach_low_read_filter_keeps_barely_read_only(
-    request, client, make_project, make_old, add_public_task
+    current_site, client, make_project, make_old, add_public_task
 ):
-    site = get_current_site(request)
-
-    not_read = make_project(site, name="NotReadProject")
+    not_read = make_project(current_site, name="NotReadProject")
     make_old(not_read)
-    add_public_task(not_read, site)
+    add_public_task(not_read, current_site)
 
-    well_read = make_project(site, name="WellReadProject")
+    well_read = make_project(current_site, name="WellReadProject")
     make_old(well_read)
-    add_public_task(well_read, site, visited=True)
-    add_public_task(well_read, site, visited=True)
+    add_public_task(well_read, current_site, visited=True)
+    add_public_task(well_read, current_site, visited=True)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
@@ -302,23 +287,21 @@ def test_low_reach_low_read_filter_keeps_barely_read_only(
 
 @pytest.mark.django_db
 def test_low_reach_mine_only_filters_by_switchtender(
-    request, client, make_project, make_old, add_public_task
+    current_site, client, make_project, make_old, add_public_task
 ):
-    site = get_current_site(request)
-
-    mine = make_project(site, name="MineProject")
+    mine = make_project(current_site, name="MineProject")
     make_old(mine)
-    add_public_task(mine, site)
+    add_public_task(mine, current_site)
 
-    other = make_project(site, name="OtherProject")
+    other = make_project(current_site, name="OtherProject")
     make_old(other)
-    add_public_task(other, site)
+    add_public_task(other, current_site)
 
     advisor = baker.make(auth_models.User)
-    advisor.profile.sites.add(site)
+    advisor.profile.sites.add(current_site)
     baker.make(
         projects_models.ProjectSwitchtender,
-        site=site,
+        site=current_site,
         switchtender=advisor,
         project=mine,
     )
@@ -334,17 +317,15 @@ def test_low_reach_mine_only_filters_by_switchtender(
 
 @pytest.mark.django_db
 def test_low_reach_search_matches_project_name(
-    request, client, make_project, make_old, add_public_task
+    current_site, client, make_project, make_old, add_public_task
 ):
-    site = get_current_site(request)
-
-    target = make_project(site, name="UniqueLighthouse")
+    target = make_project(current_site, name="UniqueLighthouse")
     make_old(target)
-    add_public_task(target, site)
+    add_public_task(target, current_site)
 
-    other = make_project(site, name="OtherProject")
+    other = make_project(current_site, name="OtherProject")
     make_old(other)
-    add_public_task(other, site)
+    add_public_task(other, current_site)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
@@ -357,12 +338,10 @@ def test_low_reach_search_matches_project_name(
 
 @pytest.mark.django_db
 def test_low_reach_days_zero_disables_time_filter(
-    request, client, make_project, add_public_task
+    current_site, client, make_project, add_public_task
 ):
-    site = get_current_site(request)
-
-    recent = make_project(site, name="RecentProject")
-    add_public_task(recent, site)
+    recent = make_project(current_site, name="RecentProject")
+    add_public_task(recent, current_site)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
@@ -379,14 +358,13 @@ def test_low_reach_days_zero_disables_time_filter(
 
 @pytest.mark.django_db
 def test_low_reach_csv_uses_french_headers_and_filename(
-    request, client, make_project, make_old, add_public_task
+    current_site, client, make_project, make_old, add_public_task
 ):
-    site = get_current_site(request)
     commune = baker.make(geomatics_models.Commune, name="Ville", insee="12345")
 
-    project = make_project(site, commune=commune)
+    project = make_project(current_site, commune=commune)
     make_old(project)
-    add_public_task(project, site)
+    add_public_task(project, current_site)
 
     url = reverse("crm-projects-low-reach-csv")
     with login(client, groups=["example_com_staff"]):
