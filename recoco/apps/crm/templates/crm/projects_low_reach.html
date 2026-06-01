@@ -61,7 +61,7 @@
                        for="status-filter">Statut :</label>
                 <div class="project-low-reach__status-wrapper">
                     <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' %}warning{% else %}info{% endif %}"
-                          title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% else %}Pas de statut sur recomandation, de message du demandeur ou de tag d'impact{% endif %}">
+                          title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% else %}Pas de statut sur recommandation, de message du demandeur ou de tag d'impact{% endif %}">
                         {% if status_filter == 'low_read' %}Recos non lues{% else %}Aucune réaction{% endif %}
                     </span>
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
