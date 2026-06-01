@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 
 import pytest
@@ -374,27 +375,16 @@ def test_low_reach_csv_uses_french_headers_and_filename(
 
     body = response.content.decode("utf-8")
     first_line = body.splitlines()[0]
-    expected_headers = [
-        "nom_dossier",
-        "commune",
-        "insee",
-        "conseillers",
-        "recos_lues",
-        "recos_total",
-        "derniere_activite",
-        "derniere_reco",
-        "statut",
-        "referent_prenom",
-        "referent_nom",
-        "referent_organisation",
-        "referent_telephone",
-        "referent_email",
-        "referent_fonction",
-    ]
-    for header in expected_headers:
-        assert header in first_line
+    assert first_line == (
+        '"nom_dossier","commune","insee","conseillers","recos_lues","recos_total",'
+        '"derniere_activite","derniere_reco","statut","referent_prenom","referent_nom",'
+        '"referent_organisation","referent_telephone","referent_email","referent_fonction"'
+    )
 
-    assert "projets-a-relancer-" in response["Content-Disposition"]
+    assert re.fullmatch(
+        r'attachment; filename="projets-a-relancer-\d{4}-\d{2}-\d{2}\.csv"',
+        response["Content-Disposition"],
+    )
 
 
 # eof
