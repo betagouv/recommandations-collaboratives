@@ -124,19 +124,12 @@ def create_task(request):
                 user=request.user,
             )
 
-            # Redirect to `action-inline` if we're coming
-            # from `action-inline` after create
-            # TODO remove the logic about 'next' field in the form when the recommendation tab is removed
-            next_url = type_form.cleaned_data["next"]
             conversation_url = reverse(
                 "projects-project-detail-conversations", args=[project.id]
             )
-            if not next_url or next_url == "None":
-                next_url = conversation_url
-
-            if not action.public and next_url == conversation_url:
-                next_url += "#drafts"
-            return redirect(next_url)
+            if not action.public:
+                conversation_url += "#drafts"
+            return redirect(conversation_url)
 
     else:
         type_form = PushTypeActionForm(request.user, request.GET)
@@ -300,16 +293,12 @@ def update_task(request, task_id=None):
                     user=request.user,
                 )
 
-            if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
-                return redirect(form.cleaned_data["next"])
-
             return redirect(
                 reverse("projects-project-detail-conversations", args=[task.project_id])
             )
     else:
         initial = {
             "topic_name": task.topic.name if task.topic else None,
-            "next": request.GET.get("next"),
         }
         form = UpdateTaskForm(instance=task, initial=initial)
         # Initialize preserved_content for template compatibility
