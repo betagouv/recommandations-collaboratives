@@ -18,8 +18,23 @@
     <!-- Container for the draft recommendation card -->
     <div class="shared-contents-draft-reco-card__container">
         <div class="shared-contents-draft-reco-card__header">
-            <span class="fr-icon-draft-line fr-icon--sm" aria-hidden="true"></span>
-            <span>Brouillon</span>
+            <div>
+                <span class="fr-icon-draft-line fr-icon--sm" aria-hidden="true"></span>
+                <span>Brouillon</span>
+            </div>
+            <div>
+                <span class="fr-mr-3v">Position : <span x-text="index + 1"></span></span>
+                <button class="fr-btn--tertiary fr-btn--tertiary-white-background"
+                        @click="$store.sharedContentsPanel.moveDraftRecommendation('above', recommendation)"
+                        :disabled="index == 0">
+                    <span class="fr-icon-arrow-up-s-line fr-icon--sm " aria-hidden="true"></span>
+                </button>
+                <button class="fr-btn--tertiary fr-btn--tertiary-white-background"
+                        @click="$store.sharedContentsPanel.moveDraftRecommendation('below', recommendation)"
+                        :disabled="index == $store.sharedContentsPanel.draftRecommendations.length - 1">
+                    <span class="fr-icon-arrow-down-s-line fr-icon--sm " aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
         <!-- Inside container  -->
         <div class="shared-contents-draft-reco-card__inside-container">

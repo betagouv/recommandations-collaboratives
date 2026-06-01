@@ -11,7 +11,6 @@ from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Prefetch
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -22,7 +21,6 @@ from django.views.decorators.csrf import csrf_exempt
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
-from recoco.apps.resources.models import Resource
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -203,47 +201,11 @@ def project_knowledge(request, project_id=None):
 
 @login_required
 def project_actions(request, project_id=None):
-    """Action page for given project"""
-
-    # we test to remove this part so we keep the code but redirect to new interface
+    """Legacy URL — redirect to the conversation tab with the action panel open."""
     url = (
         reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
     )
     return redirect(url)
-
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site)
-        .with_unread_notifications(user_id=request.user.id)
-        .prefetch_related(
-            "tasks", Prefetch("tasks__resource", Resource.objects.with_ds_annotations())
-        )
-        .select_related("commune__department"),
-        pk=project_id,
-    )
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_tasks", project
-    )
-
-    # FIXME check this really been deleted from develop
-    # Mark this project action notifications as read
-    # project_ct = ContentType.objects.get_for_model(project)
-    # task_ct = ContentType.objects.get_for_model(task_models.Task)
-    # task_notifications = request.user.notifications.unread().filter(
-    #     action_object_content_type=task_ct,
-    #     target_content_type=project_ct.pk,
-    #     target_object_id=project.pk,
-    # )  # XXX Bug?
-
-    return render(request, "projects/project/actions.html", locals())
 
 
 @xframe_options_exempt

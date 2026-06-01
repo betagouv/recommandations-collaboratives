@@ -2,6 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
+// TODO Réécrire : page /actions redirige et tasks-inline-button n'existe plus
 describe.skip("I can go to action page but can't see the loop to access the inline tasks @page-projet-recommandations", () => {
   beforeEach(() => {
     cy.login('collectivité1');

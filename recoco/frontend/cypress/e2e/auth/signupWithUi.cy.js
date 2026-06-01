@@ -1,36 +1,22 @@
+import project from '../../fixtures/projects/project.json';
+
 describe('The Signup Page @inscription', () => {
   const userToSignup = {
     '[name=first_name]': 'Signupuser',
     '[name=last_name]': 'Successful',
-    '[name=organization]': 'Signup Corp',
-    '[name=organization_position]': 'Tester',
-    '[name=email]': 'signup3@success.test',
-    '[name=phone_no]': '0102030405',
-    '[name=password1]': 'Recoco2000',
-    '[name=password2]': 'Recoco2000',
+    '[name=org_name]': 'Signup Corp',
+    '[name=role]': 'Tester',
+    '[name=email]': 'signup4@success.test',
+    '[name=phone]': '0102030405',
+    '[name=password]': 'Recoco2000',
   };
 
   it('signup a new user', function () {
+    cy.createProject('Test signup', project, true, userToSignup);
+  });
+
+  it('cannot signup without creating a projet', function () {
     cy.visit('accounts/signup/');
-
-    cy.url().should('include', '/accounts/signup/');
-
-    for (const key in userToSignup) {
-      if (Object.prototype.hasOwnProperty.call(userToSignup, key)) {
-        const element = userToSignup[key];
-        cy.get(key).type(element, { delay: 0 });
-      }
-    }
-    cy.document().then((doc) => {
-      var iframe = doc.getElementById('id_captcha').querySelector('iframe');
-      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      innerDoc.querySelector('.recaptcha-checkbox').click();
-      cy.wait(400);
-      cy.get('[type=submit]').click();
-
-      cy.location().should((loc) => {
-        expect(loc.pathname).to.eq('/');
-      });
-    });
+    cy.get('form').should('not.exist');
   });
 });

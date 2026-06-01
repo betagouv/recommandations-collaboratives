@@ -2,7 +2,6 @@ import Alpine from 'alpinejs';
 import api, {
   tasksUrl,
   taskUrl,
-  moveTaskUrl,
   followupsUrl,
   followupUrl,
   taskNotificationsUrl,
@@ -83,31 +82,6 @@ document.addEventListener('alpine:init', () => {
     },
     getTaskById(id) {
       return this.tasks.find((task) => task.id == id);
-    },
-    async moveTask(taskId, otherTaskId, { direction }) {
-      const params = new URLSearchParams(`${direction}=${otherTaskId}`);
-      await api.post(moveTaskUrl(this.projectId, taskId), params, {
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      });
-    },
-    async moveTaskFast(taskId, { direction }) {
-      const params = new URLSearchParams(`${direction}=true`);
-      await api.post(moveTaskUrl(this.projectId, taskId), params, {
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      });
-    },
-    // Movement Buttons
-    async moveAbove(task, otherTask) {
-      await this.moveTask(task.id, otherTask.id, { direction: 'above' });
-    },
-    async moveBelow(task, otherTask) {
-      await this.moveTask(task.id, otherTask.id, { direction: 'below' });
-    },
-    async moveTop(task) {
-      await this.moveTaskFast(task.id, { direction: 'top' });
-    },
-    async moveBottom(task) {
-      await this.moveTaskFast(task.id, { direction: 'bottom' });
     },
     async patchTask(taskId, patch) {
       await api.patch(taskUrl(this.projectId, taskId), patch);
