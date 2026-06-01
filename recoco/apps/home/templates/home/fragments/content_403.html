@@ -1,0 +1,14 @@
+{% extends "account/layout/layout.html" %}
+{% block layout_content %}
+    <div class="fr-callout fr-my-4w fr-pb-3w fr-pr-3w fr-pt-2w fr-pl-5v  ">
+        <p class="fr-callout__text fr-text--sm">
+            Vous êtes actuellement connecté en tant que {{ request.user }} mais tentez de vous connecter avec une autre compte
+        </p>
+    </div>
+    <a href="{{ relogin_url }}" class="fr-btn">Se connecter avec un autre compte</a>
+{% endblock layout_content %}
+{% comment %} TODO
+- [x] bandeau pour indiquer à l'utilisateur "vous êtes conecté en tant que USER.
+- [x] mettre un lien relogin_url qui va les déco, les amener à une page de connexion
+- [ ] potentiellement (à préciser avec Sabine c'est une idée à la volée) leur suggérer
+de se faire inviter sur le dossier s'ils n'ont pas l'accès {% endcomment %}
