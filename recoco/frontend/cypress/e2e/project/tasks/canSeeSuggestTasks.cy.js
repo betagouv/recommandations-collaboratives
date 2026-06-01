@@ -1,6 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
+// TODO Réécrire : la redirection /actions → /conversations#actions ne contient plus le bouton see-suggest-task-button
 describe.skip('I can see suggest task @page-projet-recommandations', () => {
   it('as advisor I can see ', () => {
     cy.login('conseiller1');

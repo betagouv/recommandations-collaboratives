@@ -1,3 +1,4 @@
+// TODO Réécrire : create-task-button n'est plus accessible depuis /actions (page redirigée)
 describe.skip('I can follow the external resource tutorial @tutoriel-ressource-externe', () => {
   it('displays the launcher tutorial on the external resource', () => {
     cy.login('conseiller1');

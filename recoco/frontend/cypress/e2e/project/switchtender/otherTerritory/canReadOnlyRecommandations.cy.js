@@ -1,6 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
+// TODO Réécrire pour la nouvelle interface conversation (/actions redirige vers /conversations#actions)
 describe.skip('I can read only recommandations @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller3');

@@ -1,6 +1,8 @@
 import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
+// TODO Réécrire pour la nouvelle interface conversation+panneau actions
+//      (l'onglet "Recommandations" n'existe plus, /actions redirige vers /conversations#actions)
 describe.skip('I can access actions tab in a project as a member @navigation-projet @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('collectivité1');

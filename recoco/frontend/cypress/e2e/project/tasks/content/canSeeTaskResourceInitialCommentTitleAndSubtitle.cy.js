@@ -4,6 +4,7 @@ const currentResource = resources[4];
 const taskName = 'task intent';
 let currentProjectId;
 
+// TODO Réécrire : list-tasks-switch-button n'existe plus, /actions redirige vers /conversations
 describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');
