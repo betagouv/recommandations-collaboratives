@@ -382,7 +382,7 @@ def test_low_reach_csv_uses_french_headers_and_filename(
     )
 
     assert re.fullmatch(
-        r'attachment; filename="projets-a-relancer-\d{4}-\d{2}-\d{2}\.csv"',
+        r'attachment; filename="projets-a-relancer-\d{4}-\d{2}-\d{2}-\d{6}\.csv"',
         response["Content-Disposition"],
     )
 

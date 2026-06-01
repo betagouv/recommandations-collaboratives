@@ -1445,9 +1445,9 @@ def crm_projects_with_low_reach_as_csv(request):
         search_q=search_q,
     ).prefetch_related("projectmember_set__member__profile__organization")
 
-    today = datetime.today().date()
+    timestamp = datetime.today().strftime("%Y-%m-%d-%H%M%S")
 
-    content_disposition = f'attachment; filename="projets-a-relancer-{today}.csv"'
+    content_disposition = f'attachment; filename="projets-a-relancer-{timestamp}.csv"'
 
     response = HttpResponse(
         content_type="text/csv",
