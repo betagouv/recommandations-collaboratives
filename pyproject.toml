@@ -251,7 +251,7 @@ dev = [
     "sphinx-toolbox>=3.8.2",
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
-    "uv>=0.9.6",
+    "uv>=0.11.15",
 ]
 
 
