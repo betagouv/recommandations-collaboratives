@@ -14,7 +14,7 @@
             </svg>
             Contacter l'équipe {{ request.site.name }}
         </h2>
-        {% if user.is_authenticated %}
+        {# quick fix to unlock brevo {% if user.is_authenticated %} #}
             <p class="text-secondary">
                 Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez
                 copier-coller notre adresse email :
@@ -22,7 +22,9 @@
                     <a class="fw-bold" href="mailto:{{ email }}">{{ email }}</a>
                 {% endwith %}
             </p>
-        {% endif %}
+        {# quick fix to unlock brevo {% endif %} #}
+
+        {% if user.is_authenticated %} {# condition is quick fix to unlock brevo #}
         <form method="post" data-test-id="contact-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}" />
@@ -84,6 +86,8 @@
                     class="btn btn-primary"
                     data-test-id="contact-form-submit">Envoyer mon message</button>
         </form>
+        {% endif %}
+
         {% if request.GET.next %}
             <p class="small fr-mt-2w">
                 <a href="{{ request.GET.next }}" class="small">Annuler et revenir à la page précédente</a>
