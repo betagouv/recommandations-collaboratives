@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import sentry_sdk
+from cookie_consent.util import get_cookie_value_from_request
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
@@ -74,9 +75,13 @@ class SetEnableSesameCookieMiddleware:
 
     def __call__(self, request: HttpRequest):
         response = self.get_response(request)
-        # if user and no cookie, set cookie
-        if request.user.is_authenticated and not request.COOKIES.get(
-            "enable-sesame-user-id"
+        # if user, cookie consent but no cookie, set cookie
+        if (
+            request.user.is_authenticated
+            and get_cookie_value_from_request(
+                request, "preference", "preference:enable-sesame"
+            )
+            and not request.COOKIES.get("enable-sesame-user-id")
         ):
             current_site = Site.objects.get_current()
             domain = current_site.domain
@@ -105,8 +110,12 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
 
         # this cookie is meant to know if user had already signed in
         # on this device, to secure this type of authentication
-        cookie_user_id = request.get_signed_cookie(
-            "enable-sesame-user-id", default=None
+        cookie_user_id = (
+            request.get_signed_cookie("enable-sesame-user-id", default=None)
+            if get_cookie_value_from_request(
+                request, "preference", "preference:enable-sesame"
+            )
+            else None
         )
 
         if cookie_user_id != user.id:
