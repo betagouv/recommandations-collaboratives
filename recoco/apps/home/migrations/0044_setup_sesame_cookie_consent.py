@@ -14,14 +14,14 @@ def set_cookie_consent(apps, schema_editor):
     )
     Cookie.objects.get_or_create(
         cookiegroup=group,
-        name="enable-sesame-user-id",
+        name="enable-sesame",
         description="Garde trace de la dernière personne connectée pour autoriser la connexion par lien magique pendant la durée de vie de cookie pour la personne",
     )
 
 
 def unset_cookie_consent(apps, schema_editor):
     Cookie = apps.get_model("cookie_consent", "Cookie")
-    Cookie.objects.filter(name="enable-sesame-user-id").delete()
+    Cookie.objects.filter(name="enable-sesame").delete()
 
     CookieGroup = apps.get_model("cookie_consent", "CookieGroup")
     group = CookieGroup.objects.filter(varname="preferences").first()

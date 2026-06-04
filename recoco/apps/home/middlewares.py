@@ -62,7 +62,6 @@ class PreviousActivityMiddleware:
         return self.get_response(request)
 
 
-# todo add resul
 class SetEnableSesameCookieMiddleware:
     """
     Middleware to set user cookie
@@ -79,7 +78,7 @@ class SetEnableSesameCookieMiddleware:
         if (
             request.user.is_authenticated
             and get_cookie_value_from_request(
-                request, "preference", "preference:enable-sesame"
+                request, "preferences", "preferences:enable-sesame"
             )
             and not request.COOKIES.get("enable-sesame-user-id")
         ):
@@ -90,7 +89,7 @@ class SetEnableSesameCookieMiddleware:
                 request.user.id,
                 max_age=timedelta(weeks=52 * 2),  # two years
                 domain=domain,
-                http_only=True,
+                httponly=True,
                 secure=True,
             )
         return response
@@ -113,12 +112,14 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
         cookie_user_id = (
             request.get_signed_cookie("enable-sesame-user-id", default=None)
             if get_cookie_value_from_request(
-                request, "preference", "preference:enable-sesame"
+                request, "preferences", "preferences:enable-sesame"
             )
             else None
         )
+        if cookie_user_id is None:
+            return None
 
-        if cookie_user_id != user.id:
+        if int(cookie_user_id) != user.id:
             # we don't change the authenticated user. If the previous one does not have access,
             # we rely that the 403 page reminds the user of the authentication status
             return None
