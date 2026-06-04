@@ -113,6 +113,7 @@ jobs:
           uv run pytest --create-db --tb=short -p no:warnings -q --cov --cov-report=xml --cov-report=term-missing
 
       - name: Coverage report to job summary
+        if: always()
         run: |
           uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
