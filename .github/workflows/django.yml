@@ -43,8 +43,9 @@ jobs:
   django-tests:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write # coverage
-      contents: write # coverage
+      pull-requests: write # post coverage comments on PRs
+      contents: write      # push to python-coverage-comment-action-data branch
+      actions: read        # read baseline coverage artifact from main branch runs
 
     services:
       # Label used to access the service container
@@ -69,6 +70,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4.1.5
+        with:
+          persist-credentials: true
 
       - name: Install packages
         run: |
@@ -83,8 +86,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          uv sync --no-dev
-          uv sync --only-dev
+          uv sync
 
       - name: Configure
         run: |
@@ -101,7 +103,7 @@ jobs:
           DJANGO_DB_PORT: 5432
           DJANGO_DB_ENGINE: django.db.backends.postgresql
         run: |
-          uv run pytest --create-db --tb=short -p no:warnings -q --cov --cov-report=xml --cov-report=term-missing
+          uv run pytest --create-db -q --cov-report=term-missing
 
       - name: Coverage report to job summary
         if: always()
@@ -109,7 +111,7 @@ jobs:
           uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
       - name: Coverage comment on PR
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         uses: py-cov-action/python-coverage-comment-action@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
