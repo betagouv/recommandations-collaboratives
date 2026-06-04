@@ -89,6 +89,9 @@ jobs:
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
 
+      - name: Audit dependencies
+        run: uv audit
+
       - name: Run Tests
         env:
           SECRET_KEY: 'this-is-not-a-secret-key'
