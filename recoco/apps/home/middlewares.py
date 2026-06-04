@@ -77,11 +77,13 @@ class SetEnableSesameCookieMiddleware:
         # if user, cookie consent but no cookie, set cookie
         if (
             request.user.is_authenticated
-            and not getattr(request.user, "is_hijacked", False)
+            and not getattr(request.user, "is_hijacked", True)
+            # during hijacking request.user is the hijacked one and is_hijacked is not set
             and get_cookie_value_from_request(
                 request, "preferences", "preferences:enable-sesame"
             )
-            and not request.COOKIES.get("enable-sesame-user-id")
+            and request.get_signed_cookie("enable-sesame-user-id", default=None)
+            != request.user.id
         ):
             current_site = Site.objects.get_current()
             domain = current_site.domain
