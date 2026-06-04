@@ -205,9 +205,9 @@ django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-conse
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
-[tool.uv-secure.vulnerability_criteria]
+[tool.uv.audit]
 # to set if packages have unfixed acceptable vulnerabilities
-ignore_vulnerabilities = [
+ignore = [
     "GHSA-r374-rxx8-8654", # low impact no fix
     "PYSEC-2025-183", # no fix alias 'CVE-2025-45768'
     "PYSEC-2026-89" # supposedly fixed in 3.8.1 in this alias 'GHSA-5wmx-573v-2qwq' otherwise unclear
