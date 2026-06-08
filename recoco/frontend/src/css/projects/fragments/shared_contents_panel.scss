@@ -11,7 +11,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 30%;
+  width: 40%;
   background: var(--background-default-grey, #fff);
   z-index: 2000;
   display: flex;
@@ -313,6 +313,8 @@
     margin-bottom: 1.5rem;
   }
   &__header {
+    display: flex;
+    justify-content: space-between;
     padding: 4px;
     color: var(--light-neutral-grey-1000, #fff);
     font-size: 12px;

@@ -293,14 +293,6 @@ export function deleteTaskUrl(taskId) {
   return `/task/${taskId}/delete/`;
 }
 
-export function deleteTaskReminderUrl(taskId) {
-  return `/task/${taskId}/remind-delete/`;
-}
-
-export function editReminderUrl(taskId) {
-  return `/task/${taskId}/remind/`;
-}
-
 // Conversations
 export function conversationsMessagesUrl(projectId) {
   return `/api/projects/${projectId}/conversations/messages/`;

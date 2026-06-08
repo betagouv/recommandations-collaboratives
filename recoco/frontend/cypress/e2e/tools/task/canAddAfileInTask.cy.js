@@ -2,6 +2,7 @@ import file from '../../../fixtures/documents/file.json';
 
 let currentProjectId;
 
+// TODO Réécrire : la création de tâche redirige désormais vers /conversations
 describe.skip('I can add a file in a task @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');

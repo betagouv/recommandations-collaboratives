@@ -1,3 +1,4 @@
+// TODO Réécrire : la création de tâche redirige désormais vers /conversations
 describe.skip('I can attach miscellanious ressource to task @page-projet-recommandations-creation @page-projet-recommandations', () => {
   it('publishes a task with resource comment / no comment', () => {
     cy.login('conseiller1');

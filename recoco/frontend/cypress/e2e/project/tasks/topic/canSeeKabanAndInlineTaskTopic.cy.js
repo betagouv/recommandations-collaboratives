@@ -1,5 +1,6 @@
 let currentProjectId;
 
+// TODO Réécrire : kanban/list-tasks-switch-button et task-kanban-topic n'existent plus
 describe.skip('I can go to tasks tab @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller1');

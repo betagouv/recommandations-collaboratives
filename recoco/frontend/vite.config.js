@@ -38,9 +38,7 @@ const config = {
         advisorCreateProject: resolve('./src/js/apps/advisorCreateProject.js'),
         home: resolve('./src/js/apps/home.js'),
         crm: resolve('./src/js/apps/crm.js'),
-        project: resolve('./src/js/apps/project.js'),
         boardProjects: resolve('./src/js/apps/boardProjects.js'),
-        tasks: resolve('./src/js/apps/tasks.js'),
         embedResource: resolve('./src/js/apps/embedResource.js'),
         advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),
         auth: resolve('./src/js/apps/auth.js'),
@@ -113,7 +111,6 @@ const config = {
         personnalDashboardStyles: resolve(
           './src/js/styles/personnal-dashboard.css.js'
         ),
-        tasksModalStyles: resolve('./src/js/styles/tasks-modal.css.js'),
         switchtenderListStyles: resolve(
           './src/js/styles/switchtender-list.css.js'
         ),
@@ -229,6 +226,7 @@ const config = {
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),
+        crmResults: resolve('./src/js/styles/crm-results.css.js'),
         projectCrmStyles: resolve('./src/js/styles/project-crm.css.js'),
         bannerProjectStatusStyle: resolve(
           './src/js/styles/banner-project-status.css.js'
@@ -243,7 +241,13 @@ const config = {
         cardCrmStyles: resolve('./src/js/styles/card-crm.css.js'),
         GravatarCache: resolve('./src/js/components/GravatarCache.js'),
         userCrmStyles: resolve('./src/js/styles/user-crm.css.js'),
-        projectCardCrmStyles: resolve('./src/js/styles/project-card-crm.css.js'),
+        projectCardCrmStyles: resolve(
+          './src/js/styles/project-card-crm.css.js'
+        ),
+        backgroundOverride: resolve(
+          './src/js/styles/background-override.css.js'
+        ),
+        emptyStateCrmStyles: resolve('./src/js/styles/crm-empty-state.css.js'),
       },
       output: {
         chunkFileNames: undefined,
