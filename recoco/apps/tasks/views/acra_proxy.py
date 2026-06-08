@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+import logging
+
 import requests
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -9,6 +11,8 @@ from rest_framework.views import APIView
 
 from recoco.apps.projects import models as project_models
 from recoco.utils import has_perm_or_403
+
+logger = logging.getLogger(__name__)
 
 
 def _acra_headers():
@@ -42,8 +46,9 @@ class AcraAskView(APIView):
                 timeout=60,
             )
             response.raise_for_status()
-        except requests.RequestException as exc:
-            return Response({"error": str(exc)}, status=502)
+        except requests.RequestException:
+            logger.exception("ACRA /ask request failed")
+            return Response({"error": "Upstream service unavailable."}, status=502)
 
         return Response(response.json())
 
@@ -71,7 +76,8 @@ class AcraCoRecommendationsView(APIView):
                 timeout=30,
             )
             response.raise_for_status()
-        except requests.RequestException as exc:
-            return Response({"error": str(exc)}, status=502)
+        except requests.RequestException:
+            logger.exception("ACRA /co-recommendations request failed")
+            return Response({"error": "Upstream service unavailable."}, status=502)
 
         return Response(response.json())
