@@ -34,9 +34,47 @@
         <div x-data="Crm" class="fr-px-0 d-flex">
             <div class="crm-home__section d-flex flex-column justify-content-start">
                 <div class="d-flex flex-column">
-                    <div class="">
+                    <div class="fr-pb-2w">
                         <h4 class="crm-home__subtitle fr-mb-1v">
                             Alertes
+                        </h4>
+                        <div class="gap-2 d-flex flex-wrap">
+                            <div>
+                                {% url 'crm-user-list' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Nouvelles demandes à modérer" icon="person-circle" text=text currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                            <div class="">
+                                {% url 'crm-project-list' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Adresses email à corriger" icon="folder-fill" text=text currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fr-pb-2w">
+                        <h4 class="crm-home__subtitle fr-mb-1v">
+                            Maintenance (ou un Autre nom pour dire truc mensuels, un peu l’entretien)
+                        </h4>
+                        <div class="gap-2 d-flex flex-wrap">
+                            <div>
+                                {% url 'crm-list-projects-low-reach' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers à relancer" icon="person-circle" text=text currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                            <div>
+                                {% url 'crm-reco-without-resources' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Recos sans ressource" icon="person-circle" text=text currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fr-pb-2w">
+                        <h4 class="crm-home__subtitle fr-mb-1v">
+                            Données (ou un autre nom pour dire rangement)
                         </h4>
                         <div class="gap-2 d-flex flex-wrap">
                             <div>
@@ -47,107 +85,107 @@
                             </div>
                             <div class="">
                                 {% url 'crm-project-list' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers" icon="folder-fill" currentColor="#0974F6" %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers" icon="folder-fill" currentColor="#0974F6" %}
+                                {% endwith %}
                             </div>
                             <div class="">
                                 {% url 'crm-organization-list' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Organisations" icon="building" currentColor="#0974F6" %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Organisations" icon="building" text=text currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                            <div>
+                                {% url 'crm-project-list-by-tags' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags / Projects" icon="tag-fill" text=text currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                            <div class="">
+                                {% url 'crm-list-tags' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Index des tags" icon="activity" currentColor="#0974F6" %}
+                                {% endwith %}
+                            </div>
+                            <div class="">
+                                {% url 'crm-list-topics' as url %}
+                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Index des thématiques" icon="boxes" text=text currentColor="#0974F6" %}
+                                {% endwith %}
                             </div>
                         </div>
                     </div>
-                    <div class="fr-px-3w fr-pb-2w">
-                        <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                            <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bar-chart-fill" />
-                            </svg>
-                            <span>Métriques</span>
-                        </h5>
-                        <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                            <li class="fr-mr-2v col-2">
-                                {% url 'crm-project-list-by-tags' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags / Projects" icon="tag-fill" %}
-                            </li>
-                            <li class="fr-mr-2v col-2 ">
-                                {% url 'crm-list-projects-low-reach' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers à faible répondant" icon="chat-square-dots" %}
-                            </li>
-                            <li class="fr-mr-2v col-2 ">
-                                {% url 'crm-list-tags' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Index des tags du crm" icon="activity" %}
-                            </li>
-                            <li class="fr-mr-2v col-2 ">
-                                {% url 'crm-list-topics' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Index des thématiques" icon="boxes" %}
-                            </li>
-                            <li class="fr-mr-2v col-2 ">
-                                {% url 'crm-reco-without-resources' as url %}
-                                {% include "crm/fragments/crm_home_card.html" with link_url=url name="Recos sans ressource" icon="suit-club" %}
-                            </li>
-                        </ul>
-                    </div>
                     {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.access_admin %}
-                        <div class="fr-pb-2w fr-px-3w">
-                            <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                                <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sliders" />
-                                </svg>
-                                <span>Configuration</span>
-                            </h5>
-                            <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
+                        <div class="fr-pb-2w">
+                            <h4 class="crm-home__subtitle fr-mb-1v">
+                                Configuration DU PORTAIL
+                            </h4>
+                            <div class="gap-2 d-flex flex-wrap">
                                 {% if "manage_configuration" in user_site_perms %}
-                                    <li class="fr-mr-2v col-2">
+                                    <div>
                                         {% url 'crm-site-configuration' as url %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Paramètres du Site" icon="gear" %}
-                                    </li>
+                                        {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Paramètres du Site" icon="gear" text=text currentColor="#0974F6" %}
+                                        {% endwith %}
+                                    </div>
                                 {% endif %}
                                 {% if perms.wagtailadmin.access_admin %}
-                                    <li class="fr-mr-2v col-2">
+                                    <div class="">
                                         {% url 'wagtailadmin_home' as url %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pages Statiques" icon="pen" %}
-                                    </li>
+                                        {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pages Statiques" icon="pen" text=text currentColor="#0974F6" %}
+                                        {% endwith %}
+                                    </div>
                                 {% endif %}
-                                <li class="fr-mr-2v col-2">
+                                <div class="">
                                     {% url 'projects-task-recommendation-list' as url %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" %}
-                                </li>
+                                    {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" text=text currentColor="#0974F6" %}
+                                    {% endwith %}
+                                </div>
                                 {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
-                                    <li class="fr-mr-2v col-2">
+                                    <div class="">
                                         {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Questionnaire" icon="question-circle" %}
-                                    </li>
+                                        {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Questionnaire" icon="question-circle" text=text currentColor="#0974F6" %}
+                                        {% endwith %}
+                                    </div>
                                 {% endif %}
-                            </ul>
+                            </div>
                         </div>
                     {% endif %}
                     {% if is_staff %}
-                        <div class="fr-pb-2w fr-px-3w">
-                            <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                                <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#people-fill" />
-                                </svg>
-                                <span>Compte</span>
-                            </h5>
-                            <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                                <li class="fr-mr-2v col-2">
+                        <div class="fr-pb-2w">
+                            <h4 class="crm-home__subtitle fr-mb-1v">
+                                sécurité
+                            </h4>
+                            <div class="gap-2 d-flex flex-wrap">
+                                <div>
                                     {% url 'mfa_activate_totp' as url %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Authentification forte" icon="lock-fill" %}
-                                </li>
-                                <li class="fr-mr-2v col-2">
+                                    {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Authentification forte" icon="lock-fill" text=text currentColor="#0974F6" %}
+                                    {% endwith %}
+                                </div>
+                                <div class="">
                                     {% url 'account_email' as email_url_ %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=email_url_ name="Vérifier l'adresse email" icon="envelope-fill" %}
-                                </li>
-                                <li class="fr-mr-2v col-2">
+                                    {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=email_url_ name="Vérifier l'adresse email" icon="envelope-fill" text=text currentColor="#0974F6" %}
+                                    {% endwith %}
+                                </div>
+                                <div class="">
                                     {% url 'mfa_index' as mfa_url_ %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=mfa_url_ name="Gestion de la double authentification" icon="lock-fill" %}
-                                </li>
-                            </ul>
+                                    {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=mfa_url_ name="Double authentification" icon="lock-fill" text=text currentColor="#0974F6" %}
+                                    {% endwith %}
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
             </div>
             <div class="crm-home__sidebar fr-px-3w fr-pt-1v crm-timeline-min-height">
-                <h3 class="fr-mt-2w">
-                    <span class="crm-home__subtitle">Activité de l'ensemble des dossiers</span>
+                <h3 class="crm-home__subtitle fr-mt-2w">
+                    Activité de l'ensemble des dossiers
                 </h3>
                 <ul class="bg-white fr-pt-2w fr-px-3w border rounded crm-activity">
                     <div class="fr-p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
@@ -201,3 +239,24 @@
         </div>
     </div>
 {% endblock content %}
+
+
+<!--
+    ----- tags -----
+    {% url 'crm-project-list-by-tags' as url %}
+    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags / Projects" icon="tag-fill" %}
+
+    ----- tags index -----
+    <div>
+        {% url 'crm-list-tags' as url %}
+        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Index des tags du crm" icon="activity" %}
+    </div>
+
+     ----- topics index -----
+    <div>
+        {% url 'crm-list-topics' as url %}
+        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Index des thématiques" icon="boxes" %}
+    </div>
+
+
+-->
