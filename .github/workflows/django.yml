@@ -1,8 +1,5 @@
 name: main.yml
 
-permissions:
-  contents: read
-
 on:
   push:
     branches: ['main', 'develop', 'release/*', 'feature/*']
@@ -48,6 +45,11 @@ jobs:
 
   django-tests:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # post coverage comments on PRs
+      contents: write      # push to python-coverage-comment-action-data branch
+      actions: read        # read baseline coverage artifact from main branch runs
+
     services:
       # Label used to access the service container
       postgres:
@@ -71,6 +73,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4.1.5
+        with:
+          persist-credentials: true
 
       - name: Install packages
         run: |
@@ -85,8 +89,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          uv sync --no-dev
-          uv sync --only-dev
+          uv sync
 
       - name: Configure
         run: |
@@ -106,4 +109,19 @@ jobs:
           DJANGO_DB_PORT: 5432
           DJANGO_DB_ENGINE: django.db.backends.postgresql
         run: |
-          uv run pytest --create-db
+          uv run pytest --create-db -q --cov-report=term-missing
+
+      - name: Coverage comment
+        id: coverage_comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Store Pull Request comment to be posted
+        uses: actions/upload-artifact@v4
+        if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
+        with:
+          # If you use a different name, update COMMENT_ARTIFACT_NAME accordingly
+          name: python-coverage-comment-action
+          # If you use a different name, update COMMENT_FILENAME accordingly
+          path: python-coverage-comment-action.txt
