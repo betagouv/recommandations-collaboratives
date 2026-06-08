@@ -590,6 +590,10 @@ WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 # https://github.com/etianen/django-watson/wiki/language-support
 WATSON_POSTGRES_SEARCH_CONFIG = "pg_catalog.french"
 
+# ACRA (ML) proxy
+ACRA_API_BASE_URL = os.environ.get("ACRA_API_BASE_URL", "")
+ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
+
 # Matomo
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
