@@ -13,7 +13,7 @@
             </div>
             <div class="document-item__actions-container">
                 <template x-if="document.uploaded_by == {{ request.user.id }} || $store.djangoData.canManageDocuments">
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-delete-line"></button>
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-delete-line fr-mr-1v"></button>
                 </template>
                 <a class="fr-btn fr-btn--sm fr-btn--tertiary"
                    :href="document.the_file"
