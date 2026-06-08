@@ -8,7 +8,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from model_bakery import baker
 
-from recoco.apps.home.middlewares import CurrentSiteConfigurationMiddleware
+from recoco.apps.home.context_processors import embed
+from recoco.apps.home.middlewares import (
+    CurrentSiteConfigurationMiddleware,
+    EmbedMiddleware,
+)
 from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import login
 
@@ -89,3 +93,65 @@ def test_dont_save_previous_activity_data_if_hijacked(client, rf, current_site):
         hijacked.refresh_from_db()
         assert hijacked.profile.previous_activity_at == last_date
         assert hijacked.profile.previous_activity_site == site1
+
+
+class TestEmbedMiddleware:
+    def setup_method(self):
+        self.get_response = Mock(return_value=Mock())
+        self.middleware = EmbedMiddleware(get_response=self.get_response)
+
+    def _make_request(self, headers=None, get_params=None, session=None):
+        request = Mock()
+        request.headers = headers or {}
+        request.GET = get_params or {}
+        request.session = session if session is not None else {}
+        return request
+
+    def test_sets_embedded_from_sec_fetch_dest_header(self):
+        request = self._make_request(headers={"Sec-Fetch-Dest": "iframe"})
+        self.middleware(request)
+        assert request.session["is_embedded"] is True
+        assert request.is_embedded is True
+
+    def test_sets_embedded_from_query_param(self):
+        request = self._make_request(get_params={"embed": "1"})
+        self.middleware(request)
+        assert request.session["is_embedded"] is True
+        assert request.is_embedded is True
+
+    def test_not_embedded_by_default(self):
+        request = self._make_request()
+        self.middleware(request)
+        assert request.is_embedded is False
+
+    def test_not_embedded_when_embed_param_is_not_one(self):
+        request = self._make_request(get_params={"embed": "0"})
+        self.middleware(request)
+        assert request.is_embedded is False
+
+    def test_persists_embedded_state_from_session(self):
+        request = self._make_request(session={"is_embedded": True})
+        self.middleware(request)
+        assert request.is_embedded is True
+
+    def test_does_not_set_session_without_trigger(self):
+        session = {}
+        request = self._make_request(session=session)
+        self.middleware(request)
+        assert "is_embedded" not in session
+
+
+class TestEmbedContextProcessor:
+    def test_returns_is_embedded_true(self):
+        request = Mock()
+        request.is_embedded = True
+        assert embed(request) == {"is_embedded": True}
+
+    def test_returns_is_embedded_false(self):
+        request = Mock()
+        request.is_embedded = False
+        assert embed(request) == {"is_embedded": False}
+
+    def test_defaults_to_false_when_attribute_missing(self):
+        request = Mock(spec=[])
+        assert embed(request) == {"is_embedded": False}
