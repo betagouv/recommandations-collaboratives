@@ -36,6 +36,9 @@ jobs:
         with:
           python-version-file: "pyproject.toml"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Setup Pre-commit
         uses: pre-commit/action@v3.0.1
 
@@ -88,6 +91,9 @@ jobs:
       - name: Configure
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
+
+      - name: Audit dependencies
+        run: uv audit
 
       - name: Run Tests
         env:
