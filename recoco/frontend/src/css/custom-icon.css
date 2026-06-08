@@ -142,3 +142,8 @@
 .fr-icon-link::before {
   mask-image: url(../assets/link.svg);
 }
+
+.fr-icon-right-arrow::after,
+.fr-icon-right-arrow::before {
+  mask-image: url(../assets/right-arrow.svg);
+}
