@@ -17,6 +17,15 @@ class ResourceSpec:
         """Return an HTML string to inject into the resource detail right sidebar."""
 
 
+class ConversationSpec:
+    @hookspec
+    def conversation_message_node_html(self, request, project):
+        """Return an HTML string containing Alpine <template x-if> blocks for rendering
+        custom node types inline in the conversation message feed.
+        The 'node' Alpine variable is in scope (from the x-for loop over element.nodes).
+        """
+
+
 class CrmSpec:
     @hookspec
     def crm_navigation_tabs(self, request):

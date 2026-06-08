@@ -80,6 +80,25 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     window.addEventListener('hashchange', async () => {
       await this.detectOpenActionsFromHash();
     });
+    window.addEventListener('plugin-message-create-request', async (e) => {
+      const { nodes } = e.detail;
+      try {
+        const response = await api.post(conversationsMessagesUrl(this.projectId), {
+          nodes,
+          in_reply_to: this.messageIdToReply,
+        });
+        this.feed.elements.push({ ...response.data, type: 'message' });
+        this.scrollToNewMessage();
+        this.updateCountOfElementsInDiscussion(response.data);
+        window.dispatchEvent(new CustomEvent('plugin-message-created'));
+      } catch (error) {
+        Alpine.store('app').displayToastMessage({
+          message: `Erreur lors de l'envoi du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
+          timeout: 5000,
+          type: ToastType.error,
+        });
+      }
+    });
   },
   async detectOpenActionsFromHash() {
     await this.detectTaskOpenFromHash();
@@ -326,7 +345,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   async getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
-    if (!shortMessage) {
+    if (!shortMessage || !shortMessage.nodes?.length) {
       return '';
     }
     let contentToSummarize;

@@ -4,7 +4,7 @@ import importlib.metadata
 
 import pluggy
 
-from .hooks import CrmSpec, ProjectSpec, ResourceSpec
+from .hooks import ConversationSpec, CrmSpec, ProjectSpec, ResourceSpec
 
 # Global manager holding ALL discovered plugins
 _plugin_manager = None
@@ -23,6 +23,7 @@ def _build_plugin_manager():
     pm.add_hookspecs(ProjectSpec)
     pm.add_hookspecs(ResourceSpec)
     pm.add_hookspecs(CrmSpec)
+    pm.add_hookspecs(ConversationSpec)
 
     for dist in importlib.metadata.distributions():
         for ep in dist.entry_points:
@@ -47,6 +48,7 @@ def get_tenant_hook(request):
     recoco_pm.add_hookspecs(ProjectSpec)
     recoco_pm.add_hookspecs(ResourceSpec)
     recoco_pm.add_hookspecs(CrmSpec)
+    recoco_pm.add_hookspecs(ConversationSpec)
 
     # Feed the scoped plugin manager with enabled plugins
     if (
