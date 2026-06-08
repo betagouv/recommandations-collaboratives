@@ -111,6 +111,9 @@ extension = "html"
 indent = 4
 exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
+[tool.coverage.run]
+relative_files = true
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "recoco.settings.testing"
 addopts = [
