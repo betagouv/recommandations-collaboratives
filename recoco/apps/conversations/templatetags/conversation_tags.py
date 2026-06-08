@@ -12,3 +12,11 @@ def conversation_plugin_node_html(context, request, project):
     hook = get_tenant_hook(request)
     results = hook.hook.conversation_message_node_html(request=request, project=project)
     return mark_safe("".join(r for r in results if r))  # noqa we are in control of the widget rendered, no user imput
+
+
+@register.simple_tag(takes_context=True)
+def conversation_plugin_extra_html(context, request, project):
+    """Render plugin-defined HTML injected once into the conversation page."""
+    hook = get_tenant_hook(request)
+    results = hook.hook.conversation_extra_html(request=request, project=project)
+    return mark_safe("".join(r for r in results if r))  # noqa we are in control of the widget rendered, no user imput

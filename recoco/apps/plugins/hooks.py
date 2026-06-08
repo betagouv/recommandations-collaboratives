@@ -25,6 +25,13 @@ class ConversationSpec:
         The 'node' Alpine variable is in scope (from the x-for loop over element.nodes).
         """
 
+    @hookspec
+    def conversation_extra_html(self, request, project):
+        """Return an HTML string injected once into the conversation page (outside the
+        message feed loop). Useful for page-level assets (e.g. <script> / vite_asset
+        tags) and globally-mounted UI such as modals listening to window events.
+        """
+
 
 class CrmSpec:
     @hookspec
