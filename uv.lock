@@ -7,6 +7,9 @@ resolution-markers = [
     "python_full_version < '3.12'",
 ]
 
+[manifest]
+constraints = [{ name = "pyjwt", specifier = ">=2.13.0" }]
+
 [[package]]
 name = "alabaster"
 version = "1.0.0"
@@ -3578,7 +3581,6 @@ dependencies = [
     { name = "pillow" },
     { name = "psycopg", extra = ["c"] },
     { name = "puremagic" },
-    { name = "pyjwt" },
     { name = "redis" },
     { name = "requests-html" },
     { name = "rest-framework-generic-relations" },
@@ -3692,7 +3694,6 @@ requires-dist = [
     { name = "pillow", specifier = "==12.2.0" },
     { name = "psycopg", extras = ["c"], specifier = ">=3.2.12" },
     { name = "puremagic", specifier = ">=1.30" },
-    { name = "pyjwt", specifier = ">=2.13.0" },
     { name = "redis", specifier = "==5.0.4" },
     { name = "requests-html", specifier = "==0.10.0" },
     { name = "rest-framework-generic-relations", specifier = ">=2.2.0" },

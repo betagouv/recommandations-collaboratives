@@ -71,7 +71,6 @@ dependencies = [
     "pillow==12.2.0",
     "psycopg[c]>=3.2.12",
     "puremagic>=1.30",
-    "pyjwt>=2.13.0",
     "redis==5.0.4",
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
@@ -98,6 +97,9 @@ version = { attr = "recoco.__version__" }
 
 [tool.uv]
 package = false
+constraint-dependencies = [
+    "pyjwt>=2.13.0",
+]
 
 [build-system]
 requires = ["setuptools"]
