@@ -260,6 +260,15 @@ class ProjectRecommandationsView(ProjectDetailBaseView):
         ) or has_perm_or_403(self.request.user, "view_tasks", self.object)
 
 
+@login_required
+def project_actions(request, project_id=None):
+    """Legacy URL — redirect to the conversation tab with the action panel open."""
+    url = (
+        reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
+    )
+    return redirect(url)
+
+
 @xframe_options_exempt
 @csrf_exempt
 def project_recommendations_embed(request, project_id=None):

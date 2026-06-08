@@ -108,5 +108,13 @@
             </div>
         </div>
     </fieldset>
-    {% include "crm/fragments/general_search_input.html" %}
+    <div class="flex-grow-1">
+        <form method="get"
+              action="{% url 'crm-search' %}"
+              class="d-flex align-items-center justify-content-end">
+            <div class="d-flex align-items-center position-relative {{ width_class|default:"w-75" }}">
+                {% include "projects/project/fragments/search_bar.html" %}
+            </div>
+        </form>
+    </div>
 </div>

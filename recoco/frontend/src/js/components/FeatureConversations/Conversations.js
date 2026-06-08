@@ -244,6 +244,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     // Update the store
     if (Alpine.store('sharedContentsPanel')) {
+      Alpine.store('sharedContentsPanel').projectId = this.projectId;
       Alpine.store('sharedContentsPanel').setRecommendations(recommendations);
       Alpine.store('sharedContentsPanel').setDraftRecommendations(
         draftRecommendations

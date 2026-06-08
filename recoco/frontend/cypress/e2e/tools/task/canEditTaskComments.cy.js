@@ -3,6 +3,7 @@ import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[2];
 const message = 'Message - Test comment on task';
 
+// TODO Réécrire : edit-comment-button et list-tasks-switch-button n'existent plus
 describe.skip('As advisor, I can make a comment on a task @page-projet-recommandations-modification', () => {
   it('adds a new comment, and stops from submitting the comment more than once', () => {
     cy.login('conseiller1');

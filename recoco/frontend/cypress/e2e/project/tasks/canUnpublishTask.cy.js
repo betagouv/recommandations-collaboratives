@@ -1,4 +1,5 @@
 let currentProjectId;
+// TODO Réécrire : #unpublish-task-button et list-tasks-switch-button n'existent plus
 describe.skip('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-brouillon', () => {
   beforeEach(() => {
     cy.login('conseiller1');

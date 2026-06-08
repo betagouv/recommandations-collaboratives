@@ -1,0 +1,17 @@
+.crm-empty {
+  border-radius: 2px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  background: var(--light-background-alt-grey, #f6f6f6);
+  display: flex;
+  padding: 32px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  & > p {
+    color: var(--light-text-default-grey, #3a3a3a);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 150%;
+  }
+}
