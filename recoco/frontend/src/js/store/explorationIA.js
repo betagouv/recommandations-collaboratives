@@ -16,7 +16,7 @@ import { ToastType } from '../models/toastType';
 Alpine.store('explorationIA', {
   // === CONFIGURATION (injectée par le composant orchestrateur via setup()) ===
   projectId: null,
-  siteId: null,
+  CSRFToken: null,
   projectContext: '',
   projectContextDisplayed: '',
   isEditingContext: false,
@@ -59,9 +59,8 @@ Alpine.store('explorationIA', {
    */
   setup(config = {}) {
     this.projectId = config.projectId ?? null;
-    this.siteId = config.siteId ?? null;
     this.projectContext = config.projectContext || '';
-    console.log(config.projectContext);
+    this.CSRFToken = config.CSRFToken ?? null;
     this.projectContextDisplayed = Object.entries(config.projectContext)
       .map((x) => x[1])
       .join('. ');
@@ -96,7 +95,8 @@ Alpine.store('explorationIA', {
         this.searchQuery.trim(),
         JSON.stringify(context),
         {
-          siteId: this.siteId,
+          projectId: this.projectId,
+          CSRFToken: this.CSRFToken,
         }
       );
       this.answerChunks = data.answer_chunks || [];
@@ -397,7 +397,7 @@ Alpine.store('explorationIA', {
 
     try {
       const items = await fetchCoRecommendations(resourceIds, {
-        siteId: this.siteId,
+        projectId: this.projectId,
       });
 
       if (items.length > 0) {
@@ -570,7 +570,7 @@ Alpine.store('explorationIA', {
 
   /**
    * Réinitialise toute l'exploration (utilisé par le bouton "Nouvelle exploration"
-   * et "Recommencer"). Conserve la configuration (projectId, siteId, projectContext).
+   * et "Recommencer"). Conserve la configuration (projectId, projectContext).
    */
   resetExploration() {
     this.currentPhase = 1;

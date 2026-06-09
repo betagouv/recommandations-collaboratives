@@ -1,31 +1,17 @@
+import { askRecommendationsUrl, corecommendationsUrl } from './api';
 /**
  * Client pour l'API LLM externe (service ML Recoco).
  *
  * Utilitaire pur, sans dépendance à Alpine, réutilisable depuis n'importe
  * quel composant, store, ou code hors Alpine.
  *
- * Variables d'environnement (Vite) lues par défaut :
- * - VITE_ML_API_BASE_URL
- * - VITE_ML_API_TOKEN
- *
  * Toutes les options peuvent être surchargées via le paramètre `opts`.
  */
 
-const DEFAULT_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL;
-const DEFAULT_TOKEN = import.meta.env.VITE_ML_API_TOKEN;
-
-function buildHeaders(token) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
-}
-
-function buildUrl(baseUrl, path, params) {
+function buildUrl(baseUrl, params) {
   const base = (baseUrl || '').replace(/\/$/, '');
   const qs = params && params.toString() ? `?${params.toString()}` : '';
-  return `${base}${path}${qs}`;
+  return `${base}${qs}`;
 }
 
 /**
@@ -34,34 +20,32 @@ function buildUrl(baseUrl, path, params) {
  * @param {string} query - La requête de l'utilisateur.
  * @param {string} [context] - Contexte additionnel (ex: description d'un projet).
  * @param {object} [opts]
- * @param {string|number} [opts.siteId] - Identifiant du site (multi-tenant).
- * @param {string} [opts.token] - Token Bearer (sinon VITE_ML_API_TOKEN).
- * @param {string} [opts.baseUrl] - URL de base (sinon VITE_ML_API_BASE_URL).
+ * @param {number} [opts.projectId] - Id du projet courant
+ * @param {number} [opts.CSRFToken] - Jeton CSRF
  * @param {AbortSignal} [opts.signal] - Pour annuler la requête.
  * @returns {Promise<{ answer_chunks: Array, citations: Array, found_answer: boolean }>}
  *   La réponse JSON brute de l'API.
  * @throws {Error} Si la requête échoue ou que la réponse n'est pas OK.
  */
 export async function askLLM(query, context = '', opts = {}) {
-  const baseUrl = opts.baseUrl || DEFAULT_BASE_URL;
-  const token = opts.token !== undefined ? opts.token : DEFAULT_TOKEN;
+  if (!opts.projectId) throw new Error('Project Id required');
 
-  const params = new URLSearchParams();
-  if (opts.siteId) {
-    params.append('site_id', opts.siteId);
-  }
-
-  const url = buildUrl(baseUrl, '/ask', params);
+  const url = askRecommendationsUrl(opts.projectId);
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: buildHeaders(token),
+    headers: {
+      'X-CSRFToken': opts.CSRFToken,
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ query, context }),
     signal: opts.signal,
   });
 
   if (!response.ok) {
-    throw new Error(`LLM API error (ask): ${response.status} ${response.statusText}`);
+    throw new Error(
+      `LLM API error (ask): ${response.status} ${response.statusText}`
+    );
   }
 
   return response.json();
@@ -73,9 +57,7 @@ export async function askLLM(query, context = '', opts = {}) {
  *
  * @param {Array<number|string>} resourceIds - Identifiants des ressources sources.
  * @param {object} [opts]
- * @param {string|number} [opts.siteId]
- * @param {string} [opts.token]
- * @param {string} [opts.baseUrl]
+ * @param {number} [opts.projectId] - Id du projet courant
  * @param {AbortSignal} [opts.signal]
  * @returns {Promise<Array<{ resource_id: number, co_occurrence_score: number }>>}
  *   La liste des co-recommandations (peut être emballée dans
@@ -83,20 +65,15 @@ export async function askLLM(query, context = '', opts = {}) {
  * @throws {Error} Si la requête échoue.
  */
 export async function fetchCoRecommendations(resourceIds, opts = {}) {
-  const baseUrl = opts.baseUrl || DEFAULT_BASE_URL;
-  const token = opts.token !== undefined ? opts.token : DEFAULT_TOKEN;
+  if (!opts.projectId) throw new Error('Project Id required');
 
   const params = new URLSearchParams();
   resourceIds.forEach((id) => params.append('resource_ids', id));
-  if (opts.siteId) {
-    params.append('site_id', opts.siteId);
-  }
 
-  const url = buildUrl(baseUrl, '/co-recommendations', params);
+  const url = buildUrl(corecommendationsUrl(opts.projectId), params);
 
   const response = await fetch(url, {
     method: 'GET',
-    headers: buildHeaders(token),
     signal: opts.signal,
   });
 

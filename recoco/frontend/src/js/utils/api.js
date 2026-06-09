@@ -91,6 +91,15 @@ export function userProjectStatusUrl() {
   return '/api/userprojectstatus/';
 }
 
+// ACRA
+export function askRecommendationsUrl(projectId) {
+  return `/api/projects/${projectId}/tasks/acra/ask/`;
+}
+
+export function corecommendationsUrl(projectId) {
+  return `/api/projects/${projectId}/tasks/acra/co-recommendations/`;
+}
+
 // Sites :
 export function sitesConfigUrl() {
   return '/api/sites/';

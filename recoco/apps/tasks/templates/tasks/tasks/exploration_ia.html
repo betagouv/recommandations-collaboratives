@@ -16,6 +16,7 @@
     {% vite_asset 'js/apps/explorationIA.js' %}
 {% endblock js %}
 {% block content %}
+    {% csrf_token %}
     {{ project.name|json_script:"project-name" }}
     {{ project.description|json_script:"project-description" }}
     {% if project.commune %}
@@ -27,7 +28,7 @@
     {{ project_tags|json_script:"project-tags" }}
     <div class="row justify-content-center">
         <div class="col-10 fr-p-3w"
-             x-data="ExplorationIA({ projectId: {{ project.id }}, siteId: {{ request.site.id }} })">
+             x-data="ExplorationIA({ projectId: {{ project.id }} })">
             <!-- Barre d'actions : aide -->
             <div class="d-flex justify-content-end fr-mb-1w">
                 <button @click="$dispatch('exploration-ia:open-welcome-modal')"
