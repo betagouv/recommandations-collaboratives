@@ -19,6 +19,10 @@
                                 <span class="fr-icon-close-line" aria-hidden="true"></span>
                             </button>
                         </template>
+                        <template x-if="$store.explorationIA.excludedSources.length > 0">
+                            <span class="fr-badge fr-badge--sm fr-badge--no-icon fr-badge--grey"
+                                  x-text="$store.explorationIA.excludedSources.length + ' source(s) écartée(s)'"></span>
+                        </template>
                     </div>
                 </div>
                 <div class="card-body">
@@ -58,7 +62,8 @@
                                             <div class="exploration-ia-chunk__sources fr-mt-1w"
                                                  x-show="item.chunk.sources && item.chunk.sources.length > 0">
                                                 <template x-for="sourceLabel in item.chunk.sources" :key="sourceLabel">
-                                                    <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus fr-mr-1v"
+                                                    <span class="fr-badge fr-badge--sm fr-mr-1v"
+                                                          :class="$store.explorationIA.isSourceExcluded(sourceLabel) ? 'exploration-ia-source-badge--excluded' : 'fr-badge--blue-cumulus'"
                                                           x-text="'Source ' + sourceLabel"></span>
                                                 </template>
                                             </div>
@@ -84,7 +89,17 @@
                     <template x-for="citation in $store.explorationIA.orderedCitations"
                               :key="citation.label">
                         <div class="exploration-ia-citation fr-mb-2w fr-p-2w"
-                             :class="{ 'exploration-ia-citation--highlighted': $store.explorationIA.isSourceHighlighted(citation.label), 'exploration-ia-citation--selected': $store.explorationIA.isSourceSelected(citation.label) }">
+                             :class="{ 'exploration-ia-citation--highlighted': !$store.explorationIA.isSourceExcluded(citation.label) && $store.explorationIA.isSourceHighlighted(citation.label), 'exploration-ia-citation--selected': !$store.explorationIA.isSourceExcluded(citation.label) && $store.explorationIA.isSourceSelected(citation.label), 'exploration-ia-citation--excluded': $store.explorationIA.isSourceExcluded(citation.label) }">
+                            <div class="exploration-ia-citation__use fr-mb-1w">
+                                <input type="checkbox"
+                                       class="fr-checkbox"
+                                       :id="'source-use-' + citation.label"
+                                       :checked="!$store.explorationIA.isSourceExcluded(citation.label)"
+                                       @change="$store.explorationIA.toggleSourceExclusion(citation.label)">
+                                <label class="fr-label fr-text--sm" :for="'source-use-' + citation.label">
+                                    Utiliser cette source
+                                </label>
+                            </div>
                             <div class="d-flex justify-content-between align-items-start fr-mb-1w">
                                 <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
                                       x-text="'Source ' + citation.label"></span>
@@ -92,7 +107,7 @@
                                       :class="{ 'fr-badge--green-emeraude': citation.source_type.toLocaleLowerCase() === 'resource', 'fr-badge--purple-glycine': citation.source_type.toLocaleLowerCase() === 'recommendation' }"
                                       x-text="$store.explorationIA.getSourceTypeLabel(citation.source_type.toLocaleLowerCase())"></span>
                             </div>
-                            <p class="fr-text--md fr-text--bold fr-mb-1w" x-text="citation.title"></p>
+                            <p class="fr-text--sm fr-mb-1w" x-text="citation.title"></p>
                             <button @click.stop="$store.explorationIA.openResourceModal(citation)"
                                     class="fr-btn fr-btn--tertiary fr-btn--sm"
                                     x-show="$store.explorationIA.getCitationUrl(citation)">

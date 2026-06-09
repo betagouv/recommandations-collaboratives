@@ -282,6 +282,35 @@
       color: #fff;
     }
   }
+
+  // Etat ecarte (source non utilisee a l'etape 2)
+  &--excluded {
+    opacity: 0.55;
+    border-style: dashed;
+
+    p,
+    .fr-badge--blue-cumulus {
+      text-decoration: line-through;
+    }
+  }
+
+  // Case a cocher "Utiliser cette source"
+  &__use {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .fr-label {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Badge "Source X" grise dans les passages lorsque la source est ecartee
+.exploration-ia-source-badge--excluded {
+  background-color: var(--light-background-disabled-grey, #e5e5e5);
+  color: var(--light-text-disabled-grey, #929292);
+  text-decoration: line-through;
 }
 .fr-search-bar {
   margin-top: 0.5rem;

@@ -31,6 +31,7 @@ Alpine.store('explorationIA', {
   answerChunks: [],
   citations: [],
   selectedChunks: [],
+  excludedSources: [],
   hoveredSources: [],
   foundAnswer: null,
 
@@ -103,6 +104,7 @@ Alpine.store('explorationIA', {
       this.citations = data.citations || [];
       this.foundAnswer = data.found_answer || false;
       this.selectedChunks = [];
+      this.excludedSources = [];
       this.invalidatePhase2State();
     } catch (err) {
       this.error = 'Erreur lors de la recherche. Veuillez réessayer.';
@@ -142,6 +144,20 @@ Alpine.store('explorationIA', {
   clearChunkSelection() {
     this.selectedChunks = [];
     this.invalidatePhase2State();
+  },
+
+  toggleSourceExclusion(label) {
+    const idx = this.excludedSources.indexOf(label);
+    if (idx > -1) {
+      this.excludedSources.splice(idx, 1);
+    } else {
+      this.excludedSources.push(label);
+    }
+    this.invalidatePhase2State();
+  },
+
+  isSourceExcluded(label) {
+    return this.excludedSources.includes(label);
   },
 
   /**
@@ -240,6 +256,7 @@ Alpine.store('explorationIA', {
       const chunk = this.answerChunks[index];
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
+          if (this.isSourceExcluded(label)) return;
           const citation = this.getCitationByLabel(label);
           if (citation && citation.resource_id) {
             resourceIds.add(citation.resource_id);
@@ -256,6 +273,7 @@ Alpine.store('explorationIA', {
       const chunk = this.answerChunks[index];
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
+          if (this.isSourceExcluded(label)) return;
           const citation = this.getCitationByLabel(label);
           if (
             citation &&
@@ -279,6 +297,7 @@ Alpine.store('explorationIA', {
       const chunk = this.answerChunks[index];
       if (chunk && chunk.sources) {
         chunk.sources.forEach((label) => {
+          if (this.isSourceExcluded(label)) return;
           const citation = this.getCitationByLabel(label);
           if (citation) {
             const existing = citations.find((c) => c.label === citation.label);
@@ -552,6 +571,7 @@ Alpine.store('explorationIA', {
       if (!chunk || !chunk.sources) return;
       chunk.sources.forEach((label) => {
         if (existingLabels.has(label)) return;
+        if (this.isSourceExcluded(label)) return;
         const citation = this.getCitationByLabel(label);
         if (!citation) return;
         existingLabels.add(label);
@@ -580,6 +600,7 @@ Alpine.store('explorationIA', {
     this.citations = [];
     this.foundAnswer = null;
     this.selectedChunks = [];
+    this.excludedSources = [];
     this.hoveredSources = [];
     this.coRecommendations = [];
     this.isLoadingCoRecos = false;
