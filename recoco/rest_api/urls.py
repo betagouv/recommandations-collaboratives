@@ -10,6 +10,7 @@ from recoco.apps.home import rest as home_rest
 from recoco.apps.projects.views import rest as projects_rest
 from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.views import rest as survey_rest
+from recoco.apps.tasks.views import acra_proxy as tasks_acra_proxy
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
 
@@ -175,6 +176,19 @@ auth_urls = [
     ),
 ]
 
+tasks_urls = [
+    path(
+        "projects/<int:project_id>/tasks/acra/ask/",
+        tasks_acra_proxy.AcraAskView.as_view(),
+        name="tasks-acra-ask",
+    ),
+    path(
+        "projects/<int:project_id>/tasks/acra/co-recommendations/",
+        tasks_acra_proxy.AcraCoRecommendationsView.as_view(),
+        name="tasks-acra-co-recommendations",
+    ),
+]
+
 survey_urls = [
     path(
         "survey/sessions/",
@@ -193,4 +207,4 @@ survey_urls = [
     ),
 ]
 
-urlpatterns = router.urls + api_urls + auth_urls + survey_urls
+urlpatterns = router.urls + api_urls + auth_urls + tasks_urls + survey_urls
