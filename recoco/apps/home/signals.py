@@ -8,11 +8,13 @@ created: 2023-06-27 08:06:10 CEST
 import sentry_sdk
 from actstream import action
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
-from django.contrib.auth.models import update_last_login
+from allauth.mfa.models import Authenticator
+from django.contrib.auth.models import User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
+from django.db.models import Q
 from django.db import connection
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, m2m_changed
 from django.dispatch import receiver
 from psycopg import sql
 
@@ -68,6 +70,21 @@ def create_tenant_schema(sender, instance, **kwargs):
                     sql.Identifier(instance.schema_name)
                 )
             )
+
+
+@receiver(m2m_changed, sender=User.groups.through)
+def ensure_2fa_requirement(sender, instance, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        requires_2fa = instance.user.groups.filter(
+            Q(user__groups__name__contains="staff")
+            | Q(user__groups__name__contains="admin")
+        ).exists()
+        has_totp = Authenticator.objects.filter(type="totp", user_id=instance.user.id)
+        instance.user.profile.requires_2fa = requires_2fa
+        instance.user.profile.login_with_code = (
+            requires_2fa and not has_totp
+        ) or instance.user.profile.login_with_code
+        instance.user.profile.save()
 
 
 # eof
