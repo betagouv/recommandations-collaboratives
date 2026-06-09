@@ -8,9 +8,13 @@
 {% load static %}
 <a class="position-relative crm-home__card d-flex flex-column" href={{ link_url }}{{ anchor }}>
     <div class="d-flex align-items-center">
-        <svg class="crm-home__card--icon bi d-inline fr-mr-1w" width="20" height="20" fill={{ currentColor }} aria-hidden="true">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ icon }}" />
-        </svg>
+        {% if is_alert %}
+            <span class="badge text-bg-danger no-underline fr-mr-1w">{{ projects_to_moderate_count }}</span>
+        {% else %}
+            <svg class="crm-home__card--icon bi d-inline fr-mr-1w" width="20" height="20" fill={{ currentColor }} aria-hidden="true">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ icon }}" />
+            </svg>
+        {% endif %}
         <span class="crm-home__card--title d-block text-center font-very-small">{{ name }}</span>
     </div>
     <div>

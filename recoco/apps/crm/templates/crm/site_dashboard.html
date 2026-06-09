@@ -21,6 +21,9 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% get_verbs as verbs %}
+    {% if 'moderate_projects' in user_site_perms %}
+        {% get_project_moderation_count as projects_to_moderate_count %}
+    {% endif %}
     {% include "crm/fragments/navigation.html" with dashboard=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Accueil' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}
@@ -39,12 +42,14 @@
                             Alertes
                         </h4>
                         <div class="gap-2 d-flex flex-wrap">
-                            <div>
-                                {% url 'crm-user-list' as url %}
-                                {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Nouvelles demandes à modérer" icon="person-circle" text=text currentColor="#0974F6" %}
-                                {% endwith %}
-                            </div>
+                            {% if projects_to_moderate_count %}
+                                <div>
+                                    {% url "projects-moderation-list" as url %}
+                                    {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Nouvelles demandes à modérer" icon="person-circle" text=text currentColor="#0974F6" is_alert=True %}
+                                    {% endwith %}
+                                </div>
+                            {% endif %}
                             <div class="">
                                 {% url 'crm-project-list' as url %}
                                 {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
