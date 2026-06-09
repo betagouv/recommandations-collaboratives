@@ -46,7 +46,7 @@
                                 <div>
                                     {% url "projects-moderation-list" as url %}
                                     {% with text="Cras viverra sed rhoncus pulvinar id netus a id nunc." %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Nouvelles demandes à modérer" icon="person-circle" text=text currentColor="#0974F6" is_alert=True %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Nouvelles demandes à modérer" icon="person-circle" text=text currentColor="#0974F6" is_alert=True nb_alert=projects_to_moderate_count %}
                                     {% endwith %}
                                 </div>
                             {% endif %}
