@@ -32,9 +32,7 @@ export async function askLLM(query, context = '', opts = {}) {
   const url = askRecommendationsUrl(opts.projectId);
 
   try {
-    const response = await api.post(url, {
-      body: JSON.stringify({ query, context }),
-    });
+    const response = await api.post(url, JSON.stringify({ query, context }));
     return response.data;
   } catch (error) {
     if (error.response) {
