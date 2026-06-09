@@ -16,7 +16,6 @@
     {% vite_asset 'js/apps/explorationIA.js' %}
 {% endblock js %}
 {% block content %}
-    {% csrf_token %}
     {{ project.name|json_script:"project-name" }}
     {{ project.description|json_script:"project-description" }}
     {% if project.commune %}

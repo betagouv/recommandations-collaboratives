@@ -16,7 +16,6 @@ import { ToastType } from '../models/toastType';
 Alpine.store('explorationIA', {
   // === CONFIGURATION (injectée par le composant orchestrateur via setup()) ===
   projectId: null,
-  CSRFToken: null,
   projectContext: '',
   projectContextDisplayed: '',
   isEditingContext: false,
@@ -60,7 +59,6 @@ Alpine.store('explorationIA', {
   setup(config = {}) {
     this.projectId = config.projectId ?? null;
     this.projectContext = config.projectContext || '';
-    this.CSRFToken = config.CSRFToken ?? null;
     this.projectContextDisplayed = Object.entries(config.projectContext)
       .map((x) => x[1])
       .join('. ');
@@ -96,7 +94,6 @@ Alpine.store('explorationIA', {
         JSON.stringify(context),
         {
           projectId: this.projectId,
-          CSRFToken: this.CSRFToken,
         }
       );
       this.answerChunks = data.answer_chunks || [];

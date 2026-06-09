@@ -1,4 +1,4 @@
-import { askRecommendationsUrl, corecommendationsUrl } from './api';
+import api, { askRecommendationsUrl, corecommendationsUrl } from './api';
 /**
  * Client pour l'API LLM externe (service ML Recoco).
  *
@@ -21,7 +21,6 @@ function buildUrl(baseUrl, params) {
  * @param {string} [context] - Contexte additionnel (ex: description d'un projet).
  * @param {object} [opts]
  * @param {number} [opts.projectId] - Id du projet courant
- * @param {number} [opts.CSRFToken] - Jeton CSRF
  * @param {AbortSignal} [opts.signal] - Pour annuler la requête.
  * @returns {Promise<{ answer_chunks: Array, citations: Array, found_answer: boolean }>}
  *   La réponse JSON brute de l'API.
@@ -32,23 +31,22 @@ export async function askLLM(query, context = '', opts = {}) {
 
   const url = askRecommendationsUrl(opts.projectId);
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': opts.CSRFToken,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query, context }),
-    signal: opts.signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `LLM API error (ask): ${response.status} ${response.statusText}`
-    );
+  try {
+    const response = await api.post(url, {
+      body: JSON.stringify({ query, context }),
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        `LLM API error (ask): ${error.response.status} ${error.response.statusText}`
+      );
+    } else if (error.request) {
+      throw new Error('LLM API error (ask): aucune réponse du serveur');
+    } else {
+      throw new Error(`LLM API error (ask): ${error.message}`);
+    }
   }
-
-  return response.json();
 }
 
 /**
@@ -71,18 +69,20 @@ export async function fetchCoRecommendations(resourceIds, opts = {}) {
   resourceIds.forEach((id) => params.append('resource_ids', id));
 
   const url = buildUrl(corecommendationsUrl(opts.projectId), params);
-
-  const response = await fetch(url, {
-    method: 'GET',
-    signal: opts.signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `LLM API error (co-recommendations): ${response.status} ${response.statusText}`
-    );
+  try {
+    const response = await api(url);
+    return response.data.co_recommendations || response.data || [];
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        `LLM API error (co-recommendations): ${error.response.status} ${error.response.statusText}`
+      );
+    } else if (error.request) {
+      throw new Error(
+        'LLM API error (co-recommendations): aucune réponse du serveur'
+      );
+    } else {
+      throw new Error(`LLM API error (co-recommendations): ${error.message}`);
+    }
   }
-
-  const data = await response.json();
-  return data.co_recommendations || data || [];
 }

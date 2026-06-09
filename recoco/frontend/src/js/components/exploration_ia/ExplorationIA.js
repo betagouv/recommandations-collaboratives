@@ -24,9 +24,6 @@ Alpine.data('ExplorationIA', (config = {}) => ({
         : '';
     }
 
-    config.CSRFToken = [
-      ...document.getElementsByName('csrfmiddlewaretoken'),
-    ][0].value;
     this.$store.explorationIA.setup({ ...config, projectContext });
     this.$watch('$store.explorationIA.currentPhase', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
