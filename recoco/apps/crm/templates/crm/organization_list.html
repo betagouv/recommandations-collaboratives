@@ -35,12 +35,21 @@
                         {% endif %}
                     {% endwith %}
                 </span>
-                {# Filter form (search) #}
+                {# Filter form (search + geographic filter) #}
                 <form method="get"
                       action="{% url 'crm-organization-list' %}"
-                      class="d-flex align-items-center flex-grow-1 fr-m-0">
+                      class="d-flex align-items-center flex-grow-1 gap-3 fr-m-0">
                     <div class="position-relative flex-grow-1">
                         {% include "projects/project/fragments/search_bar.html" with name="name" value=organizations.form.name.value placeholder="Taper le nom d'une organisation" show_search_button=True %}
+                    </div>
+                    <div x-data="DepartmentsFilterWrapper({{ selected_departments|default:'[]' }})"
+                         @is-select-all-departments="onSelectAll($event.detail)"
+                         @selected-departments="onSelected($event.detail)"
+                         @user-close-selector="$nextTick(() => $el.closest('form').submit())">
+                        <template x-for="code in (allSelected ? [] : selectedCodes)" :key="code">
+                            <input type="hidden" name="departments" :value="code">
+                        </template>
+                        {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" show_count_label=True %}
                     </div>
                 </form>
                 {# Merge action (drives the table form below through the form= attribute) #}

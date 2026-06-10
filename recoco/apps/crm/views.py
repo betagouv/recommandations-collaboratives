@@ -369,6 +369,8 @@ def get_queryset_for_site_organizations(site):
 def organization_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
+    selected_departments = request.GET.getlist("departments")
+
     # organization from addressbook current site or w/ user on site
     qs = get_queryset_for_site_organizations(request.site)
 
@@ -377,7 +379,7 @@ def organization_list(request):
         queryset=qs.order_by("name"),
     )
 
-    has_active_filter = bool(request.GET.get("name"))
+    has_active_filter = bool(request.GET.get("name")) or bool(selected_departments)
 
     max_organizations_without_filter = 25
     display_qs = (
