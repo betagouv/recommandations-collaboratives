@@ -223,6 +223,9 @@ const config = {
         ),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
         userListCrm: resolve('./src/js/apps/CRM/userListCrm.js'),
+        organizationListCrm: resolve(
+          './src/js/apps/CRM/organizationListCrm.js'
+        ),
         sharedContentsPanelStyles: resolve(
           './src/js/styles/shared-contents-panel.css.js'
         ),

@@ -377,6 +377,15 @@ def organization_list(request):
         queryset=qs.order_by("name"),
     )
 
+    has_active_filter = bool(request.GET.get("name"))
+
+    max_organizations_without_filter = 25
+    display_qs = (
+        organizations.qs
+        if has_active_filter
+        else organizations.qs[:max_organizations_without_filter]
+    )
+
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
