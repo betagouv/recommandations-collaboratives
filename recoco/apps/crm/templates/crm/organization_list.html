@@ -82,12 +82,16 @@
                             <col class="col--large">
                             <col class="col--large">
                             <col class="col--small">
+                            <col class="col--small">
+                            <col class="col--small">
                         </colgroup>
                         <thead class="project-table__thead">
                             <tr>
                                 <th scope="col"></th>
                                 <th scope="col">Organisation</th>
                                 <th scope="col">Départements</th>
+                                <th scope="col">Membres</th>
+                                <th scope="col">Dossiers</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -111,6 +115,8 @@
                                             {% if departments|length > 8 %}<span class="fw-bold">+ {{ departments|length|add:"-8" }}</span>{% endif %}
                                         {% endwith %}
                                     </td>
+                                    <td>{{ organization.members_count|default:0 }}</td>
+                                    <td>{{ organization.projects_count|default:0 }}</td>
                                     <td>
                                         <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
                                                 title="Modifier l'organisation">
@@ -121,7 +127,7 @@
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="4">-- Aucun résultat --</td>
+                                    <td colspan="6">-- Aucun résultat --</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

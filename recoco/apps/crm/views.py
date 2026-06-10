@@ -372,7 +372,20 @@ def organization_list(request):
     selected_departments = request.GET.getlist("departments")
 
     # organization from addressbook current site or w/ user on site
-    qs = get_queryset_for_site_organizations(request.site)
+    qs = get_queryset_for_site_organizations(request.site).annotate(
+        members_count=Count(
+            "registered_profiles",
+            filter=Q(registered_profiles__sites=request.site),
+            distinct=True,
+        ),
+        projects_count=Subquery(
+            Project.on_site.filter(members__profile__organization=OuterRef("pk"))
+            .order_by()
+            .values("members__profile__organization")
+            .annotate(count=Count("pk", distinct=True))
+            .values("count")
+        ),
+    )
 
     organizations = filters.OrganizationFilter(
         request.GET,
