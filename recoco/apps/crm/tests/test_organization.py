@@ -82,6 +82,36 @@ def test_crm_organization_list_filters_organizations_by_name(request, client):
     assertNotContains(response, unexpected)
 
 
+@pytest.mark.django_db
+def test_crm_organization_list_filters_organizations_by_department(request, client):
+    site = get_current_site(request)
+
+    department = baker.make(geomatics.Department, code="01")
+    other_department = baker.make(geomatics.Department, code="02")
+
+    expected = baker.make(addressbook_models.Organization)
+    expected.sites.add(site)
+    expected.departments.add(department)
+
+    unexpected = baker.make(addressbook_models.Organization)
+    unexpected.sites.add(site)
+    unexpected.departments.add(other_department)
+
+    url = reverse("crm-organization-list") + f"?departments={department.code}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected_url = reverse("crm-organization-details", args=[expected.id])
+    assertContains(response, expected_url)
+
+    unexpected_url = reverse("crm-organization-details", args=[unexpected.id])
+    assertNotContains(response, unexpected_url)
+
+
 ########################################################################
 # update organization
 ########################################################################
