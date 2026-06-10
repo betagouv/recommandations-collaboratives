@@ -394,14 +394,9 @@ def organization_list(request):
         queryset=qs.order_by("name"),
     )
 
-    has_active_filter = bool(request.GET.get("name")) or bool(selected_departments)
-
-    max_organizations_without_filter = 25
-    display_qs = (
-        organizations.qs
-        if has_active_filter
-        else organizations.qs[:max_organizations_without_filter]
-    )
+    paginator = Paginator(organizations.qs, 25)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()

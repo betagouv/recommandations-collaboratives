@@ -23,13 +23,9 @@
         <div class="project-list-crm w-100" x-data="{ selected: [] }">
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
-                    {% with count=organizations.qs.count %}
+                    {% with count=paginator.count %}
                         {% if count > 0 %}
-                            {% if not has_active_filter and count > max_organizations_without_filter %}
-                                {{ max_organizations_without_filter }} sur {{ count }} résultat{{ count|pluralize }}
-                            {% else %}
-                                {{ count }} résultat{{ count|pluralize }}
-                            {% endif %}
+                            {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
                         {% else %}
                             Aucun résultat
                         {% endif %}
@@ -69,13 +65,9 @@
                       action="{% url 'crm-organization-merge' %}">
                     <table class="project-table w-100">
                         <caption class="fr-ml-2v">
-                            {% with count=organizations.qs.count %}
+                            {% with count=paginator.count %}
                                 {% if count > 0 %}
-                                    {% if not has_active_filter and count > max_organizations_without_filter %}
-                                        {{ max_organizations_without_filter }} sur {{ count }} résultat{{ count|pluralize }} — utilisez les filtres pour affiner
-                                    {% else %}
-                                        {{ count }} résultat{{ count|pluralize }}
-                                    {% endif %}
+                                    {{ count }} résultat{{ count|pluralize }}
                                 {% else %}
                                     Aucun résultat
                                 {% endif %}
@@ -100,7 +92,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for organization in display_qs %}
+                            {% for organization in page_obj %}
                                 <tr>
                                     <td>
                                         <input name="org_ids"
@@ -140,6 +132,7 @@
                         </tbody>
                     </table>
                 </form>
+                {% include "tools/paginator.html" with page_obj=page_obj %}
             </div>
         </div>
     </div>
