@@ -7,7 +7,8 @@
                 <h2 class="error-page__title">{{ title_text }}</h2>
             {% endblock title %}
             {% block technical_info %}
-                <p class="error-page__technical-info fr-text--sm fr-mb-3w">{{ technical_info_text }}</p>
+                <p class="error-page__technical-info fr-text--sm fr-mb-3w"
+                   data-test-id="technicat-info">{{ technical_info_text }}</p>
             {% endblock technical_info %}
             {% block content %}
                 <p class="error-page__content fr-text--lead fr-mb-3w">{{ content_text }}</p>

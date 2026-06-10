@@ -25,7 +25,9 @@
                     Vous êtes connecté avec l’adresse {{ request.user }}. Si vous souhaitez vous connecter avec une autre adresse, vous pouvez vous déconnecter ci-dessous :
                 </p>
                 <p class="fr-mt-2w fr-mb-0">
-                    <a href="{{ relogin_url }}" class="fr-link">Changer de compte</a>
+                    <a href="{{ relogin_url }}"
+                       class="fr-link"
+                       data-test-id="link-relogin-403">Changer de compte</a>
                 </p>
             </div>
         </div>
