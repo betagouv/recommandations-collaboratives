@@ -20,7 +20,7 @@
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <h1 class="fr-h3 fr-px-5v fr-pt-5v fr-mb-0">Liste des organisations</h1>
     <div x-data="Crm" class="d-flex flex-column fr-px-0 crm">
-        <div class="project-list-crm w-100">
+        <div class="project-list-crm w-100" x-data="{ selected: [] }">
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
                     {% with count=organizations.qs.count %}
@@ -53,10 +53,14 @@
                     </div>
                 </form>
                 {# Merge action (drives the table form below through the form= attribute) #}
-                <div class="d-flex align-items-center text-nowrap">
+                <div class="d-flex align-items-center gap-3 text-nowrap">
+                    <span class="text-secondary"
+                          x-show="selected.length > 0"
+                          x-text="`${selected.length} organisation${selected.length > 1 ? 's' : ''} sélectionnée${selected.length > 1 ? 's' : ''}`"></span>
                     <button type="submit"
                             form="org-merge-form"
-                            class="fr-btn fr-btn--sm">Fusionner les organisations</button>
+                            class="fr-btn fr-btn--sm"
+                            :disabled="selected.length < 2">Fusionner les organisations</button>
                 </div>
             </div>
             <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
@@ -99,7 +103,10 @@
                             {% for organization in display_qs %}
                                 <tr>
                                     <td>
-                                        <input name="org_ids" type="checkbox" value="{{ organization.pk }}">
+                                        <input name="org_ids"
+                                               type="checkbox"
+                                               value="{{ organization.pk }}"
+                                               x-model="selected">
                                     </td>
                                     <td class="text-ellipsis" title="{{ organization.name }}">
                                         <a class="fr-link project-table__project-name"
