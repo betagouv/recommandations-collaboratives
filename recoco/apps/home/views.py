@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -169,6 +169,11 @@ def contact(request):
     """Sends an email to the team with contact info from user"""
     next_url = request.GET.get("next", "/")
     if request.method == "POST":
+        if request.user.is_anonymous:
+            # quick fix to unlock brevo while captcha may be weak
+            raise PermissionDenied(
+                "Le formulaire de contact n'est accessible qu'aux personnes authentifiées"
+            )
         form = ContactForm(request.user, request.POST)
         if form.is_valid():
             status = send_message_to_team(request, form.cleaned_data)
