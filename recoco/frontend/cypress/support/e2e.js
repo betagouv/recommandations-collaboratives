@@ -34,7 +34,9 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 // dès qu'un cookie dont le nom contient "cookie_consent" est présent). Sans ce
 // pré-set, le bandeau couvre les inputs et fait échouer cy.type().
 beforeEach(() => {
-  cy.setCookie('cookie_consent', 'accepted', { domain: 'example.localhost' });
+  cy.setCookie('cookie_consent', 'preferences=2999-01-01T00:00:00', {
+    domain: 'example.localhost',
+  });
 });
 
 const registerCypressGrep = require('@cypress/grep');
