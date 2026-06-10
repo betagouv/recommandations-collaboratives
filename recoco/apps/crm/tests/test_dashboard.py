@@ -9,6 +9,7 @@ from django.contrib.sites import models as site_models
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
+from model_bakery.recipe import Recipe, foreign_key
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -183,120 +184,99 @@ def test_low_reach_search_query_is_stripped(client):
 
 
 @pytest.fixture
-def add_public_task():
+def public_task_recipe(project_recipe, current_site):
     """Attach a public task in PROPOSED status to a project."""
-
-    def _add(project, site, **kwargs):
-        return baker.make(
-            tasks_models.Task,
-            project=project,
-            site=site,
-            public=True,
-            status=tasks_models.Task.PROPOSED,
-            **kwargs,
-        )
-
-    return _add
+    yield Recipe(
+        tasks_models.Task,
+        site=current_site,
+        project=foreign_key(project_recipe),
+        public=True,
+        status=tasks_models.Task.PROPOSED,
+    )
 
 
 @pytest.fixture
-def make_old():
+def project_old_recipe(project_recipe):
     """Push a project's last members activity 30 days in the past."""
-
-    def _make(project):
-        project.last_members_activity_at = timezone.now() - timedelta(days=30)
-        project.save()
-
-    return _make
+    old = project_recipe.extend(
+        last_members_activity_at=timezone.now() - timedelta(days=30)
+    )
+    yield old
 
 
 @pytest.mark.django_db
 def test_low_reach_lists_project_with_public_task_and_no_engagement(
-    current_site, client, make_project, make_old, add_public_task
+    current_site, client, project_old_recipe, public_task_recipe
 ):
-    project = make_project(current_site, name="VisibleProject")
-    make_old(project)
-    add_public_task(project, current_site)
+    project = project_old_recipe.make()
+    public_task_recipe.make(project=project)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
-    assertContains(response, "VisibleProject")
+    assertContains(response, project.name)
 
 
 @pytest.mark.django_db
 def test_low_reach_hides_project_with_task_in_progress(
-    current_site, client, make_project, make_old, add_public_task
+    current_site, client, make_project, project_old_recipe, public_task_recipe
 ):
-    project = make_project(current_site, name="EngagedProject")
-    make_old(project)
-    add_public_task(project, current_site)
-    baker.make(
-        tasks_models.Task,
-        project=project,
-        site=current_site,
-        public=True,
-        status=tasks_models.Task.INPROGRESS,
-    )
-
+    project = project_old_recipe.make()
+    public_task_recipe.make(project=project)
+    public_task_recipe.make(project=project, status=tasks_models.Task.INPROGRESS)
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
-    assertNotContains(response, "EngagedProject")
+    assertNotContains(response, project.name)
 
 
 @pytest.mark.django_db
 def test_low_reach_hides_project_without_public_task(
-    current_site, client, make_project, make_old
+    current_site, client, project_old_recipe
 ):
-    project = make_project(current_site, name="EmptyProject")
-    make_old(project)
+    empty_project = project_old_recipe.make()
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
-    assertNotContains(response, "EmptyProject")
+    assertNotContains(response, empty_project.name)
 
 
 @pytest.mark.django_db
 def test_low_reach_low_read_filter_keeps_barely_read_only(
-    current_site, client, make_project, make_old, add_public_task
+    current_site, client, project_old_recipe, public_task_recipe
 ):
-    not_read = make_project(current_site, name="NotReadProject")
-    make_old(not_read)
-    add_public_task(not_read, current_site)
+    not_read_project = project_old_recipe.make()
+    public_task_recipe.make(project=not_read_project)
 
-    well_read = make_project(current_site, name="WellReadProject")
-    make_old(well_read)
-    add_public_task(well_read, current_site, visited=True)
-    add_public_task(well_read, current_site, visited=True)
+    well_read = project_old_recipe.make()
+    public_task_recipe.make(project=well_read, visited=True)
+    public_task_recipe.make(project=well_read, visited=True)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"status": "low_read"})
 
     assert response.status_code == 200
-    assertContains(response, "NotReadProject")
-    assertNotContains(response, "WellReadProject")
+    assertContains(response, not_read_project.name)
+    assertNotContains(response, well_read.name)
 
 
 @pytest.mark.django_db
 def test_low_reach_mine_only_filters_by_switchtender(
-    current_site, client, make_project, make_old, add_public_task
+    current_site, client, project_old_recipe, public_task_recipe
 ):
-    mine = make_project(current_site, name="MineProject")
-    make_old(mine)
-    add_public_task(mine, current_site)
+    mine = project_old_recipe.make()
+    public_task_recipe.make(project=mine)
 
-    other = make_project(current_site, name="OtherProject")
-    make_old(other)
-    add_public_task(other, current_site)
+    other = project_old_recipe.make()
+    public_task_recipe.make(project=other)
 
     advisor = baker.make(auth_models.User)
     advisor.profile.sites.add(current_site)
@@ -312,44 +292,42 @@ def test_low_reach_mine_only_filters_by_switchtender(
         response = client.get(url, data={"mine": "1"})
 
     assert response.status_code == 200
-    assertContains(response, "MineProject")
-    assertNotContains(response, "OtherProject")
+    assertContains(response, mine.name)
+    assertNotContains(response, other.name)
 
 
 @pytest.mark.django_db
 def test_low_reach_search_matches_project_name(
-    current_site, client, make_project, make_old, add_public_task
+    current_site, client, project_old_recipe, public_task_recipe
 ):
-    target = make_project(current_site, name="UniqueLighthouse")
-    make_old(target)
-    add_public_task(target, current_site)
+    target = project_old_recipe.make(name="UniqueLighthouse")
+    public_task_recipe.make(project=target)
 
-    other = make_project(current_site, name="OtherProject")
-    make_old(other)
-    add_public_task(other, current_site)
+    other = project_old_recipe.make()
+    public_task_recipe.make(project=other)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"q": "Lighthouse"})
 
     assert response.status_code == 200
-    assertContains(response, "UniqueLighthouse")
-    assertNotContains(response, "OtherProject")
+    assertContains(response, target.name)
+    assertNotContains(response, other.name)
 
 
 @pytest.mark.django_db
 def test_low_reach_days_zero_disables_time_filter(
-    current_site, client, make_project, add_public_task
+    current_site, client, project_recipe, public_task_recipe
 ):
-    recent = make_project(current_site, name="RecentProject")
-    add_public_task(recent, current_site)
+    recent = project_recipe.make()
+    public_task_recipe.make(project=recent)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, data={"days": 0})
 
     assert response.status_code == 200
-    assertContains(response, "RecentProject")
+    assertContains(response, recent.name)
 
 
 ########################################################################
@@ -359,13 +337,12 @@ def test_low_reach_days_zero_disables_time_filter(
 
 @pytest.mark.django_db
 def test_low_reach_csv_uses_french_headers_and_filename(
-    current_site, client, make_project, make_old, add_public_task
+    current_site, client, project_old_recipe, public_task_recipe
 ):
     commune = baker.make(geomatics_models.Commune, name="Ville", insee="12345")
 
-    project = make_project(current_site, commune=commune)
-    make_old(project)
-    add_public_task(project, current_site)
+    project = project_old_recipe.make(commune=commune)
+    public_task_recipe.make(project=project)
 
     url = reverse("crm-projects-low-reach-csv")
     with login(client, groups=["example_com_staff"]):
