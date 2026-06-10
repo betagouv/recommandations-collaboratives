@@ -182,9 +182,6 @@
                     {% endif %}
                 </div>
                 <h3 class="fr-mt-2w">
-                    <svg class="bi align-middle" width="24" height="24">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#people" />
-                    </svg>
                     <span class="align-middle">Connexions</span>
                 </h3>
                 {% activity_stream "model_actions" user_model %}
@@ -204,9 +201,8 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="crm-home__sidebar user-crm fr-px-3w fr-pt-1v crm-timeline-min-height">
-                <section class="w-100">
-                    <h3 class="user-crm__section-title fr-mt-2w">Activité de l'ensemble des dossiers</h3>
+            <div class="crm-home__sidebar fr-px-3w fr-pt-1v crm-timeline-min-height d-flex flex-column flex-wrap">
+                    <h3 class="crm-home__subtitle fr-mt-2w">Activité de l'ensemble des dossiers</h3>
                     {% include "crm/timeline.html" with actions=site_action_stream %}
                     <div class="d-flex justify-content-center">
                         <a class="button filled grey small inherit fw-bold fr-mt-3w fr-mb-3w"
