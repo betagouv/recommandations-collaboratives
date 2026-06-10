@@ -6,5 +6,7 @@
     Vous êtes déjà connecté avec un autre compte
 {% endblock og_title %}
 {% block content %}
-    <div>{% include "home/fragments/content_403.html" with title="Vous êtes déjà connecté avec un autre compte" %}</div>
+    <div>
+        {% include "home/fragments/content_403.html" with title_text="Oh non ! Vous ne pouvez pas voir cette page." technical_info_text="Si l’équipe technique vous demande, c’est une erreur 403." %}
+    </div>
 {% endblock content %}

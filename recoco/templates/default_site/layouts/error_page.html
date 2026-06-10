@@ -1,0 +1,27 @@
+{% load django_vite %}
+{% vite_asset 'js/styles/layouts/error-page.css.js' %}
+<div class="fr-container--fluid">
+    <div class="fr-my-7w fr-mt-md-12w fr-mb-md-10w fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-grid-row--center">
+        <div class="fr-py-0 fr-col-11 fr-col-md-7">
+            {% block title %}
+                <h2 class="error-page__title">{{ title_text }}</h2>
+            {% endblock title %}
+            {% block technical_info %}
+                <p class="error-page__technical-info fr-text--sm fr-mb-3w">{{ technical_info_text }}</p>
+            {% endblock technical_info %}
+            {% block content %}
+                <p class="error-page__content fr-text--lead fr-mb-3w">{{ content_text }}</p>
+            {% endblock content %}
+            <ul class="error-page__btn-container fr-btns-group fr-btns-group--icon-left fr-btns-group--inline-md">
+                {% block buttons %}
+                {% endblock buttons %}
+            </ul>
+            {% block more %}
+            {% endblock more %}
+        </div>
+        <div class="error-page__img-container fr-col-11 fr-col-md-3 fr-px-6w fr-px-md-0 fr-py-0">
+            {% block image %}
+            {% endblock image %}
+        </div>
+    </div>
+</div>

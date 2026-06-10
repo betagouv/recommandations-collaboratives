@@ -452,7 +452,9 @@ def permission_denied(request, exception):
     login_url = (
         reverse("account_login") + "?" + urllib.parse.urlencode({"next": request.path})
     )
-    logout_url = reverse("logout") + "?" + urllib.parse.urlencode({"next": login_url})
+    logout_url = (
+        reverse("account_logout") + "?" + urllib.parse.urlencode({"next": login_url})
+    )
 
     return HttpResponseForbidden(
         template.render(
