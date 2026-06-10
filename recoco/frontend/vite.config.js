@@ -251,6 +251,7 @@ const config = {
           './src/js/styles/background-override.css.js'
         ),
         emptyStateCrmStyles: resolve('./src/js/styles/crm-empty-state.css.js'),
+        projectLowReachStyles: resolve('./src/js/styles/project-low-reach.css.js'),
       },
       output: {
         chunkFileNames: undefined,
