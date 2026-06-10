@@ -1,0 +1,50 @@
+{% comment %} Server-side paginator template (Django Paginator)
+In parent component, you need to pass the following variable:
+- page_obj: the Django Paginator page object (from a ListView or similar)
+For client-side Alpine.js pagination, use tools/pagination.html instead.
+{% endcomment %}
+{% if page_obj.paginator.num_pages > 1 %}
+    <nav role="navigation"
+         class="fr-pagination fr-mt-3w"
+         aria-label="Pagination">
+        <ul class="fr-pagination__list justify-content-center">
+            {% if page_obj.has_previous %}
+                <li>
+                    <a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label"
+                       href="{% querystring page=page_obj.previous_page_number %}"
+                       title="Page précédente">Page précédente</a>
+                </li>
+            {% endif %}
+            {% for i in page_obj.paginator.page_range %}
+                {% if i == 1 or i == page_obj.paginator.num_pages or i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+                    <li>
+                        {% if i == page_obj.number %}
+                            <a class="fr-pagination__link fr-pagination__link--current"
+                               aria-current="page"
+                               title="Page {{ i }}">{{ i }}</a>
+                        {% else %}
+                            <a class="fr-pagination__link"
+                               href="{% querystring page=i %}"
+                               title="Page {{ i }}">{{ i }}</a>
+                        {% endif %}
+                    </li>
+                {% elif i == 2 and page_obj.number > 4 %}
+                    <li>
+                        <span class="fr-pagination__link fr-mx-0">…</span>
+                    </li>
+                {% elif i == page_obj.paginator.num_pages|add:"-1" and page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+                    <li>
+                        <span class="fr-pagination__link fr-mx-0">…</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li>
+                    <a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label"
+                       href="{% querystring page=page_obj.next_page_number %}"
+                       title="Page suivante">Page suivante</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}

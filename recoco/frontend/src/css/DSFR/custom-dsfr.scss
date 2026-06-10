@@ -685,7 +685,7 @@ form > p {
 
 .font-size-12px,
 .font-size-12px p {
-  font-size: 12px;
+  font-size: 12px !important;
 }
 
 .font-size-10px,
@@ -1031,10 +1031,17 @@ a.fr-text-inverted--grey {
 }
 
 .description-help-text {
-  color: var(--light-text-mention-grey, #666);
+  color: var(--light-text-mention-grey, #666) !important;
   font-size: 12px !important;
   font-weight: 400;
   line-height: 150% !important; /* 18px */
+}
+
+.important-description-help-text {
+  color: var(--light-text-default-grey, #3A3A3A);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px; /* 150% */
 }
 
 .fr-label-rework {
