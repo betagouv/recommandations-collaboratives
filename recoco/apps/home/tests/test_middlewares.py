@@ -91,6 +91,19 @@ class TestSesameWithCookie:
         assert authenticated_user.id == user.id
         assert response.status_code == 302
 
+    def test_does_not_logout_even_if_cookie(self, client):
+        user = baker.make(auth_models.User)
+        setup_sesame_cookie(client, user)
+        query = get_query_string(user)
+
+        with login(client) as other_user:
+            url = reverse("home") + query
+            response = client.get(url)
+
+            authenticated_user = get_user(client)
+            assert authenticated_user.id == other_user.id
+            assert response.status_code == 200
+
 
 @pytest.mark.django_db
 class TestEnableSesameCookie:

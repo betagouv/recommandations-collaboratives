@@ -109,6 +109,8 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
 
         if user is None:
             return None
+        if request.user.is_authenticated and request.user.id != user.id:
+            return None
 
         # this cookie is meant to know if user had already signed in
         # on this device, to secure this type of authentication
