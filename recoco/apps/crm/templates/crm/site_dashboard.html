@@ -204,23 +204,15 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="crm-home__sidebar fr-px-3w fr-pt-1v crm-timeline-min-height">
-                <h3 class="crm-home__subtitle fr-mt-2w">
-                    Activité de l'ensemble des dossiers
-                </h3>
-                <ul class="bg-white fr-pt-2w fr-px-3w border rounded crm-activity">
-                    <div class="fr-p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
-                        <article class="overflow-hidden">
-                            {% for action in site_action_stream|slice:":30" %}
-                                {% include "crm/fragments/activity_action.html" %}
-                            {% empty %}
-                                -- Pas encore d'activité de la part du staff --
-                            {% endfor %}
-                        </article>
+            <div class="crm-home__sidebar user-crm fr-px-3w fr-pt-1v crm-timeline-min-height">
+                <section class="w-100">
+                    <h3 class="user-crm__section-title fr-mt-2w">Activité de l'ensemble des dossiers</h3>
+                    {% include "crm/timeline.html" with actions=site_action_stream %}
+                    <div class="d-flex justify-content-center">
                         <a class="button filled grey small inherit fw-bold fr-mt-3w fr-mb-3w"
-                        href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
+                           href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
                     </div>
-                </ul>
+                </section>
             </div>
         </div>
     </div>
