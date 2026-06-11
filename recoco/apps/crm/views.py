@@ -48,8 +48,8 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
@@ -644,11 +644,14 @@ def user_update(request, user_id=None):
                         # a user with the new mail already exist
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
-                            error_msg = mark_safe(  # noqa: S308
-                                f'L\'utilisateur <a href="{user_link}">'
-                                f"{users[0].first_name} {users[0].last_name}</a>'"
-                                " utilise déjà cette adresse email."
-                            )  # nosec
+                            error_msg = format_html(
+                                'L\'utilisateur <a href="{}">'
+                                "{} {}</a>'"
+                                " utilise déjà cette adresse email.",
+                                user_link,
+                                users[0].first_name,
+                                users[0].last_name,
+                            )
                             form.add_error(
                                 "username", django_forms.ValidationError(error_msg)
                             )
