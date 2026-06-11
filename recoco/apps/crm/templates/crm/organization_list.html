@@ -106,12 +106,14 @@
                                     </td>
                                     <td>
                                         {% with departments=organization.departments.all %}
-                                            {% for dpt in departments|slice:":8" %}
-                                                {{ dpt.name }} ({{ dpt.code }}){% if not forloop.last %} , {% endif %}
-                                            {% empty %}
-                                                -
-                                            {% endfor %}
-                                            {% if departments|length > 8 %}<span class="fw-bold">+ {{ departments|length|add:"-8" }}</span>{% endif %}
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for dpt in departments|slice:":8" %}
+                                                    <span>{{ dpt.name }} ({{ dpt.code }}){% if not forloop.last %} ,{% endif %}</span>
+                                                {% empty %}
+                                                    <span>-</span>
+                                                {% endfor %}
+                                                {% if departments|length > 8 %}<span class="fw-bold">+ {{ departments|length|add:"-8" }}</span>{% endif %}
+                                            </div>
                                         {% endwith %}
                                     </td>
                                     <td>{{ organization.members_count|default:0 }}</td>
