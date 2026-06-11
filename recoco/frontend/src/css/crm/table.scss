@@ -86,6 +86,22 @@
       &:nth-child(even) {
         background-color: #f8f8f8;
       }
+      &.is-selected {
+        td {
+          border-top: 2px solid
+            var(--light-background-active-blue-france, #000091);
+          border-bottom: 2px solid
+            var(--light-background-active-blue-france, #000091);
+        }
+        td:first-child {
+          border-left: 2px solid
+            var(--light-background-active-blue-france, #000091);
+        }
+        td:last-child {
+          border-right: 2px solid
+            var(--light-background-active-blue-france, #000091);
+        }
+      }
     }
     &__project-name {
       font-weight: 700;

@@ -93,7 +93,7 @@
                         </thead>
                         <tbody>
                             {% for organization in page_obj %}
-                                <tr>
+                                <tr :class="{ 'is-selected': selected.includes('{{ organization.pk }}') }">
                                     <td>
                                         <input name="org_ids"
                                                type="checkbox"
