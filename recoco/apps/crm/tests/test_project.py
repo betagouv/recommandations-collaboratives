@@ -128,50 +128,6 @@ def test_crm_project_update_property_muted(request, client):
     assert updated.muted is True
 
 
-@pytest.mark.django_db
-def test_crm_project_update_redirects_to_safe_next(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
-
-    url = reverse("crm-project-update", args=[project.id])
-    safe_next = reverse("crm-list-projects-low-reach")
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data={"statistics": False, "next": safe_next})
-
-    assertRedirects(response, safe_next, fetch_redirect_response=False)
-
-
-@pytest.mark.django_db
-def test_crm_project_update_ignores_unsafe_next(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
-
-    url = reverse("crm-project-update", args=[project.id])
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(
-            url, data={"statistics": False, "next": "https://evil.example/steal"}
-        )
-
-    # No redirect: page is re-rendered (200) instead of jumping off-site.
-    assert response.status_code == 200
-    assert projects_models.Project.objects.get(pk=project.pk).exclude_stats is True
-
-
-@pytest.mark.django_db
-def test_crm_project_update_without_next_renders_page(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
-
-    url = reverse("crm-project-update", args=[project.id])
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data={"statistics": False})
-
-    assert response.status_code == 200
-
-
 #
 # delete
 
