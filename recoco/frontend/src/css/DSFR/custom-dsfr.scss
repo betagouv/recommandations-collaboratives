@@ -78,6 +78,17 @@
   opacity: 1;
 }
 
+/* ¯¯¯¯¯ *\
+  POSITION
+\* ˍˍˍˍˍ */
+
+.fr-header {
+  &.sticky-top {
+    position: sticky;
+    top: 0;
+  }
+}
+
 /* ¯¯¯¯ *\
   ICONS
 \* ˍˍˍˍ */
@@ -567,6 +578,15 @@ form > p {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   cursor: pointer;
+}
+
+/* ¯¯¯¯¯¯ *\
+  CONTAINER
+\* ˍˍˍˍˍˍ */
+
+.fr-container--small {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 /* ¯¯¯ *\
