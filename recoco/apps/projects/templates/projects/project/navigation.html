@@ -38,13 +38,13 @@
                 {% endif %}
                 {% for plugin_tab in plugin_tabs %}
                     <div class="fr-segmented__element">
-                        <input value="plugin-0"
+                        <input value="plugin-{{ forloop.counter0 }}"
                                type="radio"
-                               id="segmented-control-overview"
+                               id="segmented-control-plugin-{{ forloop.counter0 }}"
                                name="segmented-control-project"
                                @click="window.location='{% url plugin_tab.0 project.pk %}'">
 
-                        <label class="fr-label" for="segmented-control-survey">
+                        <label class="fr-label" for="segmented-control-plugin-{{ forloop.counter0 }}">
                             <a class="stretched-link"
                                href="{% url plugin_tab.0 project.pk %}">{{  plugin_tab.1 }}
                             </a>
