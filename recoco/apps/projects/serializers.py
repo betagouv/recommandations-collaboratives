@@ -250,6 +250,14 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "owner": format_owner(data),
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,
+            "advisors_note": data.advisors_note,
+            "deleted": data.deleted,
+            "topics": [t.name for t in data.topics.all()],
+            "orga_owner": (
+                data.owner.profile.organization.name
+                if data.owner and data.owner.profile.organization
+                else ""
+            ),
         }
 
         for field_name in self.context.get("plugin_extra_fields", []):
