@@ -2,8 +2,8 @@ from unittest.mock import Mock, patch
 
 import pluggy
 import pytest
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
+from django.db.models import Value
 from django.urls import reverse
 from model_bakery import baker
 
@@ -256,8 +256,6 @@ class FakeCrmPlugin:
 
     @pluggy.HookimplMarker("recoco")
     def crm_project_list_annotations(self, request):
-        from django.db.models import Value
-
         return {"plugin_sentinel": Value(42)}
 
     @pluggy.HookimplMarker("recoco")
@@ -296,14 +294,8 @@ class TestCrmProjectListAnnotationsHook:
         assert response.status_code == 200
 
     def test_extra_field_appears_in_rest_response(
-        self, request, client, site_with_fake_plugin
+        self, client, project, site_with_fake_plugin
     ):
-        from recoco.apps.projects.models import Project
-
-        current_site = get_current_site(request)
-        project = baker.make(Project)
-        project.project_sites.create(site=current_site, status="READY", is_origin=True)
-
         pm = make_crm_plugin_manager(FakeCrmPlugin())
 
         with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
@@ -317,14 +309,9 @@ class TestCrmProjectListAnnotationsHook:
         assert results[0]["plugin_sentinel"] == 42
 
     def test_extra_field_absent_when_plugin_disabled(
-        self, request, client, current_site
+        self, client, project, current_site
     ):
         baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
-
-        from recoco.apps.projects.models import Project
-
-        project = baker.make(Project)
-        project.project_sites.create(site=current_site, status="READY", is_origin=True)
 
         pm = make_crm_plugin_manager(FakeCrmPlugin())
 
