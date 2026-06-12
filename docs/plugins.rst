@@ -242,6 +242,219 @@ Plugins implement hooks defined by the core using ``pluggy``.
             return {"trending_gifs": ["https://example.com/1.gif"]}
 
 
+Available Hooks
+================
+
+The core ships with several hook specification namespaces, defined in
+``recoco/apps/plugins/hooks.py``. Each ``@hookspec``-decorated method has a
+full docstring with its return contract and an example — the list below is
+a quick index.
+
+``ProjectSpec``
+---------------
+
+``project_tab_entries()``
+    Add a tab to the project detail page navigation. Returns
+    ``(url_name, label)``.
+
+``ResourceSpec``
+----------------
+
+``resource_sidebar_panels(resource, request)``
+    Inject an HTML fragment into the resource detail right sidebar.
+
+``ConversationSpec``
+---------------------
+
+``conversation_message_node_html(request, project)``
+    Return Alpine ``<template x-if="node.type == '...'">`` fragments
+    handling custom message node types in the conversation feed.
+
+``conversation_extra_html(request, project)``
+    Return HTML injected once into the conversation page — page-level
+    assets (``<script>`` / ``{% vite_asset %}``) and globally-mounted UI
+    such as modals.
+
+See `Conversation Hooks & JS Integration`_ below for a worked example.
+
+``CrmSpec``
+-----------
+
+``crm_navigation_tabs(request)``
+    Add a tab to the CRM navigation. Returns a dict with ``label``,
+    ``url_name``, ``tab_key`` and ``index``.
+
+``crm_project_list_annotations(request)``
+    Add queryset annotations (e.g. ``Count(...)``) to the CRM project list,
+    avoiding N+1 queries.
+
+``crm_project_list_extra_serializer_fields(request)``
+    Expose annotated fields (declared via ``crm_project_list_annotations``)
+    in the REST list response.
+
+``crm_project_list_columns(request)``
+    Add a column to the CRM project list table. Returns a dict with
+    ``header``, ``cell_html`` and an optional ``col_class``.
+
+See `CRM Project List Extension Example`_ below for how the three
+``crm_project_list_*`` hooks work together.
+
+
+CRM Project List Extension Example
+====================================
+
+The three ``crm_project_list_*`` hooks work together to add a column to the
+CRM project list without N+1 queries:
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    from django.db.models import Count
+
+    class GiphyPlugin:
+        ...
+
+        @hookimpl
+        def crm_project_list_annotations(self, request):
+            """Annotate the queryset so the count is computed in SQL."""
+            return {"giphy_searches_count": Count("giphysearch")}
+
+        @hookimpl
+        def crm_project_list_extra_serializer_fields(self, request):
+            """Expose the annotation in the REST payload."""
+            return ["giphy_searches_count"]
+
+        @hookimpl
+        def crm_project_list_columns(self, request):
+            """Render the column header and cell."""
+            return {
+                "header": "Recherches Giphy",
+                "cell_html": '<td x-text="project.giphy_searches_count"></td>',
+                "col_class": "col--small",
+            }
+
+- ``crm_project_list_annotations`` adds the queryset annotation.
+- ``crm_project_list_extra_serializer_fields`` exposes it in the REST
+  payload consumed by the Alpine table.
+- ``crm_project_list_columns`` renders the ``<th>``/``<td>`` pair;
+  ``project`` is in scope for ``cell_html`` Alpine expressions
+  (``x-text``, ``:href``, etc.).
+
+
+Conversation Hooks & JS Integration
+====================================
+
+The conversation feed (project detail → "Échanges") can be extended with
+custom message node types — for example, a plugin that lets users share a
+GIF inline in the discussion.
+
+Two hooks work together on the Python side:
+
+``conversation_message_node_html(request, project)``
+    Returns an Alpine ``<template x-if="node.type == '...'">`` fragment. It
+    is rendered inside the ``x-for="node in element.nodes"`` loop of every
+    message, so the ``node`` variable is in scope.
+
+``conversation_extra_html(request, project)``
+    Returns HTML rendered once, outside the message loop. Use it to load the
+    plugin's JS bundle (``{% vite_asset %}``) and to mount any page-level UI
+    (e.g. a modal) that the JS below opens on demand.
+
+Python side
+-----------
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    from django.template.loader import render_to_string
+
+    class GiphyPlugin:
+        ...
+
+        @hookimpl
+        def conversation_message_node_html(self, request, project):
+            return '''
+            <template x-if="node.type == 'GiphyNode'">
+                <img :src="node.data.url" class="fr-responsive-img" />
+            </template>
+            '''
+
+        @hookimpl
+        def conversation_extra_html(self, request, project):
+            return render_to_string("plugin_giphy/conversation_extra.html")
+
+.. code-block:: html+django
+
+    {# plugin_giphy/templates/plugin_giphy/conversation_extra.html #}
+    {% load django_vite %}
+    {% vite_asset 'js/plugins/giphyConversation.js' %}
+
+    <dialog id="giphy-modal" class="fr-modal" x-data="GiphyModal">
+      <!-- ... GIF picker markup ... -->
+    </dialog>
+
+JS side: window events
+-----------------------
+
+The conversation feed communicates with plugin JS exclusively through
+``window`` ``CustomEvent``\ s — plugin bundles never need direct access to
+the ``Conversations`` Alpine component.
+
+``task:done`` *(dispatched by the core)*
+    Fired when a user marks a task as done from the conversation feed.
+
+    .. code-block:: javascript
+
+        window.dispatchEvent(new CustomEvent('task:done', {
+          detail: { task, projectId, resourceId },
+        }));
+
+    A plugin can listen for this to offer a follow-up action — e.g. "share
+    a celebratory GIF for this task".
+
+``plugin-message-create-request`` *(dispatched by a plugin)*
+    Ask the core to post a new conversation message containing
+    plugin-defined nodes. The core POSTs the ``nodes`` to the conversation's
+    messages endpoint and appends the result to the feed.
+
+    .. code-block:: javascript
+
+        window.dispatchEvent(new CustomEvent('plugin-message-create-request', {
+          detail: { nodes: [{ type: 'GiphyNode', data: { url: gifUrl } }] },
+        }));
+
+``plugin-message-created`` *(dispatched by the core)*
+    Fired after a ``plugin-message-create-request`` succeeds. Use it to
+    close the plugin's modal or reset its state.
+
+Putting it together
+--------------------
+
+.. code-block:: javascript
+
+    // plugin_giphy/js/giphyConversation.js
+    import Alpine from 'alpinejs';
+
+    Alpine.data('GiphyModal', () => ({
+      open: false,
+
+      init() {
+        window.addEventListener('task:done', () => {
+          this.open = true;
+        });
+        window.addEventListener('plugin-message-created', () => {
+          this.open = false;
+        });
+      },
+
+      selectGif(gifUrl) {
+        window.dispatchEvent(new CustomEvent('plugin-message-create-request', {
+          detail: { nodes: [{ type: 'GiphyNode', data: { url: gifUrl } }] },
+        }));
+      },
+    }));
+
+
 Database Isolation
 ==================
 
@@ -470,6 +683,21 @@ The plugin entry can import packages from its own ``node_modules/`` (Node's
 module resolution walks up the directory tree and finds them there) as well
 as packages from the core frontend's ``node_modules/`` (Alpine, Leaflet,
 lodash, etc.).
+
+Importing core JS modules (``@core`` alias)
+---------------------------------------------
+
+The core ``vite.config.js`` defines an ``@core`` alias pointing at
+``recoco/frontend/src/``. Plugin entry files can import core utilities,
+stores, and components directly instead of duplicating them:
+
+.. code-block:: javascript
+
+    // plugin_giphy/js/giphyConversation.js
+    import { STATUSES, isStatus } from '@core/utils/taskStatus';
+
+This keeps plugin code in sync with core behaviour (e.g. task status enums)
+without adding a dependency between npm packages.
 
 Generating Vite entry proxies
 ------------------------------
