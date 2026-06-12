@@ -5,7 +5,20 @@ import pluggy
 hookspec = pluggy.HookspecMarker("recoco")
 
 
-class ProjectSpec:
+class HookSpec:
+    """Base class for hook specification namespaces.
+
+    Subclassing this registers the spec in `all_specs()`, so the plugin
+    manager picks it up automatically without touching manager.py.
+    """
+
+
+def all_specs():
+    """Return every declared hook spec namespace."""
+    return HookSpec.__subclasses__()
+
+
+class ProjectSpec(HookSpec):
     @hookspec
     def project_tab_entries(self):
         """Return a tab entry to add to the project detail page navigation.
@@ -23,7 +36,7 @@ class ProjectSpec:
         """
 
 
-class ResourceSpec:
+class ResourceSpec(HookSpec):
     @hookspec
     def resource_sidebar_panels(self, resource, request):
         """Return an HTML string to inject into the resource detail right sidebar.
@@ -39,7 +52,7 @@ class ResourceSpec:
         """
 
 
-class ConversationSpec:
+class ConversationSpec(HookSpec):
     @hookspec
     def conversation_message_node_html(self, request, project):
         """Return an HTML string containing Alpine <template x-if> blocks for rendering
@@ -69,7 +82,7 @@ class ConversationSpec:
         """
 
 
-class CrmSpec:
+class CrmSpec(HookSpec):
     @hookspec
     def crm_navigation_tabs(self, request):
         """Return a tab definition dict to inject into the CRM navigation.
