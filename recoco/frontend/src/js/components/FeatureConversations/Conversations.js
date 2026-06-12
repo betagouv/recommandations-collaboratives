@@ -80,13 +80,19 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     window.addEventListener('hashchange', async () => {
       await this.detectOpenActionsFromHash();
     });
+
+    // PLUGINS: hook so a Node Renderer JS plugin can respond to a custom Node
+    // type and produce the desired rendering
     window.addEventListener('plugin-message-create-request', async (e) => {
       const { nodes } = e.detail;
       try {
-        const response = await api.post(conversationsMessagesUrl(this.projectId), {
-          nodes,
-          in_reply_to: this.messageIdToReply,
-        });
+        const response = await api.post(
+          conversationsMessagesUrl(this.projectId),
+          {
+            nodes,
+            in_reply_to: this.messageIdToReply,
+          }
+        );
         this.feed.elements.push({ ...response.data, type: 'message' });
         this.scrollToNewMessage();
         this.updateCountOfElementsInDiscussion(response.data);
