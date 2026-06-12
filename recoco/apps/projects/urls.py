@@ -115,7 +115,7 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/actions",
-        detail.ProjectRecommandationsView.as_view(),
+        detail.project_actions,
         name="projects-project-detail-actions",
     ),
     path(

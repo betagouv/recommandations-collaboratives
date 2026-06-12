@@ -12,7 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Prefetch
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -25,7 +24,6 @@ from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.plugins.manager import get_tenant_hook
-from recoco.apps.resources.models import Resource
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -233,31 +231,6 @@ def mark_notifications_as_seen(user, project):
         public=True,
     )
     notifications.mark_all_as_read()
-
-
-class ProjectRecommandationsView(ProjectDetailBaseView):
-    """Action page for given project"""
-
-    template_name = "projects/project/actions.html"
-
-    def get_object(self):
-        self.pk = self.kwargs.get(self.pk_url_kwarg)
-
-        return get_object_or_404(
-            models.Project.objects.filter(sites=self.request.site)
-            .with_unread_notifications(user_id=self.request.user.id)
-            .prefetch_related(
-                "tasks",
-                Prefetch("tasks__resource", Resource.objects.with_ds_annotations()),
-            )
-            .select_related("commune__department"),
-            pk=self.pk,
-        )
-
-    def check_permissions(self):
-        return has_perm(
-            self.request.user, "list_projects", self.request.site
-        ) or has_perm_or_403(self.request.user, "view_tasks", self.object)
 
 
 @login_required
