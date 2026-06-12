@@ -194,7 +194,7 @@ def test_create_tenant_schema_signal_no_schema_name(current_site):
     with patch("django.db.connection.cursor") as mock_cursor:
         cursor_instance = mock_cursor.return_value.__enter__.return_value
 
-        # Saving SiteConfiguration without schema_name should not trigger schema craetion
+        # Saving SiteConfiguration without schema_name should not trigger schema creation
         baker.make(SiteConfiguration, site=current_site, schema_name=None)
 
         # Ensure no call to execute contains "CREATE SCHEMA"
