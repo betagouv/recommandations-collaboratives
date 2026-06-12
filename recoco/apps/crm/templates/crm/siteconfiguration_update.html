@@ -35,7 +35,7 @@
                                 {% if plugin in registered_plugins %}
                                 <p class="fr-tag">{{ plugin }}</p>
                                 {% else %}
-                                <p class="fr-tag" style="background-color: var(--background-flat-error); color: var(--text-inverted-error);" title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
+                                <p class="fr-tag fr-background-flat--error fr-text-inverted--error" title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
                                 {% endif %}
                             </li>
                             {% endfor %}
