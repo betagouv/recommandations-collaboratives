@@ -3,6 +3,7 @@
 import importlib.metadata
 
 import pluggy
+import sentry_sdk
 
 from .hooks import all_specs
 
@@ -35,8 +36,9 @@ def _build_plugin_manager():
                 try:
                     plugin_cls = ep.load()
                     pm.register(plugin_cls(), name=ep.name)
-                except ModuleNotFoundError:
-                    pass  # Fail silently if the module is not found to prevent a global crash
+                except ModuleNotFoundError as e:
+                    # Don't crash the whole site if a registered plugin's module is missing
+                    sentry_sdk.capture_exception(e)
 
     return pm
 
