@@ -11,9 +11,16 @@ from . import models
 
 
 class SiteConfigurationForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.initial["crm_available_tags"] = ", ".join(
+            self.instance.crm_available_tags.names()
+        )
+
     crm_available_tags = forms.CharField(
-        max_length=255,
         required=False,
+        disabled=True,
         widget=TagWidget(
             attrs={
                 "class": "form-control",
@@ -44,7 +51,6 @@ class SiteConfigurationForm(forms.ModelForm):
             "logo_large",
             "logo_small",
             "email_logo",
-            "crm_available_tags",
             "reminder_interval",
             "accept_handover",
             "crisp_token",
