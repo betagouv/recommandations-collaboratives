@@ -246,6 +246,42 @@ def test_project_list_last_activity_filter(request, api_client):
         assert len(response.data["results"]) == 2
 
 
+@pytest.fixture
+def my_projects_filter_setup(request, api_client, make_project):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    assigned_project = make_project(site=site, status="READY", name="Mon projet")
+    make_project(site=site, status="READY", name="Autre projet")
+
+    utils.assign_advisor(user, assigned_project, site)
+
+    api_client.force_authenticate(user=user)
+
+    return api_client, reverse("projects-list"), assigned_project
+
+
+@pytest.mark.django_db
+def test_project_list_without_my_projects_filter_(my_projects_filter_setup):
+    api_client, url, _ = my_projects_filter_setup
+
+    # without the parameter, both projects are returned
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 2
+
+
+@pytest.mark.django_db
+def test_project_list_with_my_projects_filter(my_projects_filter_setup):
+    api_client, url, assigned_project = my_projects_filter_setup
+
+    # with the parameter, only the project the user is positioned on
+    response = api_client.get(f"{url}?my_projects=true")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+    assert response.data["results"][0]["name"] == assigned_project.name
+
+
 @pytest.mark.django_db
 def test_project_list_search_filter_fulltext(request, api_client):
     site = get_current_site(request)

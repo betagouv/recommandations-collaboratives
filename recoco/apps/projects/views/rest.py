@@ -48,6 +48,7 @@ from ..filters import (
     DefaultNoDeletedFilter,
     DepartmentsFilter,
     ProjectActivityFilter,
+    ProjectAssignedToUserFilter,
     ProjectSiteStatusFilter,
 )
 from ..serializers import (
@@ -155,6 +156,7 @@ class ProjectList(ListAPIView):
         DepartmentsFilter,
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
+        ProjectAssignedToUserFilter,
         # todo filter should not be necessary after cleaning recoco_sync 2122
         DefaultNoDeletedFilter,
     ]
