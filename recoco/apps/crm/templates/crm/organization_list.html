@@ -19,7 +19,7 @@
     <div x-data="Crm" class="d-flex flex-column fr-px-0 crm org-list-scroll">
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Organisations' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-        <h1 class="fr-h3 fr-px-5v fr-pt-5v">Liste des organisations</h1>
+        <h1 class="fr-h3 fr-px-5v fr-pt-1w">Liste des organisations</h1>
         <div class="project-list-crm w-100" x-data="{ selected: [] }">
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
@@ -50,7 +50,7 @@
                 </form>
                 {# Merge action (drives the table form below through the form= attribute) #}
                 <div class="d-flex align-items-center gap-3 text-nowrap">
-                    <span class="text-secondary"
+                    <span class="text-secondary font-size-14px"
                           x-show="selected.length > 0"
                           x-text="`${selected.length} organisation${selected.length > 1 ? 's' : ''} sélectionnée${selected.length > 1 ? 's' : ''}`"></span>
                     <button type="submit"
