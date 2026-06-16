@@ -97,7 +97,6 @@ jobs:
 
       - name: Run Tests
         env:
-          SECRET_KEY: 'this-is-not-a-secret-key'
           SENDINBLUE_API_KEY: 'this-is-a-fake-api-key'
           DJANGO_DB_HOST: localhost
           DJANGO_DB_USER: postgres
