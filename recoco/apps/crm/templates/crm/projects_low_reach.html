@@ -26,7 +26,7 @@
                    <span class="fr-icon-arrow-left-s-line fr-icon--sm"></span>
                     Retour à tous les dossiers
                 </a>
-                <h1 class="fr-h2 fr-mb-0">
+                <h1 class="fr-h2 fr-mb-0" data-test-id="low-reach-title">
                     {{ total_count }} Dossier{{ total_count|pluralize }} à relancer
                 </h1>
             </div>
@@ -96,12 +96,13 @@
                 <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes projets</label>
             </div>
             <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
-               class="fr-btn fr-btn--primary fr-btn--sm text-nowrap">
+               class="fr-btn fr-btn--primary fr-btn--sm text-nowrap"
+               data-test-id="low-reach-csv-export">
                 Télécharger en CSV
             </a>
         </form>
         <div class="table-responsive">
-            <table class="project-table w-100">
+            <table class="project-table w-100" data-test-id="low-reach-table">
                 <colgroup>
                     <col class="col--xl">
                     <col class="col--xl">
