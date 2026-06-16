@@ -14,7 +14,7 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
-    "cryptography==46.0.7",
+    "cryptography==48.0.1",
     "django>=5.2.15,<6",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
@@ -99,7 +99,7 @@ version = { attr = "recoco.__version__" }
 package = false
 constraint-dependencies = [
     "pyjwt>=2.13.0",
-    "tornado>=6.5.6"
+    "tornado>=6.5.7"
 ]
 
 [build-system]
@@ -213,8 +213,6 @@ django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev =
 # to set if packages have unfixed acceptable vulnerabilities
 ignore = [
     "GHSA-r374-rxx8-8654", # low impact no fix
-    "PYSEC-2025-183", # no fix alias 'CVE-2025-45768'
-    "PYSEC-2026-89" # supposedly fixed in 3.8.1 in this alias 'GHSA-5wmx-573v-2qwq' otherwise unclear
 ]
 
 [dependency-groups]
