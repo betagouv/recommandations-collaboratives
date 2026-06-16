@@ -5,7 +5,6 @@ import pytest
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
-from django.core import signing
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from model_bakery import baker
@@ -113,14 +112,17 @@ class TestEnableSesameCookie:
 
         with login(client) as user:
             client.get("/")
-            assert (
-                int(
-                    signing.get_cookie_signer("enable-sesame-user-id").unsign(
-                        client.cookies["enable-sesame-user-id"].value
-                    )
-                )
-                == user.id
-            )
+            assert int(client.cookies["enable-sesame-user-id"].value) == user.id
+
+    def test_persist_after_session(self, client):
+        cookie_url = reverse("cookie_consent_accept_all")
+        client.post(cookie_url)
+
+        with login(client) as user:
+            client.get("/")
+            assert int(client.cookies["enable-sesame-user-id"].value) == user.id
+            client.get(reverse("account_logout"))
+            assert int(client.cookies["enable-sesame-user-id"].value) == user.id
 
     def test_no_cookie_if_hijacked(self, client):
         hijacked = baker.make(auth_models.User, username="hijacked")
@@ -148,26 +150,13 @@ class TestEnableSesameCookie:
 
     def test_new_cookie_replaces_old_one(self, client):
         old_user = baker.make(auth_models.User)
-        client.cookies.load(
-            {
-                "enable-sesame-user-id": signing.get_cookie_signer(
-                    "enable-sesame-user-id"
-                ).sign(str(old_user.id)),
-            }
-        )
+        client.cookies.load({"enable-sesame-user-id": str(old_user.id)})
         cookie_url = reverse("cookie_consent_accept_all")
         client.post(cookie_url)
 
         with login(client) as new_user:
             client.get("/")
-            assert (
-                int(
-                    signing.get_cookie_signer("enable-sesame-user-id").unsign(
-                        client.cookies["enable-sesame-user-id"].value
-                    )
-                )
-                == new_user.id
-            )
+            assert int(client.cookies["enable-sesame-user-id"].value) == new_user.id
 
 
 @pytest.mark.django_db

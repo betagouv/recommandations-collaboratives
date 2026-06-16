@@ -82,12 +82,11 @@ class SetEnableSesameCookieMiddleware:
             and get_cookie_value_from_request(
                 request, "preferences", "preferences:enable-sesame"
             )
-            and request.get_signed_cookie("enable-sesame-user-id", default=None)
-            != request.user.id
+            and request.COOKIES.get("enable-sesame-user-id", None) != request.user.id
         ):
             current_site = Site.objects.get_current()
             domain = current_site.domain
-            response.set_signed_cookie(
+            response.set_cookie(
                 "enable-sesame-user-id",
                 request.user.id,
                 max_age=timedelta(weeks=52 * 2),  # two years
@@ -115,7 +114,7 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
         # this cookie is meant to know if user had already signed in
         # on this device, to secure this type of authentication
         cookie_user_id = (
-            request.get_signed_cookie("enable-sesame-user-id", default=None)
+            request.COOKIES.get("enable-sesame-user-id", None)
             if get_cookie_value_from_request(
                 request, "preferences", "preferences:enable-sesame"
             )

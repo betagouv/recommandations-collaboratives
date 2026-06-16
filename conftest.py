@@ -5,7 +5,6 @@ from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.core import signing
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
@@ -133,13 +132,7 @@ def malicious_file():
 
 
 def setup_sesame_cookie(client, user):
-    client.cookies.load(
-        {
-            "enable-sesame-user-id": signing.get_cookie_signer(
-                "enable-sesame-user-id"
-            ).sign(str(user.id)),
-        }
-    )
+    client.cookies.load({"enable-sesame-user-id": str(user.id)})
 
     cookie_url = reverse("cookie_consent_accept_all")
     client.post(cookie_url)
