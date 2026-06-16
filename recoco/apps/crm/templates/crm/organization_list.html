@@ -16,10 +16,10 @@
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with organizations=True %}
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Organisations' } }"
-         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <h1 class="fr-h3 fr-px-5v fr-pt-5v">Liste des organisations</h1>
-    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm">
+    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm org-list-scroll">
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Organisations' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+        <h1 class="fr-h3 fr-px-5v fr-pt-5v">Liste des organisations</h1>
         <div class="project-list-crm w-100" x-data="{ selected: [] }">
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">

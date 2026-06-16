@@ -1,0 +1,15 @@
+.org-list-scroll {
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+
+  .table-responsive {
+    overflow: visible;
+  }
+
+  .project-table__thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #fff;
+  }
+}
