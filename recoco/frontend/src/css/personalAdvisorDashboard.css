@@ -81,6 +81,13 @@ main {
   transition: height 0.25s ease;
 }
 
+.personal-dashboard-map-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
 .personal-dashboard-container-inner .project-link {
   position: relative;
   text-decoration: none;

@@ -82,3 +82,20 @@ class DefaultNoDeletedFilter(BaseFilterBackend):
         if request_hide_deleted_projects(request):
             queryset = queryset.filter(deleted=None)
         return queryset
+
+
+class ProjectAssignedToUserFilter(BaseFilterBackend):
+    """Restrict to projects the current user is positioned on (switchtender).
+
+    The filter is enabled by the mere presence of the `my_projects` query
+    parameter (e.g. `?my_projects=true`). To disable it, omit the parameter.
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        my_projects = request.GET.get("my_projects", None)
+        if my_projects:
+            queryset = queryset.filter(
+                switchtender_sites__switchtender=request.user,
+                switchtender_sites__site=request.site,
+            ).distinct()
+        return queryset

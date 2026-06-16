@@ -15,10 +15,10 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: "1.29.1"
+    rev: '1.29.1'
     hooks:
       - id: django-upgrade
-        args: [--target-version, "5.2"]
+        args: [--target-version, '5.2']
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.9.21
@@ -26,8 +26,16 @@ repos:
       - id: uv-lock
       - id: uv-export
 
-  - repo: https://github.com/owenlamont/uv-secure
-    rev: 0.15.4
+  - repo: local
     hooks:
-      - id: uv-secure
-        files: uv.lock
+      - id: uv-audit
+        name: uv audit
+        language: system
+        entry: uv audit
+        pass_filenames: false
+        files: uv\.lock
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
