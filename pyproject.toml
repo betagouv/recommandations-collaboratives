@@ -99,7 +99,8 @@ version = { attr = "recoco.__version__" }
 package = false
 constraint-dependencies = [
     "pyjwt>=2.13.0",
-    "tornado>=6.5.7"
+    "tornado>=6.5.7",
+    "bleach>=6.4.0"
 ]
 
 [build-system]
