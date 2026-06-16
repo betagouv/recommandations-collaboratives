@@ -12,4 +12,8 @@
     z-index: 1;
     background-color: #fff;
   }
+
+  .org-name-cell .project-table__project-name {
+    min-width: 0;
+  }
 }

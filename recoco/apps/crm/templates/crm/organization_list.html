@@ -74,16 +74,14 @@
                             {% endwith %}
                         </caption>
                         <colgroup>
-                            <col class="col--small">
-                            <col class="col--large">
-                            <col class="col--large">
-                            <col class="col--small">
-                            <col class="col--small">
-                            <col class="col--small">
+                            <col class="col--medium">
+                            <col class="col--xxl">
+                            <col class="col--xxs">
+                            <col class="col--xxs">
+                            <col class="col--xxs">
                         </colgroup>
                         <thead class="project-table__thead">
                             <tr>
-                                <th scope="col"></th>
                                 <th scope="col">Organisation</th>
                                 <th scope="col">Départements</th>
                                 <th scope="col">Membres</th>
@@ -94,15 +92,16 @@
                         <tbody>
                             {% for organization in page_obj %}
                                 <tr :class="{ 'is-selected': selected.includes('{{ organization.pk }}') }">
-                                    <td>
-                                        <input name="org_ids"
-                                               type="checkbox"
-                                               value="{{ organization.pk }}"
-                                               x-model="selected">
-                                    </td>
-                                    <td class="text-ellipsis" title="{{ organization.name }}">
-                                        <a class="fr-link project-table__project-name"
-                                           href="{% url 'crm-organization-details' organization.pk %}">{{ organization.name }}</a>
+                                    <td title="{{ organization.name }}">
+                                        <div class="org-name-cell d-flex align-items-center gap-2">
+                                            <input class="flex-shrink-0"
+                                                   name="org_ids"
+                                                   type="checkbox"
+                                                   value="{{ organization.pk }}"
+                                                   x-model="selected">
+                                            <a class="fr-link project-table__project-name text-ellipsis"
+                                               href="{% url 'crm-organization-details' organization.pk %}">{{ organization.name }}</a>
+                                        </div>
                                     </td>
                                     <td>
                                         {% with departments=organization.departments.all %}
@@ -128,7 +127,7 @@
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="6">-- Aucun résultat --</td>
+                                    <td colspan="5">-- Aucun résultat --</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
