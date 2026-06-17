@@ -451,6 +451,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
+
   async publishDraftRecommendation(recommendation) {
     recommendation.isLoading = true;
     try {
@@ -514,28 +515,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     let uploadResponses = [];
     if (documentNodesToUpload.length > 0) {
-      try {
-        uploadResponses = await Promise.all(
-          documentNodesToUpload.map((node) => this.uploadFile(node.file))
-        );
-      } catch (error) {
-        const errorMessage =
-          error.response?.data?.the_file?.[0] ||
-          "Contactez nous via le chat pour obtenir de l'aide.";
-        Alpine.store('app').displayToastMessage({
-          message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
-          timeout: 5000,
-          type: ToastType.error,
-        });
-        if (!updateMessage) {
-          throw new Error('Failed to upload documents', { error });
-        } else {
-          throw new Error('Failed to upload documents while updating message', {
-            error,
-          });
-        }
-      }
-
+      uploadResponses = await this.sendDocuments(documentNodesToUpload.map((node) => this.uploadFile(node.file)))
       documentNodesToUpload.forEach((node, index) => {
         node.document_id = uploadResponses[index].data.id;
       });
@@ -586,6 +566,27 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         throw new Error('Failed to send message', { cause: error });
       } else {
         throw new Error('Failed to update message', { cause: error });
+      }
+    }
+  },
+  async sendDocuments(documents) {
+    try {
+        return await Promise.all(documents);
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.the_file?.[0] ||
+        "Contactez nous via le chat pour obtenir de l'aide.";
+      Alpine.store('app').displayToastMessage({
+        message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
+        timeout: 5000,
+        type: ToastType.error,
+      });
+      if (!updateMessage) {
+        throw new Error('Failed to upload documents', { error });
+      } else {
+        throw new Error('Failed to upload documents while updating message', {
+          error,
+        });
       }
     }
   },
