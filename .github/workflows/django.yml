@@ -39,7 +39,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-      - name: Setup Pre-commit
+      - name: Setup Pre-commit # contains uv audit
         uses: pre-commit/action@v3.0.1
 
       - name: Run Pre-commit checks
@@ -91,9 +91,6 @@ jobs:
       - name: Configure
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
-
-      - name: Audit dependencies
-        run: uv audit
 
       - name: Run Tests
         env:
