@@ -159,14 +159,32 @@
                         </div>
                     </div>
                 </div>
+                {# Confirmation #}
+                <p class="fr-text--lg fr-text--bold fr-mb-2w">Voulez-vous vraiment fusionner ces organisations et leurs éléments rattachés ?</p>
                 <select multiple hidden name="{{ merge_form.org_ids.name }}">
                     {% for organization in organizations %}
                         <option value="{{ organization.id }}" selected>{{ organization.name }}</option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-danger">Oui, fusionner ces organisations</button>
-                <a href="{% url 'crm-organization-list' %}"
-                   class="btn btn-outline-secondary">Non, annuler la fusion</a>
+                <ul class="fr-btns-group fr-btns-group--inline-md fr-mb-3w">
+                    <li>
+                        <button type="submit"
+                                class="fr-btn fr-icon-check-line fr-btn--icon-left">
+                            Oui, fusionner les organisations
+                        </button>
+                    </li>
+                    <li>
+                        <a href="{% url 'crm-organization-list' %}"
+                           class="fr-btn fr-btn--secondary fr-icon-close-line fr-btn--icon-left">
+                            Non, annuler la fusion
+                        </a>
+                    </li>
+                </ul>
+                <div class="fr-alert fr-alert--warning fr-alert--sm">
+                    <p>
+                        <strong>Cette action est irréversible !</strong> Une fois la fusion validée, vous ne pourrez plus revenir en arrière.
+                    </p>
+                </div>
             </form>
         </div>
     </div>
