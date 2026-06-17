@@ -8,6 +8,10 @@ resolution-markers = [
 ]
 
 [manifest]
+members = [
+    "recoco",
+    "recoco-plugin-mi-depafi",
+]
 constraints = [
     { name = "bleach", specifier = ">=6.4.0" },
     { name = "pyjwt", specifier = ">=2.13.0" },
@@ -3586,6 +3590,7 @@ dependencies = [
     { name = "pluggy" },
     { name = "psycopg", extra = ["c"] },
     { name = "puremagic" },
+    { name = "recoco-plugin-mi-depafi" },
     { name = "redis" },
     { name = "requests-html" },
     { name = "rest-framework-generic-relations" },
@@ -3700,6 +3705,7 @@ requires-dist = [
     { name = "pluggy", specifier = ">=1.6.0" },
     { name = "psycopg", extras = ["c"], specifier = ">=3.2.12" },
     { name = "puremagic", specifier = ">=1.30" },
+    { name = "recoco-plugin-mi-depafi", editable = "recoco/plugins/recoco-plugins-mi-depafi" },
     { name = "redis", specifier = "==5.0.4" },
     { name = "requests-html", specifier = "==0.10.0" },
     { name = "rest-framework-generic-relations", specifier = ">=2.2.0" },
@@ -3750,6 +3756,23 @@ dev = [
     { name = "sphinxcontrib-django", specifier = ">=2.5" },
     { name = "sphinxcontrib-django-urls", specifier = ">=0.3" },
     { name = "uv", specifier = ">=0.11.19" },
+]
+
+[[package]]
+name = "recoco-plugin-mi-depafi"
+version = "0.1.0"
+source = { editable = "recoco/plugins/recoco-plugins-mi-depafi" }
+dependencies = [
+    { name = "django" },
+    { name = "django-markdownx" },
+    { name = "pillow" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "django", specifier = ">=4.2" },
+    { name = "django-markdownx" },
+    { name = "pillow" },
 ]
 
 [[package]]
