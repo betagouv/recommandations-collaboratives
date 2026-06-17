@@ -27,26 +27,34 @@
                     Vous êtes sur le point de fusionner les organisations suivantes :
                     {% for organization in organizations %}{{ organization }}{% if not forloop.last %}, {% endif %}{% endfor %}.
                 </p>
-                {# Nom de la nouvelle organisation (redesign à venir) #}
-                <div class="fr-mb-3w">
-                    <div class="input-group">
-                        <label for="{{ merge_form.name.name }}" class="col-sm-2 col-form-label">Nouveau nom</label>
-                        <div class="col-sm-5">
-                            <input type="text"
-                                   class="form-control"
-                                   id="{{ merge_form.name.name }}"
-                                   name="{{ merge_form.name.name }}"
-                                   x-model="name"
-                                   value="{{ merge_form.name.value|default:organizations.0.name }}">
-                        </div>
+                {# Nom de la nouvelle organisation #}
+                <div class="fr-mb-4w">
+                    <div class="fr-input-group">
+                        <label class="fr-label fr-text--bold" for="{{ merge_form.name.name }}">
+                            Nom de la nouvelle organisation
+                            <span class="fr-hint-text">Saisissez un nouveau nom pour l'organisation ou cliquez sur l'un des noms proposés pour l'utiliser :</span>
+                        </label>
+                        <input type="text"
+                               class="fr-input"
+                               id="{{ merge_form.name.name }}"
+                               name="{{ merge_form.name.name }}"
+                               x-model="name"
+                               value="{{ merge_form.name.value|default:organizations.0.name }}">
                     </div>
-                    <div class="small text-secondary fr-mt-1v">
-                        Suggestions :
-                        {% for organization in organizations %}
-                            <button @click="name = '{{ organization.name|escapejs }}'"
-                                    type="button"
-                                    class="btn btn-outline-info btn-sm">{{ organization.name }}</button>
-                        {% endfor %}
+                    <div class="fr-mt-2w d-flex align-items-center flex-wrap">
+                        <span class="fr-text--sm fr-mr-2w fr-mb-0">Suggestions :</span>
+                        <ul class="fr-tags-group fr-mb-0">
+                            {% for organization in organizations %}
+                                <li>
+                                    <button type="button"
+                                            class="fr-tag"
+                                            :aria-pressed="name === '{{ organization.name|escapejs }}'"
+                                            @click="name = '{{ organization.name|escapejs }}'">
+                                        {{ organization.name }}
+                                    </button>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
                 <select multiple hidden name="{{ merge_form.org_ids.name }}">
