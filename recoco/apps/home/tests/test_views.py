@@ -642,4 +642,17 @@ def test_make_new_site(client):
         assert auth_models.Group.objects.get(name=name)
 
 
+@pytest.mark.django_db
+def test_403_sesame_other_user(client, current_site, project_ready):
+    sesame_user = baker.make(auth_models.User)
+    project_ready.members.add(sesame_user)
+    url = reverse("projects-project-detail-overview", args=[project_ready.pk])
+    with login(client) as logged_in_user:
+        response = client.get(url)
+        assert response.status_code == 403
+        assert logged_in_user.email in str(
+            response.content
+        )  # no assertContains because it requires a success status_code
+
+
 # eof
