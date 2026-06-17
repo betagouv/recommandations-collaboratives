@@ -98,6 +98,67 @@
                         </ul>
                     </div>
                 </div>
+                {# Liste des éléments rattachés #}
+                <h2 class="fr-h4 fr-mb-2w">Liste des éléments qui seront rattachés à l'organisation</h2>
+                <div class="fr-p-3w fr-mb-4w crm-merge-recap-card">
+                    <div class="fr-grid-row fr-grid-row--gutters">
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-map-pin-2-line fr-mr-1v" aria-hidden="true"></span>
+                                Départements
+                            </p>
+                            <ul class="crm-merge-recap-list">
+                                {% for dpt in departments %}
+                                    <li>{{ dpt.name }} ({{ dpt.code }})</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-folder-2-line fr-mr-1v" aria-hidden="true"></span>
+                                Dossiers
+                            </p>
+                            <ul class="crm-merge-recap-list">
+                                {% for project in projects %}
+                                    <li>{{ project.name }}</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <hr class="fr-my-3w">
+                    <div class="fr-grid-row fr-grid-row--gutters">
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-user-line fr-mr-1v" aria-hidden="true"></span>
+                                Membres
+                            </p>
+                            <ul class="crm-merge-recap-list">
+                                {% for profile in profiles %}
+                                    <li>{{ profile.user.get_full_name|default:profile.user.email }}</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-team-line fr-mr-1v" aria-hidden="true"></span>
+                                Contacts
+                            </p>
+                            <ul class="crm-merge-recap-list">
+                                {% for contact in contacts %}
+                                    <li>{{ contact }} ({{ contact.email }})</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <select multiple hidden name="{{ merge_form.org_ids.name }}">
                     {% for organization in organizations %}
                         <option value="{{ organization.id }}" selected>{{ organization.name }}</option>
@@ -110,3 +171,28 @@
         </div>
     </div>
 {% endblock content %}
+{% block css %}
+    {{ block.super }}
+    <style>
+        .crm-merge-org-card {
+            border: 1px solid var(--border-default-blue-france, #cacafb);
+            border-radius: 8px;
+            background-color: var(--background-alt-blue-france, #f5f5fe);
+        }
+
+        .crm-merge-recap-card {
+            border: 1px solid var(--border-default-grey, #ddd);
+            border-radius: 8px;
+        }
+
+        .crm-merge-recap-list {
+            columns: 2;
+            list-style-position: inside;
+            padding-left: 0;
+        }
+
+        .crm-merge-recap-list li {
+            break-inside: avoid;
+        }
+    </style>
+{% endblock css %}
