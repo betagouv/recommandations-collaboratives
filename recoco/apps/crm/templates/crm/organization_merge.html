@@ -24,8 +24,9 @@
                 {% csrf_token %}
                 <h1 class="fr-h2 fr-mb-2w">Fusionner des organisations</h1>
                 <p class="fr-text--lg fr-mb-4w">
-                    Vous êtes sur le point de fusionner les organisations suivantes :
-                    {% for organization in organizations %}{{ organization }}{% if not forloop.last %}, {% endif %}{% endfor %}.
+                    Vous êtes sur le point de fusionner des organisations : elles seront donc rassemblées en une seule.
+                    <br>
+                    Veuillez <strong>choisir un nom pour cette nouvelle organisation</strong>, vérifiez les informations fusionnées puis validez la fusion.
                 </p>
                 {# Nom de la nouvelle organisation #}
                 <div class="fr-mb-4w">
@@ -56,6 +57,34 @@
                             {% endfor %}
                         </ul>
                     </div>
+                </div>
+                {# Organisations à rassembler #}
+                <p class="fr-text--lg fr-mb-2w">Cette nouvelle organisation va rassembler les organisations suivantes :</p>
+                <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
+                    {% for summary in org_summaries %}
+                        <div class="fr-col-12 fr-col-md-6">
+                            <div class="fr-p-3w h-100 crm-merge-org-card">
+                                <p class="fr-text--lg fr-text--bold fr-mb-2w">{{ summary.organization.name }}</p>
+                                <p class="fr-mb-1w">
+                                    <span class="fr-icon-user-line fr-mr-1v" aria-hidden="true"></span>
+                                    {{ summary.members_count }} membre{{ summary.members_count|pluralize }}
+                                </p>
+                                <p class="fr-mb-1w">
+                                    <span class="fr-icon-folder-2-line fr-mr-1v" aria-hidden="true"></span>
+                                    {{ summary.projects_count }} dossier{{ summary.projects_count|pluralize }} suivi{{ summary.projects_count|pluralize }}
+                                </p>
+                                <p class="fr-mb-0">
+                                    <span class="fr-icon-map-pin-2-line fr-mr-1v" aria-hidden="true"></span>
+                                    {% if summary.departments %}
+                                        Départements :
+                                        {% for dpt in summary.departments %}{{ dpt.name }} ({{ dpt.code }}){% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% else %}
+                                        Aucun département
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
                 <select multiple hidden name="{{ merge_form.org_ids.name }}">
                     {% for organization in organizations %}
