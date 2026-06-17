@@ -244,6 +244,9 @@ const config = {
         projectCardCrmStyles: resolve(
           './src/js/styles/project-card-crm.css.js'
         ),
+        organizationMergeStyles: resolve(
+          './src/js/styles/organizationMerge.css.js'
+        ),
         backgroundOverride: resolve(
           './src/js/styles/background-override.css.js'
         ),

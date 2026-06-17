@@ -1,0 +1,49 @@
+.crm-merge {
+    &__org-card {
+        border: 1px solid var(--border-default-blue-france, #cacafb);
+        border-radius: 8px;
+        background-color: var(--background-alt-blue-france, #f5f5fe);
+        &--name {
+            color: var(--light-text-title-blue-france, #000091);
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 24px; /* 150% */
+        }
+        &--text {
+            color: var(--light-text-default-grey, #3A3A3A);
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 24px; /* 171.429% */
+        }
+    }
+
+    &__title {
+        color: var(--light-text-title-grey, #161616);
+        font-size: 20px !important;
+        font-weight: 700 !important;
+        line-height: 32px !important; /* 160% */
+    }
+
+    &__recap-card {
+        border: 1px solid var(--border-default-grey, #ddd);
+        border-radius: 8px;
+    }
+
+    &__recap-list {
+        columns: 2;
+        list-style-position: inside;
+        padding-left: 0;
+
+        li {
+            break-inside: avoid;
+        }
+    }
+
+    &__hint-text {
+        color: var(--light-decisions-text-text-mention-grey, #666);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 20px; /* 166.667% */
+        display: block;
+    }
+}
