@@ -13,119 +13,51 @@
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% block content %}
+    {% include "crm/fragments/navigation.html" with organizations=True %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-organization-list' %}', title: 'Organisations'}], current: 'Fusionner des organisations' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div x-data="Crm" class="d-flex fr-px-0">
-        {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
-                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
-                    <h3>Fusionner des organisations</h3>
-                </div>
-            </div>
-            <div class="fr-m-3w">
-                <p class="fw-bolder">Vous êtes sur le point de fusionner les organisations suivantes :</p>
-                <p>
-                    <ul>
-                        {% for organization in organizations %}<li>{{ organization }}</li>{% endfor %}
-                    </ul>
+        <div class="w-100 d-flex flex-column justify-content-start fr-px-5w fr-pb-5w">
+            <form x-data="{name: '{{ organizations.0.name|escapejs }}'}"
+                  method="post"
+                  action="{% url 'crm-organization-merge' %}">
+                {% csrf_token %}
+                <h1 class="fr-h2 fr-mb-2w">Fusionner des organisations</h1>
+                <p class="fr-text--lg fr-mb-4w">
+                    Vous êtes sur le point de fusionner les organisations suivantes :
+                    {% for organization in organizations %}{{ organization }}{% if not forloop.last %}, {% endif %}{% endfor %}.
                 </p>
-                <p>
-                    Ceci signifie que :
-                    <ul>
-                        <li>
-                            Une seule organisation sera conservée, les autres seront <strong>supprimées</strong>. Ceci est <strong>irréversible</strong>.
-                        </li>
-                        <li>
-                            L'ensemble des objets liés à cette organisation (utilisateurs, contacts, ...) seront <strong>migrés</strong>. Voici l'ensemble des éléments concernés :
-                        </li>
-                    </ul>
-                </p>
-                <div class="fr-m-3w card fr-py-3w">
-                    <ul class="fr-mb-3w">
-                        <div class="fr-mb-2v">
-                            <svg class="align-middle bi"
-                                 width="18px"
-                                 height="18px"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-square" />
-                            </svg>
-                            <span class="align-middle">Contacts</span>
+                {# Nom de la nouvelle organisation (redesign à venir) #}
+                <div class="fr-mb-3w">
+                    <div class="input-group">
+                        <label for="{{ merge_form.name.name }}" class="col-sm-2 col-form-label">Nouveau nom</label>
+                        <div class="col-sm-5">
+                            <input type="text"
+                                   class="form-control"
+                                   id="{{ merge_form.name.name }}"
+                                   name="{{ merge_form.name.name }}"
+                                   x-model="name"
+                                   value="{{ merge_form.name.value|default:organizations.0.name }}">
                         </div>
-                        {% for contact in contacts.all %}
-                            <li class="fr-ml-3w">{{ contact }} ({{ contact.email }})</li>
-                        {% empty %}
-                            <li class="fr-ml-3w">-- Aucun --</li>
+                    </div>
+                    <div class="small text-secondary fr-mt-1v">
+                        Suggestions :
+                        {% for organization in organizations %}
+                            <button @click="name = '{{ organization.name|escapejs }}'"
+                                    type="button"
+                                    class="btn btn-outline-info btn-sm">{{ organization.name }}</button>
                         {% endfor %}
-                    </ul>
-                    <ul>
-                        <div class="fr-mb-2v">
-                            <svg class="align-middle bi"
-                                 width="18px"
-                                 height="18px"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person" />
-                            </svg>
-                            <span class="align-middle">Utilisateur·trice·s</span>
-                        </div>
-                        {% for profile in profiles.all %}
-                            <li class="fr-ml-3w">{{ profile.user.get_full_name|default:profile.user.email }}</li>
-                        {% empty %}
-                            <li class="fr-ml-3w">-- Aucun --</li>
-                        {% endfor %}
-                    </ul>
-                    <ul>
-                        <div class="fr-mb-2v">
-                            <svg class="align-middle bi"
-                                 width="18px"
-                                 height="18px"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#map" />
-                            </svg>
-                            <span class="align-middle">Départements</span>
-                        </div>
-                        {% for dpt in departments.all %}
-                            <li class="fr-ml-3w">{{ dpt }} ({{ dpt.code }})</li>
-                        {% empty %}
-                            <li class="fr-ml-3w">-- Aucun --</li>
-                        {% endfor %}
-                    </ul>
+                    </div>
                 </div>
-                <div class="fr-mt-3w">
-                    <form x-data="{name: '{{ organizations.0.name }}'}"
-                          method="post"
-                          action="{% url 'crm-organization-merge' %}">
-                        {% csrf_token %}
-                        <div class="fr-mb-3w">
-                            <div class="input-group">
-                                <label for="{{ merge_form.name.name }}" class="col-sm-2 col-form-label">Nouveau nom</label>
-                                <div class="col-sm-5">
-                                    <input type="text"
-                                           class="form-control"
-                                           id="{{ merge_form.name.name }}"
-                                           name="{{ merge_form.name.name }}"
-                                           x-model="name"
-                                           value="{{ merge_form.name.value|default:organizations.0.name }}">
-                                </div>
-                            </div>
-                            <div class="small text-secondary fr-mt-1v">
-                                Suggestions :
-                                {% for organization in organizations %}
-                                    <button @click="name = '{{ organization.name }}'"
-                                            type="button"
-                                            class="btn btn-outline-info btn-sm">{{ organization.name }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <select multiple hidden  name="{{ merge_form.org_ids.name }}">
-                            {% for organization in organizations %}
-                                <option value="{{ organization.id }}" selected>{{ organization.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-danger">Oui, fusionner ces organisations</button>
-                        <a href="{% url 'crm-organization-list' %}"
-                           class="btn btn-outline-secondary">Non, annuler la fusion</a>
-                    </form>
-                </div>
-            </div>
+                <select multiple hidden name="{{ merge_form.org_ids.name }}">
+                    {% for organization in organizations %}
+                        <option value="{{ organization.id }}" selected>{{ organization.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-danger">Oui, fusionner ces organisations</button>
+                <a href="{% url 'crm-organization-list' %}"
+                   class="btn btn-outline-secondary">Non, annuler la fusion</a>
+            </form>
         </div>
     </div>
 {% endblock content %}
