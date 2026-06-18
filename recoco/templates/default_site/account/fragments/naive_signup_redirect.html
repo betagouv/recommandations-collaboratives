@@ -1,10 +1,13 @@
 {% extends "account/layout/layout.html" %}
+{% load waffle_tags %}
 {% block layout_content %}
     <p>Pour créer votre compte, vous pouvez :</p>
     <ul>
-        <li>
-            <a class="fr-link" href="{% url 'onboarding-project' %}">déposer une demande d'accompagnement</a>
-        </li>
+        {% flag not "disable_submit_new_project" %}
+            <li>
+                <a class="fr-link" href="{% url 'onboarding-project' %}">déposer une demande d'accompagnement</a>
+            </li>
+        {% endflag %}
         <li>
             <a class="fr-link"
                href="{% url 'account_signup' %}?next=/advisor-access-request">demander un accès en tant que
