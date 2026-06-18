@@ -176,7 +176,7 @@ Parameters:
                             <li>
                                 <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
                                         @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}&content=${encodeURIComponent(markdownContent || '')}`)">
-                                    Recommandation vierge
+                                    Nouvelle recommandation
                                 </button>
                             </li>
                             {% flag "suggest_reco_btn" %}
