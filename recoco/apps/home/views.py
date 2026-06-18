@@ -11,6 +11,8 @@ import urllib
 
 import django.core.mail
 from actstream import action
+from allauth.mfa.models import Authenticator
+from allauth.mfa.totp.internal import flows as totp_flows
 from allauth.account.adapter import get_adapter
 from allauth.account.views import RequestLoginCodeView
 from django.contrib import messages
@@ -58,6 +60,7 @@ from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
     SiteCreateForm,
+    TwoFaConfigForm,
     UserPasswordFirstTimeSetupForm,
 )
 from .models import AdvisorAccessRequest
@@ -492,6 +495,52 @@ class RequestLoginCodeNoStaffView(RequestLoginCodeView):
             )
             return HttpResponseRedirect(self.get_success_url())
         return super().form_valid(form)
+
+
+@method_decorator([login_required], name="dispatch")
+class TwoFAConfigView(FormView):
+    form_class = TwoFaConfigForm
+    template_name = "home/mfa-config.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def _disable_totp(self):
+        authenticator = Authenticator.objects.filter(
+            type=Authenticator.Type.TOTP, user=self.request.user
+        ).first()
+        if authenticator:
+            totp_flows.deactivate_totp(self.request, authenticator)
+
+    def form_valid(self, form):
+        if not form.cleaned_data["enable_2fa"]:  # disable both 2fa systems
+            self.request.user.profile.login_with_code = False
+            self.request.user.profile.save()
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if authenticator:
+                url = reverse("mfa_deactivate_totp")
+                return redirect(url)
+        elif form.cleaned_data["two_fa_mode"] == "totp":
+            # removing email 2fa is done through a signal
+            url = reverse("mfa_activate_totp")
+            return redirect(url)
+        else:  # 2fa is set to login with code. totp may or may not have been activated before
+            self.request.user.profile.login_with_code = True
+            self.request.user.profile.save()
+
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if authenticator:
+                url = reverse("mfa_deactivate_totp")
+                return redirect(url)
+
+        messages.success(self.request, "Vos paramètres ont bien été sauvegardés.")
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 # eof
