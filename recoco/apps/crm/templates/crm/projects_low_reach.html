@@ -1,16 +1,18 @@
 {% extends "base.html" %}
-{% load django_vite %}
 {% load static %}
+{% load django_vite %}
 {% load humanize %}
-{% load crm_tags %}
+{% load gravatar %}
 {% block title %}
-    Dossiers à faible répondant - CRM
+    Dossiers à relancer - CRM
 {% endblock title %}
 {% block og_title %}
-    Dossiers à faible répondant - CRM
+    Dossiers à relancer - CRM
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/user.js' %}
+    {% vite_asset 'js/styles/project-low-reach.css.js' %}
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with projects=True %}
@@ -125,46 +127,105 @@
                     {% for project in low_reach_projects %}
                         <tr>
                             <td>
-                                {% if project.inactive_since %}<s>{% endif %}
-                                    <a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a>
-                                    <a href="{% url 'projects-project-detail' project.pk %}"
-                                       target="_blank"
-                                       title="Ouvrir dans un nouvel onglet">
-                                        <svg class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                        </svg>
-                                    </a>
-                                    {% if project.inactive_since %}</s>{% endif %}
-                                {% with project.crm_annotations.tags.names as active_tags %}
-                                    {% for crm_tag in site_config.crm_available_tags.all %}
-                                        {% if crm_tag.name in active_tags %}
-                                            &nbsp;<span class="fr-badge--info fr-badge--sm">{{ crm_tag.name }}</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endwith %}
-                                {% if project.inactive_since %}
-                                    <br>
-                                    <span class="small">(Project désactivé: {{ project.inactive_reason|default:"Intervention humaine" }})</span>
-                                {% endif %}
+                                <a class="fr-link project-table__project-name text-wrap"
+                                   href="{% url 'crm-project-details' project.pk %}">
+                                    {% if project.owner.profile.organization %}
+                                        {{ project.owner.profile.organization.name }}
+                                    {% else %}
+                                        &mdash;
+                                    {% endif %}
+                                </a>
                                 <br>
-                                <span class="secondary small">{{ project.commune }} ({{ project.commune.postal }})</span>
+                                <span class="fr-text--sm fr-text-mention--grey font-size-12px text-wrap">{{ project.name }}</span>
                             </td>
                             <td>
-                                {% for advisor in project.switchtenders.all %}
-                                    <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
-                                    {% if not forloop.last %}-{% endif %}
-                                {% endfor %}
+                                <div class="d-flex align-items-center flex-wrap gap-1">
+                                    {% for advisor in project.switchtenders.all|slice:":3" %}
+                                        <div x-data="User()" class="d-flex align-items-center">
+                                            <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
+                                                    :src='gravatar_url("{{ advisor.email }}", 18, "{{ advisor.first_name }}" + " " + "{{ advisor.last_name }}", stringToColor("{{ advisor.email }}") )'
+                                                    :style="{ '--current-bg-color': stringToColor('{{ advisor.email }}') }"
+                                                    data-gravatar-key="{{ advisor.email }}-18"
+                                                    alt="">
+                                            <span class="project-low-reach__user-name"><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }}</a></span>
+                                        </div>
+                                    {% endfor %}
+                                    {% with advisor_count=project.switchtenders.all|length %}
+                                        {% if advisor_count > 3 %}
+                                            <span class="crm-avatar crm-avatar--overflow">+{{ advisor_count|add:"-3" }}</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
                             </td>
-                            <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>
-                            <td>{{ project.last_members_activity_at|timesince }}</td>
-                            <td>{{ project.last_reco_at|timesince|default:"-" }}</td>
-                            <td>{{ project.last_public_msg_at|timesince|default:"-" }}</td>
+                            <td>{{ project.last_members_activity_at|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if project.last_reco_at %}
+                                    {{ project.last_reco_at|date:"d/m/Y" }}
+                                {% else %}
+                                    &mdash;
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong{% if project.reco_read|add:project.reco_read <= project.reco_total %} class="text-red-light"{% endif %}>{{ project.reco_read }}</strong>&nbsp;/&nbsp;{{ project.reco_total }}
+                            </td>
+                            <td>
+                                {% if project.reco_read == 0 or project.reco_read == 1 and project.reco_total > 2 %}
+                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--warning"
+                                          title="Aucune ou une seule recommandation a été lue">Recos non lues</span>
+                                {% else %}
+                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--info"
+                                          title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">Aucune réaction</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="project-low-reach__actions d-flex align-items-center">
+                                    {# Activer / Désactiver les notifications #}
+                                    <form method="post"
+                                        action="{% url 'crm-project-update' project.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        {% if not project.exclude_stats %}
+                                            <input type="hidden" name="statistics" value="on">
+                                        {% endif %}
+                                        {% if project.muted %}
+                                            <input type="hidden" name="notifications" value="on">
+                                            <button type="submit"
+                                                    class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative">
+                                                Activer les notifications
+                                            </button>
+                                        {% else %}
+                                            <button type="submit"
+                                                    class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative">
+                                                Désactiver les notifications
+                                            </button>
+                                        {% endif %}
+                                    </form>
+                                    <!-- Go to project page -->
+                                    <a href="{% url 'projects-project-detail' project.id %}"
+                                        class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline"
+                                        title="Accéder à la page du dossier">Accéder à la page du dossier</a>
+                                    {# Éditer #}
+                                    <a href="{% url 'crm-project-update' project.pk %}"
+                                        class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline"
+                                        title="Éditer le dossier">Éditer</a>
+                                    {# Supprimer #}
+                                    <a href="{% url 'crm-project-delete' project.pk %}"
+                                        class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline"
+                                        title="Supprimer le dossier">Supprimer</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7"
+                                class="text-center fr-py-3w fr-text-mention--grey">
+                                Aucun dossier à relancer avec ces critères.
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% include "tools/paginator.html" with page_obj=page_obj %}
     </div>
 {% endblock content %}

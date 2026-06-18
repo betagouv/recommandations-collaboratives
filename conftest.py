@@ -10,9 +10,10 @@ from django.core.management import call_command
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
+from model_bakery.recipe import Recipe, related
 from rest_framework.test import APIClient
 
-from recoco.apps.projects.models import Project
+from recoco.apps.projects.models import Project, ProjectSite
 
 
 # -- Global Fixtures
@@ -79,6 +80,20 @@ def make_project(request):
         return project
 
     return _make_project
+
+
+@pytest.fixture
+def project_recipe(current_site):
+    project_site = Recipe(
+        ProjectSite, site=current_site, is_origin=True, status="READY"
+    )
+    project = Recipe(
+        Project,
+        description="Super description",
+        location="SomeWhere",
+        project_sites=related(project_site),
+    )
+    yield project
 
 
 @pytest.fixture
