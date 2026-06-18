@@ -186,11 +186,13 @@ Parameters:
                                     data-test-id="see-suggest-task-button">Ressources suggérées</a>
                                 </li>
                             {% endflag %}
-                            <li>
-                                <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                            {% flag "ia_exploration" %}
+                                <li>
+                                    <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
                                     class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
                                     data-test-id="see-suggest-task-button">Recommandations assistées par IA</a>
-                            </li>
+                                </li>
+                            {% endflag %}
                         </ul>
                 </div>
             {% endif %}
