@@ -282,8 +282,10 @@
 
                     <p>Pour créer votre compte, vous pouvez :</p>
                     <ul>
-                      <li><a class="fr-link" href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
-                        une demande d'accompagnement</a></li>
+                        {% flag not "disable_submit_new_project" %}
+                            <li><a class="fr-link" href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
+                                une demande d'accompagnement</a></li>
+                        {% endflag %}
                       <li><a class="fr-link" href="https://{{ current_site.domain }}{% url 'account_signup' %}?next=/advisor-access-request">demander un
                         accès en tant que conseiller aux dossiers de votre territoire sur {{ current_site.name }}</a>
                       </li>

@@ -1,10 +1,13 @@
 {% load static %}
+{% load waffle_tags %}
 <div class="btn-group" role="group" aria-label="Admin actions">
-    {% if is_switchtender %}
-        <a class="fr-btn fr-btn--sm fr-mr-1v text-nowrap"
-           href="{% url 'onboarding-prefill-set-user' %}"
-           role="button">Déposer un dossier</a>
-    {% endif %}
+    {% flag not "disable_submit_new_project" %}
+        {% if is_switchtender %}
+            <a class="fr-btn fr-btn--sm fr-mr-1v text-nowrap"
+            href="{% url 'onboarding-prefill-set-user' %}"
+            role="button">Déposer un dossier</a>
+        {% endif %}
+    {% endflag %}
     <a class="fr-btn fr-btn--sm fr-btn--secondary fr-mr-1v text-nowrap"
        href="{% url 'projects-project-list-export-csv' %}"
        role="button">Exporter en CSV</a>
