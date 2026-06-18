@@ -1,4 +1,6 @@
 import Alpine from 'alpinejs';
+import api, { moveTaskUrl } from '../utils/api';
+import { ToastType } from '../models/toastType';
 
 const TAB_HASHES = {
   recommendations: 'actions',
@@ -23,6 +25,7 @@ Alpine.store('sharedContentsPanel', {
   externalFiles: [], // Files from EDL (État des lieux)
   privateFiles: [], // Files from private notes
   shouldReopenOnDetailClose: false, // Track if we should re-open when detail panel closes
+  projectId: null,
 
   open(tab = null) {
     if (tab) {
@@ -55,7 +58,26 @@ Alpine.store('sharedContentsPanel', {
   },
 
   setRecommendations(recommendations) {
-    this.recommendations = recommendations;
+    this.recommendations = [...recommendations].sort((a, b) => {
+      const dateA = new Date(a.messageCreated);
+      const dateB = new Date(b.messageCreated);
+      const dayA = new Date(
+        dateA.getFullYear(),
+        dateA.getMonth(),
+        dateA.getDate()
+      ).getTime();
+      const dayB = new Date(
+        dateB.getFullYear(),
+        dateB.getMonth(),
+        dateB.getDate()
+      ).getTime();
+      // Different day : descendant order
+      if (dayA !== dayB) {
+        return dayB - dayA;
+      }
+      // Same day : ascendant order
+      return dateA.getTime() - dateB.getTime();
+    });
   },
 
   setFiles(files) {
@@ -71,6 +93,7 @@ Alpine.store('sharedContentsPanel', {
   },
 
   setDraftRecommendations(draftRecommendations) {
+    draftRecommendations.sort((a, b) => a.order - b.order);
     this.draftRecommendations = draftRecommendations;
   },
 
@@ -78,6 +101,64 @@ Alpine.store('sharedContentsPanel', {
     this.draftRecommendations = this.draftRecommendations.filter(
       (draft) => draft.id !== recommendationId
     );
+  },
+
+  async moveDraftRecommendation(direction, recommendation) {
+    const indexRecommendation = this.draftRecommendations.findIndex(
+      (x) => x.id == recommendation.id
+    );
+    let otherRecommendation;
+    if (indexRecommendation == undefined) {
+      return;
+    }
+
+    if (direction == 'above' && indexRecommendation == 0) {
+      return;
+    }
+
+    if (direction == 'above') {
+      otherRecommendation = this.draftRecommendations[indexRecommendation - 1];
+    } else {
+      otherRecommendation = this.draftRecommendations[indexRecommendation + 1];
+    }
+
+    this.moveTask(recommendation.id, otherRecommendation.id, {
+      direction,
+    })
+      .then(() => {
+        const otherIndex =
+          direction == 'above'
+            ? indexRecommendation - 1
+            : indexRecommendation + 1;
+
+        // Destructuring syntaxe to swap reco in array
+        [
+          this.draftRecommendations[indexRecommendation],
+          this.draftRecommendations[otherIndex],
+        ] = [
+          this.draftRecommendations[otherIndex],
+          this.draftRecommendations[indexRecommendation],
+        ];
+        Alpine.store('app').displayToastMessage({
+          message: `L'ordre des brouillons a été sauvegardé`,
+          timeout: 3000,
+          type: ToastType.success,
+        });
+      })
+      .catch(() => {
+        Alpine.store('app').displayToastMessage({
+          message: `Un problème est survenu lors du changement d'ordre des brouillons, contacter nous via l'assistance`,
+          timeout: 3000,
+          type: ToastType.error,
+        });
+      });
+  },
+
+  moveTask(taskId, otherTaskId, { direction }) {
+    const params = new URLSearchParams(`${direction}=${otherTaskId}`);
+    return api.post(moveTaskUrl(this.projectId, taskId), params, {
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    });
   },
 
   /**

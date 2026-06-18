@@ -19,6 +19,7 @@
 {% block js %}
     {% vite_asset 'js/styles/home-auth.css.js' %}
     {% vite_asset 'js/styles/account-login.css.js' %}
+    {% vite_asset 'js/styles/background-override.css.js' %}
 {% endblock js %}
 {% block head_title %}
     {% trans "Signup" %}
@@ -29,11 +30,11 @@
             {% if next_url == '/advisor-access-request' %}
                 {% include "account/fragments/signup_form.html" with stepper=True total_steps=2 step_number=1 current_step_title="Création du compte" next_step_title="Sélection des départements" title="Devenir conseiller" %}
             {% else %}
-                {% include "account/fragments/signup_form.html" with title="Création d'un compte" %}
+              {% include "account/fragments/naive_signup_redirect.html" with title="S'inscrire"%}
             {% endif %}
         {% endwith %}
         <hr />
-        <div class="fr-form-group fr-mt-14v">
+        <div class="fr-form-group fr-m-7w">
             <fieldset class="d-flex flex-column align-items-center justify-content-center">
                 <h4 class="fr-mb-3w d-block ">Vous avez déjà un compte chez nous ?</h4>
                 <div class="fr-fieldset__content text-center">

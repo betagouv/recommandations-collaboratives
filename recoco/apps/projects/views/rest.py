@@ -20,7 +20,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -43,7 +43,13 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
+from ..filters import (
+    DefaultNoDeletedFilter,
+    DepartmentsFilter,
+    ProjectActivityFilter,
+    ProjectAssignedToUserFilter,
+    ProjectSiteStatusFilter,
+)
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
@@ -60,16 +66,53 @@ from ..serializers import (
 ########################################################################
 
 
-class ProjectDetail(APIView):
+class ProjectDetail(
+    RetrieveAPIView
+):  # NB : interfaces are not completely respected due to legacy, cf #2077
     """Retrieve a project"""
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProjectSerializer
+    # todo filter should not be necessary after cleaning recoco_sync 2122
+    filter_backends = [DefaultNoDeletedFilter]
 
     def get_object(self, pk):
         try:
-            return models.Project.on_site.with_site_status().get(pk=pk)
+            return (
+                self.filter_queryset(self.get_queryset()).prefetch_related(
+                    Prefetch(
+                        "switchtenders",
+                        User.objects.select_related(
+                            "profile",
+                            "profile__organization",
+                            "profile__organization__group",
+                        ),
+                    ),
+                    "project_sites",
+                    "tags",
+                    Prefetch(
+                        "members",
+                        User.objects.filter(
+                            projectmember__is_owner=True
+                        ).select_related(
+                            "profile",
+                            "profile__organization",
+                            "profile__organization__group",
+                        ),
+                        to_attr="_owner",
+                    ),  # _owner is looked at in getter
+                    "project_creation_requests",
+                    "topics",
+                )
+            ).get(pk=pk)
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
+
+    def get_queryset(self):
+        # todo all_on_site should not be necessary after cleaning recoco_sync 2122
+        return models.Project.all_on_site.with_site_status().select_related(
+            "commune__department__region",
+        )
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
@@ -112,11 +155,15 @@ class ProjectList(ListAPIView):
         DepartmentsFilter,
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
+        ProjectAssignedToUserFilter,
+        # todo filter should not be necessary after cleaning recoco_sync 2122
+        DefaultNoDeletedFilter,
     ]
 
     def get_queryset(self):
         return (
-            models.Project.on_site.for_user(self.request.user)
+            # todo all_on_site should not be necessary after cleaning recoco_sync 2122
+            models.Project.all_on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
             .annotate(
                 project_site_status=Subquery(
@@ -131,13 +178,23 @@ class ProjectList(ListAPIView):
         queryset = (
             self.filter_queryset(self.get_queryset())
             .prefetch_related(
-                "switchtenders__profile__organization",
+                Prefetch(
+                    "switchtenders",
+                    User.objects.select_related(
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
+                    ),
+                ),
                 "project_sites",
                 "tags",
+                "members",
                 Prefetch(
                     "members",
                     User.objects.filter(projectmember__is_owner=True).select_related(
-                        "profile", "profile__organization"
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
                     ),
                     to_attr="_owner",
                 ),  # _owner is looked at in getter

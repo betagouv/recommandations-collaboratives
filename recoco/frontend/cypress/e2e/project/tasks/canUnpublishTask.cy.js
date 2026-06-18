@@ -1,0 +1,26 @@
+let currentProjectId;
+// TODO Réécrire : #unpublish-task-button et list-tasks-switch-button n'existent plus
+describe.skip('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-brouillon', () => {
+  beforeEach(() => {
+    cy.login('conseiller1');
+    cy.createProject('unpublish task').then((projectId) => {
+      currentProjectId = projectId;
+    });
+  });
+
+  it('unpublishes a task', () => {
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
+
+    cy.visit(`/project/${currentProjectId}/actions`);
+
+    cy.createTask('unpublish task');
+
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
+
+    cy.get('#unpublish-task-button').click({ force: true });
+
+    cy.contains('brouillon');
+  });
+});
+
+// page recommandations

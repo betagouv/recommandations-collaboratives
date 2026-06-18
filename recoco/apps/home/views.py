@@ -7,19 +7,24 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
+import urllib
+
 import django.core.mail
 from actstream import action
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.csrf import requires_csrf_token
+from django.views.defaults import ERROR_403_TEMPLATE_NAME
 from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 from notifications.signals import notify
@@ -169,6 +174,11 @@ def contact(request):
     """Sends an email to the team with contact info from user"""
     next_url = request.GET.get("next", "/")
     if request.method == "POST":
+        if request.user.is_anonymous:
+            # quick fix to unlock brevo while captcha may be weak
+            raise PermissionDenied(
+                "Le formulaire de contact n'est accessible qu'aux personnes authentifiées"
+            )
         form = ContactForm(request.user, request.POST)
         if form.is_valid():
             status = send_message_to_team(request, form.cleaned_data)
@@ -432,6 +442,29 @@ class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse("site-create")
+
+
+@requires_csrf_token
+def permission_denied(request, exception):
+    # customizes PermissionDenied to customize with next url and user's data
+
+    template = loader.get_template(ERROR_403_TEMPLATE_NAME)
+    login_url = (
+        reverse("account_login") + "?" + urllib.parse.urlencode({"next": request.path})
+    )
+    logout_url = (
+        reverse("account_logout") + "?" + urllib.parse.urlencode({"next": login_url})
+    )
+
+    return HttpResponseForbidden(
+        template.render(
+            request=request,
+            context={
+                "exception": str(exception),
+                "relogin_url": logout_url,
+            },
+        )
+    )
 
 
 # eof

@@ -225,6 +225,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     // Update the store
     if (Alpine.store('sharedContentsPanel')) {
+      Alpine.store('sharedContentsPanel').projectId = this.projectId;
       Alpine.store('sharedContentsPanel').setRecommendations(recommendations);
       Alpine.store('sharedContentsPanel').setDraftRecommendations(
         draftRecommendations
@@ -725,13 +726,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       // Mark as visited and track analytics
       await this.onClickRessourceConsumeNotification(recommendation, message);
-      if (Alpine.store('resourcePreviewPanel')) {
-        Alpine.store('resourcePreviewPanel').open(recommendation, message);
-      } else {
-        console.error('resourcePreviewPanel store not found!');
-      }
     } catch (error) {
       console.error('Error in openResourcePreviewPanel:', error);
+    }
+    if (Alpine.store('resourcePreviewPanel')) {
+      Alpine.store('resourcePreviewPanel').open(recommendation, message);
+    } else {
+      console.error('resourcePreviewPanel store not found!');
     }
   },
   replaceMessage(message, messageIdToEdit) {

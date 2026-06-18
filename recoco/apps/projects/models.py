@@ -138,7 +138,7 @@ class ProjectManager(models.Manager):
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):
-            projects = self.filter(sites=site, deleted=None).exclude(
+            projects = self.filter(sites=site).exclude(
                 project_sites__site=site, project_sites__status="DRAFT"
             )
         else:
@@ -155,7 +155,7 @@ class ProjectManager(models.Manager):
         # Extend scope of projects to those where you're member or invited advisor
         my_projects = get_objects_for_user(
             user, "projects.view_project", klass=Project
-        ).filter(deleted=None, sites=site)
+        ).filter(sites=site)
 
         return (projects | my_projects).distinct()
 
@@ -234,7 +234,11 @@ class ProjectQuerySet(models.QuerySet):
         )
 
 
-class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
+class ProjectOnSiteManagerBase(CurrentSiteManager, ProjectManager):
+    pass
+
+
+class ProjectOnSiteManager(ProjectOnSiteManagerBase.from_queryset(ProjectQuerySet)):
     pass
 
 
@@ -245,18 +249,23 @@ class ActiveProjectManagerBase(ProjectManager):
         return super().get_queryset().filter(deleted=None)
 
 
-ActiveProjectManager = ActiveProjectManagerBase.from_queryset(ProjectQuerySet)
+class ActiveProjectManager(ActiveProjectManagerBase.from_queryset(ProjectQuerySet)):
+    pass
 
 
 class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
     pass
 
 
-class DeletedProjectManager(ProjectManager):
+class DeletedProjectManagerBase(ProjectManager):
     """Manager for deleted projects"""
 
     def get_queryset(self):
         return super().get_queryset().exclude(deleted=None)
+
+
+class DeletedProjectManager(DeletedProjectManagerBase.from_queryset(ProjectQuerySet)):
+    pass
 
 
 class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):

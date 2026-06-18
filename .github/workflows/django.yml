@@ -36,6 +36,9 @@ jobs:
         with:
           python-version-file: "pyproject.toml"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Setup Pre-commit
         uses: pre-commit/action@v3.0.1
 
@@ -89,9 +92,11 @@ jobs:
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
 
+      - name: Audit dependencies
+        run: uv audit
+
       - name: Run Tests
         env:
-          SECRET_KEY: 'this-is-not-a-secret-key'
           SENDINBLUE_API_KEY: 'this-is-a-fake-api-key'
           DJANGO_DB_HOST: localhost
           DJANGO_DB_USER: postgres

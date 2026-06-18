@@ -117,6 +117,11 @@
   overflow: hidden;
 }
 
+.common-dropdown__top-menu {
+  top: auto;
+  bottom: 100%;
+}
+
 .common-dropdown.show {
   display: flex;
 }

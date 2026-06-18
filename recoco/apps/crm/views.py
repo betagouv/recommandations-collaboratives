@@ -15,15 +15,12 @@ from allauth.account.internal.flows.email_verification import (
     send_verification_email_for_user,
 )
 from allauth.account.models import EmailAddress
-from allauth.account.utils import (
-    filter_users_by_email,
-    setup_user_email,
-)
+from allauth.account.utils import filter_users_by_email, setup_user_email
 from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.contrib.sites.models import Site
@@ -34,6 +31,7 @@ from django.core.exceptions import BadRequest
 from django.db import transaction
 from django.db.models import (
     Count,
+    Exists,
     ExpressionWrapper,
     F,
     FloatField,
@@ -49,7 +47,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
@@ -62,11 +60,18 @@ from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
+from recoco.apps.conversations.models import Message, RecommendationNode
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.projects.models import Project, Topic
+from recoco.apps.projects.models import (
+    Document,
+    Project,
+    ProjectMember,
+    ProjectSwitchtender,
+    Topic,
+)
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
@@ -178,6 +183,77 @@ def crm_search(request):
             return False
 
         search_results = list(filter(filter_current_site, all_sites_search_results))
+
+        # Used to remove duplicate project also found in ProjectAnnotation
+        project_ids = {
+            entry.object.pk
+            for entry in search_results
+            if isinstance(entry.object, Project)
+        }
+        search_results = [
+            entry
+            for entry in search_results
+            if not (
+                isinstance(entry.object, models.ProjectAnnotations)
+                and entry.object.project_id in project_ids
+            )
+        ]
+
+        grouped_search_results = OrderedDict(
+            (
+                (
+                    "projects",
+                    {"label": "dossier", "items": []},
+                ),
+                (
+                    "users",
+                    {
+                        "label": "utilisateur",
+                        "items": [],
+                    },
+                ),
+                (
+                    "organizations",
+                    {
+                        "label": "organisation",
+                        "items": [],
+                    },
+                ),
+                ("notes", {"label": "note", "items": []}),
+            )
+        )
+
+        is_empty_result = not search_results
+
+        # Count of Orga CRM note
+        organization_ct = ContentType.objects.get_for_model(Organization)
+
+        for entry in search_results:
+            obj = entry.object
+            if isinstance(obj, (Project, models.ProjectAnnotations)):
+                grouped_search_results["projects"]["items"].append(entry)
+            elif isinstance(obj, User):
+                grouped_search_results["users"]["items"].append(entry)
+            elif isinstance(obj, Organization):
+                org_user_ids = User.objects.filter(
+                    profile__in=obj.registered_profiles.all(),
+                    profile__sites=site,
+                ).values("id")
+                obj.members_count = org_user_ids.count()
+                obj.projects_count = (
+                    Project.on_site.filter(
+                        Q(members__in=org_user_ids) | Q(switchtenders__in=org_user_ids)
+                    )
+                    .distinct()
+                    .count()
+                )
+                obj.notes_count = models.Note.on_site.filter(
+                    object_id=obj.pk,
+                    content_type=organization_ct,
+                ).count()
+                grouped_search_results["organizations"]["items"].append(entry)
+            elif isinstance(obj, models.Note):
+                grouped_search_results["notes"]["items"].append(entry)
 
     return render(request, "crm/search_results.html", locals())
 
@@ -477,13 +553,64 @@ def organization_details(request, organization_id):
 def user_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered users
-    users = filters.UserFilter(
-        request.GET,
-        queryset=User.objects.filter(
-            profile__sites=request.site, profile__deleted__isnull=True
-        ).prefetch_related("profile__organization"),
+    site = request.site
+    advisor_group_name = make_group_name_for_site("advisor", site)
+    staff_group_name = make_group_name_for_site("staff", site)
+    admin_group_name = make_group_name_for_site("admin", site)
+    selected_departments = request.GET.getlist("departments")
+
+    base_qs = (
+        User.objects.filter(profile__sites=site, profile__deleted__isnull=True)
+        .prefetch_related("profile__organization")
+        .annotate(
+            projects_count=(
+                Subquery(
+                    Project.objects.filter(
+                        Q(
+                            pk__in=Subquery(
+                                ProjectMember.objects.filter(
+                                    member_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                        | Q(
+                            pk__in=Subquery(
+                                ProjectSwitchtender.objects.filter(
+                                    switchtender_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                    )
+                    .distinct()
+                    .annotate(count=Func(F("id"), function="Count"))
+                    .values("count")
+                )
+            ),
+            is_advisor=Exists(
+                Group.objects.filter(name=advisor_group_name, user=OuterRef("pk"))
+            ),
+            is_staff_member=Exists(
+                Group.objects.filter(name=staff_group_name, user=OuterRef("pk"))
+            ),
+            is_admin=Exists(
+                Group.objects.filter(name=admin_group_name, user=OuterRef("pk"))
+            ),
+        )
     )
+
+    users = filters.UserFilter(request.GET, queryset=base_qs)
+
+    has_active_filter = any(
+        [
+            request.GET.get("username"),
+            request.GET.get("role"),
+            selected_departments,
+            request.GET.get("inactive"),
+        ]
+    )
+
+    max_users_without_filter = 25
+    display_qs = users.qs if has_active_filter else users.qs[:max_users_without_filter]
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -515,11 +642,14 @@ def user_update(request, user_id=None):
                         # a user with the new mail already exist
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
-                            error_msg = mark_safe(  # noqa: S308
-                                f'L\'utilisateur <a href="{user_link}">'
-                                f"{users[0].first_name} {users[0].last_name}</a>'"
-                                " utilise déjà cette adresse email."
-                            )  # nosec
+                            error_msg = format_html(
+                                'L\'utilisateur <a href="{}">'
+                                "{} {}</a>'"
+                                " utilise déjà cette adresse email.",
+                                user_link,
+                                users[0].first_name,
+                                users[0].last_name,
+                            )
                             form.add_error(
                                 "username", django_forms.ValidationError(error_msg)
                             )
@@ -673,7 +803,7 @@ def user_details(request, user_id):
             verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
         )
         | crm_user.action_object_actions.all()
-    )
+    ).order_by("-timestamp")[:50]
 
     user_ct = ContentType.objects.get_for_model(User)
 
@@ -689,6 +819,18 @@ def user_details(request, user_id):
     ).order_by("-updated_on")
     sticky_notes = all_notes.filter(sticky=True)
     notes = all_notes.exclude(sticky=True)
+
+    if not crm_user_is_advisor and not crm_user.is_staff:
+        user_project_ids = crm_user.projectmember_set.values_list(
+            "project_id", flat=True
+        )
+        next_user_reminder = (
+            reminders_models.Reminder.on_site.filter(
+                project_id__in=user_project_ids, sent_on=None
+            )
+            .order_by("deadline")
+            .first()
+        )
 
     search_form = forms.CRMSearchForm()
 
@@ -826,6 +968,15 @@ def project_details(request, project_id):
     user_ct = ContentType.objects.get_for_model(User)
 
     project_ct = ContentType.objects.get_for_model(Project)
+
+    conversation_stats = {
+        "messages_count": Message.not_deleted.filter(project=project).count(),
+        "participants_count": project.members.count() + project.switchtenders.count(),
+        "recommendations_count": RecommendationNode.objects.filter(
+            message__project=project, message__deleted=None
+        ).count(),
+        "documents_count": Document.objects.filter(project=project).count(),
+    }
 
     participants = project.members.all()
     participant_ids = list(participants.values_list("id", flat=True))

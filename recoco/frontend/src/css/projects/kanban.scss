@@ -66,6 +66,21 @@
     min-height: 100px;
     background-color: #f6f6f6;
 
+    &__project-count {
+      display: flex;
+      height: 20px;
+      padding: 0 6px;
+      align-items: center;
+      border-radius: 4px;
+      background: #fff;
+
+      color: var(--light-text-mention-grey, #666);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 12px; /* 120% */
+      text-transform: uppercase;
+    }
+
     &__content {
       height: 75vh;
       overflow-x: hidden;

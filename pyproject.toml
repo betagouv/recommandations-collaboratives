@@ -14,8 +14,8 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
-    "cryptography==46.0.7",
-    "django>=5.2.1,<6",
+    "cryptography==48.0.1",
+    "django>=5.2.15,<6",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
     "django-allauth[mfa,openid,socialaccount]==65.14.1",
@@ -78,8 +78,8 @@ dependencies = [
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
     "tqdm>=4.67.1",
-    "urllib3>=2.6.3",
-    "wagtail==6.3.8",
+    "urllib3>=2.7",
+    "wagtail==7.0.7",
 ]
 
 [project.urls]
@@ -97,6 +97,11 @@ version = { attr = "recoco.__version__" }
 
 [tool.uv]
 package = false
+constraint-dependencies = [
+    "pyjwt>=2.13.0",
+    "tornado>=6.5.7",
+    "bleach>=6.4.0"
+]
 
 [build-system]
 requires = ["setuptools"]
@@ -156,7 +161,7 @@ unfixable = ["ALL"]
 fixable = ["I"]
 exclude = [
     "docs/*",
-    "frontend_tests/*",
+    "recoco/frontend/cypress/*",
     "node_modules/*",
     "notebooks/*",
     "sql/*",
@@ -205,8 +210,11 @@ django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-conse
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
-[tool.uv-secure.vulnerability_criteria]
-ignore_vulnerabilities = [] # to set if packages have unfixed acceptable vulnerabilities
+[tool.uv.audit]
+# to set if packages have unfixed acceptable vulnerabilities
+ignore = [
+    "GHSA-r374-rxx8-8654", # low impact no fix
+]
 
 [dependency-groups]
 dev = [
@@ -246,7 +254,7 @@ dev = [
     "sphinx-toolbox>=3.8.2",
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
-    "uv>=0.9.6",
+    "uv>=0.11.15",
 ]
 
 

@@ -41,6 +41,23 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     profile = UserProfileSerializer(read_only=True, many=False)
 
 
+# todo should not be necessary when orga is duplicated to project (#2124)
+class UserWebhookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = auth_models.User
+
+        fields = ["id", "email", "projects"]
+
+    projects = serializers.SerializerMethodField()
+
+    def get_projects(self, instance):
+        return list(
+            instance.projectmember_set.filter(is_owner=True).values_list(
+                "project", flat=True
+            )
+        )
+
+
 class SiteConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteConfiguration
