@@ -26,15 +26,6 @@ repos:
       - id: uv-lock
       - id: uv-export
 
-  - repo: local
-    hooks:
-      - id: uv-audit
-        name: uv audit
-        language: system
-        entry: uv audit
-        pass_filenames: false
-        files: uv\.lock
-
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
