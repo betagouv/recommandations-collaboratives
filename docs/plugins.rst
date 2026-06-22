@@ -776,9 +776,9 @@ Activation
 
 Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
-1. Install the plugin package into the environment::
+1. Install the plugin package into the dev environment::
 
-    uv add ./plugins/plugin_giphy
+    uv pip install -e ./plugins/plugin_giphy
 
 2. Add ``plugin_giphy`` to ``INSTALLED_APPS`` in the relevant settings file.
 
