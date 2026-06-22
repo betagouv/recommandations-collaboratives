@@ -43,12 +43,13 @@ class Command(BaseCommand):
                     )
                     continue
 
-                proxy_filename = f"{entry_name}.js"
-                proxy_path = os.path.join(PLUGINS_PROXY_DIR, proxy_filename)
+                proxy_rel = f"{entry_name}.js"
+                proxy_path = os.path.join(PLUGINS_PROXY_DIR, proxy_rel)
+                os.makedirs(os.path.dirname(proxy_path), exist_ok=True)
                 with open(proxy_path, "w") as f:
                     f.write(f"import '{abs_path}';\n")
 
-                manifest[entry_name] = f"js/plugins/{proxy_filename}"
+                manifest[entry_name] = f"js/plugins/{proxy_rel}"
 
         with open(PLUGIN_ENTRIES_JSON, "w") as f:
             json.dump(manifest, f, indent=2)
