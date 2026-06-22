@@ -235,7 +235,7 @@ def mark_notifications_as_seen(user, project):
 
 @login_required
 def project_actions(request, project_id=None):
-    """Legacy URL — redirect to the conversation tab with the action panel open."""
+    """Legacy URL: redirect to the conversation tab with the action panel open."""
     url = (
         reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
     )
@@ -255,40 +255,6 @@ def project_recommendations_embed(request, project_id=None):
     actions = project.tasks.filter(public=True).order_by("-created_on", "-updated_on")
 
     return render(request, "projects/project/actions_embed.html", locals())
-
-
-@login_required
-def project_conversations_new(request, project_id=None):
-    """New Conversation page for project (replaced by CBV)"""
-    # we test to remove this part so we keep the code but redirect to new interface
-    url = (
-        reverse("projects-project-detail-conversations", args=[project_id]) + "#actions"
-    )
-    return redirect(url)
-
-
-def project_actions_inline(request, project_id=None):
-    """Inline Action page for given project"""
-
-    project = get_object_or_404(
-        models.Project.objects.select_related("commune__department"),
-        sites=request.site,
-        pk=project_id,
-    )
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
-
-    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-        request.user, "view_tasks", project
-    )
-
-    return render(request, "projects/project/actions_inline.html", locals())
 
 
 class ProjectConversationView(ProjectDetailBaseView):
@@ -337,9 +303,7 @@ class ProjectConversationView(ProjectDetailBaseView):
                     project_id=self.object.pk, private=True
                 ).values("id", "created_on", "the_file")
             )
-            if has_perm(
-                self.request.user, "manage_private_documents", self.context_object_name
-            )
+            if has_perm(self.request.user, "manage_private_documents", self.object)
             else []
         )
 
