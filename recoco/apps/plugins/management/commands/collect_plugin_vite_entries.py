@@ -43,7 +43,12 @@ class Command(BaseCommand):
                     )
                     continue
 
-                proxy_rel = f"{entry_name}.js"
+                norm_rel = os.path.normpath(rel_path)
+                parts = norm_rel.split(os.sep)
+                if parts[0] == "js":
+                    parts = parts[1:]
+                proxy_rel = os.path.join(*parts)
+
                 proxy_path = os.path.join(PLUGINS_PROXY_DIR, proxy_rel)
                 os.makedirs(os.path.dirname(proxy_path), exist_ok=True)
                 with open(proxy_path, "w") as f:
