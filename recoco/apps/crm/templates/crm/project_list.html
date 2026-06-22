@@ -95,10 +95,10 @@
                                 <td x-text="`${project?.commune?.name} (${project?.commune?.postal})`"></td>
                                 <td x-text="new Date(project?.created_on).toLocaleDateString('fr-FR')"></td>
                                 <td class="project-table__status">
-                                    <span x-text="projectStatusLabel(project.status)"
+                                    <span x-text="ProjectStatus[project.status].text"
                                           class="fr-badge fr-badge--no-icon"
                                           x-tooltip="projectTooltip(project)"
-                                          :class="projectStatusColor(project.status)"></span>
+                                          :class="ProjectStatus[project.status].color"></span>
                                 </td>
                                 {% for col in plugin_columns %}{{ col.cell_html|safe }}{% endfor %}
                                 <td>
