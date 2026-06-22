@@ -72,7 +72,6 @@ dependencies = [
     "pluggy>=1.6.0",
     "psycopg[c]>=3.2.12",
     "puremagic>=1.30",
-    "recoco-plugin-mi-depafi",
     "redis==5.0.4",
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
@@ -211,17 +210,11 @@ django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git
 django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "1ddd4717d35dc882eed1f1b1bee6970f5755ae03" }
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
-recoco-plugin-mi-depafi = { workspace = true }
 
 [tool.uv.audit]
 # to set if packages have unfixed acceptable vulnerabilities
 ignore = [
     "GHSA-r374-rxx8-8654", # low impact no fix
-]
-
-[tool.uv.workspace]
-members = [
-    "recoco/plugins/recoco-plugins-mi-depafi",
 ]
 
 [dependency-groups]
