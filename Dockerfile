@@ -7,7 +7,7 @@ RUN apt-get update && \
 
 WORKDIR /piptmp
 
-COPY requirements.txt requirements-dev.txt ./
+COPY pyproject.toml ./
 
 RUN uv sync --no-dev
 
