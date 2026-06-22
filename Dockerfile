@@ -9,7 +9,7 @@ WORKDIR /piptmp
 
 COPY requirements.txt requirements-dev.txt ./
 
-RUN pip install -r requirements.txt -r requirements-dev.txt
+RUN uv sync --no-dev
 
 WORKDIR /workspace
 
