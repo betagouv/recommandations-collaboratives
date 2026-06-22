@@ -780,7 +780,7 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
     uv pip install -e ./plugins/plugin_giphy
 
-2. Add ``plugin_giphy`` to ``INSTALLED_APPS`` in the relevant settings file.
+2. Add ``plugin_giphy`` to ``INSTALLED_APPS`` in the relevant settings file (ie. ``development.py``).
 
 3. Create the tenant schema and run plugin migrations::
 
@@ -791,7 +791,7 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
     cd /path/to/plugin-giphy && npm install
     cd /path/to/recoco && python manage.py collect_plugin_vite_entries
 
-5. Rebuild the frontend::
+5. Rebuild the frontend (only when deploying)::
 
     cd recoco/frontend && npm run build
 
