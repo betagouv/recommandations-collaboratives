@@ -212,6 +212,7 @@ Légende :
 | Connexion                  | `/accounts/login/`             | Connexion (UI et programmatique)                   | `// @connexion`                                     |      ✅ |
 | Inscription                | `/accounts/signup/`            | Inscription utilisateur                            | `// @inscription`                                   |      ✅ |
 | Smoke / transverse         | tous URLs                      | Exploration de toutes les URLs accessibles         | `// @can-explore-all-urls`                          |      ✅ |
+| Page d'erreur              | n/a (composant)                | Exploration des pages d'erreur                     | `// @error-page`                                    |      🚧 |
 | DSRC (formulaires)         | n/a (composant)                | Validation des formulaires DSRC (test désactivé)   | `// @dsrc-form-validator`                           |      ⏭️ |
 
 Le code est à positionner dans le nom du `describe` du test, pour permettre de retrouver et d'exécuter sélectivement les tests via `@cypress/grep`.

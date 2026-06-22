@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from rest_framework.test import APIClient
@@ -128,6 +129,13 @@ def malicious_file():
     headers = puremagic.magic_header_array
     header = [e for e in headers if e.extension == ".exe"][0].byte_match
     return SimpleUploadedFile("fake-img.png", header, content_type="image/png")
+
+
+def setup_sesame_cookie(client, user):
+    client.cookies.load({"enable-sesame-user-id": str(user.id)})
+
+    cookie_url = reverse("cookie_consent_accept_all")
+    client.post(cookie_url)
 
 
 # eof
