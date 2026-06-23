@@ -42,7 +42,14 @@ class EmbedMiddleware:
         ):
             request.session["is_embedded"] = True
         request.is_embedded = request.session.get("is_embedded", False)
-        return self.get_response(request)
+
+        response = self.get_response(request)
+
+        # TODO verify security on this option
+        if request.is_embedded:
+            response.xframe_options_exempt = True
+
+        return response
 
 
 class PreviousActivityMiddleware:
