@@ -78,14 +78,22 @@
   opacity: 1;
 }
 
-/* ¯¯¯¯¯ *\
-  POSITION
-\* ˍˍˍˍˍ */
+/* ¯¯¯¯ *\
+  HEADER
+\* ˍˍˍˍ */
 
 .fr-header {
   &.sticky-top {
     position: sticky;
     top: 0;
+  }
+  &__tools {
+    line-height: 1rem;
+  }
+  &__separator {
+    border-left: 1px solid #aaa ;
+    height: 24px;
+    padding-left: 1rem;
   }
 }
 
