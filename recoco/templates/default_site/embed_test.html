@@ -1,0 +1,43 @@
+{% load django_vite %}
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="system">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Test d'intégration iframe</title>
+        {% vite_hmr_client %}
+        {% vite_asset 'js/main.js' %}
+        {% vite_asset 'js/styles/base.css.js' %}
+        {% include "favicon.html" %}
+    </head>
+    <body>
+        <main class="d-flex flex-column" role="main">
+            <div class="fr-mt-4w fr-mx-4w">
+                <h1 class="fr-h3">Test d'intégration iframe</h1>
+                <form method="get">
+                    <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                        <div class="fr-col-12 fr-col-md">
+                            <div class="fr-input-group d-flex">
+                                <input class="fr-input"
+                                       type="text"
+                                       id="embed-test-url"
+                                       name="url"
+                                       value="{{ target_url }}"
+                                       placeholder="/project/1/recommandations/embed?key=...">
+                                <button class="fr-btn fr-icon-refresh-line fr-btn--icon-left" type="submit">Charger</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% if target_url %}
+                <div class="fr-mt-3w">
+                    <iframe src="{{ target_url }}"
+                            title="Contenu embarqué"
+                            class="embed-test-iframe"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            {% endif %}
+        </main>
+    </body>
+</html>

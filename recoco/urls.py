@@ -29,6 +29,7 @@ from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.survey.urls import urlpatterns as survey_urls
 from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.rest_api.urls import urlpatterns as rest_api_urls
+from recoco.views import embed_test
 
 # Alter admin login with secure (2fa) version from allauth
 admin.autodiscover()
@@ -45,6 +46,7 @@ urlpatterns = [
     path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("p/", include(wagtail_urls)),
+    path("embed-test/", embed_test, name="embed-test"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns.extend(magicauth_urls)

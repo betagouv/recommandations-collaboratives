@@ -292,3 +292,11 @@
 .text-overflow-ellipsis {
   text-overflow: ellipsis;
 }
+
+.embed-test-iframe {
+    display: block;
+    width: 100%;
+    height: 75vh;
+    border: 1px solid var(--border-default-grey);
+    border-radius: .25rem;
+}
