@@ -100,7 +100,10 @@ package = false
 constraint-dependencies = [
     "pyjwt>=2.13.0",
     "tornado>=6.5.7",
-    "bleach>=6.4.0"
+    "bleach>=6.4.0",
+    "msgpack>=1.2.1",
+    "jupyterlab>=4.5.9",
+    "jupyter-server>=2.20.0"
 ]
 
 [build-system]
