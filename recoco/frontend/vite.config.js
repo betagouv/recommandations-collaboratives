@@ -252,6 +252,7 @@ const config = {
           './src/js/styles/form-information.css.js'
         ),
         layoutFormStyles: resolve('./src/js/styles/layout-form.css.js'),
+        errorPageStyles: resolve('./src/js/styles/layouts/error-page.css.js'),
       },
       output: {
         chunkFileNames: undefined,

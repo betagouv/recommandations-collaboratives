@@ -1,0 +1,38 @@
+{% extends "layouts/error_page.html" %}
+{% load static %}
+{% block content %}
+    <p class="fr-text--lead fr-mb-3w">
+        Oups, vous n'avez pas l'autorisation d'accéder à cette page
+        {% if request.user.is_authenticated %}avec votre compte <strong>{{ request.user }}</strong>{% endif %}
+        . Si vous pensez que c'est une erreur, écrivez aux administrateurs du site !
+    </p>
+{% endblock content %}
+{% block buttons %}
+    <li>
+        <a class="fr-btn fr-btn--icon-left fr-icon-home-4-line fr-mr-3w"
+           href="{% url 'home' %}">Retour à l'accueil</a>
+    </li>
+    <li>
+        <a class="fr-btn fr-btn--secondary" href="{% url 'home-contact' %}">Contactez les administrateurs</a>
+    </li>
+{% endblock buttons %}
+{% block more %}
+    {% if request.user.is_authenticated %}
+        <div class="fr-background-alt--blue-france fr-px-3w fr-py-2w d-flex">
+            <span class="fr-icon-information-line fr-mr-1w" aria-hidden="true"></span>
+            <div>
+                <p class="fr-mb-0">
+                    Vous êtes connecté avec l’adresse {{ request.user }}. Si vous souhaitez vous connecter avec une autre adresse, vous pouvez vous déconnecter ci-dessous :
+                </p>
+                <p class="fr-mt-2w fr-mb-0">
+                    <a href="{{ relogin_url }}"
+                       class="fr-link"
+                       data-test-id="link-relogin-403">Changer de compte</a>
+                </p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock more %}
+{% block image %}
+    <img src="{% static 'svg/page-eaten.svg' %}" alt="">
+{% endblock image %}
