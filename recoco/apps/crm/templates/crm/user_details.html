@@ -68,7 +68,9 @@
                 {% endif %}
                 <!-- Organization -->
                 {% if crm_user.profile.organization %}
-                    <span class="user-crm__user-information fr-icon-people fr-icon--sm {% if crm_user_is_advisor %}fr-mb-1v{% else %}fr-mb-3v{% endif %}">{{ crm_user.profile.organization.name }}</span>
+                    <span class="user-crm__user-information--link fr-icon-people fr-icon--sm {% if crm_user_is_advisor %}fr-mb-1v{% else %}fr-mb-3v{% endif %}">
+                        <a href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">{{ crm_user.profile.organization.name }}</a>
+                    </span>
                 {% endif %}
                 <!-- Departments (if advisor) -->
                 {% if crm_user_is_advisor %}
