@@ -1,0 +1,65 @@
+{% extends "layout/new_layout.html" %}
+{% block breadcrumbs %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Connexion à {{ request.site.name }}' } }"
+         class="fr-p-0 fr-ml-15w fr-mb-4w fr-mt-2w">{% include "tools/breadcrumb.html" %}</div>
+{% endblock breadcrumbs %}
+{% block main_form %}
+    <form method="post" action="{% url 'account_confirm_login_code' %}">
+        {% csrf_token %}
+        {% if redirect_field_value %}
+            <input type="hidden"
+                   name="{{ redirect_field_name }}"
+                   value="{{ redirect_field_value }}" />
+        {% endif %}
+        <fieldset>
+            <h2 class="form__title">Saisir le code de connexion</h2>
+            {% if verify_form.non_field_errors %}
+                <div class="fr-alert fr-alert--error fr-mb-2w">
+                    {% for error in verify_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
+            {% for field in verify_form %}
+                <div class="fr-input-group {% if field.errors %}fr-input-group--error{% endif %}">
+                    <label class="fr-label" for="{{ field.id_for_label }}">
+                        Code de connexion
+                        <span class="fr-hint-text">Saisissez le code de connexion à 6 caractères reçu par e-mail.</span>
+                    </label>
+                    <input class="fr-input {% if field.errors %}fr-input--error{% endif %}"
+                           type="{{ field.field.widget.input_type|default:'text' }}"
+                           id="{{ field.id_for_label }}"
+                           name="{{ field.name }}"
+                           autocomplete="one-time-code"
+                           inputmode="numeric"
+                           {% if field.field.required %}required{% endif %} />
+                    {% for error in field.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+            {% include "fragments/form_information.html" with content="Vous n'avez pas reçu de code ? Vérifiez vos spams (courriers indésirables)" %}
+        </fieldset>
+        <ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--icon-left">
+            <li class="flex-grow-1">
+                <button type="submit" class="fr-btn w-100 fr-icon-check-line">Me connecter</button>
+            </li>
+        </ul>
+    </form>
+    <ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--icon-left justify-content-center">
+        <li>
+            <a type="submit"
+               class="fr-link normal-link-style"
+               href="{% url 'account_logout' %}?next={% url 'account_login' %}">Renseigner mon mot de passe</a>
+        </li>
+    </ul>
+{% endblock main_form %}
+{% block fallback_actions %}
+    <h2 class="form__title">Vous n'avez pas de compte {{ request.site.name }}</h2>
+    <p class="content">
+        Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut déposer une demande :
+    </p>
+    <a class="fr-btn no-underline fr-mb-3w" href="{% url 'onboarding' %}">Déposer une demande</a>
+    <p class="content">
+        Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez faire une demande de compte conseiller.
+    </p>
+    <p class="content">
+        Si vous souhaitez rejoindre un dossier qui a déjà été déposé sur UrbanVitaliz, il vous faut demander à un membre de ce dossier de vous y inviter.
+    </p>
+{% endblock fallback_actions %}
