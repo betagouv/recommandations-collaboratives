@@ -12,55 +12,5 @@
     {% vite_asset 'js/styles/account-login.css.js' %}
 {% endblock js %}
 {% block content %}
-    <div class="fr-container fr-container--fluid fr-my-md-14v">
-        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-8 fr-col-lg-8">
-                <div class="fr-container fr-px-md-0 fr-py-10v fr-py-md-14v">
-                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
-                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
-                            <h2>Se connecter par email</h2>
-                            <p>
-                                Renseignez votre adresse email ci-dessous. Vous recevrez un code de connexion à usage unique à saisir sur la page suivante.
-                            </p>
-                            <form method="post" action="{% url 'account_request_login_code' %}">
-                                {% csrf_token %}
-                                {% if redirect_field_value %}
-                                    <input type="hidden"
-                                           name="{{ redirect_field_name }}"
-                                           value="{{ redirect_field_value }}" />
-                                {% endif %}
-                                {% if form.non_field_errors %}
-                                    <div class="fr-alert fr-alert--error fr-mb-2w">
-                                        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-                                    </div>
-                                {% endif %}
-                                <div class="fr-input-group {% if form.email.errors %}fr-input-group--error{% endif %}">
-                                    <label class="fr-label" for="{{ form.email.id_for_label }}">
-                                        {% trans "Email" %}
-                                        {% if form.email.help_text %}<span class="fr-hint-text">{{ form.email.help_text }}</span>{% endif %}
-                                    </label>
-                                    <input class="fr-input {% if form.email.errors %}fr-input--error{% endif %}"
-                                           type="email"
-                                           id="{{ form.email.id_for_label }}"
-                                           name="{{ form.email.name }}"
-                                           value="{{ form.email.value|default:'' }}"
-                                           autocomplete="email"
-                                           required />
-                                    {% for error in form.email.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
-                                </div>
-                                <ul class="fr-btns-group fr-btns-group--inline-md">
-                                    <li>
-                                        <button type="submit" class="fr-btn fr-btn--primary">Recevoir mon code</button>
-                                    </li>
-                                    <li>
-                                        <a class="fr-btn fr-btn--secondary" href="{% url 'account_login' %}">Connexion avec mot de passe</a>
-                                    </li>
-                                </ul>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include "account/fragments/request_login_code_form.html" with title="Connexion à "|add:request.site.name legend="Connectez-vous à "|add:request.site.name|add:" en utilisant votre adresse e-mail." fallback_actions=True %}
 {% endblock content %}
