@@ -326,6 +326,7 @@ ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
+LOGIN_REDIRECT_URL = "login-redirect"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 
 # Common signup form shared by account and socialaccount
