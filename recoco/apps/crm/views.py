@@ -832,6 +832,26 @@ def user_details(request, user_id):
             .first()
         )
 
+    current_site_id = request.site.id
+    user_memberships = sorted(
+        crm_user.projectmember_set.select_related("project").prefetch_related(
+            "project__project_sites"
+        ),
+        key=lambda m: any(
+            ps.site_id == current_site_id for ps in m.project.project_sites.all()
+        ),
+        reverse=True,
+    )
+    user_switchtendings = sorted(
+        crm_user.projects_switchtended_per_site.select_related(
+            "project"
+        ).prefetch_related("project__project_sites"),
+        key=lambda s: any(
+            ps.site_id == current_site_id for ps in s.project.project_sites.all()
+        ),
+        reverse=True,
+    )
+
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_details.html", locals())
