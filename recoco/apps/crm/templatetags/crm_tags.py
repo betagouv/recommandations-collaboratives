@@ -25,6 +25,18 @@ def projects_for_tag(tag_name):
     return Project.on_site.filter(tags__name=tag_name).order_by("name")
 
 
+@register.simple_tag(takes_context=True)
+def project_other_site_config(context, project):
+    current_site = context["request"].site
+    project_sites = list(project.project_sites.all())
+    if any(ps.site_id == current_site.id for ps in project_sites):
+        return None
+    target = next((ps for ps in project_sites if ps.is_origin), None) or (
+        project_sites[0] if project_sites else None
+    )
+    return getattr(target.site, "configuration", None) if target else None
+
+
 @register.simple_tag
 def get_note_update_url(note: Note) -> str | None:
     project_ct = ContentType.objects.get_for_model(Project)

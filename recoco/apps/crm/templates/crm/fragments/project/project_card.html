@@ -1,5 +1,21 @@
+{% load crm_tags %}
+{% project_other_site_config project as other_portal %}
 <div class="crm-project-card d-flex flex-column">
-    <span class="crm-project-card__name"><a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a></span>
+    <span class="crm-project-card__name d-flex align-items-center gap-2">
+        {% if other_portal %}
+            <span>{{ project.name }}</span>
+            {% if other_portal.logo_small %}
+                <img class="crm-project-card__portal-logo"
+                     src="{{ other_portal.logo_small.url }}"
+                     alt="{{ other_portal.site.name }}"
+                     title="Dossier actif sur {{ other_portal.site.name }}">
+            {% else %}
+                <span class="fr-text--xs text-muted">{{ other_portal.site.name }}</span>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a>
+        {% endif %}
+    </span>
     {% if project.commune %}
         <span class="crm-project-card__org fr-icon-people fr-icon--sm fr-btn--icon-left">{{ project.commune }}</span>
     {% endif %}
