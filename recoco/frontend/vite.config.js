@@ -248,6 +248,9 @@ const config = {
           './src/js/styles/background-override.css.js'
         ),
         emptyStateCrmStyles: resolve('./src/js/styles/crm-empty-state.css.js'),
+        formInformationStyles: resolve(
+          './src/js/styles/form-information.css.js'
+        ),
       },
       output: {
         chunkFileNames: undefined,
