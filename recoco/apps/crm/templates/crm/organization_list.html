@@ -118,11 +118,9 @@
                                     <td>{{ organization.members_count|default:0 }}</td>
                                     <td>{{ organization.projects_count|default:0 }}</td>
                                     <td>
-                                        <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Modifier l'organisation">
-                                            <a href="{% url 'crm-organization-update' organization.pk %}"
-                                               class="stretched-link">Modifier</a>
-                                        </button>
+                                        <a href="{% url 'crm-organization-update' organization.pk %}"
+                                           title="Modifier l'organisation"
+                                           class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline">Modifier</a>
                                     </td>
                                 </tr>
                             {% empty %}
