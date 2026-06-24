@@ -122,12 +122,12 @@
             {% endfor %}
         </div>
     {% endif %}
-    <!-- Autre dossiers -->
+    <!-- Autres dossiers -->
     {% with crm_user.projectmember_set.all as memberships %}
         {% if memberships %}
             <div>
                 <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="user-crm__section-title">Autre dossiers</span>
+                    <span class="user-crm__section-title">{% if crm_user_is_advisor %}Autres dossiers{% else %}Dossiers{% endif %}</span>
                 </div>
                 {% for membership in memberships %}
                     <div class="user-crm__section-container fr-px-3w fr-py-2w">
