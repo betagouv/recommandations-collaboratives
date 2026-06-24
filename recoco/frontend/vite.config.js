@@ -251,6 +251,7 @@ const config = {
         formInformationStyles: resolve(
           './src/js/styles/form-information.css.js'
         ),
+        layoutFormStyles: resolve('./src/js/styles/layout-form.css.js'),
       },
       output: {
         chunkFileNames: undefined,
