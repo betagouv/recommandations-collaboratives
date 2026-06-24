@@ -1,7 +1,7 @@
 {% load gravatar %}
 <li class="d-flex flex-columns list-group-item">
     <div class="flex-row flex-grow-1">
-        <div class="w-100 font-size-12px {% if wrap %}no-wrap{% endif %}">
+        <div class="w-100 font-size-12px">
             {% if action.actor %}
                 <span class="d-inline-flex align-middle">
                     {% include "user/user_card.html" with user=action.actor show_organization=False %}
