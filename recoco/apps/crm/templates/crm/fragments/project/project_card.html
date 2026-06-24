@@ -13,7 +13,8 @@
                 <span class="fr-text--xs text-muted">{{ other_portal.site.name }}</span>
             {% endif %}
         {% else %}
-            <a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a>
+            <a href="{% url 'crm-project-details' project.pk %}"
+               {% if project.deleted %}class="text-decoration-line-through"{% endif %}>{{ project.name }}</a>
         {% endif %}
     </span>
     {% if project.commune %}
