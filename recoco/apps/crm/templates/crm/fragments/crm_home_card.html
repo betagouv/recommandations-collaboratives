@@ -9,7 +9,7 @@
     nb_alert: number (optional) - the alert count shown in the badge when is_alert is true
 -->
 {% load static %}
-<a class="position-relative crm-home__card d-flex flex-column" href={{ link_url }}{{ anchor }}>
+<a class="position-relative crm-home__card d-flex flex-column" href="{{ link_url }}{{ anchor }}">
     <div class="d-flex align-items-center">
         {% if is_alert %}
             <span class="badge text-bg-danger no-underline fr-mr-1w">{{ nb_alert }}</span>
