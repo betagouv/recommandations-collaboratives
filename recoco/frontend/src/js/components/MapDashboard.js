@@ -73,47 +73,40 @@ function MapDashboard(currentSiteId, regions) {
           searchText: searchText,
           departments: searchDepartment,
           status: ['TO_PROCESS', 'STUCK', 'READY', 'IN_PROGRESS', 'DONE'],
+          myProjects: this.isDisplayingOnlyUserProjects,
         })
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(
         projects.data.results,
         this.currentSiteId
       );
-      this.projectListFiltered = [...this.projectList];
-      this.filterMyProjects();
+      this.renderMap();
     },
 
-    filterMyProjects() {
-      if (this.isDisplayingOnlyUserProjects) {
-        this.projectListFiltered = this.projectList.filter(
-          (d) => d.is_observer || d.is_switchtender
-        );
-      } else {
-        this.projectListFiltered = [...this.projectList];
-      }
+    renderMap() {
       if (this.map) {
         this.map.remove();
       }
       if (this.markersLayer) {
         this.markersLayer.remove();
       }
-      const { map, markersLayer } = initMap(this.projectListFiltered);
+      const { map, markersLayer } = initMap(this.projectList);
       this.map = map;
       this.markersLayer = markersLayer;
-      if (this.projectListFiltered.length > 0) {
+      if (this.projectList.length > 0) {
         zoomToCentroid(this.map, this.markersLayer);
       } else {
         setTimeout(() => this.map.invalidateSize(), 251);
       }
     },
 
-    toggleMyProjectsFilter() {
+    async toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
       localStorage.setItem(
         'isDisplayingOnlyUserProjects',
         this.isDisplayingOnlyUserProjects
       );
-      this.filterMyProjects();
+      await this.getDataFiltered();
     },
 
     async onSearch(event) {
