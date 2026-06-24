@@ -27,6 +27,7 @@
         <!-- Fallback actions -->
         <div class="layout-form__container-fallback">
             {% block fallback_actions %}
+                {% include "account/fragments/no_account_action.html" %}
             {% endblock fallback_actions %}
         </div>
     {% endif %}
