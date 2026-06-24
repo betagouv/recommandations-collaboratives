@@ -525,9 +525,15 @@ class TwoFAConfigView(FormView):
                 url = reverse("mfa_deactivate_totp")
                 return redirect(url)
         elif form.cleaned_data["two_fa_mode"] == "totp":
-            # removing email 2fa is done through a signal
-            url = reverse("mfa_activate_totp")
-            return redirect(url)
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if not authenticator:
+                # removing email 2fa is done through a signal
+                url = reverse("mfa_activate_totp")
+                return redirect(url)
+            self.request.user.profile.login_with_code = False
+            self.request.user.profile.save()
         else:  # 2fa is set to login with code. totp may or may not have been activated before
             self.request.user.profile.login_with_code = True
             self.request.user.profile.save()
