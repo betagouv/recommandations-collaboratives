@@ -46,4 +46,27 @@
         line-height: 20px; /* 166.667% */
         display: block;
     }
+
+    &__warning-box {
+        display: flex;
+        padding: 12px 24px;
+        align-items: flex-start;
+        gap: 8px;
+        align-self: stretch;
+        background: var(--light-decisions-background-background-contrast-warning, #FFE9E6);
+    }
+
+    &__warning-box p {
+        color: var(--light-decisions-text-text-default-warning, #B34000);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px; /* 150% */
+    }
+
+    &__warning-box span {
+        color: var(--light-decisions-text-text-default-warning, #B34000);
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px; /* 150% */
+    }
 }
