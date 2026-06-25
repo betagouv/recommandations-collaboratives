@@ -167,6 +167,7 @@
   }
 
   &--with-source {
+    cursor: pointer;
     padding-left: 1rem;
     border-left: 3px solid var(--light-accent-blue-france, #000091);
     background-color: var(--light-background-alt-grey, #f6f6f6);
@@ -391,8 +392,11 @@
       border-color: var(--light-accent-blue-france, #000091);
     }
 
-    .card-resource__body {
-      background-color: transparent;
+    .card-resource{
+      cursor: pointer;
+      &__body {
+        background-color: transparent;
+      }
     }
   }
 

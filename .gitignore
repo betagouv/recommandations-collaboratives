@@ -52,7 +52,3 @@ docker/docker-compose.local.yml
 scripts/*_local.py
 recoco/frontend/.env.*
 recoco/frontend/cypress/downloads
-
-# plugin
-recoco/frontend/src/js/plugins
-plugins

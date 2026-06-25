@@ -75,8 +75,7 @@
                         <div class="col">
                             <div class="card-resource card h-100 exploration-ia-co-reco"
                                  :class="{ 'exploration-ia-co-reco--selected': $store.explorationIA.isCoRecoSelected(resource.id) }"
-                                 @click="$store.explorationIA.toggleCoRecoSelection(resource.id)"
-                                 style="cursor: pointer">
+                                 @click="$store.explorationIA.toggleCoRecoSelection(resource.id)">
                                 <div class="card-resource__body fr-p-3v">
                                     <!-- Checkbox + Catégorie -->
                                     <div class="d-flex justify-content-between align-items-center fr-mb-2v">
@@ -100,9 +99,9 @@
                                     </div>
                                     <!-- Titre -->
                                     <div class="card-resource__title">
-                                        <a href="#"
+                                        <button class="fr-link"
                                            @click.prevent.stop="$store.explorationIA.openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'resource', label: 'co-reco' })"
-                                           x-text="$store.explorationIA.truncate(resource.title, 80)"></a>
+                                           x-text="$store.explorationIA.truncate(resource.title, 80)"></button>
                                     </div>
                                     <!-- Description -->
                                     <div class="card-resource__text"
@@ -154,8 +153,8 @@
                     :disabled="!$store.explorationIA.canProceedToNextPhase()"
                     class="fr-btn fr-btn--primary">
                 <span>
-                    <span class="fr-icon-draft-line fr-mr-1v"></span>
-                    Lancer la synthese
+                    <span class="fr-icon-draft-line fr-mr-1v" aria-hidden="true"></span>
+                    Lancer la synthèse
                 </span>
             </button>
         </div>

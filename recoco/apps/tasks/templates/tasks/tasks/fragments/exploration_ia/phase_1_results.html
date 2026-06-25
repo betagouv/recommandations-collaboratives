@@ -44,8 +44,7 @@
                                      :class="{ 'exploration-ia-chunk--with-source': item.chunk.sources && item.chunk.sources.length > 0, 'exploration-ia-chunk--selected': $store.explorationIA.isChunkSelected(item.index) }"
                                      @click="item.chunk.sources && item.chunk.sources.length > 0 ? $store.explorationIA.toggleChunkSelection(item.index) : null"
                                      @mouseenter="$store.explorationIA.highlightSources(item.chunk.sources)"
-                                     @mouseleave="$store.explorationIA.clearHighlight()"
-                                     :style="item.chunk.sources && item.chunk.sources.length > 0 ? 'cursor: pointer;' : ''">
+                                     @mouseleave="$store.explorationIA.clearHighlight()">
                                     <div class="d-flex align-items-start gap-3">
                                         <div class="exploration-ia-chunk__checkbox"
                                              x-show="item.chunk.sources && item.chunk.sources.length > 0">

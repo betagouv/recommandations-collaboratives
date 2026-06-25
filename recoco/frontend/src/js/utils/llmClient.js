@@ -8,12 +8,6 @@ import api, { askRecommendationsUrl, corecommendationsUrl } from './api';
  * Toutes les options peuvent être surchargées via le paramètre `opts`.
  */
 
-function buildUrl(baseUrl, params) {
-  const base = (baseUrl || '').replace(/\/$/, '');
-  const qs = params && params.toString() ? `?${params.toString()}` : '';
-  return `${base}${qs}`;
-}
-
 /**
  * Pose une question libre à la LLM avec un contexte facultatif.
  *
@@ -56,8 +50,6 @@ export async function askLLM(query, context = '', opts = {}) {
  * @param {number} [opts.projectId] - Id du projet courant
  * @param {AbortSignal} [opts.signal]
  * @returns {Promise<Array<{ resource_id: number, co_occurrence_score: number }>>}
- *   La liste des co-recommandations (peut être emballée dans
- *   { co_recommendations: [...] } selon la version de l'API — on normalise).
  * @throws {Error} Si la requête échoue.
  */
 export async function fetchCoRecommendations(resourceIds, opts = {}) {
@@ -66,7 +58,7 @@ export async function fetchCoRecommendations(resourceIds, opts = {}) {
   const params = new URLSearchParams();
   resourceIds.forEach((id) => params.append('resource_ids', id));
 
-  const url = buildUrl(corecommendationsUrl(opts.projectId), params);
+  const url = corecommendationsUrl(opts.projectId, params);
   try {
     const response = await api(url);
     return response.data.co_recommendations || response.data || [];

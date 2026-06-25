@@ -70,7 +70,7 @@
                            type="search"
                            id="exploration-search"
                            x-model="$store.explorationIA.searchQuery"
-                           @keydown.enter.prevent="$store.explorationIA.performSearch()"
+                           @keydown.enter="$store.explorationIA.performSearch()"
                            placeholder="Formulez votre besoin sur ce projet. Ex: Quelles aides puis-je avoir pour mettre en place un jardin partagé ?"
                            :disabled="$store.explorationIA.isLoading"
                            data-test-id="exploration-ia-search-input">
