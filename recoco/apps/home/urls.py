@@ -7,9 +7,11 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-05-26 15:54:25 CEST
 """
 
+from django.conf import settings
 from django.urls import path
 
 from . import views
+from .views import RequestLoginCodeNoStaffView
 
 urlpatterns = [
     path(
@@ -99,5 +101,16 @@ urlpatterns = [
     ),
     path(r"site/create", views.SiteCreateView.as_view(), name="site-create"),
 ]
+
+if settings.ACCOUNT_LOGIN_BY_CODE_ENABLED:
+    urlpatterns.extend(
+        [
+            path(
+                "login/code/",
+                RequestLoginCodeNoStaffView.as_view(),
+                name="account_request_login_code",
+            ),
+        ]
+    )
 
 # eof
