@@ -176,7 +176,7 @@ Parameters:
                             <li>
                                 <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
                                         @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}&content=${encodeURIComponent(markdownContent || '')}`)">
-                                    Recommandation vierge
+                                    Nouvelle recommandation
                                 </button>
                             </li>
                             {% flag "suggest_reco_btn" %}
@@ -186,11 +186,13 @@ Parameters:
                                     data-test-id="see-suggest-task-button">Ressources suggérées</a>
                                 </li>
                             {% endflag %}
-                            <li>
-                                <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                            {% flag "ia_exploration" %}
+                                <li>
+                                    <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
                                     class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
                                     data-test-id="see-suggest-task-button">Recommandations assistées par IA</a>
-                            </li>
+                                </li>
+                            {% endflag %}
                         </ul>
                 </div>
             {% endif %}
