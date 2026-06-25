@@ -1,7 +1,7 @@
 {% load gravatar %}
 {% load common_tags %}
 {% get_verbs as verbs %}
-<ul class="hide-ul-style fr-mt-1w {% if wrap %}{% else %}w-100{% endif %}">
+<ul class="hide-ul-style fr-mt-1w {% if not wrap %}w-100{% endif %}">
     {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
     {% for date_group in actions_by_date %}
         <li class="timeline__date">le {{ date_group.grouper }}</li>
