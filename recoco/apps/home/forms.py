@@ -88,7 +88,7 @@ class ContactForm(forms.Form):
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
     def __init__(self, *args, **kwargs):
-        user = kwargs["user"]
+        user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
         if user.is_authenticated:
             del self.fields["name"]

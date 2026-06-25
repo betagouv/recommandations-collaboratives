@@ -195,13 +195,13 @@ def contact(request):
             raise PermissionDenied(
                 "Le formulaire de contact n'est accessible qu'aux personnes authentifiées"
             )
-        form = ContactForm(request.user, request.POST)
+        form = ContactForm(request.POST, user=request.user)
         if form.is_valid():
             status = send_message_to_team(request, form.cleaned_data)
             notify_user_of_sending(request, status)
             return redirect(next_url)
     else:
-        form = ContactForm(request.user)
+        form = ContactForm(user=request.user)
     return render(request, "home/contact.html", locals())
 
 
