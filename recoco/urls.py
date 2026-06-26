@@ -13,7 +13,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
-from magicauth.urls import urlpatterns as magicauth_urls
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
@@ -49,7 +48,6 @@ urlpatterns = [
     path("", include(plugins_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
 urlpatterns.extend(onboarding_urls)
 urlpatterns.extend(projects_urls)

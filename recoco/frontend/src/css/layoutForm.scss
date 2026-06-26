@@ -1,0 +1,50 @@
+// Styles : layoutForm
+.layout-form {
+  &__container {
+    width: 50%;
+    margin: auto;
+  }
+
+  &__title {
+    color: var(--light-text-title-grey, #161616);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 3rem;
+  }
+  &__legend {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.75rem;
+  }
+
+  .form {
+    &__title {
+      color: var(--light-text-title-grey, #161616);
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 40px;
+      margin-bottom: 2rem;
+    }
+  }
+
+  &__container-form {
+    padding: 3rem 4rem;
+    margin-bottom: 2rem;
+    &--bg-blue {
+      background: var(--light-background-alt-blue-france, #f5f5fe);
+    }
+  }
+
+  &__container-fallback {
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    padding: 1.5rem;
+    margin-bottom: 4rem;
+    .content {
+      color: var(--light-text-default-grey, #3a3a3a);
+      font-size: 1.125rem;
+      font-weight: 400;
+      line-height: 1.75rem;
+    }
+  }
+}

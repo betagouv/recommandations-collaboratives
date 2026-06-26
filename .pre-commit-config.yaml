@@ -24,7 +24,6 @@ repos:
     rev: 0.9.21
     hooks:
       - id: uv-lock
-      - id: uv-export
 
   - repo: local
     hooks:
