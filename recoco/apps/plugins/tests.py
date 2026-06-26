@@ -178,15 +178,17 @@ class TestTenantPluginSchemaMiddleware:
 
 @pytest.mark.django_db
 def test_create_tenant_schema_signal(current_site):
+    from psycopg import sql
+
     with patch("django.db.connection.cursor") as mock_cursor:
         cursor_instance = mock_cursor.return_value.__enter__.return_value
 
-        # Saving SiteConfiguration with schema_name should trigger the signal
         baker.make(SiteConfiguration, site=current_site, schema_name="test_schema")
 
-        cursor_instance.execute.assert_called_with(
-            "CREATE SCHEMA IF NOT EXISTS test_schema"
+        expected = sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
+            sql.Identifier("test_schema")
         )
+        cursor_instance.execute.assert_called_with(expected)
 
 
 @pytest.mark.django_db
