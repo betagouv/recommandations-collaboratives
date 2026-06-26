@@ -41,14 +41,17 @@ class ResourceSpec(HookSpec):
     def resource_sidebar_panels(self, resource, request):
         """Return an HTML string to inject into the resource detail right sidebar.
 
+        The returned string MUST be wrapped with ``mark_safe()``; the framework
+        renders it without an additional ``|safe`` filter.
+
         Example:
             @hookimpl
             def resource_sidebar_panels(self, resource, request):
-                return render_to_string(
+                return mark_safe(render_to_string(
                     "plugin_giphy/resource_sidebar_panel.html",
                     {"resource": resource},
                     request=request,
-                )
+                ))
         """
 
 
@@ -59,14 +62,14 @@ class ConversationSpec(HookSpec):
         custom node types inline in the conversation message feed.
         The 'node' Alpine variable is in scope (from the x-for loop over element.nodes).
 
+        The returned string MUST be wrapped with ``mark_safe()``.
+
         Example:
             @hookimpl
             def conversation_message_node_html(self, request, project):
-                return '''
-                <template x-if="node.type == 'giphy'">
-                    <img :src="node.data.url" class="fr-responsive-img" />
-                </template>
-                '''
+                return mark_safe(render_to_string(
+                    "plugin_giphy/node_giphy.html", {}, request=request
+                ))
         """
 
     @hookspec
@@ -75,10 +78,12 @@ class ConversationSpec(HookSpec):
         message feed loop). Useful for page-level assets (e.g. <script> / vite_asset
         tags) and globally-mounted UI such as modals listening to window events.
 
+        The returned string MUST be wrapped with ``mark_safe()``.
+
         Example:
             @hookimpl
             def conversation_extra_html(self, request, project):
-                return render_to_string("plugin_giphy/conversation_extra.html")
+                return mark_safe(render_to_string("plugin_giphy/conversation_extra.html"))
         """
 
 
