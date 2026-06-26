@@ -14,6 +14,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db import connection
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from psycopg2 import sql
 
 from recoco import verbs
 from recoco.apps.home.models import SiteConfiguration, UserProfile
@@ -62,8 +63,11 @@ def create_tenant_schema(sender, instance, **kwargs):
     """Create a PGSql schema for plugins upon SiteConfiguration creation"""
     if instance.schema_name:
         with connection.cursor() as cursor:
-            # XXX: upgrade to a parametrized query to avoir security flaws?
-            cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {instance.schema_name}")
+            cursor.execute(
+                sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
+                    sql.Identifier(instance.schema_name)
+                )
+            )
 
 
 # eof
