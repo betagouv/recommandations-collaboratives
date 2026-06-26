@@ -14,7 +14,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db import connection
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from psycopg2 import sql
+from psycopg import sql
 
 from recoco import verbs
 from recoco.apps.home.models import SiteConfiguration, UserProfile
