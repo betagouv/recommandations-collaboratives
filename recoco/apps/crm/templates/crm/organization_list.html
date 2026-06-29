@@ -45,7 +45,7 @@
                         <template x-for="code in (allSelected ? [] : selectedCodes)" :key="code">
                             <input type="hidden" name="departments" :value="code">
                         </template>
-                        {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" show_count_label=True %}
+                        {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
                 </form>
                 {# Merge action (drives the table form below through the form= attribute) #}
