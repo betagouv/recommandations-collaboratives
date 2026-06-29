@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.db.models import Value
 from django.urls import reverse
 from model_bakery import baker
+from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import login
@@ -172,21 +173,19 @@ class TestTenantPluginSchemaMiddleware:
             middleware(request_mock)
 
             cursor_instance.execute.assert_called_once_with(
-                "SET search_path TO tenant_lyon, public"
+                SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
             )
 
 
 @pytest.mark.django_db
 def test_create_tenant_schema_signal(current_site):
-    from psycopg import sql
-
     with patch("django.db.connection.cursor") as mock_cursor:
         cursor_instance = mock_cursor.return_value.__enter__.return_value
 
         baker.make(SiteConfiguration, site=current_site, schema_name="test_schema")
 
-        expected = sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
-            sql.Identifier("test_schema")
+        expected = SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
+            Identifier("test_schema")
         )
         cursor_instance.execute.assert_called_with(expected)
 
@@ -215,8 +214,10 @@ def test_migrate_tenant_command_logic(current_site):
     with patch(
         "recoco.apps.plugins.management.commands.migrate_tenant.call_command"
     ) as mock_migrate:
-        with patch("django.db.connection.cursor") as mock_cursor:
-            cursor_instance = mock_cursor.return_value.__enter__.return_value
+        with patch(
+            "recoco.apps.plugins.management.commands.migrate_tenant.connection"
+        ) as mock_conn:
+            cursor_instance = mock_conn.cursor.return_value.__enter__.return_value
             # Return a truthy row so the schema-existence SELECT passes.
             cursor_instance.fetchone.return_value = (1,)
 
@@ -234,16 +235,18 @@ def test_migrate_tenant_command_logic(current_site):
             # Schema creation (CREATE SCHEMA) is handled by the post_save signal
             # on SiteConfiguration, not by this command.
             calls = [call[0][0] for call in cursor_instance.execute.call_args_list]
-            assert "SET search_path TO tenant_lyon" in calls
-            assert "SET search_path TO tenant_lyon, public" in calls
+            assert (
+                SQL("SET search_path TO {}").format(Identifier("tenant_lyon")) in calls
+            )
+            assert (
+                SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
+                in calls
+            )
             assert "SET search_path TO public" in calls
 
             # Ghost entries for core migrations must be inserted so Django
             # skips them in the plan and doesn't re-execute them in the tenant.
-            assert any(
-                isinstance(c, str) and "INSERT" in c and "django_migrations" in c
-                for c in calls
-            )
+            assert any("django_migrations" in repr(c) for c in calls)
 
             # Check migrate was called with the correct app
             mock_migrate.assert_called_with("migrate", "my_app", verbosity=1)
