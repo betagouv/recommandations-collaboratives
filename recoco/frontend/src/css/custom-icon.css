@@ -142,8 +142,3 @@
 .fr-icon-link::before {
   mask-image: url(../assets/link.svg);
 }
-
-.fr-icon-warning-fill::after,
-.fr-icon-warning-fill::before {
-  mask-image: url(../assets/warning-fill.svg);
-}
