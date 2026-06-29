@@ -30,10 +30,10 @@ Architecture Overview
 
 Three mechanisms work together:
 
-- **pluggy** — defines a formal hook contract between the core and plugins.
-- **PostgreSQL schemas** — each tenant gets an isolated schema for its plugin
+- **pluggy** - defines a formal hook contract between the core and plugins.
+- **PostgreSQL schemas** - each tenant gets an isolated schema for its plugin
   tables; the ``public`` schema holds shared core data.
-- **PluginURLResolver** — routes are only exposed to the tenant that has the
+- **PluginURLResolver** - routes are only exposed to the tenant that has the
   plugin enabled.
 
 
@@ -105,7 +105,7 @@ Defining a Hook Specification
 ==============================
 
 Hook specifications live in ``recoco/apps/plugins/hooks.py``.  They declare
-the *contract* — name, parameters, and return-value semantics — that every
+the *contract* - name, parameters, and return-value semantics - that every
 plugin implementation must follow.
 
 Each spec class is registered with the global plugin manager once in
@@ -167,7 +167,7 @@ Anatomy of a hookspec decorator
     Emit a warning whenever a plugin implements this hook.  Handy for
     deprecating a hook without removing it.
 
-Example — adding a new hookspec
+Example - adding a new hookspec
 ---------------------------------
 
 Suppose you want every enabled plugin to be able to inject extra context into
@@ -247,7 +247,7 @@ Available Hooks
 
 The core ships with several hook specification namespaces, defined in
 ``recoco/apps/plugins/hooks.py``. Each ``@hookspec``-decorated method has a
-full docstring with its return contract and an example — the list below is
+full docstring with its return contract and an example - the list below is
 a quick index.
 
 ``ProjectSpec``
@@ -271,7 +271,7 @@ a quick index.
     handling custom message node types in the conversation feed.
 
 ``conversation_extra_html(request, project)``
-    Return HTML injected once into the conversation page — page-level
+    Return HTML injected once into the conversation page - page-level
     assets (``<script>`` / ``{% vite_asset %}``) and globally-mounted UI
     such as modals.
 
@@ -345,7 +345,7 @@ Conversation Hooks & JS Integration
 ====================================
 
 The conversation feed (project detail → "Échanges") can be extended with
-custom message node types — for example, a plugin that lets users share a
+custom message node types - for example, a plugin that lets users share a
 GIF inline in the discussion.
 
 Two hooks work together on the Python side:
@@ -397,7 +397,7 @@ JS side: window events
 -----------------------
 
 The conversation feed communicates with plugin JS exclusively through
-``window`` ``CustomEvent``\ s — plugin bundles never need direct access to
+``window`` ``CustomEvent``\ s - plugin bundles never need direct access to
 the ``Conversations`` Alpine component.
 
 ``task:done`` *(dispatched by the core)*
@@ -409,7 +409,7 @@ the ``Conversations`` Alpine component.
           detail: { task, projectId, resourceId },
         }));
 
-    A plugin can listen for this to offer a follow-up action — e.g. "share
+    A plugin can listen for this to offer a follow-up action - e.g. "share
     a celebratory GIF for this task".
 
 ``plugin-message-create-request`` *(dispatched by a plugin)*
@@ -481,6 +481,152 @@ via foreign keys.
 .. code-block:: bash
 
     python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+
+
+Migration Mechanics
+===================
+
+Understanding how migrations are split between the public schema and tenant
+schemas is essential for anyone working on the plugin system or debugging
+migration issues.
+
+The contract
+------------
+
+There are two categories of migration:
+
+- **Core migrations** : all apps whose ``app_label`` does *not* start with
+  ``plugin_``.  These belong to the ``public`` schema and are applied by the
+  standard ``manage.py migrate`` command.
+- **Plugin migrations** : apps whose ``app_label`` starts with ``plugin_``.
+  These belong exclusively to the tenant schema for which the plugin is
+  enabled.
+
+The contract is enforced by ``TenantPluginRouter`` in
+``recoco/apps/plugins/routers.py``:
+
+.. code-block:: python
+
+    class TenantPluginRouter:
+        is_tenant_operation = False   # class-level flag, set by migrate_tenant
+
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
+            if app_label.startswith("plugin_"):
+                return self.is_tenant_operation   # only allowed in tenant mode
+            return not self.is_tenant_operation   # core only allowed in normal mode
+
+When ``is_tenant_operation`` is ``False`` (the default, i.e. a normal
+``migrate`` run):
+
+- Core migrations → **allowed** ✓
+- Plugin migrations → **blocked** ✗
+
+When ``is_tenant_operation`` is ``True`` (set by ``migrate_tenant``):
+
+- Core migrations → **blocked** ✗
+- Plugin migrations → **allowed** ✓
+
+How ``allow_migrate`` is enforced (per operation, not per migration)
+--------------------------------------------------------------------
+
+A critical implementation detail: Django's migration *executor* does **not**
+call ``allow_migrate`` before applying an individual migration.  It is called
+instead by each **operation** inside the migration : ``CreateModel``,
+``AddField``, ``RunSQL``, ``RunPython``, etc. immediately before executing
+any SQL.  If ``allow_migrate`` returns ``False`` the operation is silently
+skipped but the migration **is still recorded** in ``django_migrations``.
+
+This means that even if a core migration ends up in the tenant's execution
+plan (because it is a declared dependency of a plugin migration), its SQL
+will never touch the tenant schema. The tables of core models live in
+``public`` and are visible to the tenant via ``search_path`` : no copy is
+created per tenant.
+
+
+The ``django_migrations`` ghost-entry mechanism
+-----------------------------------------------
+
+Django's migration planner reads ``django_migrations`` to decide which
+migrations still need to run.  Without intervention, an empty tenant
+``django_migrations`` table would cause Django to include every core migration
+in the plan. Not to execute them (the per-operation guard prevents that) but
+to process them as no-ops, recording them one by one.  On a project with
+hundreds of migrations this produces hundreds of ``Applying auth.0001...``
+lines and a slow first run.
+
+``migrate_tenant`` solves this with a single INSERT before running any plugin
+migration:
+
+.. code-block:: sql
+
+    INSERT INTO "<schema>".django_migrations (app, name, applied)
+    SELECT app, name, applied
+    FROM public.django_migrations
+    WHERE app NOT LIKE 'plugin_%'
+      AND NOT EXISTS (
+        SELECT 1 FROM "<schema>".django_migrations existing
+        WHERE existing.app = public.django_migrations.app
+          AND existing.name = public.django_migrations.name
+      )
+
+These are called **ghost entries**: records copied from the public schema that
+tell Django "this core migration has already been accounted for : do not
+include it in the tenant plan."
+
+Why ghost entries are INSERT-only (no DELETE on rollback)
+---------------------------------------------------------
+
+A ghost entry for a core migration means *"do not re-apply this here"*.  That
+statement remains true even if the core migration is later rolled back in
+``public``.  The tenant never ran that migration's SQL; rolling it back in
+``public`` changes the shared schema (which the tenant sees through
+``search_path``), but it does not create any obligation for the tenant's
+``django_migrations`` bookkeeping.
+
+Deleting ghost entries on rollback would introduce a spurious inconsistency:
+``django_migrations`` would show a plugin migration as applied while its core
+dependency ghost was gone, causing ``check_consistent_history`` to raise
+``InconsistentMigrationHistory`` on the next run.
+
+Keeping stale ghosts avoids this problem and is semantically correct: the
+ghost just continues to say "don't try to run this core migration in the
+tenant", which is the right answer before and after any public rollback.
+
+``migrate_tenant`` execution flow
+----------------------------------
+
+Putting it all together, here is what happens when you run:
+
+.. code-block:: bash
+
+    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+
+1. **Validation** : ``SiteConfiguration`` with ``schema_name="tenant_paris"``
+   must exist; the PostgreSQL schema must be present (created by the
+   ``post_save`` signal on ``SiteConfiguration``).
+
+2. **Router flag** : ``TenantPluginRouter.is_tenant_operation = True``.
+   From this point on ``allow_migrate`` blocks core migrations and permits
+   plugin migrations.
+
+3. **Create** ``django_migrations`` **in tenant** : ``search_path`` is
+   temporarily set to *only* the tenant schema so that
+   ``MigrationRecorder.ensure_schema()`` creates the table there rather than
+   picking up ``public.django_migrations``.
+
+4. **Ghost entry sync** : the INSERT above copies all unapplied core migration
+   records from ``public.django_migrations`` into the tenant table.  Any core
+   migration already present (from a previous run) is left untouched.
+
+5. **Run plugin migrations** : ``search_path`` is restored to
+   ``tenant_paris, public`` and ``call_command("migrate", "plugin_giphy")``
+   is called.  Django sees all core migrations as applied (from the ghost
+   entries) and only executes the plugin's own unapplied migrations.  Tables
+   created by plugin migrations land in ``tenant_paris``; ForeignKeys to core
+   models resolve through ``public`` via ``search_path``.
+
+6. **Cleanup** : ``is_tenant_operation`` is reset to ``False`` and
+   ``search_path`` is reset to ``public`` in a ``finally`` block.
 
 
 URL Routing
@@ -623,7 +769,7 @@ global ``urlpatterns``.  The resulting endpoint is served under ``/api/``:
 Frontend (Vite / Alpine)
 ========================
 
-Plugins can ship their own JavaScript — including npm dependencies — without
+Plugins can ship their own JavaScript - including npm dependencies - without
 modifying the core frontend's ``package.json`` or ``vite.config.js``.
 
 Plugin package layout
@@ -713,7 +859,7 @@ This command:
 1. Discovers all installed plugins that declare ``vite_entries`` on their
    plugin class (matching the keys in ``package.json`` ``recocoPlugin.viteEntries``).
 2. Writes a thin proxy file for each entry into
-   ``recoco/frontend/src/js/plugins/`` — e.g.
+   ``recoco/frontend/src/js/plugins/`` - e.g.
    ``src/js/plugins/giphySearch.js`` containing::
 
        import '/abs/path/to/plugin_giphy/js/giphySearch.js';
@@ -725,7 +871,7 @@ Both generated artefacts are gitignored; they must be regenerated whenever a
 plugin is installed or removed.
 
 The core ``vite.config.js`` reads ``plugin-entries.json`` at build time and
-adds the proxy files as named Vite inputs automatically — no manual edits
+adds the proxy files as named Vite inputs automatically - no manual edits
 required.
 
 Loading the bundle in a template
