@@ -45,13 +45,13 @@
                     </div>
                     <div class="fr-mt-2w d-flex align-items-center flex-wrap">
                         <span class="fr-text--sm fr-mr-2w fr-mb-0">Suggestions :</span>
-                        <ul class="fr-tags-group fr-mb-0" @click.capture="selectOrganization($event)">
+                        <ul class="fr-tags-group fr-mb-0">
                             {% for organization in organizations %}
                                 <li>
                                     <button type="button"
                                             class="fr-tag"
-                                            data-org-name="{{ organization.name }}"
-                                            :aria-pressed="name === '{{ organization.name|escapejs }}'">
+                                            :aria-pressed="name === '{{ organization.name|escapejs }}'"
+                                            @click.capture="selectOrganization('{{ organization.name }}')">
                                         {{ organization.name }}
                                     </button>
                                 </li>
