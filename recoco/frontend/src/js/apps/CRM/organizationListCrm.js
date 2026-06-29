@@ -3,3 +3,4 @@ import '../../../css/crm/organizationList.scss';
 
 import '../../components/DepartmentsSelector.js';
 import '../../components/DepartmentsFilterWrapper.js';
+import '../../components/OrgMergeSelection.js';

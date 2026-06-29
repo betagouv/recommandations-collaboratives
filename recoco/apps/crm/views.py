@@ -401,6 +401,9 @@ def organization_list(request):
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
+    # consumed once after a merge to clear the persisted org selection client-side
+    just_merged = request.session.pop("org_merge_done", False)
+
     return render(request, "crm/organization_list.html", locals())
 
 
@@ -442,6 +445,8 @@ def organization_merge(request):
             update_contacts(orgs)
             update_profiles(orgs)
             merge_organizations_with_name(orgs, name)
+        # one-shot flag telling the list page to clear the persisted selection
+        request.session["org_merge_done"] = True
         return redirect(reverse("crm-organization-list"))
 
     merge_form = forms.CRMOrganizationMergeForm(request.GET)
