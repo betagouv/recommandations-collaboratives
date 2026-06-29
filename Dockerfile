@@ -7,9 +7,9 @@ RUN apt-get update && \
 
 WORKDIR /piptmp
 
-COPY requirements.txt requirements-dev.txt ./
+COPY pyproject.toml ./
 
-RUN pip install -r requirements.txt -r requirements-dev.txt
+RUN uv sync --no-dev
 
 WORKDIR /workspace
 

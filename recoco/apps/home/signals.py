@@ -11,11 +11,13 @@ from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models.signals import pre_save
+from django.db import connection
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from psycopg import sql
 
 from recoco import verbs
-from recoco.apps.home.models import UserProfile
+from recoco.apps.home.models import SiteConfiguration, UserProfile
 from recoco.apps.projects.utils import refresh_user_projects_in_session
 
 
@@ -54,6 +56,18 @@ def watch_organisation_to_understand_mystery(instance: UserProfile, **kwargs):
         )
         sentry_sdk.capture_exception(Exception(text))
         print(text)
+
+
+@receiver(post_save, sender=SiteConfiguration)
+def create_tenant_schema(sender, instance, **kwargs):
+    """Create a PGSql schema for plugins upon SiteConfiguration creation"""
+    if instance.schema_name:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
+                    sql.Identifier(instance.schema_name)
+                )
+            )
 
 
 # eof

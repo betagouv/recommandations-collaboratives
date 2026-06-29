@@ -1,10 +1,11 @@
 import pytest
+from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
-from magicauth import models as magicauth_models
 from model_bakery import baker
 from sesame.utils import get_query_string
 
+from conftest import setup_sesame_cookie
 from recoco.utils import login
 
 
@@ -32,27 +33,19 @@ def test_allauth_signin_should_be_logged(request, client):
 
 
 @pytest.mark.django_db
-def test_magicauth_signin_should_be_logged(request, client):
-    user = baker.make(auth_models.User)
-    assert user.actor_actions.count() == 0
-    token = baker.make(magicauth_models.MagicToken, user=user)
-
-    url = reverse("magicauth-validate-token", args=[token.key])
-    response = client.get(url)
-
-    assert response.status_code == 302
-    assert user.actor_actions.count() == 1
-
-
-@pytest.mark.django_db
 def test_sesame_signin_should_be_logged(request, client):
     user = baker.make(auth_models.User)
+
+    setup_sesame_cookie(client, user)
+
     assert user.actor_actions.count() == 0
     query = get_query_string(user)
 
     url = reverse("home") + query
     response = client.get(url)
 
+    authenticated_user = get_user(client)
+    assert authenticated_user == user
     assert response.status_code == 302
     assert user.actor_actions.count() == 1
 

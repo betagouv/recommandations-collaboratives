@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}
+    Vous ne pouvez pas accéder à cette page
+{% endblock title %}
+{% block og_title %}
+    Vous ne pouvez pas accéder à cette page
+{% endblock og_title %}
+{% block content %}
+    {% include "home/fragments/content_403.html" with title_text="Oh non ! Vous ne pouvez pas voir cette page." technical_info_text="Si l’équipe technique vous demande, c’est une erreur 403." %}
+{% endblock content %}

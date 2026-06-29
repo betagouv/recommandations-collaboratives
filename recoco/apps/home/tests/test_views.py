@@ -9,13 +9,11 @@ created: 2021-08-17 12:33:33 CEST
 
 import django.core.mail
 import pytest
-from django import forms
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
-from django.db.utils import IntegrityError
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
@@ -27,7 +25,7 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
 from recoco.utils import login
 
-from .. import adapters, models, utils
+from .. import models, utils
 
 
 @pytest.mark.django_db
@@ -194,55 +192,6 @@ def test_create_user_assign_current_site_via_allauth(client, request):
     assert site in user.profile.organization.sites.all()
 
 
-#################################################
-# create new user hook for magicauth
-#################################################
-@pytest.mark.django_db
-def test_create_user_assign_current_site_via_magicauth(client, request):
-    site = get_current_site(request)
-    data = {
-        "email": "kkkd@kdkdk.fr",
-    }
-    response = client.post(reverse("magicauth-login"), data)
-    assert response.status_code == 302
-
-    user = auth_models.User.objects.get(email=data["email"])
-
-    assert len(user.profile.sites.all()) == 1
-    assert site in user.profile.sites.all()
-
-
-@pytest.mark.django_db
-def test_create_user_with_proper_email(request):
-    adapter = adapters.UVMagicauthAdapter()
-    email = "new.user@example.com"
-    adapter.email_unknown_callback(request, email, None)
-
-    user = auth_models.User.objects.get(email=email)
-
-    assert user.email == email
-    assert user.username == email
-    assert user.profile
-
-
-@pytest.mark.django_db
-def test_create_user_fails_with_missing_email(request):
-    adapter = adapters.UVMagicauthAdapter()
-    email = None
-    with pytest.raises(forms.ValidationError):
-        adapter.email_unknown_callback(request, email, None)
-
-
-@pytest.mark.django_db
-def test_create_user_fails_for_known_email(request):
-    adapter = adapters.UVMagicauthAdapter()
-    email = "known.user@example.com"
-    baker.make(auth_models.User, username=email)
-    with pytest.raises(IntegrityError):
-        adapter.email_unknown_callback(request, email, None)
-
-
-#
 # seding message to team
 
 
@@ -640,6 +589,19 @@ def test_make_new_site(client):
         "new_example_com_admin",
     ):
         assert auth_models.Group.objects.get(name=name)
+
+
+@pytest.mark.django_db
+def test_403_sesame_other_user(client, current_site, project_ready):
+    sesame_user = baker.make(auth_models.User)
+    project_ready.members.add(sesame_user)
+    url = reverse("projects-project-detail-overview", args=[project_ready.pk])
+    with login(client) as logged_in_user:
+        response = client.get(url)
+        assert response.status_code == 403
+        assert logged_in_user.email in str(
+            response.content
+        )  # no assertContains because it requires a success status_code
 
 
 # eof
