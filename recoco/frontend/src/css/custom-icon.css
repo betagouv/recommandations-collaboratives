@@ -192,3 +192,8 @@
 .fr-icon-fingerprint::before {
   mask-image: url(../assets/fingerprint.svg);
 }
+
+.fr-icon-check-line::after,
+.fr-icon-check-line::before {
+  mask-image: url(../assets/check-line.svg);
+}

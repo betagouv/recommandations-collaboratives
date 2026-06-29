@@ -33,7 +33,6 @@ dependencies = [
     "django-htmx>=1.22.0",
     "django-json-widget==2.0.1",
     "django-leaflet>=0.31.0",
-    "django-magicauth",
     "django-markdownx==4.0.7",
     "django-model-info>=2024.11.5",
     "django-multisite2>=2.0.1",
@@ -69,6 +68,7 @@ dependencies = [
     "nh3>=0.3.4",
     "pandoc==2.4",
     "pillow==12.2.0",
+    "pluggy>=1.6.0",
     "psycopg[c]>=3.2.12",
     "puremagic>=1.30",
     "redis==5.0.4",
@@ -205,11 +205,10 @@ section-order = [
 check-typed-exception = true
 
 [tool.uv.sources]
-django-magicauth = { git = "https://github.com/glibersat/django-magicauth", rev = "55eab0b91c95012944933b342748540b2c1b31bf" }
 django-notifications-hq = { git = "https://github.com/glibersat/django-notifications.git", rev = "feature/sites-framework-dj5" }
 django-activity-stream = { git = "https://github.com/glibersat/django-activity-stream.git", rev = "django4" }
 django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git", rev = "master" }
-django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "master" }
+django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "1ddd4717d35dc882eed1f1b1bee6970f5755ae03" }
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
@@ -257,7 +256,7 @@ dev = [
     "sphinx-toolbox>=3.8.2",
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
-    "uv>=0.11.15",
+    "uv>=0.11.19",
 ]
 
 
