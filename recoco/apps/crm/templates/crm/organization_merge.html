@@ -19,7 +19,7 @@
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div x-data="Crm" class="d-flex fr-px-0">
         <div class="w-100 d-flex flex-column justify-content-start fr-px-5w fr-pb-5w">
-            <form x-data="OrganizationMerge({ initialName: '{{ organizations.0.name|escapejs }}' })"
+            <form x-data="{ name: '{{ merge_form.name.value|default:organizations.0.name|escapejs }}' }"
                   method="post"
                   action="{% url 'crm-organization-merge' %}">
                 {% csrf_token %}
@@ -45,12 +45,12 @@
                     </div>
                     <div class="fr-mt-2w d-flex align-items-center flex-wrap">
                         <span class="fr-text--sm fr-mr-2w fr-mb-0">Suggestions :</span>
-                        <ul class="fr-tags-group fr-mb-0" @click.capture="selectOrganization($event)">
+                        <ul class="fr-tags-group fr-mb-0">
                             {% for organization in organizations %}
                                 <li>
                                     <button type="button"
                                             class="fr-tag"
-                                            data-org-name="{{ organization.name }}"
+                                            @click="name = '{{ organization.name|escapejs }}'"
                                             :aria-pressed="name === '{{ organization.name|escapejs }}'">
                                         {{ organization.name }}
                                     </button>
