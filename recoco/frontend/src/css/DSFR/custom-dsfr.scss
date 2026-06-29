@@ -93,7 +93,7 @@ p a {
 
 .normal-link-style {
   text-decoration: underline;
-  color: #0000ee;
+  color: var(--light-decisions-text-text-action-high-blue-france, #000091) !important;
 }
 
 p {
@@ -129,6 +129,18 @@ p {
   overflow: auto;
 }
 
+/* ¯¯¯ *\
+  LINK
+\* ˍˍˍ */
+.fr-link {
+  --text-spacing: 0;
+  --title-spacing: 0;
+  color: var(--text-action-high-blue-france);
+  display: inline;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0;
+}
 /* ¯¯¯ *\
   LISTS
 \* ˍˍˍ */

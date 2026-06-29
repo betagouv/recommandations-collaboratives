@@ -53,3 +53,5 @@ docker/docker-compose.local.yml
 scripts/*_local.py
 recoco/frontend/.env.*
 recoco/frontend/cypress/downloads
+recoco/frontend/plugin-entries.json
+recoco/frontend/src/js/plugins/

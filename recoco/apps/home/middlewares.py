@@ -52,7 +52,7 @@ class PreviousActivityMiddleware:
         ):
             try:
                 # update() rather than save() so that signals are not sent
-                UserProfile.objects.filter(pk=request.user.pk).update(
+                UserProfile.objects.filter(user_id=request.user.pk).update(
                     previous_activity_at=now,
                     previous_activity_site=request.site,
                 )
