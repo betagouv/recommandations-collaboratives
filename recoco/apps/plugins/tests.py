@@ -206,34 +206,46 @@ def test_create_tenant_schema_signal_no_schema_name(current_site):
 
 # --- MANAGEMENT COMMAND--#
 @pytest.mark.django_db
-def test_migrate_tenant_command_logic():
-    # We mock migrate call_command and connection.cursor
+def test_migrate_tenant_command_logic(current_site):
+    # SiteConfiguration must exist before calling the command.
+    # Created outside the cursor mock so the post_save signal (CREATE SCHEMA)
+    # does not pollute the cursor call assertions below.
+    baker.make(SiteConfiguration, site=current_site, schema_name="tenant_lyon")
+
     with patch(
         "recoco.apps.plugins.management.commands.migrate_tenant.call_command"
     ) as mock_migrate:
         with patch("django.db.connection.cursor") as mock_cursor:
             cursor_instance = mock_cursor.return_value.__enter__.return_value
+            # Return a truthy row so the schema-existence SELECT passes.
+            cursor_instance.fetchone.return_value = (1,)
 
             assert TenantPluginRouter.is_tenant_operation is False
 
             call_command("migrate_tenant", "--schema", "tenant_lyon", "my_app")
 
-            # Check router was enabled during execution (we check it's back to False)
+            # Check router flag is back to False after execution
             assert TenantPluginRouter.is_tenant_operation is False
 
-            # Check search_path was set
-            # The order of calls should be:
-            # 1- CREATE SCHEMA
-            # 2- SET search_path TO tenant_lyon, public
-            #  (migration)
-            # 3- SET search_path TO public
-
+            # migrate_tenant sets search_path in three steps:
+            # 1. SET search_path TO tenant_lyon        (before ensure_schema)
+            # 2. SET search_path TO tenant_lyon, public (after core-migration copy)
+            # 3. SET search_path TO public             (finally)
+            # Schema creation (CREATE SCHEMA) is handled by the post_save signal
+            # on SiteConfiguration, not by this command.
             calls = [call[0][0] for call in cursor_instance.execute.call_args_list]
-            assert "CREATE SCHEMA IF NOT EXISTS tenant_lyon" in calls
+            assert "SET search_path TO tenant_lyon" in calls
             assert "SET search_path TO tenant_lyon, public" in calls
             assert "SET search_path TO public" in calls
 
-            # Check migrate was called with correct app
+            # Ghost entries for core migrations must be inserted so Django
+            # skips them in the plan and doesn't re-execute them in the tenant.
+            assert any(
+                isinstance(c, str) and "INSERT" in c and "django_migrations" in c
+                for c in calls
+            )
+
+            # Check migrate was called with the correct app
             mock_migrate.assert_called_with("migrate", "my_app", verbosity=1)
 
 
