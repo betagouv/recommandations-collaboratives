@@ -1,7 +1,7 @@
 {% load static %}
 {% load waffle_tags %}
 <div class="btn-group" role="group" aria-label="Admin actions">
-    {% flag not "disable_submit_new_project" %}
+    {% flag "enable_submit_new_project" %}
         {% if is_switchtender %}
             <a class="fr-btn fr-btn--sm fr-mr-1v text-nowrap"
             href="{% url 'onboarding-prefill-set-user' %}"
