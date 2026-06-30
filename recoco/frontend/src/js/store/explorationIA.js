@@ -5,16 +5,16 @@ import { askLLM, fetchCoRecommendations } from '../utils/llmClient';
 import { ToastType } from '../models/toastType';
 
 /**
- * Store global de la page d'exploration assistée par IA.
+ * Global store for the AI-assisted exploration page.
  *
- * Porte tout l'état partagé entre les phases (1: recherche, 2: co-recos,
- * 3: synthèse) et les modales, ainsi que la logique métier (appels LLM,
- * synthèse, navigation entre phases).
+ * Holds all the state shared between the phases (1: search, 2: co-recos,
+ * 3: synthesis) and the modals, as well as the business logic (LLM calls,
+ * synthesis, navigation between phases).
  *
  * @store explorationIA
  */
 Alpine.store('explorationIA', {
-  // === CONFIGURATION (injectée par le composant orchestrateur via setup()) ===
+  // === CONFIGURATION (injected by the orchestrator component via setup()) ===
   projectId: null,
   projectContext: '',
   isEditingContext: false,
@@ -22,7 +22,7 @@ Alpine.store('explorationIA', {
   // === PHASES ===
   currentPhase: 1,
 
-  // === RECHERCHE (Phase 1) ===
+  // === SEARCH (Phase 1) ===
   searchQuery: '',
   isLoading: false,
   error: null,
@@ -39,7 +39,7 @@ Alpine.store('explorationIA', {
   selectedCitationsForStep2: [],
   selectedCoRecoIds: [],
 
-  // === MODALE RESSOURCE ===
+  // === RESOURCE MODAL ===
   resourceModal: {
     isOpen: false,
     isLoading: false,
@@ -50,8 +50,8 @@ Alpine.store('explorationIA', {
   },
 
   /**
-   * Initialise le store avec la configuration fournie par Django.
-   * Appelé par le composant orchestrateur dans son init().
+   * Initializes the store with the configuration provided by Django.
+   * Called by the orchestrator component in its init().
    */
   setup(config = {}) {
     this.projectId = config.projectId ?? null;
@@ -59,7 +59,7 @@ Alpine.store('explorationIA', {
   },
 
   // ============================================================
-  // PHASE 1 : RECHERCHE
+  // PHASE 1: SEARCH
   // ============================================================
 
   async performSearch() {
@@ -79,9 +79,9 @@ Alpine.store('explorationIA', {
         Département: this.projectContext.department || '',
         Région: this.projectContext.region || '',
         'Demande initiale': this.projectContext.description,
-        'Thématiques identifiées': this.projectContext.tags
+        'Thématiques identifiées': this.projectContext ? this.projectContext.tags
           .map((x) => x.name)
-          .join(', '),
+          .join(', ') : '',
       };
       const data = await askLLM(
         this.searchQuery.trim(),
@@ -108,7 +108,7 @@ Alpine.store('explorationIA', {
     }
   },
 
-  // === Gestion des chunks ===
+  // === Chunk management ===
   toggleChunkSelection(index) {
     const chunk = this.answerChunks[index];
     if (!chunk || !chunk.sources || chunk.sources.length === 0) return;
@@ -151,8 +151,8 @@ Alpine.store('explorationIA', {
   },
 
   /**
-   * Invalide les données de l'étape 2 lorsqu'on modifie la sélection de l'étape 1,
-   * pour éviter une incohérence entre les ressources retenues et les co-recommandations.
+   * Invalidates the step 2 data when the step 1 selection is modified,
+   * to avoid an inconsistency between the retained resources and the co-recommendations.
    */
   invalidatePhase2State() {
     this.coRecommendations = [];
@@ -160,7 +160,7 @@ Alpine.store('explorationIA', {
     this.selectedCoRecoIds = [];
   },
 
-  // === Survol des sources ===
+  // === Source hovering ===
   highlightSources(sources) {
     this.hoveredSources = sources || [];
   },
@@ -180,7 +180,7 @@ Alpine.store('explorationIA', {
     });
   },
 
-  // === Getters de présentation pour la phase 1 ===
+  // === Presentation getters for phase 1 ===
   get groupedAnswerChunks() {
     const groups = [];
     this.answerChunks.forEach((chunk, index) => {
@@ -237,7 +237,7 @@ Alpine.store('explorationIA', {
   },
 
   // ============================================================
-  // PHASE 2 : CO-RECOMMANDATIONS
+  // PHASE 2: CO-RECOMMENDATIONS
   // ============================================================
 
   getSelectedResourceIds() {
@@ -308,7 +308,7 @@ Alpine.store('explorationIA', {
     return citations;
   },
 
-  // Appels Django internes (auth session) — gardés dans le store, pas dans llmClient.
+  // Internal Django calls (session auth) — kept in the store, not in llmClient.
   async fetchResourceFromApi(resourceId) {
     try {
       const response = await fetch(`/api/resources/${resourceId}/`, {
@@ -318,7 +318,7 @@ Alpine.store('explorationIA', {
       });
       if (!response.ok) {
         console.warn(
-          `Impossible de récupérer la ressource ${resourceId}:`,
+          `Error while fetching resource : `,
           response.status
         );
         return null;
@@ -342,7 +342,7 @@ Alpine.store('explorationIA', {
       );
       if (!response.ok) {
         console.warn(
-          `Impossible de récupérer la recommandation ${recoId}:`,
+          `Unable to fetch recommendation ${recoId}:`,
           response.status
         );
         return null;
@@ -482,11 +482,11 @@ Alpine.store('explorationIA', {
   },
 
   // ============================================================
-  // PHASE 3 : SYNTHÈSE
+  // PHASE 3: SYNTHESIS
   // ============================================================
 
   /**
-   * Combine toutes les ressources sélectionnées (étapes 1 et 2) pour la synthèse.
+   * Combines all the selected resources (steps 1 and 2) for the synthesis.
    */
   getAllSelectedResources() {
     const all = [];
@@ -521,7 +521,7 @@ Alpine.store('explorationIA', {
   },
 
   // ============================================================
-  // NAVIGATION ENTRE PHASES
+  // NAVIGATION BETWEEN PHASES
   // ============================================================
 
   canProceedToNextPhase() {
@@ -546,8 +546,8 @@ Alpine.store('explorationIA', {
   },
 
   /**
-   * Réinitialise toute l'exploration (utilisé par le bouton "Nouvelle exploration"
-   * et "Recommencer"). Conserve la configuration (projectId, projectContext).
+   * Resets the whole exploration (used by the "New exploration"
+   * and "Restart" buttons). Keeps the configuration (projectId, projectContext).
    */
   resetExploration() {
     this.currentPhase = 1;
@@ -573,13 +573,13 @@ Alpine.store('explorationIA', {
     this.error = null;
   },
 
-  // === Contexte du projet ===
+  // === Project context ===
   toggleEditContext() {
     this.isEditingContext = !this.isEditingContext;
   },
 
   // ============================================================
-  // MODALE RESSOURCE
+  // RESOURCE MODAL
   // ============================================================
 
   async openResourceModal(citation) {
@@ -644,7 +644,7 @@ Alpine.store('explorationIA', {
   },
 
   // ============================================================
-  // UTILITAIRES PARTAGÉS
+  // SHARED UTILITIES
   // ============================================================
 
   parseMarkdown(text) {
