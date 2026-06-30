@@ -17,7 +17,6 @@ Alpine.store('explorationIA', {
   // === CONFIGURATION (injectée par le composant orchestrateur via setup()) ===
   projectId: null,
   projectContext: '',
-  projectContextDisplayed: '',
   isEditingContext: false,
 
   // === PHASES ===
@@ -57,9 +56,6 @@ Alpine.store('explorationIA', {
   setup(config = {}) {
     this.projectId = config.projectId ?? null;
     this.projectContext = config.projectContext || '';
-    this.projectContextDisplayed = Object.entries(config.projectContext)
-      .map((x) => x[1])
-      .join('. ');
   },
 
   // ============================================================
