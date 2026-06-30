@@ -2,6 +2,7 @@ import Alpine from 'alpinejs';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { askLLM, fetchCoRecommendations } from '../utils/llmClient';
+import api, { resourceUrl, taskUrl } from '../utils/api';
 import { ToastType } from '../models/toastType';
 
 /**
@@ -311,19 +312,8 @@ Alpine.store('explorationIA', {
   // Internal Django calls (session auth) — kept in the store, not in llmClient.
   async fetchResourceFromApi(resourceId) {
     try {
-      const response = await fetch(`/api/resources/${resourceId}/`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-      });
-      if (!response.ok) {
-        console.warn(
-          `Error while fetching resource : `,
-          response.status
-        );
-        return null;
-      }
-      return await response.json();
+      const response = await api.get(resourceUrl(resourceId));
+      return response.data;
     } catch (err) {
       console.error('Erreur lors de la récupération de la ressource:', err);
       return null;
@@ -332,22 +322,8 @@ Alpine.store('explorationIA', {
 
   async fetchRecommendationDetails(projectId, recoId) {
     try {
-      const response = await fetch(
-        `/api/projects/${projectId}/tasks/${recoId}/`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
-        }
-      );
-      if (!response.ok) {
-        console.warn(
-          `Unable to fetch recommendation ${recoId}:`,
-          response.status
-        );
-        return null;
-      }
-      return await response.json();
+      const response = await api.get(taskUrl(projectId, recoId));
+      return response.data;
     } catch (err) {
       console.error(
         'Erreur lors de la récupération de la recommandation:',
