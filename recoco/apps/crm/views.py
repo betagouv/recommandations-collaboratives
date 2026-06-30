@@ -603,6 +603,7 @@ def user_list(request):
                 Group.objects.filter(name=admin_group_name, user=OuterRef("pk"))
             ),
         )
+        .order_by("-date_joined")
     )
 
     users = filters.UserFilter(request.GET, queryset=base_qs)
