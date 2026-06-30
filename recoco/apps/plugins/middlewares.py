@@ -2,6 +2,7 @@
 
 from django.db import connection
 from django.http import HttpRequest
+from psycopg.sql import SQL, Identifier
 
 from .resolvers import set_enabled_plugins
 
@@ -25,8 +26,9 @@ class TenantPluginSchemaMiddleware:
 
             schema = request.site_config.schema_name
             with connection.cursor() as cursor:
-                # XXX schema_name is a SlugField, so it should be safe from injection
-                cursor.execute(f"SET search_path TO {schema}, public")
+                cursor.execute(
+                    SQL("SET search_path TO {}, public").format(Identifier(schema))
+                )
         else:
             set_enabled_plugins([])
 
