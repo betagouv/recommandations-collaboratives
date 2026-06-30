@@ -7,6 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-05-31 10:11:56 CEST
 """
 
+import re
+
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
@@ -16,7 +18,6 @@ from django.db import transaction
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
@@ -81,7 +82,11 @@ def test_private_document_is_displayed_in_project_documents_page_for_advisor(
         )
 
         assert response.status_code == 200
-        assertContains(response, "private-project-document.txt")
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            > 0
+        )
 
 
 @pytest.mark.django_db
@@ -111,7 +116,11 @@ def test_private_document_is_not_displayed_in_project_documents_page_for_collabo
         )
 
         assert response.status_code == 200
-        assertNotContains(response, "private-project-document.txt")
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            == 0
+        )
 
 
 @pytest.mark.django_db
@@ -139,7 +148,11 @@ def test_private_document_is_given_for_conversations_panel_for_advisor(
         )
 
         assert response.status_code == 200
-        assertContains(response, "private-project-document.txt")
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            > 0
+        )
 
 
 @pytest.mark.django_db
@@ -171,7 +184,11 @@ def test_private_document_is_not_given_for_conversations_panel_for_collaborators
         )
 
         assert response.status_code == 200
-        assertNotContains(response, "private-project-document.txt")
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            == 0
+        )
 
 
 @pytest.mark.django_db

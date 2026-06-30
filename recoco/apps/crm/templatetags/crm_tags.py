@@ -10,13 +10,54 @@ created: 2021-06-29 11:30:42 CEST
 from django import template
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.crm.models import Note
+from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.apps.projects.models import Project
 
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def crm_plugin_tabs(context, min_index, max_index):
+    """Return plugin-defined CRM navigation tabs to render between two builtin tabs.
+
+    Plugins register tabs via the ``crm_navigation_tabs`` hook, each returning a
+    dict with an ``index`` (see CrmSpec.crm_navigation_tabs for the full dict
+    shape). Builtin CRM tabs occupy indexes 0, 10, 20, 30, 40, 50 (Accueil,
+    Dossiers, Utilisateurs, Organisations, Ressources, Paramètres). This tag is
+    called once between each pair of adjacent builtin tabs, with min_index and
+    max_index set to their respective indexes, and returns only the plugin tabs
+    whose index falls strictly in that (min_index, max_index) range, sorted by
+    index. This lets a plugin position its tab anywhere in the navigation by
+    picking an index between the two builtin tabs it should appear between
+    (e.g. index=25 to insert between Utilisateurs and Organisations).
+
+    Tabs whose url_name cannot be reversed (e.g. the owning plugin is disabled
+    on the current tenant) are silently dropped.
+
+    Example template usage, inserting plugin tabs between Dossiers (10) and
+    Utilisateurs (20):
+
+        {% crm_plugin_tabs 10 20 as plugin_tabs %}
+        {% for tab in plugin_tabs %}
+            ...
+        {% endfor %}
+    """
+    request = context.get("request")
+    if request is None:
+        return []
+    tabs = []
+    for tab in get_tenant_hook(request).hook.crm_navigation_tabs(request=request):
+        if min_index < tab["index"] < max_index:
+            try:
+                tab = {**tab, "url": reverse(tab["url_name"])}
+            except NoReverseMatch:
+                continue
+            tabs.append(tab)
+    return sorted(tabs, key=lambda t: t["index"])
 
 
 @register.simple_tag

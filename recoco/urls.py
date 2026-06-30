@@ -13,7 +13,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
-from magicauth.urls import urlpatterns as magicauth_urls
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
@@ -24,6 +23,7 @@ from recoco.apps.hitcount.urls import urlpatterns as hitcount_urls
 from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
+from recoco.apps.plugins.urls import urlpatterns as plugins_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
 from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.survey.urls import urlpatterns as survey_urls
@@ -45,9 +45,9 @@ urlpatterns = [
     path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("p/", include(wagtail_urls)),
+    path("", include(plugins_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
 urlpatterns.extend(onboarding_urls)
 urlpatterns.extend(projects_urls)

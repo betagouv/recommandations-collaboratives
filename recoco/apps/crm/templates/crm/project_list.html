@@ -57,6 +57,7 @@
                         <col class="col--large">
                         <col class="col--medium">
                         <col class="col--medium">
+                        {% for col in plugin_columns %}<col class="{{ col.col_class|default:'col--medium' }}">{% endfor %}
                         <col class="col--small col--fixed-180">
                     </colgroup>
                     <thead class="project-table__thead">
@@ -66,6 +67,7 @@
                             <th scope="col">Localisation</th>
                             <th scope="col">Date de dépôt</th>
                             <th scope="col">Statut</th>
+                            {% for col in plugin_columns %}<th scope="col">{{ col.header }}</th>{% endfor %}
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -93,11 +95,12 @@
                                 <td x-text="`${project?.commune?.name} (${project?.commune?.postal})`"></td>
                                 <td x-text="new Date(project?.created_on).toLocaleDateString('fr-FR')"></td>
                                 <td class="project-table__status">
-                                    <span x-text="projectStatusLabel(project.status)"
+                                    <span x-text="ProjectStatus[project.status].text"
                                           class="fr-badge fr-badge--no-icon"
                                           x-tooltip="projectTooltip(project)"
-                                          :class="projectStatusColor(project.status)"></span>
+                                          :class="ProjectStatus[project.status].color"></span>
                                 </td>
+                                {% for col in plugin_columns %}{{ col.cell_html|safe }}{% endfor %}
                                 <td>
                                     <!-- inclure dans les statistiques -->
                                     <template x-if="project.exclude_stats">
