@@ -40,9 +40,6 @@ Alpine.store('explorationIA', {
   selectedCitationsForStep2: [],
   selectedCoRecoIds: [],
 
-  // === SYNTHÈSE (Phase 3) ===
-  allSelectedItems: [],
-
   // === MODALE RESSOURCE ===
   resourceModal: {
     isOpen: false,
@@ -442,7 +439,6 @@ Alpine.store('explorationIA', {
       }
 
       if (this.currentPhase === 1) {
-        this.recordSelectedItems();
         this.currentPhase = 2;
       }
 
@@ -547,42 +543,10 @@ Alpine.store('explorationIA', {
 
   proceedToNextPhase() {
     if (!this.canProceedToNextPhase()) return;
-    this.recordSelectedItems();
 
     if (this.currentPhase < 3) {
       this.currentPhase++;
     }
-  },
-
-  /**
-   * Capture les sélections de chunks de la phase courante dans `allSelectedItems`,
-   * en évitant les doublons sur `label`. Appelée avant de quitter une phase qui
-   * peut comporter des sélections de chunks (transitions 1 → 2 et 2 → 3).
-   */
-  recordSelectedItems() {
-    const existingLabels = new Set(
-      this.allSelectedItems.map((item) => item.id)
-    );
-    this.selectedChunks.forEach((index) => {
-      const chunk = this.answerChunks[index];
-      if (!chunk || !chunk.sources) return;
-      chunk.sources.forEach((label) => {
-        if (existingLabels.has(label)) return;
-        if (this.isSourceExcluded(label)) return;
-        const citation = this.getCitationByLabel(label);
-        if (!citation) return;
-        existingLabels.add(label);
-        this.allSelectedItems.push({
-          id: citation.label,
-          title: citation.title,
-          content: citation.content,
-          type: citation.source_type,
-          resourceId: citation.resource_id,
-          recoId: citation.reco_id,
-          projectId: citation.project_id,
-        });
-      });
-    });
   },
 
   /**
@@ -592,7 +556,6 @@ Alpine.store('explorationIA', {
   resetExploration() {
     this.currentPhase = 1;
     this.searchQuery = '';
-    this.allSelectedItems = [];
     this.answerChunks = [];
     this.citations = [];
     this.foundAnswer = null;
