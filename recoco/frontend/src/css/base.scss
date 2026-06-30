@@ -183,6 +183,10 @@ p {
 * BASE EMBED SPECIFICITIES
 */
 .base-embed {
+  .fr-header__logo {
+    padding-bottom: 0;
+    padding-top: 0;
+  }
   .fr-header__body-row {
     height: 4em;
   }
