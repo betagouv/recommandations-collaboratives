@@ -41,15 +41,15 @@
                 {% for plugin_tab in plugin_tabs %}
                     <div class="fr-segmented__element">
                         <input value="plugin-{{ forloop.counter0 }}"
-                               type="radio"
-                               id="segmented-control-plugin-{{ forloop.counter0 }}"
-                               name="segmented-control-project"
-                               @click="window.location='{% url plugin_tab.0 project.pk %}'">
-
+                                type="radio"
+                                {% if plugin_tab.active %}checked{% endif %}
+                                aria-checked="{% if plugin_tab.active %}true{% else %}false{% endif %}"
+                                id="segmented-control-plugin-{{ forloop.counter0 }}"
+                                name="segmented-control-project"
+                                @click="window.location='{% url plugin_tab.url_name project.pk %}'">
                         <label class="fr-label" for="segmented-control-plugin-{{ forloop.counter0 }}">
                             <a class="stretched-link"
-                               href="{% url plugin_tab.0 project.pk %}">{{  plugin_tab.1 }}
-                            </a>
+                                href="{% url plugin_tab.url_name project.pk %}">{{ plugin_tab.label }}</a>
                         </label>
                     </div>
                 {% endfor %}
