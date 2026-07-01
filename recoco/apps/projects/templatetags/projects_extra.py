@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 
 from recoco import utils as recoco_utils
 from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.plugins.manager import get_tenant_hook
 
 from .. import models
 
@@ -85,6 +86,26 @@ def count_has_notifications(feed_items):
 def count_message_by_type(feed_items, *args):
     """Count message by type in feed"""
     return len([item for item in feed_items if item.get("type") in args])
+
+
+@register.simple_tag(takes_context=True)
+def project_plugin_tabs(context):
+    request = context.get("request")
+    if request is None:
+        return []
+
+    current_namespace = (
+        request.resolver_match.namespace if request.resolver_match else ""
+    )
+
+    return [
+        {
+            "url_name": url_name,
+            "label": label,
+            "active": url_name.split(":")[0] == current_namespace,
+        }
+        for url_name, label in get_tenant_hook(request).hook.project_tab_entries()
+    ]
 
 
 # eof

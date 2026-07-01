@@ -36,6 +36,8 @@
                         </label>
                     </div>
                 {% endif %}
+
+                {% project_plugin_tabs as plugin_tabs %}
                 {% for plugin_tab in plugin_tabs %}
                     <div class="fr-segmented__element">
                         <input value="plugin-{{ forloop.counter0 }}"
