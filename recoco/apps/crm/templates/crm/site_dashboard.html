@@ -47,11 +47,7 @@
                                 <div>
                                     {% url "projects-moderation-list" as url %}
                                     {% with text="Nouveaux dossiers ou demandes d’accès conseiller à modérer" %}
-                                    {% if advisor_access_requests_count %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=url anchor="?view=advisor" name="Nouvelles demandes à modérer" icon="fr-icon-error-warning-line" text=text currentColor="#0974F6" is_alert=True nb_alert=projects_to_moderate_count|add:advisor_access_requests_count %}
-                                    {% else %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=url anchor="?view=projects" name="Nouvelles demandes à modérer" icon="fr-icon-error-warning-line" text=text currentColor="#0974F6" is_alert=True nb_alert=projects_to_moderate_count|add:advisor_access_requests_count %}
-                                    {% endif %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url anchor=advisor_access_requests_count|yesno:"?view=advisor,?view=projects" name="Nouvelles demandes à modérer" icon="fr-icon-error-warning-line" text=text currentColor="#0974F6" is_alert=True nb_alert=projects_to_moderate_count|add:advisor_access_requests_count %}
                                     {% endwith %}
                                 </div>
                             </div>
