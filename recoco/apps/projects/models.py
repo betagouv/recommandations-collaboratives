@@ -455,6 +455,12 @@ class Project(models.Model):
     inactive_since = models.DateTimeField(
         null=True, blank=True, verbose_name="Quand le dossier a été déclaré inactif"
     )
+    paused_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="inactive_by_user",
+    )
     inactive_reason = models.CharField(
         max_length=256,
         blank=True,
