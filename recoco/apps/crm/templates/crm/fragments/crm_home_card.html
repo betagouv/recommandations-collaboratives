@@ -2,7 +2,6 @@
     name: string - the name of the card, shown in the top left corner
     text: string - the text content of the card
     icon: string - the icon CSS class to display (ex: "fr-icon-folder-2-line")
-    currentColor: string (optional) - the icon color (ex: "#0974F6")
     link_url: string - the URL the card links to
     anchor: string (optional) - an anchor link for the card
     is_alert: boolean (optional) - if true, displays an alert badge (nb_alert) instead of the icon
@@ -14,7 +13,7 @@
         {% if is_alert %}
             <span class="badge text-bg-danger no-underline fr-mr-1w">{{ nb_alert }}</span>
         {% else %}
-            <span class="crm-home__card--icon {{ icon }} fr-icon--sm fr-mr-1w" style="color: {{ currentColor }}" aria-hidden="true"></span>
+            <span class="crm-home__card--icon {{ icon }} fr-icon--sm fr-mr-1w" aria-hidden="true"></span>
         {% endif %}
         <span class="crm-home__card--title d-block text-center font-very-small">{{ name }}</span>
     </div>

@@ -47,7 +47,7 @@
                                 <div>
                                     {% url "projects-moderation-list" as url %}
                                     {% with text="Nouveaux dossiers ou demandes d’accès conseiller à modérer" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url anchor=advisor_access_requests_count|yesno:"?view=advisor,?view=projects" name="Nouvelles demandes à modérer" icon="fr-icon-error-warning-line" text=text currentColor="#0974F6" is_alert=True nb_alert=projects_to_moderate_count|add:advisor_access_requests_count %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url anchor=advisor_access_requests_count|yesno:"?view=advisor,?view=projects" name="Nouvelles demandes à modérer" icon="fr-icon-error-warning-line" text=text is_alert=True nb_alert=projects_to_moderate_count|add:advisor_access_requests_count %}
                                     {% endwith %}
                                 </div>
                             </div>
@@ -61,13 +61,13 @@
                             <div>
                                 {% url 'crm-list-projects-low-reach' as url %}
                                 {% with text="Rappelez les demandeurs qui n’ont pas lu les recommandations ou donné de nouvelles" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers à relancer" icon="fr-icon-phone-line" text=text currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers à relancer" icon="fr-icon-phone-line" text=text %}
                                 {% endwith %}
                             </div>
                             <div>
                                 {% url 'crm-reco-without-resources' as url %}
                                 {% with text="Transformez les recommandations de texte libre en ressources réutilisables" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Recommandations sans ressource" icon="fr-icon-book" text=text currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Recommandations sans ressource" icon="fr-icon-book" text=text %}
                                 {% endwith %}
                             </div>
                         </div>
@@ -80,37 +80,37 @@
                             <div>
                                 {% url 'crm-user-list' as url %}
                                 {% with text="Gestion de vos utilisateurs, suivi de leur activité" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Utilisateurs" icon="fr-icon-group" text=text currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Utilisateurs" icon="fr-icon-group" text=text %}
                                 {% endwith %}
                             </div>
                             <div>
                                 {% url 'crm-project-list' as url %}
                                 {% with text="Gestion de vos dossiers, suivi de leur activité" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers" icon="fr-icon-file" currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers" icon="fr-icon-file" %}
                                 {% endwith %}
                             </div>
                             <div>
                                 {% url 'crm-organization-list' as url %}
                                 {% with text="Gestion de vos organisations, suivi d’activité et possibilité de les fusionner" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Organisations" icon="fr-icon-building-line" text=text currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Organisations" icon="fr-icon-building-line" text=text %}
                                 {% endwith %}
                             </div>
                             <div>
                                 {% url 'crm-project-list-by-tags' as url %}
                                 {% with text="Usage des tags et sur quels dossiers ils sont employés" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags sur les dossiers" icon="fr-icon-tag-line" text=text currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags sur les dossiers" icon="fr-icon-tag-line" text=text %}
                                 {% endwith %}
                             </div>
                             <div>
                                 {% url 'crm-list-tags' as url %}
                                 {% with text="Usage des tags employés dans les notes du CRM" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags des notes CRM" icon="fr-icon-tag-line" currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags des notes CRM" icon="fr-icon-tag-line" %}
                                 {% endwith %}
                             </div>
                             <div>
                                 {% url 'crm-list-topics' as url %}
                                 {% with text="Usage des thématiques employées sur les dossiers et sur les recommandations" %}
-                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Thématiques des dossiers et recos" icon="fr-icon-books" text=text currentColor="#0974F6" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Thématiques des dossiers et recos" icon="fr-icon-books" text=text %}
                                 {% endwith %}
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                                     <div>
                                         {% url 'crm-site-configuration' as url %}
                                         {% with text="Infos légales, email de contact, logos utilisés, tags d’impact etc" %}
-                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Paramètres du portail" icon="fr-icon-settings" text=text currentColor="#0974F6" %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Paramètres du portail" icon="fr-icon-settings" text=text %}
                                         {% endwith %}
                                     </div>
                                 {% endif %}
@@ -133,21 +133,21 @@
                                     <div>
                                         {% url 'wagtailadmin_home' as url %}
                                         {% with text="Création et modification des pages-vitrines (cas d’usage, actualités etc.)" %}
-                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="CMS Pages-vitrines" icon="fr-icon-article" text=text currentColor="#0974F6" %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="CMS Pages-vitrines" icon="fr-icon-article" text=text %}
                                         {% endwith %}
                                     </div>
                                 {% endif %}
                                 <div>
                                     {% url 'projects-task-recommendation-list' as url %}
                                     {% with text="Scénarios qui permettent de suggérer aux conseillers des ressources à recommander" %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pré-fléchage de ressources" icon="fr-icon-swap-lines" text=text currentColor="#0974F6" %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pré-fléchage de ressources" icon="fr-icon-swap-lines" text=text %}
                                     {% endwith %}
                                 </div>
                                 {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
                                     <div>
                                         {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}
                                         {% with text="Gestion des questions, choix de réponses et réponses affichées du questionnaire initial" %}
-                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Questionnaire d’état des lieux" icon="fr-icon-questionnaire" text=text currentColor="#0974F6" %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Questionnaire d’état des lieux" icon="fr-icon-questionnaire" text=text %}
                                         {% endwith %}
                                     </div>
                                 {% endif %}
@@ -163,13 +163,13 @@
                                 <div>
                                     {% url 'account_email' as email_url_ %}
                                     {% with text="Confirmez que vous avez accès à votre adresse email" %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=email_url_ name="Vérification de l'adresse email" icon="fr-icon-mail-line" text=text currentColor="#0974F6" %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=email_url_ name="Vérification de l'adresse email" icon="fr-icon-mail-line" text=text %}
                                     {% endwith %}
                                 </div>
                                 <div>
                                     {% url 'mfa_index' as mfa_url_ %}
                                     {% with text="Gérez la double authentification pour protéger l’accès à votre compte" %}
-                                        {% include "crm/fragments/crm_home_card.html" with link_url=mfa_url_ name="Double authentification" icon="fr-icon-fingerprint" text=text currentColor="#0974F6" %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=mfa_url_ name="Double authentification" icon="fr-icon-fingerprint" text=text %}
                                     {% endwith %}
                                 </div>
                             </div>
