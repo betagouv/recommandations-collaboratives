@@ -110,7 +110,7 @@
                     <col class="col--small">
                     <col class="col--xs">
                     <col class="col--ms">
-                    <col class="col--fixed-140">
+                    <col class="col--fixed-70">
                 </colgroup>
                 <thead class="project-table__thead">
                     <tr>
@@ -204,14 +204,6 @@
                                     <a href="{% url 'projects-project-detail' project.id %}"
                                         class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline"
                                         title="Accéder à la page du dossier">Accéder à la page du dossier</a>
-                                    {# Éditer #}
-                                    <a href="{% url 'crm-project-update' project.pk %}"
-                                        class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline"
-                                        title="Éditer le dossier">Éditer</a>
-                                    {# Supprimer #}
-                                    <a href="{% url 'crm-project-delete' project.pk %}"
-                                        class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline"
-                                        title="Supprimer le dossier">Supprimer</a>
                                 </div>
                             </td>
                         </tr>
