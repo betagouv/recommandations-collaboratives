@@ -9,6 +9,8 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.projects import models as projects_models
+from recoco.apps.projects import utils as projects_utils
 from recoco.utils import login
 
 ########################################################################
@@ -110,6 +112,54 @@ def test_crm_organization_list_filters_organizations_by_department(request, clie
 
     unexpected_url = reverse("crm-organization-details", args=[unexpected.id])
     assertNotContains(response, unexpected_url)
+
+
+@pytest.mark.django_db
+def test_crm_organization_list_annotates_member_and_project_counts(request, client):
+    site = get_current_site(request)
+
+    org = baker.make(addressbook_models.Organization)
+    org.sites.add(site)
+
+    # deux membres de l'orga, rattachés au site
+    members = []
+    for _ in range(2):
+        member = baker.make(auth_models.User)
+        member.profile.organization = org
+        member.profile.save()
+        member.profile.sites.add(site)
+        members.append(member)
+
+    # une autre orga avec un seul membre (cas de contrôle)
+    other_org = baker.make(addressbook_models.Organization)
+    other_org.sites.add(site)
+    other_member = baker.make(auth_models.User)
+    other_member.profile.organization = other_org
+    other_member.profile.save()
+    other_member.profile.sites.add(site)
+
+    # deux projets sur le site avec un membre de `org`
+    project1 = baker.make(projects_models.Project, sites=[site])
+    projects_utils.assign_collaborator(members[0], project1, is_owner=True)
+    project2 = baker.make(projects_models.Project, sites=[site])
+    projects_utils.assign_collaborator(members[1], project2)
+
+    # un projet appartenant à l'autre orga, ne doit pas compter pour `org`
+    other_project = baker.make(projects_models.Project, sites=[site])
+    projects_utils.assign_collaborator(other_member, other_project, is_owner=True)
+
+    url = reverse("crm-organization-list")
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    orgs_by_id = {o.id: o for o in response.context["page_obj"]}
+    assert orgs_by_id[org.id].members_count == 2
+    assert orgs_by_id[org.id].projects_count == 2
+    assert orgs_by_id[other_org.id].members_count == 1
+    assert orgs_by_id[other_org.id].projects_count == 1
 
 
 ########################################################################
