@@ -7,10 +7,10 @@
         <p class="fr-mb-0">
             Ce dossier a été mis en pause
             {% comment %} TODO Set data available {% endcomment %}
-            {% comment %} {% if user %}
-                par {{ user.firstName }} {{ user.lastName }}
-                {% if user.organization %}({{ user.organization }}){% endif %}
-            {% endif %} {% endcomment %}.
+            {% if project.paused_by %}
+                par <strong> {{ project.paused_by.first_name }} {{ project.paused_by.last_name }}
+                {% if project.paused_by.profile.organization %}({{ project.paused_by.profile.organization }}){% endif %}</strong>
+            {% endif %}.
         </p>
         <form id="admin-activate-project"
               method="post"
