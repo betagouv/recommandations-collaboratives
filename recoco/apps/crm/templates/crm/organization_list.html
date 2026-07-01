@@ -117,8 +117,8 @@
                                             </div>
                                         {% endwith %}
                                     </td>
-                                    <td>{{ organization.members_count|default:0 }}</td>
-                                    <td>{{ organization.projects_count|default:0 }}</td>
+                                    <td>{{ organization.members_count|default_if_none:"-" }}</td>
+                                    <td>{{ organization.projects_count|default_if_none:"-" }}</td>
                                     <td>
                                         <a href="{% url 'crm-organization-update' organization.pk %}"
                                            title="Modifier l'organisation"
