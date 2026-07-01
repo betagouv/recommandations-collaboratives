@@ -572,6 +572,7 @@ def set_project_inactive(request, project_id: int):
     if form.is_valid():
         project = form.save(commit=False)
         project.inactive_since = timezone.now()
+        project.paused_by = request.user
         project.save()
 
         # Notifications

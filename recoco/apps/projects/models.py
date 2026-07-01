@@ -481,6 +481,7 @@ class Project(models.Model):
 
         self.inactive_since = None
         self.inactive_reason = None
+        self.paused_by = None
         self.save()
 
     last_members_activity_at = models.DateTimeField(
