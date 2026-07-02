@@ -126,14 +126,14 @@ def test_site_dashboard_hides_other_site_project_notifications(request, client):
 
 
 @pytest.mark.django_db
-def test_low_reach_defaults_to_no_reaction_and_15_days(client):
+def test_low_reach_defaults_to_all_and_15_days(client):
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
     assert response.context["days"] == 15
-    assert response.context["status_filter"] == "no_reaction"
+    assert response.context["status_filter"] == "all"
     assert response.context["mine_only"] is False
     assert response.context["search_q"] == ""
 
@@ -165,7 +165,7 @@ def test_low_reach_falls_back_on_unknown_status(client):
         response = client.get(url, data={"status": "something-else"})
 
     assert response.status_code == 200
-    assert response.context["status_filter"] == "no_reaction"
+    assert response.context["status_filter"] == "all"
 
 
 @pytest.mark.django_db
@@ -228,7 +228,8 @@ def test_low_reach_hides_project_with_task_in_progress(
     public_task_recipe.make(project=project, status=tasks_models.Task.INPROGRESS)
     url = reverse("crm-list-projects-low-reach")
     with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
+        # Engagement-based exclusion now only applies to the "no_reaction" filter.
+        response = client.get(url, data={"status": "no_reaction"})
 
     assert response.status_code == 200
     assertNotContains(response, project.name)
