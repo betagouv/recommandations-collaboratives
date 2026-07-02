@@ -11,121 +11,182 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/styles/organizationMerge.css.js' %}
 {% endblock js %}
 {% block content %}
+    {% include "crm/fragments/navigation.html" with organizations=True %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'crm-organization-list' %}', title: 'Organisations'}], current: 'Fusionner des organisations' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div x-data="Crm" class="d-flex fr-px-0">
-        {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
-                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
-                    <h3>Fusionner des organisations</h3>
-                </div>
-            </div>
-            <div class="fr-m-3w">
-                <p class="fw-bolder">Vous êtes sur le point de fusionner les organisations suivantes :</p>
-                <p>
-                    <ul>
-                        {% for organization in organizations %}<li>{{ organization }}</li>{% endfor %}
-                    </ul>
+        <div class="w-100 d-flex flex-column justify-content-start fr-px-5w fr-pb-5w">
+            <form x-data="{ name: '{{ merge_form.name.value|default:organizations.0.name|escapejs }}' }"
+                  method="post"
+                  action="{% url 'crm-organization-merge' %}">
+                {% csrf_token %}
+                <h1 class="fr-h2 fr-mb-2w">Fusionner des organisations</h1>
+                <p class="fr-text--lg fr-mb-4w">
+                    Vous êtes sur le point de fusionner des organisations : elles seront donc rassemblées en une seule.
+                    <br>
+                    Veuillez <strong>choisir un nom pour cette nouvelle organisation</strong>, vérifiez les informations fusionnées puis validez la fusion.
                 </p>
-                <p>
-                    Ceci signifie que :
-                    <ul>
-                        <li>
-                            Une seule organisation sera conservée, les autres seront <strong>supprimées</strong>. Ceci est <strong>irréversible</strong>.
-                        </li>
-                        <li>
-                            L'ensemble des objets liés à cette organisation (utilisateurs, contacts, ...) seront <strong>migrés</strong>. Voici l'ensemble des éléments concernés :
-                        </li>
-                    </ul>
-                </p>
-                <div class="fr-m-3w card fr-py-3w">
-                    <ul class="fr-mb-3w">
-                        <div class="fr-mb-2v">
-                            <svg class="align-middle bi"
-                                 width="18px"
-                                 height="18px"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-square" />
-                            </svg>
-                            <span class="align-middle">Contacts</span>
-                        </div>
-                        {% for contact in contacts.all %}
-                            <li class="fr-ml-3w">{{ contact }} ({{ contact.email }})</li>
-                        {% empty %}
-                            <li class="fr-ml-3w">-- Aucun --</li>
-                        {% endfor %}
-                    </ul>
-                    <ul>
-                        <div class="fr-mb-2v">
-                            <svg class="align-middle bi"
-                                 width="18px"
-                                 height="18px"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person" />
-                            </svg>
-                            <span class="align-middle">Utilisateur·trice·s</span>
-                        </div>
-                        {% for profile in profiles.all %}
-                            <li class="fr-ml-3w">{{ profile.user.get_full_name|default:profile.user.email }}</li>
-                        {% empty %}
-                            <li class="fr-ml-3w">-- Aucun --</li>
-                        {% endfor %}
-                    </ul>
-                    <ul>
-                        <div class="fr-mb-2v">
-                            <svg class="align-middle bi"
-                                 width="18px"
-                                 height="18px"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#map" />
-                            </svg>
-                            <span class="align-middle">Départements</span>
-                        </div>
-                        {% for dpt in departments.all %}
-                            <li class="fr-ml-3w">{{ dpt }} ({{ dpt.code }})</li>
-                        {% empty %}
-                            <li class="fr-ml-3w">-- Aucun --</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="fr-mt-3w">
-                    <form x-data="{name: '{{ organizations.0.name }}'}"
-                          method="post"
-                          action="{% url 'crm-organization-merge' %}">
-                        {% csrf_token %}
-                        <div class="fr-mb-3w">
-                            <div class="input-group">
-                                <label for="{{ merge_form.name.name }}" class="col-sm-2 col-form-label">Nouveau nom</label>
-                                <div class="col-sm-5">
-                                    <input type="text"
-                                           class="form-control"
-                                           id="{{ merge_form.name.name }}"
-                                           name="{{ merge_form.name.name }}"
-                                           x-model="name"
-                                           value="{{ merge_form.name.value|default:organizations.0.name }}">
-                                </div>
-                            </div>
-                            <div class="small text-secondary fr-mt-1v">
-                                Suggestions :
-                                {% for organization in organizations %}
-                                    <button @click="name = '{{ organization.name }}'"
-                                            type="button"
-                                            class="btn btn-outline-info btn-sm">{{ organization.name }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <select multiple hidden  name="{{ merge_form.org_ids.name }}">
+                {# Nom de la nouvelle organisation #}
+                <div class="fr-mb-4w">
+                    <div class="fr-input-group">
+                        <label class="fr-label fr-text--bold" for="{{ merge_form.name.name }}">
+                            Nom de la nouvelle organisation
+                            <span class="crm-merge__hint-text">Saisissez un nouveau nom pour l'organisation ou cliquez sur l'un des noms proposés pour l'utiliser :</span>
+                        </label>
+                        <input type="text"
+                               class="fr-input"
+                               id="{{ merge_form.name.name }}"
+                               name="{{ merge_form.name.name }}"
+                               x-model="name"
+                               value="{{ merge_form.name.value|default:organizations.0.name }}">
+                    </div>
+                    <div class="fr-mt-2w d-flex align-items-center flex-wrap">
+                        <span class="fr-text--sm fr-mr-2w fr-mb-0">Suggestions :</span>
+                        <ul class="fr-tags-group fr-mb-0">
                             {% for organization in organizations %}
-                                <option value="{{ organization.id }}" selected>{{ organization.name }}</option>
+                                <li>
+                                    <button type="button"
+                                            class="fr-tag"
+                                            @click="name = '{{ organization.name|escapejs }}'"
+                                            :aria-pressed="name === '{{ organization.name|escapejs }}'">
+                                        {{ organization.name }}
+                                    </button>
+                                </li>
                             {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-danger">Oui, fusionner ces organisations</button>
-                        <a href="{% url 'crm-organization-list' %}"
-                           class="btn btn-outline-secondary">Non, annuler la fusion</a>
-                    </form>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+                <p class="fr-text--lg fr-mb-2w">Cette nouvelle organisation va rassembler les organisations suivantes :</p>
+                <div class="fr-grid-row fr-grid-row--gutters fr-mb-4w">
+                    {% for summary in org_summaries %}
+                        <div class="fr-col-12 fr-col-md-6">
+                            <div class="fr-p-3w h-100 crm-merge__org-card">
+                                <p class="fr-text--lg fr-text--bold fr-mb-2w crm-merge__org-card--name">{{ summary.organization.name }}</p>
+                                <p class="fr-mb-1w">
+                                    <span class="fr-icon-user-line fr-icon--sm fr-mr-1v crm-merge__org-card--text" aria-hidden="true"></span>
+                                    {{ summary.members_count }} membre{{ summary.members_count|pluralize }}
+                                </p>
+                                <p class="fr-mb-1w">
+                                    <span class="fr-icon-folder-2-line fr-icon--sm fr-mr-1v crm-merge__org-card--text" aria-hidden="true"></span>
+                                    {{ summary.projects_count }} dossier{{ summary.projects_count|pluralize }} suivi{{ summary.projects_count|pluralize }}
+                                </p>
+                                <p class="fr-mb-0">
+                                    <span class="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v crm-merge__org-card--text" aria-hidden="true"></span>
+                                    {% if summary.departments %}
+                                        Départements :
+                                        {% for dpt in summary.departments %}{{ dpt.name }} ({{ dpt.code }}){% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {% else %}
+                                        Aucun département
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Explication de la fusion #}
+                <div class="fr-callout fr-mb-4w">
+                    <h2 class="fr-callout__title fr-h5">Que se passe-t-il quand on fusionne des organisations ?</h2>
+                    <div class="fr-callout__text">
+                        <ul>
+                            <li>Une seule organisation sera conservée : les autres seront supprimées.</li>
+                            <li>
+                                Les <strong>membres</strong> (demandeurs et conseillers), les <strong>dossiers</strong>, les <strong>départements</strong> et les <strong>contacts</strong> des organisations fusionnées seront rattachés à l'organisation conservée.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                {# Liste des éléments rattachés #}
+                <h2 class="fr-h4 fr-mb-2w crm-merge__title">Liste des éléments qui seront rattachés à l'organisation</h2>
+                <div class="fr-p-3w fr-mb-4w crm-merge__recap-card">
+                    <div class="fr-grid-row fr-grid-row--gutters">
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-map-pin-2-line fr-mr-1v" aria-hidden="true"></span>
+                                Départements
+                            </p>
+                            <ul class="crm-merge__recap-list">
+                                {% for dpt in departments %}
+                                    <li>{{ dpt.name }} ({{ dpt.code }})</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-folder-2-line fr-mr-1v" aria-hidden="true"></span>
+                                Dossiers
+                            </p>
+                            <ul class="crm-merge__recap-list">
+                                {% for project in projects %}
+                                    <li>{{ project.name }}</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <hr class="fr-my-3w">
+                    <div class="fr-grid-row fr-grid-row--gutters">
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-user-line fr-mr-1v" aria-hidden="true"></span>
+                                Membres
+                            </p>
+                            <ul class="crm-merge__recap-list">
+                                {% for profile in profiles %}
+                                    <li>{{ profile.user.get_full_name|default:profile.user.email }}</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                            <p class="fr-text--bold fr-mb-1w">
+                                <span class="fr-icon-team-line fr-mr-1v" aria-hidden="true"></span>
+                                Contacts
+                            </p>
+                            <ul class="crm-merge__recap-list">
+                                {% for contact in contacts %}
+                                    <li>{{ contact }} ({{ contact.email }})</li>
+                                {% empty %}
+                                    <li class="text-secondary">-- Aucun --</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {# Confirmation #}
+                <p class="fr-text--lg fr-text--bold fr-mb-2w">Voulez-vous vraiment fusionner ces organisations et leurs éléments rattachés ?</p>
+                <select multiple hidden name="{{ merge_form.org_ids.name }}">
+                    {% for organization in organizations %}
+                        <option value="{{ organization.id }}" selected>{{ organization.name }}</option>
+                    {% endfor %}
+                </select>
+                <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--icon-left fr-mb-3w">
+                    <li>
+                        <button type="submit"
+                                class="fr-btn fr-icon-check-line fr-btn--icon-left">
+                            Oui, fusionner les organisations
+                        </button>
+                    </li>
+                    <li>
+                        <a href="{% url 'crm-organization-list' %}"
+                           class="fr-btn fr-btn--secondary fr-icon-close-line fr-btn--icon-left">
+                            Non, annuler la fusion
+                        </a>
+                    </li>
+                </ul>
+                <div class="crm-merge__warning-box">
+                    <span class="fr-icon-warning-fill" aria-hidden="true"></span>
+                    <p class="fr-mb-0">
+                        <strong>Cette action est irréversible !</strong> Une fois la fusion validée, vous ne pourrez plus revenir en arrière.
+                    </p>
+                </div>
+            </form>
         </div>
     </div>
 {% endblock content %}
