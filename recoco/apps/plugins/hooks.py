@@ -23,16 +23,29 @@ class ProjectSpec(HookSpec):
     def project_tab_entries(self):
         """Return a tab entry to add to the project detail page navigation.
 
-        Return a 2-tuple ``(url_name, label)``:
-          url_name (str) — Django URL name, resolved with the project pk as
-                            its single argument (may include namespace, e.g.
-                            "myplugin:project-detail")
-          label (str)    — display text for the tab
+        Return a dict with keys:
+          url_name (str)          — Django URL name the tab links to, resolved
+                                    with the project pk as its single argument
+                                    (may include a namespace, e.g.
+                                    "myplugin:project-detail")
+          label (str)             — display text for the tab
+          active_url_names (list) — optional list of fully-qualified view names
+                                    (``namespace:name``) that mark the tab as
+                                    active. The tab is active when the current
+                                    request's view name is in this list.
+                                    Defaults to ``[url_name]`` when omitted.
 
         Example:
             @hookimpl
             def project_tab_entries(self):
-                return ("plugin_giphy:project-detail-giphy", "Giphyme!")
+                return {
+                    "url_name": "plugin_giphy:project-detail-giphy",
+                    "label": "Giphyme!",
+                    "active_url_names": [
+                        "plugin_giphy:project-detail-giphy",
+                        "plugin_giphy:giphy-detail",
+                    ],
+                }
         """
 
 

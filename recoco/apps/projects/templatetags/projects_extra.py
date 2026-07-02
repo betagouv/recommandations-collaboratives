@@ -94,17 +94,18 @@ def project_plugin_tabs(context):
     if request is None:
         return []
 
-    current_namespace = (
-        request.resolver_match.namespace if request.resolver_match else ""
+    current_view_name = (
+        request.resolver_match.view_name if request.resolver_match else ""
     )
 
     return [
         {
-            "url_name": url_name,
-            "label": label,
-            "active": url_name.split(":")[0] == current_namespace,
+            "url_name": entry["url_name"],
+            "label": entry["label"],
+            "active": current_view_name
+            in (entry.get("active_url_names") or [entry["url_name"]]),
         }
-        for url_name, label in get_tenant_hook(request).hook.project_tab_entries()
+        for entry in get_tenant_hook(request).hook.project_tab_entries()
     ]
 
 
