@@ -1368,6 +1368,13 @@ def make_low_reach_project_query(
                     public=True,
                 ).exclude(status=Task.PROPOSED)
             ),
+            has_impact_tags=Exists(
+                models.ProjectAnnotations.objects.filter(
+                    project=OuterRef("pk"),
+                    site=request.site,
+                    tags__isnull=False,
+                )
+            ),
         )
     )
 
@@ -1376,19 +1383,29 @@ def make_low_reach_project_query(
         cutoff_date = datetime.now() - timedelta(days=days)
         qs = qs.filter(last_members_activity_at__lte=cutoff_date)
 
-    # A projet has engagement if a member posted a public message,
-    # or if at least one task has a status other than "proposé".
-    has_engagement = Q(last_public_msg_at__isnull=False) | Q(has_task_status=True)
-    qs = qs.exclude(has_engagement)
-
-    if status_filter == "low_read":
+    # The three status filters are independent dimensions:
+    # - "no_reaction" is engagement-based (no public message, no task status
+    #   other than "proposé", no impact tag),
+    # - "zero_read" and "low_read" only depend on the number of read
+    #   recommendations, regardless of any engagement.
+    if status_filter == "zero_read":
+        # Only projects where no recommendation has been read at all.
+        qs = qs.filter(reco_read=0)
+    elif status_filter == "low_read":
         # A project has low read status if no recommendation has been read,
         # or if only one has been read but there are more than 2 recommendations in total.
         barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
         qs = qs.filter(barely_read)
-    elif status_filter == "zero_read":
-        # Only projects where no recommendation has been read at all.
-        qs = qs.filter(reco_read=0)
+    else:  # "no_reaction"
+        # A projet has engagement if a member posted a public message,
+        # if at least one task has a status other than "proposé",
+        # or if the project has at least one impact tag.
+        has_engagement = (
+            Q(last_public_msg_at__isnull=False)
+            | Q(has_task_status=True)
+            | Q(has_impact_tags=True)
+        )
+        qs = qs.exclude(has_engagement)
 
     if mine_only:
         qs = qs.filter(switchtenders=request.user)
@@ -1515,14 +1532,20 @@ def crm_projects_with_low_reach_as_csv(request):
     writer.writeheader()
 
     for project in low_reach_projects:
-        # Same rule as the HTML table badge: "recos non lues" only when
-        # no reco read, or a single reco read but more than 2 recos sent.
-        project_status = (
-            "RECOS NON LUES"
-            if project.reco_read == 0
-            or (project.reco_read == 1 and project.reco_total > 2)
-            else "AUCUNE RÉACTION"
-        )
+        # Same priority as the HTML table badge:
+        # "0 reco lue" > "recos non lues" > "aucune réaction".
+        if project.reco_read == 0:
+            project_status = "0 RECO LUE"
+        elif project.reco_read == 1 and project.reco_total > 2:
+            project_status = "RECOS NON LUES"
+        elif not (
+            project.has_task_status
+            or project.last_public_msg_at
+            or project.has_impact_tags
+        ):
+            project_status = "AUCUNE RÉACTION"
+        else:
+            project_status = ""
         owner = project.owner
         if owner:
             profile = getattr(owner, "profile", None)
