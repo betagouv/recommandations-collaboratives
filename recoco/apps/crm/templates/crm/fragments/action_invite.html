@@ -1,9 +1,11 @@
 {% load gravatar %}
 <li class="d-flex flex-columns list-group-item">
-    <div class="flex-row flex-grow-1 font-size-12px no-wrap">
-        <div class="d-flex flex-grow w-100 flex-grow-1">
+    <div class="flex-row flex-grow-1">
+        <div class="w-100 font-size-12px">
             {% if action.actor %}
-                {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                <span class="d-inline-flex align-middle">
+                    {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                </span>
             {% endif %}
             <span class="verb">
                 {% if action.action_object.role %}

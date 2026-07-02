@@ -326,6 +326,61 @@ def test_crm_organization_merge_page_with_permission(request, client):
 
 
 @pytest.mark.django_db
+def test_crm_organization_merge_page_summarizes_members_and_projects(request, client):
+    site = get_current_site(request)
+
+    org_a = baker.make(addressbook_models.Organization, sites=[site])
+    org_b = baker.make(addressbook_models.Organization, sites=[site])
+
+    # org_a : 2 membres, tous deux conseillers sur 1 même projet -> projects_count == 1
+    members_a = []
+    for _ in range(2):
+        member = baker.make(auth_models.User)
+        member.profile.organization = org_a
+        member.profile.sites.add(site)
+        member.profile.save()
+        members_a.append(member)
+
+    project_a = baker.make(projects_models.Project, sites=[site])
+    for member in members_a:
+        baker.make(
+            projects_models.ProjectSwitchtender,
+            site=site,
+            switchtender=member,
+            project=project_a,
+        )
+
+    # org_b : 1 membre, conseiller sur 2 projets -> projects_count == 2
+    member_b = baker.make(auth_models.User)
+    member_b.profile.organization = org_b
+    member_b.profile.sites.add(site)
+    member_b.profile.save()
+
+    for _ in range(2):
+        project_b = baker.make(projects_models.Project, sites=[site])
+        baker.make(
+            projects_models.ProjectSwitchtender,
+            site=site,
+            switchtender=member_b,
+            project=project_b,
+        )
+
+    url = reverse("crm-organization-merge") + f"?org_ids={org_a.id}&org_ids={org_b.id}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    summaries = {s["organization"].id: s for s in response.context["org_summaries"]}
+    assert summaries[org_a.id]["members_count"] == 2
+    assert summaries[org_a.id]["projects_count"] == 1
+    assert summaries[org_b.id]["members_count"] == 1
+    assert summaries[org_b.id]["projects_count"] == 2
+
+
+@pytest.mark.django_db
 def test_crm_organization_merge_page_with_empty_list(request, client):
     site = get_current_site(request)
 

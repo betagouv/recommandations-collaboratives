@@ -465,9 +465,30 @@ def organization_merge(request):
     if not ids:
         return redirect(reverse("crm-organization-list"))
     organizations = [get_object_or_404(qs, pk=id) for id in ids]
-    departments = geomatics.Department.objects.filter(organizations__in=organizations)
+
+    # per-organization summary used for the recap cards
+    org_summaries = []
+    for organization in organizations:
+        members = User.objects.filter(
+            profile__in=organization.registered_profiles.all()
+        )
+        advised_projects = Project.on_site.filter(switchtenders__in=members).distinct()
+        org_summaries.append(
+            {
+                "organization": organization,
+                "members_count": members.count(),
+                "projects_count": advised_projects.count(),
+                "departments": organization.departments.all(),
+            }
+        )
+
+    # aggregated elements that will be attached to the merged organization
+    departments = geomatics.Department.objects.filter(
+        organizations__in=organizations
+    ).distinct()
     profiles = home_models.UserProfile.objects.filter(organization__in=organizations)
     contacts = addressbook_models.Contact.objects.filter(organization__in=organizations)
+    projects = Project.on_site.filter(switchtenders__profile__in=profiles).distinct()
 
     # first request confirmation for merging
     return render(request, "crm/organization_merge.html", locals())
@@ -628,6 +649,7 @@ def user_list(request):
                 Group.objects.filter(name=admin_group_name, user=OuterRef("pk"))
             ),
         )
+        .order_by("-date_joined")
     )
 
     users = filters.UserFilter(request.GET, queryset=base_qs)

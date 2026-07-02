@@ -272,11 +272,13 @@
                                                 </p>
                                                 <p>Pour créer votre compte, vous pouvez :</p>
                                                 <ul>
-                                                    <li>
-                                                        <a class="fr-link"
-                                                           href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
-                                                        une demande d'accompagnement</a>
-                                                    </li>
+                                                    {% flag "enable_submit_new_project" %}
+                                                        <li>
+                                                            <a class="fr-link"
+                                                            href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
+                                                            une demande d'accompagnement</a>
+                                                        </li>
+                                                    {% endflag %}
                                                     <li>
                                                         <a class="fr-link"
                                                            href="https://{{ current_site.domain }}{% url 'account_signup' %}?next=/advisor-access-request">demander un
