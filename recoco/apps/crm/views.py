@@ -1386,6 +1386,9 @@ def make_low_reach_project_query(
         # or if only one has been read but there are more than 2 recommendations in total.
         barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
         qs = qs.filter(barely_read)
+    elif status_filter == "zero_read":
+        # Only projects where no recommendation has been read at all.
+        qs = qs.filter(reco_read=0)
 
     if mine_only:
         qs = qs.filter(switchtenders=request.user)
@@ -1421,7 +1424,7 @@ def _parse_low_reach_params(request):
         days = 15
 
     status_filter = request.GET.get("status", "no_reaction")
-    if status_filter not in ("low_read", "no_reaction"):
+    if status_filter not in ("low_read", "zero_read", "no_reaction"):
         status_filter = "no_reaction"
 
     mine_only = bool(request.GET.get("mine"))
