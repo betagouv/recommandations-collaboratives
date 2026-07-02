@@ -11,10 +11,10 @@ import urllib
 
 import django.core.mail
 from actstream import action
-from allauth.mfa.models import Authenticator
-from allauth.mfa.totp.internal import flows as totp_flows
 from allauth.account.adapter import get_adapter
 from allauth.account.views import RequestLoginCodeView
+from allauth.mfa.models import Authenticator
+from allauth.mfa.totp.internal import flows as totp_flows
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
@@ -67,7 +67,6 @@ from .models import AdvisorAccessRequest
 from .utils import get_current_site_sender_email, make_new_site
 
 
-class HomePageView(TemplateView):
     template_name = "home/home.html"
 
 

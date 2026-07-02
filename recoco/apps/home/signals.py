@@ -13,9 +13,9 @@ from allauth.mfa.signals import authenticator_added, authenticator_removed
 from django.contrib.auth.models import User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models import Q
 from django.db import connection
-from django.db.models.signals import post_save, pre_save, m2m_changed
+from django.db.models import Q
+from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 from psycopg import sql
 
