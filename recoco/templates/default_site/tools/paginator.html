@@ -1,0 +1,56 @@
+{% comment %} Server-side paginator template (Django Paginator)
+In parent component, you need to pass the following variable:
+- page_obj: the Django Paginator page object (from a ListView or similar)
+For client-side Alpine.js pagination, use tools/pagination.html instead.
+{% endcomment %}
+{% if page_obj.paginator.num_pages > 1 %}
+    <nav role="navigation"
+         class="fr-pagination fr-mt-3w"
+         aria-label="Pagination">
+        <ul class="fr-pagination__list justify-content-center">
+            <li>
+                <a class="fr-pagination__link fr-pagination__link--first{% if not page_obj.has_previous %} fr-pagination__link--disabled{% endif %}"
+                   {% if page_obj.has_previous %}href="{% querystring page=1 %}"{% else %}aria-disabled="true" role="link"{% endif %}
+                   title="Première page">Première page</a>
+            </li>
+            <li>
+                <a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label{% if not page_obj.has_previous %} fr-pagination__link--disabled{% endif %}"
+                   {% if page_obj.has_previous %}href="{% querystring page=page_obj.previous_page_number %}"{% else %}aria-disabled="true" role="link"{% endif %}
+                   title="Page précédente">Page précédente</a>
+            </li>
+            {% for i in page_obj.paginator.page_range %}
+                {% if i == 1 or i == page_obj.paginator.num_pages or i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+                    <li>
+                        {% if i == page_obj.number %}
+                            <a class="fr-pagination__link fr-pagination__link--current"
+                               aria-current="page"
+                               title="Page {{ i }}">{{ i }}</a>
+                        {% else %}
+                            <a class="fr-pagination__link"
+                               href="{% querystring page=i %}"
+                               title="Page {{ i }}">{{ i }}</a>
+                        {% endif %}
+                    </li>
+                {% elif i == 2 and page_obj.number > 4 %}
+                    <li>
+                        <span class="fr-pagination__link fr-mx-0">…</span>
+                    </li>
+                {% elif i == page_obj.paginator.num_pages|add:"-1" and page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+                    <li>
+                        <span class="fr-pagination__link fr-mx-0">…</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            <li>
+                <a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label{% if not page_obj.has_next %} fr-pagination__link--disabled{% endif %}"
+                   {% if page_obj.has_next %}href="{% querystring page=page_obj.next_page_number %}"{% else %}aria-disabled="true" role="link"{% endif %}
+                   title="Page suivante">Page suivante</a>
+            </li>
+            <li>
+                <a class="fr-pagination__link fr-pagination__link--last{% if not page_obj.has_next %} fr-pagination__link--disabled{% endif %}"
+                   {% if page_obj.has_next %}href="{% querystring page=page_obj.paginator.num_pages %}"{% else %}aria-disabled="true" role="link"{% endif %}
+                   title="Dernière page">Dernière page</a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}
