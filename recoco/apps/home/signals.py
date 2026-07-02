@@ -75,17 +75,24 @@ def create_tenant_schema(sender, instance, **kwargs):
 
 @receiver(m2m_changed, sender=User.groups.through)
 def ensure_2fa_requirement(sender, instance, **kwargs):
+    action = kwargs.get("action")
     if action in ["post_add", "post_remove", "post_clear"]:
-        requires_2fa = instance.user.groups.filter(
-            Q(user__groups__name__contains="staff")
-            | Q(user__groups__name__contains="admin")
-        ).exists()
-        has_totp = Authenticator.objects.filter(type="totp", user_id=instance.user.id)
-        instance.user.profile.requires_2fa = requires_2fa
-        instance.user.profile.login_with_code = (
-            requires_2fa and not has_totp
-        ) or instance.user.profile.login_with_code
-        instance.user.profile.save()
+        users = (
+            [instance]
+            if not kwargs["reverse"]
+            else list(User.objects.filter(id__in=kwargs["pk_set"]))
+        )
+        for user in users:
+            requires_2fa = user.groups.filter(
+                Q(user__groups__name__contains="staff")
+                | Q(user__groups__name__contains="admin")
+            ).exists()
+            has_totp = Authenticator.objects.filter(type="totp", user_id=user.id)
+            user.profile.requires_2fa = requires_2fa
+            user.profile.login_with_code = (
+                requires_2fa and not has_totp
+            ) or user.profile.login_with_code
+            user.profile.save()
 
 
 @receiver(authenticator_added, sender=Authenticator)
