@@ -8,9 +8,11 @@ created: 2021-08-17 12:33:33 CEST
 """
 
 from unittest.mock import ANY
+from urllib.parse import parse_qs, urlparse
 
 import django.core.mail
 import pytest
+from allauth.mfa.models import Authenticator
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
@@ -31,7 +33,6 @@ from recoco.utils import assign_site_admin, login
 from .. import utils
 
 
-@pytest.mark.django_db
 def test_visitor_can_access_home_page(client):
     url = reverse("home")
     response = client.get(url)
@@ -195,7 +196,7 @@ def test_create_user_assign_current_site_via_allauth(client, request):
     assert site in user.profile.organization.sites.all()
 
 
-# seding message to team
+# sending message to team
 
 
 @pytest.mark.django_db
@@ -636,6 +637,94 @@ def test_unkown_user_ask_code_no_fail(client, mocker):
 
     adapter = import_string(settings.ACCOUNT_ADAPTER)
     adapter.send_mail.assert_called_with("account/email/unknown_account", email, ANY)
+
+
+################################################################
+# 2fa config
+################################################################
+
+
+@pytest.mark.django_db
+def test_sensitive_enabled_2fa_field_disabled(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = True
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    with login(client, user=user):
+        response = client.get(url)
+        assert response.context_data.get("form").fields.get("enable_2fa").disabled
+
+
+@pytest.mark.django_db
+def test_enabled_2fa_disabled_sensitive_default_by_code(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = True
+    user.profile.login_with_code = True
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    data = {"enable_2fa": False}
+    with login(client, user=user):
+        response = client.post(url, data)
+        assert not response.context_data.get("form").is_valid()
+    user.profile.refresh_from_db()
+    assert user.profile.login_with_code
+
+
+@pytest.mark.django_db
+def test_setting_none_removes_login_with_email(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = False
+    user.profile.login_with_code = True
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    data = {"enable_2fa": False, "two_fa_mode": "none"}
+    with login(client, user=user):
+        response = client.post(url, data)
+        assert response.context_data.get("form").is_valid()
+    user.profile.refresh_from_db()
+    assert not user.profile.login_with_code
+
+
+@pytest.mark.django_db
+def test_setting_no_2fa_removes_totp(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = False
+    user.profile.login_with_code = False
+    user.profile.save()
+    baker.make(Authenticator, type="totp", user_id=user.id)
+
+    url = reverse("mfa_index")
+    data = {"enable_2fa": False, "two_fa_mode": "none"}
+    disable_totp_url = reverse("mfa_deactivate_totp")
+    with login(client, user=user):
+        response = client.post(url, data, follow=True)
+        last_url, _ = response.redirect_chain[-1]
+        parsed_url = urlparse(last_url)
+        assert parsed_url.path == reverse("account_reauthenticate")
+        next_url = parse_qs(parsed_url.query)["next"][0]
+        assert next_url == disable_totp_url
+
+
+@pytest.mark.django_db
+def test_setting_totp_activates_totp(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = False
+    user.profile.login_with_code = False
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    data = {"enable_2fa": True, "two_fa_mode": "totp"}
+    activate_totp_url = reverse("mfa_activate_totp")
+    with login(client, user=user):
+        response = client.post(url, data, follow=True)
+        last_url, _ = response.redirect_chain[-1]
+        parsed_url = urlparse(last_url)
+        assert parsed_url.path == reverse("account_reauthenticate")
+        next_url = parse_qs(parsed_url.query)["next"][0]
+        assert next_url == activate_totp_url
 
 
 # eof
