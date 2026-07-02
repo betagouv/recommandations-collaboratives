@@ -1383,29 +1383,31 @@ def make_low_reach_project_query(
         cutoff_date = datetime.now() - timedelta(days=days)
         qs = qs.filter(last_members_activity_at__lte=cutoff_date)
 
-    # The three status filters are independent dimensions:
+    # The status filters are independent dimensions:
     # - "no_reaction" is engagement-based (no public message, no task status
     #   other than "proposé", no impact tag),
     # - "zero_read" and "low_read" only depend on the number of read
-    #   recommendations, regardless of any engagement.
+    #   recommendations, regardless of any engagement,
+    # - "all" is the union of the three filters above (the default).
+    # A projet has engagement if a member posted a public message, if at least
+    # one task has a status other than "proposé", or if it has an impact tag.
+    has_engagement = (
+        Q(last_public_msg_at__isnull=False)
+        | Q(has_task_status=True)
+        | Q(has_impact_tags=True)
+    )
+    # A project barely read its recommendations if none were read, or if only
+    # one was read but there are more than 2 recommendations in total.
+    barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
+
     if status_filter == "zero_read":
-        # Only projects where no recommendation has been read at all.
         qs = qs.filter(reco_read=0)
     elif status_filter == "low_read":
-        # A project has low read status if no recommendation has been read,
-        # or if only one has been read but there are more than 2 recommendations in total.
-        barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
         qs = qs.filter(barely_read)
-    else:  # "no_reaction"
-        # A projet has engagement if a member posted a public message,
-        # if at least one task has a status other than "proposé",
-        # or if the project has at least one impact tag.
-        has_engagement = (
-            Q(last_public_msg_at__isnull=False)
-            | Q(has_task_status=True)
-            | Q(has_impact_tags=True)
-        )
+    elif status_filter == "no_reaction":
         qs = qs.exclude(has_engagement)
+    else:  # "all": every project matched by any of the filters above
+        qs = qs.filter(barely_read | ~has_engagement)
 
     if mine_only:
         qs = qs.filter(switchtenders=request.user)
@@ -1440,9 +1442,9 @@ def _parse_low_reach_params(request):
     if days not in (0, 15, 30, 90, 180):
         days = 15
 
-    status_filter = request.GET.get("status", "no_reaction")
-    if status_filter not in ("low_read", "zero_read", "no_reaction"):
-        status_filter = "no_reaction"
+    status_filter = request.GET.get("status", "all")
+    if status_filter not in ("all", "low_read", "zero_read", "no_reaction"):
+        status_filter = "all"
 
     mine_only = bool(request.GET.get("mine"))
     search_q = request.GET.get("q", "").strip()
