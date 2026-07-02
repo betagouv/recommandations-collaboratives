@@ -189,6 +189,7 @@ class TwoFaConfigForm(forms.Form):
         choices=[
             ("totp", "Application externe"),
             ("login_with_code", "Envoi d'un code par mail"),
+            ("none", "Aucun"),
         ],
         widget=forms.RadioSelect,
     )
@@ -209,12 +210,14 @@ class TwoFaConfigForm(forms.Form):
             has_2fa = True
 
         self.fields["enable_2fa"].initial = has_2fa
+        if not has_2fa:
+            self.fields["two_fa_mode"].initial = "none"
 
     def clean(self):
         cleaned_data = super().clean()
         two_fa_mode = cleaned_data.get("two_fa_mode")
         enable_2fa = cleaned_data.get("enable_2fa")
-        if enable_2fa and two_fa_mode is None:
+        if enable_2fa and (two_fa_mode is None or two_fa_mode == "none"):
             self.add_error(
                 "two_fa_mode", "Sélectionnez un mode de double authentification"
             )
