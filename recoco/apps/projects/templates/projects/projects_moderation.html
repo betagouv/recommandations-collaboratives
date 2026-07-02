@@ -21,8 +21,28 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <div x-data="{ show: sessionStorage.getItem('view') }"
-         {% if projects_to_moderate_count and advisor_access_requests.count %} x-init="if (sessionStorage.getItem('view') !== null) { show = sessionStorage.getItem('view') } else { sessionStorage.setItem('view', 'projects'); show = 'projects' }" {% elif projects_to_moderate_count %} x-init="sessionStorage.setItem('view', 'projects'); show = 'projects'" {% elif advisor_access_requests.count %} x-init="sessionStorage.setItem('view', 'advisor'); show = 'advisor'" {% else %} x-init="sessionStorage.setItem('view', null);" {% endif %}>
+    <div x-data="{
+             show: null,
+             hasProjects: {{ projects_to_moderate_count|yesno:'true,false' }},
+             hasAdvisors: {{ advisor_access_requests.count|yesno:'true,false' }},
+             initView() {
+                 const stored = sessionStorage.getItem('view');
+                 const urlView = new URLSearchParams(window.location.search).get('view');
+                 if (this.hasProjects && this.hasAdvisors) {
+                     if (urlView) this.show = urlView;
+                     else if (stored !== null) this.show = stored;
+                     else this.show = 'projects';
+                 } else if (this.hasProjects) {
+                     this.show = 'projects';
+                 } else if (this.hasAdvisors) {
+                     this.show = 'advisor';
+                 } else {
+                     this.show = null;
+                 }
+                 sessionStorage.setItem('view', this.show);
+             }
+         }"
+         x-init="initView()">
         {% if projects_to_moderate_count > 0 and advisor_access_requests.count > 0 %}
             <div class="d-flex col-11 fr-py-5v fr-mx-auto">
                 <div class="row">
