@@ -11,6 +11,7 @@ import urllib
 
 import django.core.mail
 from actstream import action
+from allauth.account.adapter import get_adapter
 from allauth.account.views import RequestLoginCodeView
 from django.contrib import messages
 from django.contrib.auth import login as log_user
@@ -19,7 +20,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
-from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
@@ -476,8 +482,15 @@ def permission_denied(request, exception):
 
 class RequestLoginCodeNoStaffView(RequestLoginCodeView):
     def form_valid(self, form):
-        if is_sensitive_account(form._user, get_current_site(self.request)):
-            form._user = None
+        if form._user and is_sensitive_account(
+            form._user, get_current_site(self.request)
+        ):
+            get_adapter().send_mail(
+                "home/email/no_login_by_code_staff",
+                form._user.email,
+                {"request": self.request},
+            )
+            return HttpResponseRedirect(self.get_success_url())
         return super().form_valid(form)
 
 
