@@ -645,7 +645,7 @@ def test_unkown_user_ask_code_no_fail(client, mocker):
 
 
 @pytest.mark.django_db
-def test_sensitive_enabled_2fa_field_disabled(client):
+def test_sensitive_two_fa_mode_field_disabled(client):
     user = baker.make(auth_models.User)
     user.profile.requires_2fa = True
     user.profile.save()
@@ -653,18 +653,19 @@ def test_sensitive_enabled_2fa_field_disabled(client):
     url = reverse("mfa_index")
     with login(client, user=user):
         response = client.get(url)
-        assert response.context_data.get("form").fields.get("enable_2fa").disabled
+        choices = response.context_data.get("form").fields.get("two_fa_mode").choices
+        assert all(value != "none" for value, _ in choices)
 
 
 @pytest.mark.django_db
-def test_enabled_2fa_disabled_sensitive_default_by_code(client):
+def test_disabled_two_fa_mode_sensitive_default_by_code(client):
     user = baker.make(auth_models.User)
     user.profile.requires_2fa = True
     user.profile.login_with_code = True
     user.profile.save()
 
     url = reverse("mfa_index")
-    data = {"enable_2fa": False}
+    data = {"two_fa_mode": "none"}
     with login(client, user=user):
         response = client.post(url, data)
         assert not response.context_data.get("form").is_valid()
@@ -680,7 +681,7 @@ def test_setting_none_removes_login_with_email(client):
     user.profile.save()
 
     url = reverse("mfa_index")
-    data = {"enable_2fa": False, "two_fa_mode": "none"}
+    data = {"two_fa_mode": "none"}
     with login(client, user=user):
         response = client.post(url, data)
         assert response.context_data.get("form").is_valid()
@@ -697,7 +698,7 @@ def test_setting_no_2fa_removes_totp(client):
     baker.make(Authenticator, type="totp", user_id=user.id)
 
     url = reverse("mfa_index")
-    data = {"enable_2fa": False, "two_fa_mode": "none"}
+    data = {"two_fa_mode": "none"}
     disable_totp_url = reverse("mfa_deactivate_totp")
     with login(client, user=user):
         response = client.post(url, data, follow=True)
@@ -716,7 +717,7 @@ def test_setting_totp_activates_totp(client):
     user.profile.save()
 
     url = reverse("mfa_index")
-    data = {"enable_2fa": True, "two_fa_mode": "totp"}
+    data = {"two_fa_mode": "totp"}
     activate_totp_url = reverse("mfa_activate_totp")
     with login(client, user=user):
         response = client.post(url, data, follow=True)

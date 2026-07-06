@@ -180,9 +180,6 @@ class SiteCreateForm(forms.ModelForm):
 
 
 class TwoFaConfigForm(forms.Form):
-    enable_2fa = forms.BooleanField(
-        label="Activer la double authentification", required=False
-    )
     two_fa_mode = forms.ChoiceField(
         label="Quelle double authentification",
         help_text="La double authentification par application externe est plus sécurisée",
@@ -196,28 +193,26 @@ class TwoFaConfigForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        has_2fa = False
+        self.user = user
         if user.is_authenticated and user.profile.requires_2fa:
-            self.fields["enable_2fa"].disabled = True
-            has_2fa = True
+            self.fields["two_fa_mode"].choices = [
+                c for c in self.fields["two_fa_mode"].choices if c[0] != "none"
+            ]
         if user.profile.login_with_code:
             self.fields["two_fa_mode"].initial = "login_with_code"
-            has_2fa = True
         if Authenticator.objects.filter(
             type=Authenticator.Type.TOTP, user=user
         ).exists():
             self.fields["two_fa_mode"].initial = "totp"
-            has_2fa = True
-
-        self.fields["enable_2fa"].initial = has_2fa
-        if not has_2fa:
-            self.fields["two_fa_mode"].initial = "none"
 
     def clean(self):
         cleaned_data = super().clean()
-        two_fa_mode = cleaned_data.get("two_fa_mode")
-        enable_2fa = cleaned_data.get("enable_2fa")
-        if enable_2fa and (two_fa_mode is None or two_fa_mode == "none"):
+        if (
+            self.user.is_authenticated
+            and self.user.profile.requires_2fa
+            and self.data.get("two_fa_mode") == "none"
+        ):
             self.add_error(
                 "two_fa_mode", "Sélectionnez un mode de double authentification"
             )
+        return cleaned_data

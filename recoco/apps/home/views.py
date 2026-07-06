@@ -514,7 +514,8 @@ class TwoFAConfigView(FormView):
             totp_flows.deactivate_totp(self.request, authenticator)
 
     def form_valid(self, form):
-        if not form.cleaned_data["enable_2fa"]:  # disable both 2fa systems
+        two_fa_mode = form.cleaned_data["two_fa_mode"]
+        if two_fa_mode == "none":
             self.request.user.profile.login_with_code = False
             self.request.user.profile.save()
             authenticator = Authenticator.objects.filter(
@@ -523,7 +524,7 @@ class TwoFAConfigView(FormView):
             if authenticator:
                 url = reverse("mfa_deactivate_totp")
                 return redirect(url)
-        elif form.cleaned_data["two_fa_mode"] == "totp":
+        elif two_fa_mode == "totp":
             authenticator = Authenticator.objects.filter(
                 type=Authenticator.Type.TOTP, user=self.request.user
             ).first()
