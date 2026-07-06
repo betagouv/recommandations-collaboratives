@@ -21,7 +21,7 @@ maintenance:
   contractors:
     - name: Recommendations Collaboratives
       until: 2026-12-31
-      email: recommandations-collaboratives\x64beta.gouv.fr
+      email: recommandations-collaboratives@beta.gouv.fr
       website: https://beta.gouv.fr/startups/recommandations-collaboratives.html
 localisation:
   localisationReady: false
