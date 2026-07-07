@@ -5,13 +5,15 @@
 {% if project.inactive_since %}
     <div class="project-banner project-banner--paused">
         <p class="fr-mb-0">
+        {% spaceless %} {# many span so that spaceless has intented effect #}
             Ce dossier a été mis en pause
             {% if project.set_inactive_by %}
-                par <strong> {{ project.set_inactive_by.first_name }} {{ project.set_inactive_by.last_name }}
-                {% if project.set_inactive_by.profile.organization %}({{ project.set_inactive_by.profile.organization }}){% endif %}</strong>
+                par <strong><span> {{ project.set_inactive_by.first_name }} {{ project.set_inactive_by.last_name }}</span>
+                {% if project.set_inactive_by.profile.organization %}<span> ({{ project.set_inactive_by.profile.organization }})</span>{% endif %}</strong>
             {% else %}
-            automatiquement pour inactivité du demandeur
-            {% endif %}.
+              <span>automatiquement pour inactivité du demandeur</span>
+            {% endif %}<span>.</span>
+        {% endspaceless %}
         </p>
         <form id="admin-activate-project"
               method="post"
