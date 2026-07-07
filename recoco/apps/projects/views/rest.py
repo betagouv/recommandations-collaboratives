@@ -26,6 +26,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
+from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.rest_api.filters import (
     TagsFilterbackend,
     VectorSearchFilter,
@@ -47,6 +48,7 @@ from ..filters import (
     DefaultNoDeletedFilter,
     DepartmentsFilter,
     ProjectActivityFilter,
+    ProjectAssignedToUserFilter,
     ProjectSiteStatusFilter,
 )
 from ..serializers import (
@@ -154,6 +156,7 @@ class ProjectList(ListAPIView):
         DepartmentsFilter,
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
+        ProjectAssignedToUserFilter,
         # todo filter should not be necessary after cleaning recoco_sync 2122
         DefaultNoDeletedFilter,
     ]
@@ -171,6 +174,17 @@ class ProjectList(ListAPIView):
                 )
             )
         )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        pm = get_tenant_hook(self.request)
+        extra_fields = []
+        for fields in pm.hook.crm_project_list_extra_serializer_fields(
+            request=self.request
+        ):
+            extra_fields.extend(fields)
+        context["plugin_extra_fields"] = extra_fields
+        return context
 
     def list(self, request, *args, **kwargs):
         queryset = (
@@ -202,6 +216,14 @@ class ProjectList(ListAPIView):
                 "commune__department__region",
             )
         )
+
+        # Apply plugin queryset annotations (e.g. realisations_count)
+        pm = get_tenant_hook(request)
+        plugin_annotations = {}
+        for p_annotations in pm.hook.crm_project_list_annotations(request=request):
+            plugin_annotations.update(p_annotations)
+        if plugin_annotations:
+            queryset = queryset.annotate(**plugin_annotations)
 
         # Paginate the queryset
         page = self.paginate_queryset(queryset)

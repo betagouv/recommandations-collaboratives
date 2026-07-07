@@ -97,7 +97,7 @@
                                                href="{% url 'account_reset_password' %}">Réinitialisez votre mot de passe</a>
                                         </p>
                                         <p class="font-size-14px fr-mb-0">
-                                            Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="/login/">Connectez-vous par email</a>
+                                            Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="{% url 'account_request_login_code' %}">Connectez-vous par email</a>
                                         </p>
                                     </div>
                                 </div>
@@ -133,14 +133,16 @@
             <div class="fr-form-group">
                 <fieldset>
                     <h3 class="d-block fr-mb-1w">Vous n'avez pas de compte {{ site.name }} ?</h3>
-                    <p class="font-size-14px fr-mb-1w">
-                        Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut déposer une demande :
-                    </p>
-                    <div class="fr-fieldset__content fr-m-0">
-                        <div class="fr-input-group">
-                            <a class="fr-btn" href="{% url 'onboarding-project' %}">Déposer une demande</a>
+                    {% flag "enable_submit_new_project" %}
+                        <p class="font-size-14px fr-mb-1w">
+                            Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut déposer une demande :
+                        </p>
+                        <div class="fr-fieldset__content fr-m-0">
+                            <div class="fr-input-group">
+                                <a class="fr-btn" href="{% url 'onboarding-project' %}">Déposer une demande</a>
+                            </div>
                         </div>
-                    </div>
+                    {% endflag %}
                     <p class="font-size-14px fr-mt-1w fr-mb-0">
                         Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez <a class="font-size-14px" href="{% url 'advisor-access-request' %}">faire une demande de compte conseiller.</a>
                     </p>

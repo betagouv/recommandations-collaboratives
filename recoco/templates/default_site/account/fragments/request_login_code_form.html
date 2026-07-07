@@ -1,0 +1,50 @@
+{% extends "layout/new_layout.html" %}
+{% block breadcrumbs %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Connexion à {{ request.site.name }}' } }"
+         class="fr-p-0 fr-ml-15w fr-mb-4w fr-mt-2w">{% include "tools/breadcrumb.html" %}</div>
+{% endblock breadcrumbs %}
+{% block main_form %}
+    <form method="post" action="{% url 'account_request_login_code' %}">
+        {% csrf_token %}
+        {% if redirect_field_value %}
+            <input type="hidden"
+                   name="{{ redirect_field_name }}"
+                   value="{{ redirect_field_value }}" />
+        {% endif %}
+        <fieldset>
+            <h2 class="form__title">Saisir le code de connexion</h2>
+            {% if form.non_field_errors %}
+                <div class="fr-alert fr-alert--error fr-mb-2w">
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
+            <div class="fr-input-group {% if form.email.errors %}fr-input-group--error{% endif %}">
+                <label class="fr-label" for="{{ field.email.id_for_label }}">
+                        Adresse e-mail
+                        <span class="fr-hint-text">Format attendu : prenom.nom@domaine.fr</span>
+                    </label>
+                <input class="fr-input {% if form.email.errors %}fr-input--error{% endif %}"
+                       type="email"
+                       id="{{ form.email.id_for_label }}"
+                       name="{{ form.email.name }}"
+                       value="{{ form.email.value|default:'' }}"
+                       autocomplete="email"
+                       required />
+                {% for error in form.email.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+            </div>
+        </fieldset>
+        <ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--icon-left fr-mt-3w">
+            <li class="flex-grow-1">
+                <button type="submit" class="fr-btn w-100 fr-icon-send-plane-line">Recevoir un code de connexion</button>
+            </li>
+        </ul>
+    </form>
+    <ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--icon-left justify-content-center">
+        <li class="fr-mr-1w">ou</li>
+        <li>
+            <a class="fr-link normal-link-style"
+               href="{% url 'account_login' %}">Renseigner mon mot de passe</a>
+        </li>
+    </ul>
+
+{% endblock main_form %}

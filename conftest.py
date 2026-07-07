@@ -1,6 +1,10 @@
 # global personal configuration of pytest
+from datetime import timedelta
+
 import puremagic
 import pytest
+from cookie_consent.cache import delete_cache
+from cookie_consent.models import Cookie, CookieGroup
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
@@ -128,6 +132,27 @@ def malicious_file():
     headers = puremagic.magic_header_array
     header = [e for e in headers if e.extension == ".exe"][0].byte_match
     return SimpleUploadedFile("fake-img.png", header, content_type="image/png")
+
+
+def setup_sesame_cookie(client, user):
+    delete_cache()
+
+    # somehow tests are flaky without this
+    group, _ = CookieGroup.objects.get_or_create(
+        name="Préférences", varname="preferences"
+    )
+    cookie, _ = Cookie.objects.get_or_create(
+        cookiegroup=group,
+        name="enable-sesame",
+        description="Garde trace de la dernière personne connectée pour autoriser la connexion par lien magique pendant la durée de vie de cookie pour la personne",
+    )
+
+    client.cookies.load(
+        {
+            "cookie_consent": f"preferences={(cookie.created + timedelta(minutes=1)).isoformat()}"
+        }
+    )
+    client.cookies.load({"enable-sesame-user-id": str(user.id)})
 
 
 # eof

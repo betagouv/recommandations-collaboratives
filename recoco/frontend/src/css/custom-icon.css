@@ -142,3 +142,58 @@
 .fr-icon-link::before {
   mask-image: url(../assets/link.svg);
 }
+
+.fr-icon-right-arrow::after,
+.fr-icon-right-arrow::before {
+  mask-image: url(../assets/right-arrow.svg);
+}
+
+.fr-icon-book::after,
+.fr-icon-book::before {
+  mask-image: url(../assets/book.svg);
+}
+
+.fr-icon-group::after,
+.fr-icon-group::before {
+  mask-image: url(../assets/group.svg);
+}
+
+.fr-icon-file::after,
+.fr-icon-file::before {
+  mask-image: url(../assets/file.svg);
+}
+
+.fr-icon-books::after,
+.fr-icon-books::before {
+  mask-image: url(../assets/books.svg);
+}
+
+.fr-icon-settings::after,
+.fr-icon-settings::before {
+  mask-image: url(../assets/settings.svg);
+}
+
+.fr-icon-article::after,
+.fr-icon-article::before {
+  mask-image: url(../assets/article.svg);
+}
+
+.fr-icon-swap-lines::after,
+.fr-icon-swap-lines::before {
+  mask-image: url(../assets/swap-lines.svg);
+}
+
+.fr-icon-questionnaire::after,
+.fr-icon-questionnaire::before {
+  mask-image: url(../assets/questionnaire.svg);
+}
+
+.fr-icon-fingerprint::after,
+.fr-icon-fingerprint::before {
+  mask-image: url(../assets/fingerprint.svg);
+}
+
+.fr-icon-check-line::after,
+.fr-icon-check-line::before {
+  mask-image: url(../assets/check-line.svg);
+}

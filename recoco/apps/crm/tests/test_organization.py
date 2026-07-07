@@ -9,6 +9,8 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.projects import models as projects_models
+from recoco.apps.projects import utils as projects_utils
 from recoco.utils import login
 
 ########################################################################
@@ -80,6 +82,84 @@ def test_crm_organization_list_filters_organizations_by_name(request, client):
 
     unexpected = reverse("crm-organization-details", args=[unexpected.id])
     assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_organization_list_filters_organizations_by_department(request, client):
+    site = get_current_site(request)
+
+    department = baker.make(geomatics.Department, code="01")
+    other_department = baker.make(geomatics.Department, code="02")
+
+    expected = baker.make(addressbook_models.Organization)
+    expected.sites.add(site)
+    expected.departments.add(department)
+
+    unexpected = baker.make(addressbook_models.Organization)
+    unexpected.sites.add(site)
+    unexpected.departments.add(other_department)
+
+    url = reverse("crm-organization-list") + f"?departments={department.code}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected_url = reverse("crm-organization-details", args=[expected.id])
+    assertContains(response, expected_url)
+
+    unexpected_url = reverse("crm-organization-details", args=[unexpected.id])
+    assertNotContains(response, unexpected_url)
+
+
+@pytest.mark.django_db
+def test_crm_organization_list_annotates_member_and_project_counts(request, client):
+    site = get_current_site(request)
+
+    org = baker.make(addressbook_models.Organization)
+    org.sites.add(site)
+
+    # deux membres de l'orga, rattachés au site
+    members = []
+    for _ in range(2):
+        member = baker.make(auth_models.User)
+        member.profile.organization = org
+        member.profile.save()
+        member.profile.sites.add(site)
+        members.append(member)
+
+    # une autre orga avec un seul membre (cas de contrôle)
+    other_org = baker.make(addressbook_models.Organization)
+    other_org.sites.add(site)
+    other_member = baker.make(auth_models.User)
+    other_member.profile.organization = other_org
+    other_member.profile.save()
+    other_member.profile.sites.add(site)
+
+    # deux projets sur le site avec un membre de `org`
+    project1 = baker.make(projects_models.Project, sites=[site])
+    projects_utils.assign_collaborator(members[0], project1, is_owner=True)
+    project2 = baker.make(projects_models.Project, sites=[site])
+    projects_utils.assign_collaborator(members[1], project2)
+
+    # un projet appartenant à l'autre orga, ne doit pas compter pour `org`
+    other_project = baker.make(projects_models.Project, sites=[site])
+    projects_utils.assign_collaborator(other_member, other_project, is_owner=True)
+
+    url = reverse("crm-organization-list")
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    orgs_by_id = {o.id: o for o in response.context["page_obj"]}
+    assert orgs_by_id[org.id].members_count == 2
+    assert orgs_by_id[org.id].projects_count == 2
+    assert orgs_by_id[other_org.id].members_count == 1
+    assert orgs_by_id[other_org.id].projects_count == 1
 
 
 ########################################################################
@@ -243,6 +323,61 @@ def test_crm_organization_merge_page_with_permission(request, client):
 
     assertContains(response, a.name)
     assertContains(response, b.name)
+
+
+@pytest.mark.django_db
+def test_crm_organization_merge_page_summarizes_members_and_projects(request, client):
+    site = get_current_site(request)
+
+    org_a = baker.make(addressbook_models.Organization, sites=[site])
+    org_b = baker.make(addressbook_models.Organization, sites=[site])
+
+    # org_a : 2 membres, tous deux conseillers sur 1 même projet -> projects_count == 1
+    members_a = []
+    for _ in range(2):
+        member = baker.make(auth_models.User)
+        member.profile.organization = org_a
+        member.profile.sites.add(site)
+        member.profile.save()
+        members_a.append(member)
+
+    project_a = baker.make(projects_models.Project, sites=[site])
+    for member in members_a:
+        baker.make(
+            projects_models.ProjectSwitchtender,
+            site=site,
+            switchtender=member,
+            project=project_a,
+        )
+
+    # org_b : 1 membre, conseiller sur 2 projets -> projects_count == 2
+    member_b = baker.make(auth_models.User)
+    member_b.profile.organization = org_b
+    member_b.profile.sites.add(site)
+    member_b.profile.save()
+
+    for _ in range(2):
+        project_b = baker.make(projects_models.Project, sites=[site])
+        baker.make(
+            projects_models.ProjectSwitchtender,
+            site=site,
+            switchtender=member_b,
+            project=project_b,
+        )
+
+    url = reverse("crm-organization-merge") + f"?org_ids={org_a.id}&org_ids={org_b.id}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    summaries = {s["organization"].id: s for s in response.context["org_summaries"]}
+    assert summaries[org_a.id]["members_count"] == 2
+    assert summaries[org_a.id]["projects_count"] == 1
+    assert summaries[org_b.id]["members_count"] == 1
+    assert summaries[org_b.id]["projects_count"] == 2
 
 
 @pytest.mark.django_db

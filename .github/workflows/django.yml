@@ -26,6 +26,7 @@ jobs:
           yarn install
           yarn build
 
+
   pre-commit:
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +36,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Setup Pre-commit
         uses: pre-commit/action@v3.0.1
@@ -91,7 +95,6 @@ jobs:
 
       - name: Run Tests
         env:
-          SECRET_KEY: 'this-is-not-a-secret-key'
           SENDINBLUE_API_KEY: 'this-is-a-fake-api-key'
           DJANGO_DB_HOST: localhost
           DJANGO_DB_USER: postgres
@@ -101,3 +104,25 @@ jobs:
           DJANGO_DB_ENGINE: django.db.backends.postgresql
         run: |
           uv run pytest --create-db
+
+
+  uv-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.1.5
+
+      - name: Install packages
+        run: |
+          sudo apt-get update
+#          sudo apt-get install python3-gdal python3-dev libpq-dev libxml2-dev libxslt1-dev libheif-dev
+
+      - name: Install uv and python
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Audit dependencies
+        run: uv audit

@@ -4,6 +4,7 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% load invites_tags %}
+{% load waffle_tags %}
 {% block js %}
     {% vite_asset 'js/apps/menuTop.js' %}
 {% endblock js %}
@@ -104,11 +105,13 @@
                                 </a>
                             </div>
                         </template>
-                        {% if not is_switchtender %}
-                            <a class="fr-btn justify-content-center w-100"
-                               data-test-id="create-project"
-                               href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
-                        {% endif %}
+                        {% flag "enable_submit_new_project" %}
+                            {% if not is_switchtender %}
+                                <a class="fr-btn justify-content-center w-100"
+                                data-test-id="create-project"
+                                href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
+                            {% endif %}
+                        {% endflag %}
                     </ul>
                 </div>
             </li>
