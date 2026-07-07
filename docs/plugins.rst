@@ -769,7 +769,7 @@ global ``urlpatterns``.  The resulting endpoint is served under ``/api/``:
 Frontend (Vite / Alpine)
 ========================
 
-Plugins can ship their own JavaScript - including npm dependencies - without
+Plugins can ship their own JavaScript - including yarn dependencies - without
 modifying the core frontend's ``package.json`` or ``vite.config.js``.
 
 Plugin package layout
@@ -790,16 +790,16 @@ directory**:
         }
       },
       "dependencies": {
-        "some-npm-lib": "^1.0.0"
+        "some-yarn-lib": "^1.0.0"
       }
     }
 
-Install the plugin's own npm deps once:
+Install the plugin's own yarn deps once:
 
 .. code-block:: bash
 
     cd /path/to/plugin-giphy
-    npm install
+    yarn install
 
 Writing the Alpine controller
 -----------------------------
@@ -843,7 +843,7 @@ stores, and components directly instead of duplicating them:
     import { STATUSES, isStatus } from '@core/utils/taskStatus';
 
 This keeps plugin code in sync with core behaviour (e.g. task status enums)
-without adding a dependency between npm packages.
+without adding a dependency between yarn packages.
 
 Generating Vite entry proxies
 ------------------------------
@@ -898,7 +898,7 @@ Summary of the full workflow
     │ Plugin repo                                                   │
     │  package.json  →  recocoPlugin.viteEntries                   │
     │  plugin.py     →  vite_entries = {"giphySearch": "js/..."}   │
-    │  js/giphySearch.js  (Alpine controller, own npm deps)        │
+    │  js/giphySearch.js  (Alpine controller, own yarn deps)        │
     └────────────────────────────┬──────────────────────────────────┘
                                  │  python manage.py collect_plugin_vite_entries
                                  ▼
@@ -908,7 +908,7 @@ Summary of the full workflow
     │  src/js/plugins/giphySearch.js    (gitignored, proxy file)   │
     │  vite.config.js  reads plugin-entries.json automatically     │
     └───────────────────────────────────────────────────────────────┘
-                                 │  npm run build / npm run dev
+                                 │  yarn build / yarn dev
                                  ▼
     ┌───────────────────────────────────────────────────────────────┐
     │ Output                                                        │
@@ -932,14 +932,14 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
     python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
 
-4. If the plugin ships JavaScript, install its npm deps and generate Vite proxies::
+4. If the plugin ships JavaScript, install its yarn deps and generate Vite proxies::
 
-    cd /path/to/plugin-giphy && npm install
+    cd /path/to/plugin-giphy && yarn install
     cd /path/to/recoco && python manage.py collect_plugin_vite_entries
 
 5. Rebuild the frontend (only when deploying)::
 
-    cd recoco/frontend && npm run build
+    cd recoco/frontend && yarn build
 
 6. In the Django admin, edit the ``SiteConfiguration`` for the target site:
 
