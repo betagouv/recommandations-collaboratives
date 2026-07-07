@@ -6,9 +6,11 @@
     <div class="project-banner project-banner--paused">
         <p class="fr-mb-0">
             Ce dossier a été mis en pause
-            {% if project.paused_by %}
-                par <strong> {{ project.paused_by.first_name }} {{ project.paused_by.last_name }}
-                {% if project.paused_by.profile.organization %}({{ project.paused_by.profile.organization }}){% endif %}</strong>
+            {% if project.set_inactive_by %}
+                par <strong> {{ project.set_inactive_by.first_name }} {{ project.set_inactive_by.last_name }}
+                {% if project.set_inactive_by.profile.organization %}({{ project.set_inactive_by.profile.organization }}){% endif %}</strong>.
+            {% else %}
+            automatiquement pour inactivité du demandeur.
             {% endif %}.
         </p>
         <form id="admin-activate-project"
