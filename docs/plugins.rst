@@ -826,9 +826,38 @@ data objects with ``Alpine.data()``:
     Alpine.data('GiphySearch', GiphySearch);
 
 The plugin entry can import packages from its own ``node_modules/`` (Node's
-module resolution walks up the directory tree and finds them there) as well
-as packages from the core frontend's ``node_modules/`` (Alpine, Leaflet,
-lodash, etc.).
+module resolution walks up the directory tree and finds them there).
+
+Core frontend packages (Alpine, htmx, Leaflet, lodash) are a special case:
+the plugin sources live *outside* ``recoco/frontend/``, so walking up the
+directory tree never reaches the core's ``node_modules/``.  They resolve
+because they are listed in ``resolve.dedupe`` in the core
+``vite.config.js``, which forces Vite to resolve them from the core
+frontend root regardless of the importer's location:
+
+.. code-block:: javascript
+
+    // recoco/frontend/vite.config.js
+    resolve: {
+      dedupe: ['alpinejs', 'htmx.org', 'leaflet', 'lodash'],
+    }
+
+Beyond fixing resolution, ``dedupe`` guarantees the plugin bundle shares the
+**same module instance** as the core.  This matters: ``Alpine.data()`` calls
+from a plugin must register on the Alpine instance started by ``main.js`` -
+a second bundled copy of Alpine would register components that never mount.
+The same applies to Leaflet plugins (e.g. ``leaflet.markercluster``) that
+attach to the shared ``L`` object.
+
+.. warning::
+
+   Do **not** declare core packages (``alpinejs``, ``leaflet``, etc.) as
+   dependencies in the plugin's ``package.json`` - that would bundle a
+   duplicate instance and silently break ``Alpine.data()`` registration.
+   Only list packages the core does not ship (e.g.
+   ``leaflet.markercluster``).  If a plugin needs another *core* package not
+   yet in the list above, add it to ``resolve.dedupe`` in the core
+   ``vite.config.js``.
 
 Importing core JS modules (``@core`` alias)
 ---------------------------------------------
