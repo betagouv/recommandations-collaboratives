@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -567,35 +567,28 @@ def set_project_inactive(request, project_id: int):
     ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
-    form = forms.ProjectActiveForm(request.POST, instance=project)
+    project.inactive_since = timezone.now()
+    project.set_inactive_by = request.user
+    project.save()
 
-    if form.is_valid():
-        project = form.save(commit=False)
-        project.inactive_since = timezone.now()
-        project.set_inactive_by = request.user
-        project.save()
+    # Notifications
+    notification = {
+        "sender": request.user,
+        "actor": request.user,
+        "verb": verbs.Project.SET_INACTIVE,
+        "action_object": project,
+        "target": project,
+    }
 
-        # Notifications
-        notification = {
-            "sender": request.user,
-            "actor": request.user,
-            "verb": verbs.Project.SET_INACTIVE,
-            "action_object": project,
-            "target": project,
-        }
+    notify_advisors_of_project(project, notification, exclude=request.user)
 
-        notify_advisors_of_project(project, notification, exclude=request.user)
-
-        # Action trace
-        action.send(
-            request.user,
-            verb=verbs.Project.SET_INACTIVE,
-            action_object=project,
-            target=project,
-        )
-
-    else:
-        raise HttpResponseBadRequest("Formulaire invalide")
+    # Action trace
+    action.send(
+        request.user,
+        verb=verbs.Project.SET_INACTIVE,
+        action_object=project,
+        target=project,
+    )
 
     return redirect(reverse("projects-project-administration", args=(project.id,)))
 

@@ -34,7 +34,7 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_inactive_without_reason(request, client, project):
+def test_owner_can_set_project_inactive(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
         args=[project.id],
@@ -94,26 +94,6 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client, project)
 
     # Action traces
     assert Action.objects.filter(verb=verbs.Project.SET_INACTIVE).count() == 1
-
-
-@pytest.mark.django_db
-def test_owner_can_set_project_inactive_with_reason(request, client, project):
-    url = reverse(
-        "projects-project-set-inactive",
-        args=[project.id],
-    )
-
-    with login(client) as user:
-        assign_collaborator(user, project, is_owner=True)
-        response = client.post(url, data={"inactive_reason": "because"})
-
-    assert response.status_code == 302
-
-    project = models.Project.on_site.get(id=project.id)
-
-    assert project.inactive_since is not None
-    assert project.inactive_reason == "because"
-    assert project.set_inactive_by == user
 
 
 @pytest.mark.django_db
