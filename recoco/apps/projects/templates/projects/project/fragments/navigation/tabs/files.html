@@ -10,9 +10,9 @@
            {% if files_links %}checked{% endif %}
            aria-checked="{% if files_links %}true{% else %}false{% endif %}"
            {% if 'manage_documents' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-documents' project.pk %}'" {% else %} disabled {% endif %}
-           id="segmented-control-tasks"
+           id="segmented-control-files"
            name="segmented-control-project">
-    <label class="fr-label" for="segmented-control-tasks">
+    <label class="fr-label" for="segmented-control-files">
         <a class="stretched-link"
            data-test-id="project-navigation-documents"
            href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">{{ label |default:"Fichiers" }}

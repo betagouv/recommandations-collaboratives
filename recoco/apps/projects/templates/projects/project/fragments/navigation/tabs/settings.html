@@ -10,9 +10,9 @@
            {% if administration_panel %}checked{% endif %}
            aria-checked="{% if administration_panel %}true{% else %}false{% endif %}"
            {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} @click="window.location='{% url 'projects-project-administration' project.pk %}'" {% else %} disabled {% endif %}
-           id="segmented-control-tasks"
+           id="segmented-control-settings"
            name="segmented-control-project">
-    <label class="fr-label" for="segmented-control-tasks">
+    <label class="fr-label" for="segmented-control-settings">
         <a class="stretched-link"
            data-test-id="navigation-administration-tab"
            href="{% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} {% url 'projects-project-administration' project.pk %} {% else %}#{% endif %}">{{ label |default:"Paramètres" }}

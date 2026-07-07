@@ -11,9 +11,9 @@
                {% if internal_followup %}checked{% endif %}
                aria-checked="{% if internal_followup %}true{% else %}false{% endif %}"
                {% if 'use_private_notes' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-internal-followup' project.pk %}'" {% else %} disabled {% endif %}
-               id="segmented-control-tasks"
+               id="segmented-control-private-conversation"
                name="segmented-control-project">
-        <label class="fr-label" for="segmented-control-tasks">
+        <label class="fr-label" for="segmented-control-private-conversation">
             <a class="stretched-link"
                href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">{{ label |default:"Espace conseillers" }}
                 {% if 'use_private_notes' in user_project_perms %}

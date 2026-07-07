@@ -14,9 +14,9 @@
            {% if conversations_new %}checked{% endif %}
            aria-checked="{% if conversations_new %}true{% else %}false{% endif %}"
            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations' project.pk %}'" {% else %} disabled {% endif %}
-           id="segmented-control-tasks"
+           id="segmented-control-conversation"
            name="segmented-control-project">
-    <label class="fr-label" for="segmented-control-tasks">
+    <label class="fr-label" for="segmented-control-conversation">
         <a class="stretched-link"
            data-test-id="project-navigation-conversations-new"
            @click="if ($store.tutorialsEvents?.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
