@@ -8,9 +8,9 @@
             Ce dossier a été mis en pause
             {% if project.set_inactive_by %}
                 par <strong> {{ project.set_inactive_by.first_name }} {{ project.set_inactive_by.last_name }}
-                {% if project.set_inactive_by.profile.organization %}({{ project.set_inactive_by.profile.organization }}){% endif %}</strong>.
+                {% if project.set_inactive_by.profile.organization %}({{ project.set_inactive_by.profile.organization }}){% endif %}</strong>
             {% else %}
-            automatiquement pour inactivité du demandeur.
+            automatiquement pour inactivité du demandeur
             {% endif %}.
         </p>
         <form id="admin-activate-project"
