@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="project",
-            name="paused_by",
+            name="set_inactive_by",
             field=models.ForeignKey(
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="inactive_by_user",
+                related_name="projects_set_inactive",
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
