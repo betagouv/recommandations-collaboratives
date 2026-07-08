@@ -10,11 +10,11 @@ from actstream import action
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
-from django.contrib.auth.models import User, update_last_login
+from django.contrib.auth.models import Group, User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import connection
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q, Subquery, Value
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 from psycopg import sql
@@ -75,23 +75,39 @@ def create_tenant_schema(sender, instance, **kwargs):
 
 @receiver(m2m_changed, sender=User.groups.through)
 def ensure_2fa_requirement(sender, instance, **kwargs):
-    action = kwargs.get("action")
-    if action in ["post_add", "post_remove", "post_clear"]:
-        users = (
-            [instance]
+    signal_action = kwargs.get("action")
+    user_profile_qs = UserProfile.objects.none()
+    if signal_action in ["post_add", "post_remove"]:
+        user_profile_qs = (
+            UserProfile.objects.filter(user=instance)
             if not kwargs["reverse"]
-            else list(User.objects.filter(id__in=kwargs["pk_set"]))
+            else UserProfile.objects.filter(user_id__in=kwargs["pk_set"])
         )
-        for user in users:
-            requires_2fa = user.groups.filter(
+    if signal_action == "post_clear" and not kwargs["reverse"]:
+        user_profile_qs = UserProfile.objects.filter(user=instance)
+
+    requires_2fa = Exists(
+        Subquery(
+            Group.objects.filter(user=OuterRef("user_id")).filter(
                 Q(name__contains="staff") | Q(name__contains="admin")
-            ).exists()
-            has_totp = Authenticator.objects.filter(type="totp", user_id=user.id)
-            user.profile.requires_2fa = requires_2fa
-            user.profile.login_with_code = (
-                requires_2fa and not has_totp
-            ) or user.profile.login_with_code
-            user.profile.save()
+            )
+        )
+    )
+
+    if (
+        signal_action == "pre_clear"
+        and kwargs["reverse"]
+        and ("staff" in instance.name or "admin" in instance.name)
+    ):
+        user_profile_qs = UserProfile.objects.filter(user__groups=instance)
+        requires_2fa = Value(False)
+
+    has_totp = Exists(
+        Subquery(Authenticator.objects.filter(type="totp", user_id=OuterRef("user_id")))
+    )
+
+    user_profile_qs.update(requires_2fa=requires_2fa)
+    user_profile_qs.filter(requires_2fa=True).update(login_with_code=~has_totp)
 
 
 @receiver(authenticator_added, sender=Authenticator)
