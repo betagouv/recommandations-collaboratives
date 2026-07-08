@@ -11,10 +11,12 @@ import urllib
 
 import django.core.mail
 from actstream import action
+from allauth.account.views import RequestLoginCodeView
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
@@ -37,7 +39,12 @@ from recoco.apps.projects.utils import (
 )
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor, get_admin_for_site, get_staff_for_site
+from recoco.utils import (
+    check_if_advisor,
+    get_admin_for_site,
+    get_staff_for_site,
+    is_sensitive_account,
+)
 
 from ... import verbs
 from . import models
@@ -465,6 +472,13 @@ def permission_denied(request, exception):
             },
         )
     )
+
+
+class RequestLoginCodeNoStaffView(RequestLoginCodeView):
+    def form_valid(self, form):
+        if is_sensitive_account(form._user, get_current_site(self.request)):
+            form._user = None
+        return super().form_valid(form)
 
 
 # eof

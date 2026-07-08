@@ -1,4 +1,19 @@
+import { readFileSync } from 'fs';
 import { resolve } from 'path';
+
+function discoverPluginEntries() {
+  try {
+    const json = readFileSync(resolve('./plugin-entries.json'), 'utf-8');
+    const entries = JSON.parse(json);
+    const result = {};
+    for (const [name, relPath] of Object.entries(entries)) {
+      result[name] = resolve('./src', relPath);
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
 
 const config = {
   plugins: [],
@@ -18,6 +33,9 @@ const config = {
   },
   resolve: {
     extensions: ['.js', '.json'],
+    alias: {
+      '@core': resolve('./src'),
+    },
   },
   css: {
     preprocessorOptions: {
@@ -44,6 +62,7 @@ const config = {
         advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),
         auth: resolve('./src/js/apps/auth.js'),
         projectDetails: resolve('./src/js/apps/projectDetails.js'),
+        resourceDetails: resolve('./src/js/apps/resourceDetails.js'),
         projectShare: resolve('./src/js/apps/projectShare.js'),
         projectAdministration: resolve(
           './src/js/apps/projectAdministration.js'
@@ -251,7 +270,12 @@ const config = {
           './src/js/styles/background-override.css.js'
         ),
         emptyStateCrmStyles: resolve('./src/js/styles/crm-empty-state.css.js'),
+        formInformationStyles: resolve(
+          './src/js/styles/form-information.css.js'
+        ),
+        layoutFormStyles: resolve('./src/js/styles/layout-form.css.js'),
         errorPageStyles: resolve('./src/js/styles/layouts/error-page.css.js'),
+        ...discoverPluginEntries(),
       },
       output: {
         chunkFileNames: undefined,

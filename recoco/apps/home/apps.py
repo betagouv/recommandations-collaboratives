@@ -12,6 +12,6 @@ class HomeConfig(AppConfig):
         from django.contrib.auth.models import User
         from recoco.apps.home.models import AdvisorAccessRequest
 
-        registry.register(User)
         registry.register(AdvisorAccessRequest)
+        registry.register(User)
         watson.register(User)

@@ -1,3 +1,5 @@
+import importlib
+
 from django.urls import path
 from notifications import views as notifications_views
 from rest_framework import routers
@@ -207,4 +209,24 @@ survey_urls = [
     ),
 ]
 
-urlpatterns = router.urls + api_urls + auth_urls + tasks_urls + survey_urls
+
+def _collect_plugin_rest_urls():
+    from recoco.apps.plugins.manager import get_plugin_manager
+
+    urls = []
+    pm = get_plugin_manager()
+    for _name, plugin in pm.list_name_plugin():
+        rest_mod_name = getattr(plugin, "rest_urls_module", None)
+        if not rest_mod_name:
+            continue
+        try:
+            mod = importlib.import_module(rest_mod_name)
+            urls.extend(getattr(mod, "urlpatterns", []))
+        except ImportError:
+            pass
+    return urls
+
+
+urlpatterns = (
+    router.urls + api_urls + auth_urls + survey_urls + _collect_plugin_rest_urls()
+)

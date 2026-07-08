@@ -19,6 +19,8 @@
             <template x-if="node.type == 'RecommendationNode'">
                 {% include "conversations/messages/fragments/node_recommendation.html" %}
             </template>
+            {% load conversation_tags %}
+            {% conversation_plugin_node_html request project %}
         </div>
     </template>
 </template>

@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.openid_connect",
     "allauth.mfa",
     "guardian",
-    "magicauth",
     "sass_processor",
     "django_vite",
     "markdownx",
@@ -93,6 +92,7 @@ INSTALLED_APPS = [
     "recoco.apps.metrics",
     "recoco.apps.demarches_simplifiees",
     "recoco.apps.social_account",
+    "recoco.apps.plugins",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -113,6 +113,8 @@ INSTALLED_APPS = [
 
 SITE_ID = SiteID(default=1)
 
+DATABASE_ROUTERS = ["recoco.apps.plugins.routers.TenantPluginRouter"]
+
 SILENCED_SYSTEM_CHECKS = [
     "sites.E101"  # Check to ensure SITE_ID is an int - ours is an object
 ]
@@ -124,6 +126,7 @@ MIDDLEWARE = [
     "multisite.middleware.DynamicSiteMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
+    "recoco.apps.plugins.middlewares.TenantPluginSchemaMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "recoco.apps.home.middlewares.SesameWithCookieMiddleware",
@@ -272,16 +275,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Email Configuration
 EMAIL_FROM = "Recoco <no-reply@recoco.fr>"
 
-# MagicAuth configuration
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "login-redirect"
-MAGICAUTH_FROM_EMAIL = EMAIL_FROM
-MAGICAUTH_ADAPTER = "recoco.apps.home.adapters.UVMagicauthAdapter"
-MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à votre compte en un clic"
-MAGICAUTH_EMAIL_FIELD = "email"
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
-MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
-
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
     "markdown.extensions.extra",
@@ -337,7 +330,10 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "login-redirect"
+LOGIN_REDIRECT_URL = "login-redirect"
+ACCOUNT_LOGIN_BY_CODE_ENABLED = True
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 3600  # 1 hour in seconds
 
 # Common signup form shared by account and socialaccount
 ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"
