@@ -4,7 +4,8 @@ import logging
 
 import requests
 from django.conf import settings
-from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,14 +18,14 @@ logger = logging.getLogger(__name__)
 
 def _acra_headers():
     token = getattr(settings, "ACRA_API_TOKEN", None)
-    headers = {"Content-Type": "application/json"}
+    headers = {}
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
 
 
 def _acra_url(path):
-    base = getattr(settings, "ACRA_API_BASE_URL", "").rstrip("/")
+    base = settings.ACRA_API_BASE_URL.rstrip("/")
     return f"{base}{path}"
 
 
@@ -48,7 +49,10 @@ class AcraAskView(APIView):
             response.raise_for_status()
         except requests.RequestException:
             logger.exception("ACRA /ask request failed")
-            return Response({"error": "Upstream service unavailable."}, status=502)
+            return Response(
+                {"detail": "Upstream service unavailable."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
 
         return Response(response.json())
 
@@ -78,6 +82,9 @@ class AcraCoRecommendationsView(APIView):
             response.raise_for_status()
         except requests.RequestException:
             logger.exception("ACRA /co-recommendations request failed")
-            return Response({"error": "Upstream service unavailable."}, status=502)
+            return Response(
+                {"detail": "Upstream service unavailable."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
 
         return Response(response.json())
