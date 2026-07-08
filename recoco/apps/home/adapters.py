@@ -34,14 +34,4 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         return saved_user
 
     def is_login_by_code_required(self, request, **kwargs):
-        from allauth.account import authentication
-
-        # todo do we want to keep that code that comes from source?
-        method = None
-        records = authentication.get_authentication_records(self.request)
-        if records:
-            method = records[-1]["method"]
-        if method == "code":
-            return False
-
         return request.user.profile.login_with_code

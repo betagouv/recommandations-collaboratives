@@ -33,6 +33,7 @@ from recoco.utils import assign_site_admin, login
 from .. import utils
 
 
+@pytest.mark.django_db
 def test_visitor_can_access_home_page(client):
     url = reverse("home")
     response = client.get(url)
@@ -645,7 +646,7 @@ def test_unkown_user_ask_code_no_fail(client, mocker):
 
 
 @pytest.mark.django_db
-def test_sensitive_two_fa_mode_field_disabled(client):
+def test_sensitive_two_fa_mode_field_cant_select_none(client):
     user = baker.make(auth_models.User)
     user.profile.requires_2fa = True
     user.profile.save()
@@ -654,14 +655,14 @@ def test_sensitive_two_fa_mode_field_disabled(client):
     with login(client, user=user):
         response = client.get(url)
         choices = response.context_data.get("form").fields.get("two_fa_mode").choices
-        assert all(value != "none" for value, _ in choices)
+        assert "none" not in (value for value, _ in choices)
 
 
 @pytest.mark.django_db
 def test_disabled_two_fa_mode_sensitive_default_by_code(client):
     user = baker.make(auth_models.User)
     user.profile.requires_2fa = True
-    user.profile.login_with_code = True
+    user.profile.login_with_code = False
     user.profile.save()
 
     url = reverse("mfa_index")

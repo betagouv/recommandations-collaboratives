@@ -14,7 +14,6 @@ from actstream import action
 from allauth.account.adapter import get_adapter
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
-from allauth.mfa.totp.internal import flows as totp_flows
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
@@ -67,6 +66,7 @@ from .models import AdvisorAccessRequest
 from .utils import get_current_site_sender_email, make_new_site
 
 
+class HomePageView(TemplateView):
     template_name = "home/home.html"
 
 
@@ -506,12 +506,19 @@ class TwoFAConfigView(FormView):
         kwargs["user"] = self.request.user
         return kwargs
 
-    def _disable_totp(self):
+    def form_invalid(self, form):
+        # at least ensure that requires_2fa is respected
         authenticator = Authenticator.objects.filter(
             type=Authenticator.Type.TOTP, user=self.request.user
         ).first()
-        if authenticator:
-            totp_flows.deactivate_totp(self.request, authenticator)
+        if (
+            self.request.user.profile.requires_2fa
+            and not authenticator
+            and not self.request.user.profile.login_with_code
+        ):
+            self.request.user.profile.login_with_code = True
+            self.request.user.profile.save()
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         two_fa_mode = form.cleaned_data["two_fa_mode"]

@@ -84,8 +84,7 @@ def ensure_2fa_requirement(sender, instance, **kwargs):
         )
         for user in users:
             requires_2fa = user.groups.filter(
-                Q(user__groups__name__contains="staff")
-                | Q(user__groups__name__contains="admin")
+                Q(name__contains="staff") | Q(name__contains="admin")
             ).exists()
             has_totp = Authenticator.objects.filter(type="totp", user_id=user.id)
             user.profile.requires_2fa = requires_2fa
