@@ -228,5 +228,10 @@ def _collect_plugin_rest_urls():
 
 
 urlpatterns = (
-    router.urls + api_urls + auth_urls + survey_urls + _collect_plugin_rest_urls()
+    router.urls
+    + api_urls
+    + auth_urls
+    + tasks_urls
+    + survey_urls
+    + _collect_plugin_rest_urls()
 )
