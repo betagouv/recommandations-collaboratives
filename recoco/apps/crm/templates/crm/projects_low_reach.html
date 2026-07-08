@@ -71,25 +71,21 @@
                             name="status"
                             onchange="this.form.submit()">
                         <option value="all"
-                                class="font-size-12px"
                                 {% if status_filter == 'all' %}selected{% endif %}
                                 title="Tous les dossiers à relancer">
                             Tous
                         </option>
                         <option value="no_reaction"
-                                class="font-size-12px"
                                 {% if status_filter == 'no_reaction' %}selected{% endif %}
                                 title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">
                             Aucune réaction
                         </option>
                         <option value="zero_read"
-                                class="font-size-12px"
                                 {% if status_filter == 'zero_read' %}selected{% endif %}
                                 title="Aucune recommandation n'a été lue">
                             0 reco lue
                         </option>
                         <option value="low_read"
-                                class="font-size-12px"
                                 {% if status_filter == 'low_read' %}selected{% endif %}
                                 title="Aucune ou une seule recommandation a été lue">
                             Recos non lues

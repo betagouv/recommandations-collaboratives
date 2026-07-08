@@ -103,6 +103,10 @@
         background: transparent;
         appearance: none;
         -webkit-appearance: none;
+
+        option {
+            font-size: 12px;
+        }
     }
 
     &__label {
