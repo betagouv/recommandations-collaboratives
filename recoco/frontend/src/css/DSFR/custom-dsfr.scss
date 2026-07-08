@@ -963,6 +963,20 @@ a.fr-text-inverted--grey {
   }
 }
 
+.fr-btn--secondary {
+  &-grey {
+    border: 1px solid #E5E5E5;
+    color: var(--light-text-default-grey, #3A3A3A);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: white;
+    &:hover {
+      background-color: var(--light-background-default-grey, #eee) !important;
+    }
+  }
+}
+
 .border-none {
   box-shadow: none;
 }

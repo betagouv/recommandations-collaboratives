@@ -34,7 +34,7 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_inactive_without_reason(request, client, project):
+def test_owner_can_set_project_inactive(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
         args=[project.id],
@@ -50,6 +50,7 @@ def test_owner_can_set_project_inactive_without_reason(request, client, project)
 
     assert project.inactive_since is not None
     assert project.inactive_reason == ""
+    assert project.set_inactive_by == user
 
 
 @pytest.mark.django_db
@@ -96,25 +97,6 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client, project)
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_inactive_with_reason(request, client, project):
-    url = reverse(
-        "projects-project-set-inactive",
-        args=[project.id],
-    )
-
-    with login(client) as user:
-        assign_collaborator(user, project, is_owner=True)
-        response = client.post(url, data={"inactive_reason": "because"})
-
-    assert response.status_code == 302
-
-    project = models.Project.on_site.get(id=project.id)
-
-    assert project.inactive_since is not None
-    assert project.inactive_reason == "because"
-
-
-@pytest.mark.django_db
 def test_site_staff_can_set_project_inactive(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
@@ -131,6 +113,7 @@ def test_site_staff_can_set_project_inactive(request, client, project):
 
     assert project.inactive_since is not None
     assert project.inactive_reason == ""
+    assert project.set_inactive_by == user
 
 
 @pytest.mark.django_db
@@ -149,6 +132,7 @@ def test_regular_collaborator_cannot_set_project_inactive(request, client, proje
 
     project = models.Project.on_site.get(id=project.id)
     assert project.inactive_since is None
+    assert project.set_inactive_by is None
 
 
 # -- Activate project
@@ -158,10 +142,13 @@ def test_regular_collaborator_cannot_set_project_inactive(request, client, proje
 def test_owner_can_set_project_active(request, client, make_project):
     site = get_current_site(request)
 
+    pauser = baker.make(auth_models.User, username="pauser@project.info")
     project = make_project(
         site=site,
         status="READY",
         inactive_since=timezone.now(),
+        inactive_reason="no more advice needed",
+        set_inactive_by=pauser,
     )
 
     url = reverse(
@@ -178,6 +165,9 @@ def test_owner_can_set_project_active(request, client, make_project):
     project = models.Project.on_site.get(id=project.id)
 
     assert project.inactive_since is None
+    assert project.inactive_reason is None
+    assert project.set_inactive_by is None
+    assert project.last_manual_reactivation is not None
 
 
 @pytest.mark.django_db
@@ -229,7 +219,13 @@ def test_trace_when_project_is_set_active(request, client, make_project):
 def test_site_staff_can_set_project_active(request, client, make_project):
     site = get_current_site(request)
 
-    project = make_project(site=site, status="READY", inactive_since=timezone.now())
+    pauser = baker.make(auth_models.User, username="pauser@project.info")
+    project = make_project(
+        site=site,
+        status="READY",
+        inactive_since=timezone.now(),
+        set_inactive_by=pauser,
+    )
 
     url = reverse(
         "projects-project-set-active",
@@ -245,6 +241,7 @@ def test_site_staff_can_set_project_active(request, client, make_project):
     project = models.Project.on_site.get(id=project.id)
 
     assert project.inactive_since is None
+    assert project.set_inactive_by is None
 
 
 @pytest.mark.django_db

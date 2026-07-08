@@ -79,9 +79,7 @@ class SetEnableSesameCookieMiddleware:
             request.user.is_authenticated
             and not getattr(request.user, "is_hijacked", True)
             # during hijacking request.user is the hijacked one and is_hijacked is not set
-            and get_cookie_value_from_request(
-                request, "preferences", "preferences:enable-sesame"
-            )
+            and get_cookie_value_from_request(request, "preferences", "enable-sesame:")
             and request.COOKIES.get("enable-sesame-user-id", None) != request.user.id
         ):
             current_site = Site.objects.get_current()
@@ -115,9 +113,7 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
         # on this device, to secure this type of authentication
         cookie_user_id = (
             request.COOKIES.get("enable-sesame-user-id", None)
-            if get_cookie_value_from_request(
-                request, "preferences", "preferences:enable-sesame"
-            )
+            if get_cookie_value_from_request(request, "preferences", "enable-sesame:")
             else None
         )
         if cookie_user_id is None:
