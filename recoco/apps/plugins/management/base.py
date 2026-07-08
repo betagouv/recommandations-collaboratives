@@ -3,6 +3,7 @@ from django.db import connection
 from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.plugins.resolvers import set_enabled_plugins
 
 
 class TenantCommand(BaseCommand):
@@ -32,7 +33,7 @@ class TenantCommand(BaseCommand):
         schema = self.get_schema(options)
 
         try:
-            SiteConfiguration.objects.get(schema_name=schema)
+            site_config = SiteConfiguration.objects.get(schema_name=schema)
         except SiteConfiguration.DoesNotExist as err:
             raise CommandError(
                 f"No SiteConfiguration found for schema '{schema}'"
@@ -42,4 +43,9 @@ class TenantCommand(BaseCommand):
             cursor.execute(
                 SQL("SET search_path TO {}, public").format(Identifier(schema))
             )
+
+        # Mirror what TenantPluginSchemaMiddleware does for HTTP requests so
+        # that PluginURLResolver.reverse() works inside management commands.
+        set_enabled_plugins(site_config.enabled_plugins or [])
+
         super().execute(*args, **options)
