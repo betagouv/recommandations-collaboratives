@@ -1019,5 +1019,32 @@
         1
       ]
     }
+  },
+  {
+    "model": "projects.project",
+    "pk": 38,
+    "fields": {
+      "submitted_by": 5,
+      "ro_key": "e2e00000000000000000000000000038",
+      "last_name": "Johnna",
+      "first_name": "Doa",
+      "publish_to_cartofriches": false,
+      "exclude_stats": true,
+      "muted": false,
+      "org_name": "Collectivité 1",
+      "created_on": "2025-06-01T10:00:00Z",
+      "updated_on": "2025-06-01T10:00:00Z",
+      "tags": "",
+      "name": "Dossier reco à modifier",
+      "phone": "01 01 01 01 01",
+      "description": "Projet fixture dédié aux tests e2e de recommandations",
+      "location": "861 chemin rural 53",
+      "commune": 42,
+      "impediments": "",
+      "deleted": null,
+      "sites": [
+        1
+      ]
+    }
   }
 ]

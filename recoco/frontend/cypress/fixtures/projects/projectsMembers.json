@@ -529,5 +529,23 @@
       "project": 37,
       "site": 1
     }
+  },
+  {
+    "model": "projects.projectmember",
+    "pk": 30,
+    "fields": {
+      "member": 5,
+      "project": 38,
+      "is_owner": true
+    }
+  },
+  {
+    "model": "projects.projectswitchtender",
+    "pk": 36,
+    "fields": {
+      "switchtender": 2,
+      "project": 38,
+      "site": 1
+    }
   }
 ]
