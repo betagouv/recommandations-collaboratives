@@ -3,6 +3,7 @@
 import logging
 
 import requests
+import sentry_sdk
 from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
@@ -47,8 +48,9 @@ class AcraAskView(APIView):
                 timeout=60,
             )
             response.raise_for_status()
-        except requests.RequestException:
+        except requests.RequestException as exc:
             logger.exception("ACRA /ask request failed")
+            sentry_sdk.capture_exception(exc)
             return Response(
                 {"detail": "Upstream service unavailable."},
                 status=status.HTTP_502_BAD_GATEWAY,
@@ -80,8 +82,9 @@ class AcraCoRecommendationsView(APIView):
                 timeout=30,
             )
             response.raise_for_status()
-        except requests.RequestException:
+        except requests.RequestException as exc:
             logger.exception("ACRA /co-recommendations request failed")
+            sentry_sdk.capture_exception(exc)
             return Response(
                 {"detail": "Upstream service unavailable."},
                 status=status.HTTP_502_BAD_GATEWAY,
