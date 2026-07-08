@@ -101,7 +101,7 @@
                        value="1"
                        {% if mine_only %}checked{% endif %}
                        @change="$el.closest('form').submit()">
-                <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes projets</label>
+                <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes dossiers</label>
             </div>
             <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
                class="fr-btn fr-btn--primary fr-btn--sm text-nowrap"
