@@ -5,7 +5,20 @@
         <div class="fr-callout fr-callout--green-emeraude fr-mb-3w">
             <p class="fr-callout__title">
                 <span class="fr-icon-checkbox-circle-fill fr-mr-1v" aria-hidden="true"></span>
-                Vos <strong x-text="$store.explorationIA.getAllSelectedResources().length"></strong> ressources sont prêtes pour créer vos recommandations.
+                <template x-if="$store.explorationIA.getAllSelectedResources().length > 1">
+                    Vos <strong x-text="$store.explorationIA.getAllSelectedResources().length"></strong> ressources sont prêtes pour créer vos recommandations.
+                </template>
+                <template x-if="$store.explorationIA.getAllSelectedResources().length == 1">
+                    Votre ressource est prête pour créer votre recommandation.
+                </template>
+                <template x-if="$store.explorationIA.getAllSelectedResources().length == 0">
+                    Aucune ressource disponible pour la création de recommandation. 
+                    <button @click="$store.explorationIA.resetExploration()"
+                        class="fr-btn fr-btn--primary">
+                        <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
+                        Effectuer une nouvelle exploration ?
+                    </button>
+                </template>
             </p>
         </div>
         <!-- Ressources sélectionnées (étapes 1 et 2 combinées) -->
