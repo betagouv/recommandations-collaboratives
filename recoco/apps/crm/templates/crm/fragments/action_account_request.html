@@ -1,16 +1,11 @@
 {% load gravatar %}
 <li class="d-flex flex-columns list-group-item">
-    {% if action.actor %}
-        <div class="align-middle fr-mx-2v flex-shrink">
-            <img class="rounded-circle"
-                 src="{% gravatar_url action.actor.email size=24 %}"
-                 alt="{{ action.actor }}">
-        </div>
-    {% endif %}
-    <div class=" flex-row flex-grow-1">
-        <div class="flex-grow w-100 flex-grow-1">
+    <div class="flex-row flex-grow-1">
+        <div class="w-100 font-size-12px">
             {% if action.actor %}
-                {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                <span class="d-inline-flex align-middle">
+                    {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                </span>
             {% else %}
                 <span class="actor">(compte supprimé)</span>
             {% endif %}

@@ -27,9 +27,11 @@ class OrganizationFilter(django_filters.FilterSet):
         lookup_expr="icontains",
     )
 
-    department = django_filters.CharFilter(
-        field_name="department",
-        lookup_expr="code",
+    departments = django_filters.ModelMultipleChoiceFilter(
+        label="Départements concernés",
+        field_name="departments",
+        to_field_name="code",
+        queryset=geomatics_models.Department.objects.all(),
     )
 
     class Meta:

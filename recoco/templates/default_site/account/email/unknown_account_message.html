@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load waffle_tags %}
 <!DOCTYPE html>
 <html>
     {# todo refactor email styles #}
@@ -266,7 +267,7 @@
                                             <td>
                                                 <p>Bonjour,</p>
                                                 <p>
-                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe
+                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe ou un code pour vous connecter
                                                     sur {{ current_site.name }}. Cependant, nous n'avons pas de compte utilisateur associé à votre
                                                     adresse.
                                                 </p>
@@ -294,7 +295,7 @@
                                                     sur <a href="mailto:{{ current_site.configuration.contact_form_recipient }}">{{ current_site.configuration.contact_form_recipient }}</a>.
                                                 </p>
                                                 <p>
-                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe, vous pouvez
+                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe ou de connexion, vous pouvez
                                                     ignorer cet email.
                                                 </p>
                                                 <p>

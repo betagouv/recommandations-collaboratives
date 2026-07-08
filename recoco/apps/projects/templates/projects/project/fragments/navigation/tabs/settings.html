@@ -1,0 +1,24 @@
+{% comment %}
+    Parameter:
+        - label (string): label to display in project navigation
+{% endcomment %}
+<div class="fr-segmented__element"
+     {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %} aria-describedby="tooltip-lock-access-settings" {% endif %}>
+    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-settings" %}
+    <input value="administrationPanel"
+           type="radio"
+           {% if administration_panel %}checked{% endif %}
+           aria-checked="{% if administration_panel %}true{% else %}false{% endif %}"
+           {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} @click="window.location='{% url 'projects-project-administration' project.pk %}'" {% else %} disabled {% endif %}
+           id="segmented-control-settings"
+           name="segmented-control-project">
+    <label class="fr-label" for="segmented-control-settings">
+        <a class="stretched-link"
+           data-test-id="navigation-administration-tab"
+           href="{% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} {% url 'projects-project-administration' project.pk %} {% else %}#{% endif %}">{{ label |default:"Paramètres" }}
+            {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %}
+                <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+            {% endif %}
+        </a>
+    </label>
+</div>

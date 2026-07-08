@@ -89,6 +89,9 @@
       &:nth-child(even) {
         background-color: #f8f8f8;
       }
+      &.is-selected {
+        border: 2px solid var(--light-background-active-blue-france, #000091);
+      }
     }
     &__project-name {
       font-weight: 700;
