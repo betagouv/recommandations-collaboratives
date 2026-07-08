@@ -28,6 +28,7 @@ from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.core.exceptions import BadRequest
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
     Count,
@@ -376,16 +377,38 @@ def get_queryset_for_site_organizations(site):
 def organization_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
+    selected_departments = request.GET.getlist("departments")
+
     # organization from addressbook current site or w/ user on site
-    qs = get_queryset_for_site_organizations(request.site)
+    qs = get_queryset_for_site_organizations(request.site).annotate(
+        members_count=Count(
+            "registered_profiles",
+            filter=Q(registered_profiles__sites=request.site),
+            distinct=True,
+        ),
+        projects_count=Subquery(
+            Project.on_site.filter(members__profile__organization=OuterRef("pk"))
+            .order_by()
+            .values("members__profile__organization")
+            .annotate(count=Count("pk", distinct=True))
+            .values("count")
+        ),
+    )
 
     organizations = filters.OrganizationFilter(
         request.GET,
         queryset=qs.order_by("name"),
     )
 
+    paginator = Paginator(organizations.qs, 25)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
     # required by default on crm
     search_form = forms.CRMSearchForm()
+
+    # consumed once after a merge to clear the persisted org selection client-side
+    just_merged = request.session.pop("org_merge_done", False)
 
     return render(request, "crm/organization_list.html", locals())
 
@@ -428,6 +451,8 @@ def organization_merge(request):
             update_contacts(orgs)
             update_profiles(orgs)
             merge_organizations_with_name(orgs, name)
+        # one-shot flag telling the list page to clear the persisted selection
+        request.session["org_merge_done"] = True
         return redirect(reverse("crm-organization-list"))
 
     merge_form = forms.CRMOrganizationMergeForm(request.GET)
@@ -440,9 +465,30 @@ def organization_merge(request):
     if not ids:
         return redirect(reverse("crm-organization-list"))
     organizations = [get_object_or_404(qs, pk=id) for id in ids]
-    departments = geomatics.Department.objects.filter(organizations__in=organizations)
+
+    # per-organization summary used for the recap cards
+    org_summaries = []
+    for organization in organizations:
+        members = User.objects.filter(
+            profile__in=organization.registered_profiles.all()
+        )
+        advised_projects = Project.on_site.filter(switchtenders__in=members).distinct()
+        org_summaries.append(
+            {
+                "organization": organization,
+                "members_count": members.count(),
+                "projects_count": advised_projects.count(),
+                "departments": organization.departments.all(),
+            }
+        )
+
+    # aggregated elements that will be attached to the merged organization
+    departments = geomatics.Department.objects.filter(
+        organizations__in=organizations
+    ).distinct()
     profiles = home_models.UserProfile.objects.filter(organization__in=organizations)
     contacts = addressbook_models.Contact.objects.filter(organization__in=organizations)
+    projects = Project.on_site.filter(switchtenders__profile__in=profiles).distinct()
 
     # first request confirmation for merging
     return render(request, "crm/organization_merge.html", locals())
@@ -603,6 +649,7 @@ def user_list(request):
                 Group.objects.filter(name=admin_group_name, user=OuterRef("pk"))
             ),
         )
+        .order_by("-date_joined")
     )
 
     users = filters.UserFilter(request.GET, queryset=base_qs)

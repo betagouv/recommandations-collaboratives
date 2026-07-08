@@ -23,5 +23,5 @@ class TenantPluginRouter:
             # Do not fail by erroring, the main migrate would fail too early
             return self.is_tenant_operation or hints.get("is_tenant_operation", False)
 
-        # Core apps always go to the default (public) schema
-        return True
+        # Core apps go to the public schema only, never to tenant schemas
+        return not self.is_tenant_operation

@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load waffle_tags %}
 <!DOCTYPE html>
 <html>
     {# todo refactor email styles #}
@@ -266,17 +267,19 @@
                                             <td>
                                                 <p>Bonjour,</p>
                                                 <p>
-                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe
+                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe ou un code pour vous connecter
                                                     sur {{ current_site.name }}. Cependant, nous n'avons pas de compte utilisateur associé à votre
                                                     adresse.
                                                 </p>
                                                 <p>Pour créer votre compte, vous pouvez :</p>
                                                 <ul>
-                                                    <li>
-                                                        <a class="fr-link"
-                                                           href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
-                                                        une demande d'accompagnement</a>
-                                                    </li>
+                                                    {% flag "enable_submit_new_project" %}
+                                                        <li>
+                                                            <a class="fr-link"
+                                                            href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
+                                                            une demande d'accompagnement</a>
+                                                        </li>
+                                                    {% endflag %}
                                                     <li>
                                                         <a class="fr-link"
                                                            href="https://{{ current_site.domain }}{% url 'account_signup' %}?next=/advisor-access-request">demander un
@@ -292,7 +295,7 @@
                                                     sur <a href="mailto:{{ current_site.configuration.contact_form_recipient }}">{{ current_site.configuration.contact_form_recipient }}</a>.
                                                 </p>
                                                 <p>
-                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe, vous pouvez
+                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe ou de connexion, vous pouvez
                                                     ignorer cet email.
                                                 </p>
                                                 <p>
