@@ -54,3 +54,8 @@ recoco/frontend/.env.*
 recoco/frontend/cypress/downloads
 recoco/frontend/plugin-entries.json
 recoco/frontend/src/js/plugins/
+
+# Playwright (e2e)
+recoco/frontend/e2e/.auth/
+recoco/frontend/e2e/playwright-report/
+recoco/frontend/e2e/test-results/
