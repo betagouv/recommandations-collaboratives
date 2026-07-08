@@ -18,13 +18,6 @@ def advisor(project):
     return user
 
 
-@pytest.fixture
-def collaborator(project):
-    user = baker.make(auth_models.User)
-    project_utils.assign_collaborator(user, project)
-    return user
-
-
 def acra_ask_url(project_id):
     return reverse("tasks-acra-ask", args=[project_id])
 
@@ -46,9 +39,10 @@ def test_acra_ask_requires_authentication(project):
 
 
 @pytest.mark.django_db
-def test_acra_ask_requires_manage_tasks_permission(project, collaborator):
+def test_acra_ask_requires_manage_tasks_permission(project):
+    user = baker.make(auth_models.User)
     client = APIClient()
-    client.force_authenticate(user=collaborator)
+    client.force_authenticate(user=user)
     response = client.post(acra_ask_url(project.id), data={}, format="json")
     assert response.status_code == 403
 
@@ -117,9 +111,10 @@ def test_acra_co_reco_requires_authentication(project):
 
 
 @pytest.mark.django_db
-def test_acra_co_reco_requires_manage_tasks_permission(project, collaborator):
+def test_acra_co_reco_requires_manage_tasks_permission(project):
+    user = baker.make(auth_models.User)
     client = APIClient()
-    client.force_authenticate(user=collaborator)
+    client.force_authenticate(user=user)
     response = client.get(acra_co_reco_url(project.id))
     assert response.status_code == 403
 
