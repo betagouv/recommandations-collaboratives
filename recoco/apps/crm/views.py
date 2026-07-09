@@ -1356,7 +1356,7 @@ def crm_list_recommendation_without_resources(request):
 
 
 def make_low_reach_project_query(
-    request, days=15, status_filter="no_reaction", mine_only=False, search_q=""
+    request, days=15, status_filter="all", mine_only=False, search_q=""
 ):
     qs = (
         Project.on_site.filter(
