@@ -1462,9 +1462,6 @@ def _parse_low_reach_params(request):
         days = int(request.GET.get("days", 15))
     except ValueError:
         days = 15
-    # 0 == "Tout" (no time filter), others are "plus de N jours"
-    if days not in (0, 15, 30, 90, 180):
-        days = 15
 
     status_filter = request.GET.get("status", "all")
     if status_filter not in ("all", "low_read", "zero_read", "no_reaction"):
