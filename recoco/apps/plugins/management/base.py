@@ -3,6 +3,7 @@ from django.db import connection
 from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.plugins.manager import get_site_plugin_manager
 
 
 class TenantCommand(BaseCommand):
@@ -14,6 +15,10 @@ class TenantCommand(BaseCommand):
 
     By default, the schema is taken from the --schema argument. Override
     get_schema(options) to derive it from other arguments (e.g. --site-domain).
+
+    The resolved SiteConfiguration is stored as ``self.site_config`` for use
+    in handle(). Use ``self.plugin_manager`` to get a plugin manager scoped to
+    that site.
     """
 
     def add_arguments(self, parser):
@@ -28,11 +33,15 @@ class TenantCommand(BaseCommand):
             )
         return schema
 
+    @property
+    def plugin_manager(self):
+        return get_site_plugin_manager(self.site_config.site)
+
     def execute(self, *args, **options):
         schema = self.get_schema(options)
 
         try:
-            SiteConfiguration.objects.get(schema_name=schema)
+            self.site_config = SiteConfiguration.objects.get(schema_name=schema)
         except SiteConfiguration.DoesNotExist as err:
             raise CommandError(
                 f"No SiteConfiguration found for schema '{schema}'"

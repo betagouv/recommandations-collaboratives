@@ -12,7 +12,7 @@ from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import login
 
 from .hooks import CrmSpec, ProjectSpec
-from .manager import get_tenant_hook
+from .manager import get_site_plugin_manager, get_tenant_hook
 from .middlewares import TenantPluginSchemaMiddleware
 from .routers import TenantPluginRouter
 
@@ -134,6 +134,45 @@ class TestGetTenantHook:
         results = [item for sublist in scoped.hook.get_tab_views() for item in sublist]
         assert {"name": "plugin_a"} in results
         assert {"name": "plugin_b"} not in results
+
+
+@pytest.mark.django_db
+class TestGetSitePluginManager:
+    def test_returns_only_enabled_plugins(self, current_site):
+        global_pm = make_plugin_manager(
+            ("plugin_a", PluginA()), ("plugin_b", PluginB())
+        )
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=["plugin_a"])
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            scoped = get_site_plugin_manager(current_site)
+
+        names = [name for name, _ in scoped.list_name_plugin()]
+        assert "plugin_a" in names
+        assert "plugin_b" not in names
+
+    def test_returns_empty_manager_when_no_plugins_enabled(self, current_site):
+        global_pm = make_plugin_manager(("plugin_a", PluginA()))
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            scoped = get_site_plugin_manager(current_site)
+
+        assert scoped.list_name_plugin() == []
+
+    def test_returns_empty_manager_when_no_site_configuration(self, current_site):
+        global_pm = make_plugin_manager(("plugin_a", PluginA()))
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            scoped = get_site_plugin_manager(current_site)
+
+        assert scoped.list_name_plugin() == []
 
 
 @pytest.mark.django_db

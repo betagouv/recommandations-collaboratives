@@ -5,6 +5,8 @@ import importlib.metadata
 import pluggy
 import sentry_sdk
 
+from recoco.apps.home.models import SiteConfiguration
+
 from .hooks import all_specs
 
 # Global manager holding ALL discovered plugins
@@ -41,6 +43,29 @@ def _build_plugin_manager():
                     sentry_sdk.capture_exception(e)
 
     return pm
+
+
+def get_site_plugin_manager(site):
+    """Return a plugin manager scoped to a site, for use outside HTTP requests.
+
+    Mirrors get_tenant_hook() but accepts a Site instance instead of a request.
+    Useful in management commands where no HTTP context is available.
+    """
+    pm = get_plugin_manager()
+    recoco_pm = _new_plugin_manager()
+
+    try:
+        site_config = SiteConfiguration.objects.get(site=site)
+    except SiteConfiguration.DoesNotExist:
+        return recoco_pm
+
+    if site_config.enabled_plugins:
+        enabled = set(site_config.enabled_plugins)
+        for name, plugin in pm.list_name_plugin():
+            if name in enabled:
+                recoco_pm.register(plugin, name=name)
+
+    return recoco_pm
 
 
 def get_tenant_hook(request):
