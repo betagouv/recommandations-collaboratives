@@ -1500,7 +1500,6 @@ def crm_list_projects_with_low_reach(request):
         {
             "low_reach_projects": page_obj.object_list,
             "page_obj": page_obj,
-            "paginator": paginator,
             "total_count": total_count,
             "days": days,
             "status_filter": status_filter,
