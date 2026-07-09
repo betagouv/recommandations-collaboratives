@@ -1456,6 +1456,37 @@ def make_low_reach_project_query(
     )
 
 
+# Status filters offered on the low-reach page, in display order. Drives both the
+# selected badge and the <select> options in the template, so labels/titles live
+# in one place.
+LOW_REACH_STATUS_OPTIONS = [
+    {
+        "value": "all",
+        "label": "Tous",
+        "title": "Tous les dossiers à relancer",
+        "variant": "info",
+    },
+    {
+        "value": "no_reaction",
+        "label": "Aucune réaction",
+        "title": "Pas de statut sur recommandation, de message du demandeur ou de tag d'impact",
+        "variant": "info",
+    },
+    {
+        "value": "zero_read",
+        "label": "0 reco lue",
+        "title": "Aucune recommandation n'a été lue",
+        "variant": "warning",
+    },
+    {
+        "value": "low_read",
+        "label": "Recos non lues",
+        "title": "Aucune ou une seule recommandation a été lue",
+        "variant": "warning",
+    },
+]
+
+
 def _parse_low_reach_params(request):
     """Extract and validate filter params from request GET for low-reach views."""
     try:
@@ -1464,7 +1495,7 @@ def _parse_low_reach_params(request):
         days = 15
 
     status_filter = request.GET.get("status", "all")
-    if status_filter not in ("all", "low_read", "zero_read", "no_reaction"):
+    if status_filter not in [opt["value"] for opt in LOW_REACH_STATUS_OPTIONS]:
         status_filter = "all"
 
     mine_only = bool(request.GET.get("mine"))
@@ -1503,6 +1534,7 @@ def crm_list_projects_with_low_reach(request):
             "total_count": total_count,
             "days": days,
             "status_filter": status_filter,
+            "status_options": LOW_REACH_STATUS_OPTIONS,
             "mine_only": mine_only,
             "search_q": search_q,
         },

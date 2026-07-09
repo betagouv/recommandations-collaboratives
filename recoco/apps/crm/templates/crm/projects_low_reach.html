@@ -60,36 +60,23 @@
                 <label class="fr-label fr-mb-0 text-nowrap description-help-text"
                        for="status-filter">Statut :</label>
                 <div class="project-low-reach__status-wrapper">
-                    <span class="project-low-reach__status-badge project-low-reach__status-badge--{% if status_filter == 'low_read' or status_filter == 'zero_read' %}warning{% else %}info{% endif %}"
-                          title="{% if status_filter == 'low_read' %}Aucune ou une seule recommandation a été lue{% elif status_filter == 'zero_read' %}Aucune recommandation n'a été lue{% elif status_filter == 'no_reaction' %}Pas de statut sur recommandation, de message du demandeur ou de tag d'impact{% else %}Tous les dossiers à relancer{% endif %}">
-                        {% if status_filter == 'low_read' %}Recos non lues{% elif status_filter == 'zero_read' %}0 reco lue{% elif status_filter == 'no_reaction' %}Aucune réaction{% else %}Tous{% endif %}
-                    </span>
+                    {% for opt in status_options %}
+                        {% if opt.value == status_filter %}
+                            <span class="project-low-reach__status-badge project-low-reach__status-badge--{{ opt.variant }}"
+                                  title="{{ opt.title }}">{{ opt.label }}</span>
+                        {% endif %}
+                    {% endfor %}
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
                           aria-hidden="true"></span>
                     <select class="fr-select fr-select--sm project-low-reach__status-select-hidden"
                             id="status-filter"
                             name="status"
                             onchange="this.form.submit()">
-                        <option value="all"
-                                {% if status_filter == 'all' %}selected{% endif %}
-                                title="Tous les dossiers à relancer">
-                            Tous
-                        </option>
-                        <option value="no_reaction"
-                                {% if status_filter == 'no_reaction' %}selected{% endif %}
-                                title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">
-                            Aucune réaction
-                        </option>
-                        <option value="zero_read"
-                                {% if status_filter == 'zero_read' %}selected{% endif %}
-                                title="Aucune recommandation n'a été lue">
-                            0 reco lue
-                        </option>
-                        <option value="low_read"
-                                {% if status_filter == 'low_read' %}selected{% endif %}
-                                title="Aucune ou une seule recommandation a été lue">
-                            Recos non lues
-                        </option>
+                        {% for opt in status_options %}
+                            <option value="{{ opt.value }}"
+                                    {% if status_filter == opt.value %}selected{% endif %}
+                                    title="{{ opt.title }}">{{ opt.label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
