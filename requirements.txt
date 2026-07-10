@@ -1193,9 +1193,9 @@ metabase-api==3.4 \
     --hash=sha256:073d87e543faa49f127c576c7525ce0352703ea2db3d45d420cbec000a0d1bff \
     --hash=sha256:1d213c79c4aa638b5b85c8389bda412d04260d7e25d1c8861090bf1304cb036c
     # via recoco
-mistune==3.2.1 \
-    --hash=sha256:78cdb0ba5e938053ccf63651b352508d2efa9411dc8810bfb05f2dc5140c0048 \
-    --hash=sha256:7c8e5501d38bac1582e067e46c8343f17d57ea1aaa735823f3aba1fd59c88a28
+mistune==3.3.0 \
+    --hash=sha256:3074ec4c61b384abe725128e4dcbb483f5a09cc4632012505cdee655d3a113b9 \
+    --hash=sha256:a758e578acda49d8195f9a860b132dae2cf7bf409381393b1c4e6e489a65397b
     # via nbconvert
 model-bakery==1.20.4 \
     --hash=sha256:30ad372604f326a1ba9f949bad9d0f85e6a510db4ef6a0b07be2d6bd7485008b \
