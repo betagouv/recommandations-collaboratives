@@ -35,6 +35,7 @@ const config = {
     alias: {
       '@core': resolve('./src'),
     },
+    dedupe: ['alpinejs', 'htmx.org', 'leaflet', 'lodash'],
   },
   css: {
     preprocessorOptions: {
