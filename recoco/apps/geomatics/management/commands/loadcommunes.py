@@ -22,6 +22,9 @@ from django.db import transaction
 
 from recoco.apps.geomatics import models
 
+FRANCE_CODE = "FR"
+FRANCE_NAME = "France"
+
 
 class Command(BaseCommand):
     help = "Import France communes/department/region from given CSV file"
@@ -81,8 +84,18 @@ def load_commune(row):
 
 
 @lru_cache(maxsize=None)
+def get_france():
+    country, _ = models.Country.objects.get_or_create(
+        code=FRANCE_CODE, defaults={"name": FRANCE_NAME}
+    )
+    return country
+
+
+@lru_cache(maxsize=None)
 def get_region(code, name):
-    region, _ = models.Region.objects.get_or_create(code=code, defaults={"name": name})
+    region, _ = models.Region.objects.get_or_create(
+        code=code, defaults={"name": name, "country": get_france()}
+    )
     return region
 
 
