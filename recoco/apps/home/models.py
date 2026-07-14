@@ -292,6 +292,15 @@ class SiteConfiguration(models.Model):
         help_text="Liste des plugins activés sur ce portail",
     )
 
+    embed_allowed_origins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Liste des origines (ex: https://exemple.gouv.fr) autorisées à "
+            "intégrer ce portail dans une iframe (embed). Admin uniquement."
+        ),
+    )
+
     def save(self, *args, **kwargs):
         if self.enabled_plugins and not self.schema_name:
             self.schema_name = make_site_slug(self.site)

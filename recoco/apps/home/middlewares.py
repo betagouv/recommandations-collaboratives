@@ -50,9 +50,19 @@ class EmbedMiddleware:
 
         response = self.get_response(request)
 
-        # TODO verify security on this option
-        if request.is_embedded:
-            response.xframe_options_exempt = True
+        site_config = getattr(request, "site_config", None)
+        if request.is_embedded and site_config is not None:
+            allowed_origins = site_config.embed_allowed_origins
+            if allowed_origins:
+                # frame-ancestors is the modern, multi-origin-capable
+                # replacement for X-Frame-Options: ALLOW-FROM (unsupported
+                # by browsers). Only the origins configured for this site
+                # (Django admin only) may embed it; everyone else falls
+                # back to the default SAMEORIGIN behaviour.
+                response.xframe_options_exempt = True
+                response["Content-Security-Policy"] = (
+                    "frame-ancestors 'self' " + " ".join(allowed_origins)
+                )
 
         return response
 
