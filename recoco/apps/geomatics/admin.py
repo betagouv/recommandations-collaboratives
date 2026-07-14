@@ -3,9 +3,15 @@ from django.contrib import admin
 from . import models
 
 
+@admin.register(models.Country)
+class CountryAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.Region)
 class RegionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["name", "code", "country"]
+    list_filter = ["country"]
 
 
 @admin.register(models.Department)

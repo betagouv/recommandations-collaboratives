@@ -10,8 +10,30 @@ created: 2021-07-12 12:05:28 CEST
 from django.db import models
 
 
+class Country(models.Model):
+    """Represents a Country (ISO 3166-1 alpha-2 code)"""
+
+    code = models.CharField(max_length=2, primary_key=True)
+    name = models.CharField(max_length=64)
+
+    class Meta:
+        verbose_name = "pays"
+        verbose_name_plural = "pays"
+
+    def __str__(self):  # pragma: nocover
+        return self.name
+
+
 class Region(models.Model):
     """Represents a Region"""
+
+    country = models.ForeignKey(
+        "Country",
+        on_delete=models.CASCADE,
+        related_name="regions",
+        null=True,
+        blank=True,
+    )
 
     code = models.CharField(max_length=2, primary_key=True)
     name = models.CharField(max_length=64)

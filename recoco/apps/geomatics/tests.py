@@ -17,6 +17,7 @@ from model_bakery import baker
 
 from recoco.apps.geomatics.management.commands.loadcommunes import (
     get_department,
+    get_france,
     get_region,
 )
 from recoco.apps.geomatics.management.commands.mergecommunes import merge_communes
@@ -27,8 +28,52 @@ from . import models
 
 @pytest.fixture(autouse=True)
 def clear_lru_caches():
+    get_france.cache_clear()
     get_region.cache_clear()
     get_department.cache_clear()
+
+
+##### Country ######
+@pytest.mark.django_db
+def test_country_str_returns_name():
+    country = baker.make(models.Country, code="BE", name="Belgique")
+    assert str(country) == "Belgique"
+
+
+@pytest.mark.django_db
+def test_region_country_is_optional():
+    region = baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes")
+    assert region.country is None
+
+
+@pytest.mark.django_db
+def test_region_can_be_scoped_to_a_country():
+    belgium = baker.make(models.Country, code="BE", name="Belgique")
+    region = baker.make(
+        models.Region, code="WA", name="Région wallonne", country=belgium
+    )
+    assert region.country == belgium
+    assert region in belgium.regions.all()
+
+
+@pytest.mark.django_db
+def test_seed_france_country_migration_backfills_regions():
+    """The 0007 data migration seeds France and attaches it to pre-existing regions."""
+    import importlib
+
+    from django.apps import apps as global_apps
+
+    migration_0007 = importlib.import_module(
+        "recoco.apps.geomatics.migrations.0007_seed_france_country"
+    )
+
+    baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes", country=None)
+
+    migration_0007.seed_france_and_backfill_regions(global_apps, None)
+
+    france = models.Country.objects.get(code="FR")
+    assert france.name == "France"
+    assert models.Region.objects.get(code="84").country == france
 
 
 ##### Loading ######
@@ -53,6 +98,7 @@ def test_load_file_create_region_department_and_commune():
     region = models.Region.objects.all()[0]
     assert region.name == "Auvergne-Rhône-Alpes"
     assert region.code == "84"
+    assert region.country.code == "FR"
     department = models.Department.objects.all()[0]
     assert department.name == "Ain"
     assert department.code == "01"
