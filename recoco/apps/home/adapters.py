@@ -1,8 +1,11 @@
+from urllib import parse
+
 from allauth.account import adapter as allauth_adapter
 from allauth.account import app_settings
 from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 
 from . import utils
 from .validators import EmailValidatorForBrevo
@@ -47,3 +50,36 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         # - Domaine valide (chaque label ≤ 63 caractères, caractères autorisés uniquement, pas d’espace, pas de <>, etc.)
         EmailValidatorForBrevo()(email)
         return email
+
+    def get_email_confirmation_url(self, request, emailconfirmation):
+        url_str = super().get_email_confirmation_url(request, emailconfirmation)
+
+        # redirect according to context
+        url_to_redirect = ""
+        match request.resolver_match.view_name:
+            #                        setup_user_email(request, crm_user, [])
+            case "onboarding":
+                url_to_redirect = (
+                    reverse(
+                        "onboarding-summary",
+                        args=(request.session["project_id"],),
+                    )
+                    if request.session["project_id"]
+                    else "/"
+                )
+            case "account_signup":
+                url_to_redirect = reverse("advisor-access-request")
+            case "crm-user-update":
+                url_to_redirect = "/"
+            case _:  # random login
+                url_to_redirect = request.resolver_match.route
+
+        if url_to_redirect:
+            url = parse.urlsplit(url_str)
+            qs = parse.parse_qs(url.query)
+            qs["next"] = [url_to_redirect]
+            qs_str = parse.urlencode(qs)
+            parts = (url.scheme, url.netloc, url.path, qs_str, url.fragment)
+            url_str = parse.urlunsplit(parts)
+
+        return url_str
