@@ -9,6 +9,7 @@ created: 2023-07-17 20:39:35 CEST
 
 import uuid
 
+from allauth.account.utils import setup_user_email
 from allauth.account.views import LoginView
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
@@ -22,6 +23,7 @@ from django.utils.http import urlencode
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.home.adapters import UVAccountAdapter, send_confirmation_email
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -178,6 +180,10 @@ def onboarding_signup(request):
                 }
             )
             return redirect(f"{login_url}?{next_args}")
+        else:
+            setup_user_email(request, user, [])
+            if not UVAccountAdapter().is_email_verified(request, user.email):
+                send_confirmation_email(request, user, True)
 
         user.set_password(form.cleaned_data.get("password"))
         user = update_user(
