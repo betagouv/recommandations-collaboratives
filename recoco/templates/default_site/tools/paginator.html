@@ -31,11 +31,7 @@ For client-side Alpine.js pagination, use tools/pagination.html instead.
                                title="Page {{ i }}">{{ i }}</a>
                         {% endif %}
                     </li>
-                {% elif i == 2 and page_obj.number > 4 %}
-                    <li>
-                        <span class="fr-pagination__link fr-mx-0">…</span>
-                    </li>
-                {% elif i == page_obj.paginator.num_pages|add:"-1" and page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+                {% elif i == 2 and page_obj.number > 4 or i == page_obj.paginator.num_pages|add:"-1" and page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
                     <li>
                         <span class="fr-pagination__link fr-mx-0">…</span>
                     </li>
