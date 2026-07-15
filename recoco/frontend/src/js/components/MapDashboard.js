@@ -7,7 +7,6 @@ import mapUtils from '../utils/map';
 
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
-import 'leaflet-providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import _ from 'lodash';
@@ -126,15 +125,15 @@ function MapDashboard(currentSiteId, regions) {
 
 // Map base layer
 function initMap(projects) {
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }
-  );
+  // L.tileLayer(
+  //   'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  //   {
+  //     attribution:
+  //       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  //     subdomains: 'abcd',
+  //     maxZoom: 20,
+  //   }
+  // );
 
   // Guard against double-initialization on the same container
   const existing = L.DomUtil.get('map');
@@ -144,7 +143,7 @@ function initMap(projects) {
   }
   const map = L.map('map').setView([48.51, 10.2], 2);
 
-  L.tileLayer.provider('CartoDB.Positron').addTo(map);
+  mapUtils.initPlanIGNLayer().addTo(map);
 
   const markers = createMapMarkers(projects);
 

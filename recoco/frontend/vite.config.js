@@ -281,6 +281,7 @@ const config = {
         errorPageStyles: resolve('./src/js/styles/layouts/error-page.css.js'),
         crmDashboardStyles: resolve('./src/js/styles/crm_dashboard.css.js'),
         ...discoverPluginEntries(),
+        mapStyles: resolve('./src/js/styles/map.css.js'),
       },
       output: {
         chunkFileNames: undefined,

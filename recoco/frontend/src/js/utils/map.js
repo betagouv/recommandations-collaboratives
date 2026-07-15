@@ -127,6 +127,19 @@ function initMapLayer(lat, lng, zoom) {
   );
 }
 
+// Plan IGN v2 base layer: sober style, labels fully in French
+function initPlanIGNLayer() {
+  console.debug('initializing Plan IGN layer...');
+  return L.tileLayer(
+    ignServiceURL('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'essentiels', 'image/png'),
+    {
+      maxZoom: 19,
+      attribution: 'IGN-F/Géoportail',
+      className: 'basemap-grayscale',
+    }
+  );
+}
+
 function initSatelliteLayer(lat, lng, zoom) {
   if (!geolocUtils.IGN_BBOX.contains(new L.LatLng(lat, lng))) {
     console.warn(
@@ -350,6 +363,7 @@ function mapOptions({ interactive, zoom }) {
 export default {
   makeMap,
   initMapLayer,
+  initPlanIGNLayer,
   initSatelliteLayer,
   initMarkerLayer,
   initMapLayers,
