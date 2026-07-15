@@ -10,13 +10,11 @@ For client-side Alpine.js pagination, use tools/pagination.html instead.
         <ul class="fr-pagination__list justify-content-center">
             <li>
                 <a class="fr-pagination__link fr-pagination__link--first{% if not page_obj.has_previous %} fr-pagination__link--disabled{% endif %}"
-                   {% if page_obj.has_previous %}href="{% querystring page=1 %}"{% else %}aria-disabled="true" role="link"{% endif %}
-                   title="Première page">Première page</a>
+                   {% if page_obj.has_previous %}href="{% querystring page=1 %}"{% else %}aria-disabled="true" role="link"{% endif %}>Première page</a>
             </li>
             <li>
                 <a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label{% if not page_obj.has_previous %} fr-pagination__link--disabled{% endif %}"
-                   {% if page_obj.has_previous %}href="{% querystring page=page_obj.previous_page_number %}"{% else %}aria-disabled="true" role="link"{% endif %}
-                   title="Page précédente">Page précédente</a>
+                   {% if page_obj.has_previous %}href="{% querystring page=page_obj.previous_page_number %}"{% else %}aria-disabled="true" role="link"{% endif %}>Page précédente</a>
             </li>
             {% for i in page_obj.paginator.page_range %}
                 {% if i == 1 or i == page_obj.paginator.num_pages or i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
@@ -39,13 +37,11 @@ For client-side Alpine.js pagination, use tools/pagination.html instead.
             {% endfor %}
             <li>
                 <a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label{% if not page_obj.has_next %} fr-pagination__link--disabled{% endif %}"
-                   {% if page_obj.has_next %}href="{% querystring page=page_obj.next_page_number %}"{% else %}aria-disabled="true" role="link"{% endif %}
-                   title="Page suivante">Page suivante</a>
+                   {% if page_obj.has_next %}href="{% querystring page=page_obj.next_page_number %}"{% else %}aria-disabled="true" role="link"{% endif %}>Page suivante</a>
             </li>
             <li>
                 <a class="fr-pagination__link fr-pagination__link--last{% if not page_obj.has_next %} fr-pagination__link--disabled{% endif %}"
-                   {% if page_obj.has_next %}href="{% querystring page=page_obj.paginator.num_pages %}"{% else %}aria-disabled="true" role="link"{% endif %}
-                   title="Dernière page">Dernière page</a>
+                   {% if page_obj.has_next %}href="{% querystring page=page_obj.paginator.num_pages %}"{% else %}aria-disabled="true" role="link"{% endif %}>Dernière page</a>
             </li>
         </ul>
     </nav>
