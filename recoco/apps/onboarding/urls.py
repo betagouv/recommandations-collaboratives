@@ -18,22 +18,22 @@ urlpatterns = [
         RedirectView.as_view(pattern_name="onboarding-project", query_string=True),
         name="onboarding",
     ),
-    path(
-        r"onboarding/signin",
-        views.OnboardingLogin.as_view(),
-        name="onboarding-signin",
-    ),
-    path(
-        r"onboarding/signup",
-        views.onboarding_signup,
-        name="onboarding-signup",
-    ),
-    path(
+    path(  # step 1
         r"onboarding/project",
         views.onboarding_project,
         name="onboarding-project",
     ),
-    path(
+    path(  # step 2
+        r"onboarding/signup",
+        views.onboarding_signup,
+        name="onboarding-signup",
+    ),
+    path(  # step 3 through login for existing users
+        r"onboarding/signin",
+        views.OnboardingLogin.as_view(),
+        name="onboarding-signin",
+    ),
+    path(  # step 3 and final
         r"onboarding/summary/<int:project_id>",
         views.onboarding_summary,
         name="onboarding-summary",
