@@ -210,7 +210,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
     {
-        "NAME": "recoco.apps.home.password_validation.UppercaseAndDigitPasswordValidator",
+        "NAME": "recoco.apps.home.validators.UppercaseAndDigitPasswordValidator",
     },
 ]
 

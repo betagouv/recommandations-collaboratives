@@ -14,7 +14,6 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
-    "cryptography==48.0.1",
     "django>=5.2.15,<6",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
@@ -31,14 +30,12 @@ dependencies = [
     "django-guardian==2.4.0",
     "django-hijack==3.4.5",
     "django-htmx>=1.22.0",
-    "django-json-widget==2.0.1",
     "django-leaflet>=0.31.0",
+    "django-json-widget==2.0.1",
     "django-markdownx==4.0.7",
-    "django-model-info>=2024.11.5",
     "django-multisite2>=2.0.1",
     "django-notifications-hq",
     "django-ordered-model==3.7.4",
-    "django-otp==1.3.0",
     "django-phonenumber-field[phonenumbers]==6.3.0",
     "django-polymorphic>=4.1.0",
     "django-recaptcha==3.0.0",
@@ -55,30 +52,25 @@ dependencies = [
     "django-webhook",
     "djangorestframework==3.15.2",
     "djangorestframework-simplejwt>=5.5.1",
-    "djangorestframework-xml>=2.0.0",
     "drf-spectacular[sidecar]>=0.28.0",
+    "djangorestframework-xml>=2.0.0",
     "dynamic-django-forms>=0.1.11",
     "ipython>=8.32.0",
-    "libsass>=0.23.0",
     "lxml[html-clean]>=5.3.1",
     "markdown-link-attr-modifier==0.2.1",
     "metabase-api==3.4",
-    "multimethod==1.7",
     "mwclient==0.11.0",
     "nh3>=0.3.4",
     "pandoc==2.4",
-    "pillow==12.2.0",
     "pluggy>=1.6.0",
     "psycopg[c]>=3.2.12",
     "puremagic>=1.30",
-    "redis==5.0.4",
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
     "sentry-sdk>=2.20.0",
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
     "tqdm>=4.67.1",
-    "urllib3>=2.7",
     "wagtail==7.0.8",
 ]
 
@@ -98,12 +90,18 @@ version = { attr = "recoco.__version__" }
 [tool.uv]
 package = false
 constraint-dependencies = [
+    "cryptography==48.0.1",
     "pyjwt>=2.13.0",
     "tornado>=6.5.7",
     "bleach>=6.4.0",
     "msgpack>=1.2.1",
+    "mistune>=3.3.0",
     "jupyterlab>=4.5.9",
-    "jupyter-server>=2.20.0"
+    "jupyter-server>=2.20.0",
+    "pillow==12.2.0",
+    "redis==5.0.4",
+    "soupsieve>=2.8.4",
+    "urllib3>=2.7",
 ]
 
 [build-system]
@@ -207,7 +205,6 @@ check-typed-exception = true
 [tool.uv.sources]
 django-notifications-hq = { git = "https://github.com/glibersat/django-notifications.git", rev = "feature/sites-framework-dj5" }
 django-activity-stream = { git = "https://github.com/glibersat/django-activity-stream.git", rev = "django4" }
-django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git", rev = "master" }
 django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "1ddd4717d35dc882eed1f1b1bee6970f5755ae03" }
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
@@ -216,21 +213,28 @@ django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev =
 # to set if packages have unfixed acceptable vulnerabilities
 ignore = [
     "GHSA-r374-rxx8-8654", # low impact no fix
+    "GHSA-4jhm-jv67-739f"
+    # used only in adapters.py through requests-html that is unmaintained.
+    # #2250 to replace module and fix vulnerability
 ]
 
 [dependency-groups]
 dev = [
     "coverage==7.4.1",
+    "deptry",
     "django-coverage-plugin>=3.1.0",
     "django-debug-toolbar==4.3.0",
     "django-extensions==3.2.1",
+    "django-model-info>=2024.11.5",
     "fabric==3.2.2",
     "freezegun>=1.5.1",
     "graphviz==0.20.1",
+    "invoke>=2.2.0",
     "ipykernel==6.20.1",
     "ipython>=8.32.0",
     "jupyter==1.1.1",
     "jupytext==1.16.1",
+    "jwt>=1.4.0",
     "model-bakery==1.20.4",
     "notebook==6.4.12",
     "pre-commit==3.6.0",
@@ -246,6 +250,7 @@ dev = [
     "pytest-xdist==3.5.0",
     "python-dotenv>=1.2.2",
     "pytz>=2025.1",
+    "requests>=2.33.0",
     "requests-mock==1.12.1",
     "responses==0.25.3",
     "rich>=13.9.4",
