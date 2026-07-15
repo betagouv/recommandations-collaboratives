@@ -31,6 +31,8 @@ from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
+    Case,
+    CharField,
     Count,
     Exists,
     ExpressionWrapper,
@@ -42,6 +44,7 @@ from django.db.models import (
     Q,
     Subquery,
     Value,
+    When,
 )
 from django.db.models.functions import Cast
 from django.http import Http404, HttpRequest, HttpResponse
@@ -1424,6 +1427,21 @@ def make_low_reach_project_query(
     # one was read but there are more than 2 recommendations in total.
     barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
 
+    # Single source of truth for the displayed status badge, following the same
+    # priority as the HTML table and the CSV export: "0 reco lue" > "recos non
+    # lues" > "aucune réaction". Consumed by both the template and the CSV via
+    # LOW_REACH_STATUS_OPTIONS, so the status is computed once and only read
+    # afterwards.
+    qs = qs.annotate(
+        status_key=Case(
+            When(reco_read=0, then=Value("zero_read")),
+            When(Q(reco_read=1, reco_total__gt=2), then=Value("low_read")),
+            When(~has_engagement, then=Value("no_reaction")),
+            default=Value(""),
+            output_field=CharField(),
+        )
+    )
+
     if status_filter == "zero_read":
         qs = qs.filter(reco_read=0)
     elif status_filter == "low_read":
@@ -1585,21 +1603,13 @@ def crm_projects_with_low_reach_as_csv(request):
     writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
     writer.writeheader()
 
+    # Uppercase labels keyed by the status_key annotation computed in the query.
+    status_labels = {
+        opt["value"]: opt["label"].upper() for opt in LOW_REACH_STATUS_OPTIONS
+    }
+
     for project in low_reach_projects:
-        # Same priority as the HTML table badge:
-        # "0 reco lue" > "recos non lues" > "aucune réaction".
-        if project.reco_read == 0:
-            project_status = "0 RECO LUE"
-        elif project.reco_read == 1 and project.reco_total > 2:
-            project_status = "RECOS NON LUES"
-        elif not (
-            project.has_task_status
-            or project.last_public_msg_at
-            or project.has_impact_tags
-        ):
-            project_status = "AUCUNE RÉACTION"
-        else:
-            project_status = ""
+        project_status = status_labels.get(project.status_key, "")
         owner = project.owner
         if owner:
             profile = getattr(owner, "profile", None)

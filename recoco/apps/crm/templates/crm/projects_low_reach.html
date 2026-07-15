@@ -164,16 +164,12 @@
                                 <strong{% if project.reco_read|add:project.reco_read <= project.reco_total %} class="text-red-light"{% endif %}>{{ project.reco_read }}</strong>&nbsp;/&nbsp;{{ project.reco_total }}
                             </td>
                             <td>
-                                {% if project.reco_read == 0 %}
-                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--warning"
-                                          title="Aucune recommandation n'a été lue">0 reco lue</span>
-                                {% elif project.reco_read == 1 and project.reco_total > 2 %}
-                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--warning"
-                                          title="Aucune ou une seule recommandation a été lue">Recos non lues</span>
-                                {% elif not project.has_task_status and not project.last_public_msg_at and not project.has_impact_tags %}
-                                    <span class="project-low-reach__status-badge project-low-reach__status-badge--info"
-                                          title="Pas de statut sur reco, de message du demandeur ou de tag d'impact">Aucune réaction</span>
-                                {% endif %}
+                                {% for opt in status_options %}
+                                    {% if opt.value == project.status_key %}
+                                        <span class="project-low-reach__status-badge project-low-reach__status-badge--{{ opt.variant }}"
+                                              title="{{ opt.title }}">{{ opt.label }}</span>
+                                    {% endif %}
+                                {% endfor %}
                             </td>
                             <td>
                                 <div class="project-low-reach__actions d-flex align-items-center">
