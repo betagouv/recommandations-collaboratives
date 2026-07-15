@@ -12,12 +12,13 @@ import urllib
 import django.core.mail
 from actstream import action
 from allauth.account.adapter import get_adapter
+from allauth.account.decorators import verified_email_required
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
@@ -55,6 +56,7 @@ from recoco.utils import (
 
 from ... import verbs
 from . import models
+from .adapters import VerifiedEmailRequiredMixin
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
@@ -371,7 +373,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
 
-@login_required
+@verified_email_required
 def advisor_access_request_moderator_view(
     request: HttpRequest, advisor_access_request_id: int
 ) -> HttpResponse:
@@ -433,7 +435,7 @@ def advisor_access_request_moderator_view(
 ### Site Creation
 ### 3 tests are at least required: permission enforcement, site creation and
 ### site creation error (domain already used for eg)
-class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+class SiteCreateView(VerifiedEmailRequiredMixin, PermissionRequiredMixin, FormView):
     form_class = SiteCreateForm
     permission_required = "sites.add_site"
     template_name = "home/site_create.html"

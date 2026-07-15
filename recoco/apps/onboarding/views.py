@@ -9,11 +9,11 @@ created: 2023-07-17 20:39:35 CEST
 
 import uuid
 
+from allauth.account.decorators import verified_email_required
 from allauth.account.utils import setup_user_email
 from allauth.account.views import LoginView
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
-from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
 from django.db import transaction
 from django.http import Http404
@@ -333,7 +333,7 @@ def onboarding_project(request):
     return render(request, "onboarding/onboarding-project.html", context)
 
 
-@login_required
+@verified_email_required
 def onboarding_summary(request, project_id=None):
     """Resume project from onboarding"""
     site_config = request.site_config

@@ -7,15 +7,16 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-03 14:26:39 CEST
 """
 
+from allauth.account.decorators import verified_email_required
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.sites.models import Site
 from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import DetailView, RedirectView
 
+from recoco.apps.home.adapters import VerifiedEmailRequiredMixin
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import reactivate_if_necessary
 from recoco.utils import has_perm, has_perm_or_403
@@ -27,7 +28,9 @@ from .. import forms, models, signals
 #####
 
 
-class SessionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class SessionDetailsView(
+    VerifiedEmailRequiredMixin, PermissionRequiredMixin, DetailView
+):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
@@ -38,7 +41,9 @@ class SessionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView
         return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
-class SessionResultsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class SessionResultsView(
+    VerifiedEmailRequiredMixin, PermissionRequiredMixin, DetailView
+):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
@@ -49,7 +54,7 @@ class SessionResultsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView
         return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
-class SessionDoneView(LoginRequiredMixin, RedirectView):
+class SessionDoneView(VerifiedEmailRequiredMixin, RedirectView):
     permanent = False
     query_string = True
     pattern_name = "projects-project-detail-knowledge"
@@ -65,7 +70,7 @@ class SessionDoneView(LoginRequiredMixin, RedirectView):
 #####
 
 
-@login_required
+@verified_email_required
 def survey_question_details(request, session_id, question_id):
     """Display a single question and go to next"""
     session = get_object_or_404(
@@ -102,7 +107,7 @@ def survey_question_details(request, session_id, question_id):
     return render(request, "survey/question_details.html", locals())
 
 
-@login_required
+@verified_email_required
 def survey_create_session_for_project(request, project_id, site_id=None):
     """
     Create a session for the given project if necessary. Redirects to session.
@@ -140,7 +145,7 @@ def survey_create_session_for_project(request, project_id, site_id=None):
     return redirect(url)
 
 
-@login_required
+@verified_email_required
 def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
@@ -164,7 +169,7 @@ def survey_next_question(request, session_id, question_id=None):
     return redirect("survey-session-done", session_id=session.pk)
 
 
-@login_required
+@verified_email_required
 def survey_previous_question(request, session_id, question_id):
     """Redirect to previous unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
@@ -185,7 +190,7 @@ def survey_previous_question(request, session_id, question_id):
 
 
 # Admin Tasks
-@login_required
+@verified_email_required
 def survey_signals_refresh(request, session_id):
     """Refresh a given session with new signals, on request"""
     session = get_object_or_404(

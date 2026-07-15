@@ -8,8 +8,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
 from actstream import action
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from allauth.account.decorators import verified_email_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
@@ -22,6 +21,7 @@ from django.views.generic import DetailView
 
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
+from recoco.apps.home.adapters import VerifiedEmailRequiredMixin
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
@@ -44,13 +44,13 @@ from ..utils import (
 )
 
 
-@login_required
+@verified_email_required
 def project_detail(request, project_id=None):
     """Set as active project, then redirect to overview page"""
     return redirect(reverse("projects-project-detail-overview", args=[project_id]))
 
 
-class ProjectDetailBaseView(LoginRequiredMixin, DetailView):
+class ProjectDetailBaseView(VerifiedEmailRequiredMixin, DetailView):
     """Base view to share common data/computation required by the project page templates"""
 
     http_method_names = ["get", "head", "options"]
@@ -228,7 +228,7 @@ def mark_notifications_as_seen(user, project):
     notifications.mark_all_as_read()
 
 
-@login_required
+@verified_email_required
 def project_actions(request, project_id=None):
     """Legacy URL: redirect to the conversation tab with the action panel open."""
     url = (
@@ -334,7 +334,7 @@ class ProjectAdvisorConversationView(ProjectDetailBaseView):
         return context
 
 
-@login_required
+@verified_email_required
 def project_internal_followup_tracking(request, project_id=None):
     """Advisors chat for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
@@ -348,7 +348,7 @@ def project_internal_followup_tracking(request, project_id=None):
     return render(request, "projects/project/internal_followup_tracking.html", locals())
 
 
-@login_required
+@verified_email_required
 def project_create_or_update_topics(request, project_id=None):
     """Create/Update topics for a project and updates advisor's note"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)

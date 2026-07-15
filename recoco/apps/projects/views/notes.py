@@ -8,7 +8,7 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 import notifications
-from django.contrib.auth.decorators import login_required
+from allauth.account.decorators import verified_email_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
@@ -23,7 +23,7 @@ from ..utils import can_administrate_project
 from .documents import document_upload
 
 
-@login_required
+@verified_email_required
 def create_private_note(request, project_id=None):
     """Create a new private note for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
@@ -63,7 +63,7 @@ def create_private_note(request, project_id=None):
     return render(request, "projects/project/note_create.html", locals())
 
 
-@login_required
+@verified_email_required
 def update_private_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id, site=request.site)
@@ -118,7 +118,7 @@ def update_private_note(request, note_id=None):
     return render(request, "projects/project/note_update.html", locals())
 
 
-@login_required
+@verified_email_required
 def delete_private_note(request, note_id=None):
     """Delete existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id, site=request.site)

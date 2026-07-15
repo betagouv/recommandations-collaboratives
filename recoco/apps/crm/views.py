@@ -11,12 +11,13 @@ from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action, target_stream
+from allauth.account.decorators import verified_email_required
 from allauth.account.models import EmailAddress
 from allauth.account.utils import filter_users_by_email, setup_user_email
 from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
@@ -66,7 +67,10 @@ from recoco.apps.conversations.models import Message, RecommendationNode
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
-from recoco.apps.home.adapters import send_confirmation_email
+from recoco.apps.home.adapters import (
+    VerifiedEmailRequiredMixin,
+    send_confirmation_email,
+)
 from recoco.apps.home.utils import deactivate_user, reactivate_user
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.plugins.manager import get_plugin_manager, get_tenant_hook
@@ -114,7 +118,9 @@ def site_action_stream(site):
     )
 
 
-class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class CRMSiteDashboardView(
+    VerifiedEmailRequiredMixin, UserPassesTestMixin, TemplateView
+):
     template_name = "crm/site_dashboard.html"
 
     def test_func(self):
@@ -146,7 +152,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         return context
 
 
-@login_required
+@verified_email_required
 def crm_search(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -267,7 +273,9 @@ def crm_search(request):
 ########################################################################
 
 
-class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class SiteConfigurationUpdateView(
+    VerifiedEmailRequiredMixin, UserPassesTestMixin, UpdateView
+):
     form_class = SiteConfigurationForm
     template_name = "crm/siteconfiguration_update.html"
     success_url = reverse_lazy("crm-site-dashboard")
@@ -294,7 +302,7 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
         return super().form_valid(form)
 
 
-@login_required
+@verified_email_required
 def siteconfiguration_tags(request: HttpRequest):
     has_perm_or_403(request.user, "sites.manage_configuration", request.site)
 
@@ -375,7 +383,7 @@ def get_queryset_for_site_organizations(site):
     )
 
 
-@login_required
+@verified_email_required
 def organization_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -415,7 +423,7 @@ def organization_list(request):
     return render(request, "crm/organization_list.html", locals())
 
 
-@login_required
+@verified_email_required
 def organization_update(request, organization_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -436,7 +444,7 @@ def organization_update(request, organization_id=None):
     return render(request, "crm/organization_update.html", locals())
 
 
-@login_required
+@verified_email_required
 def organization_merge(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -530,7 +538,7 @@ def merge_organizations_with_name(orgs, name):
     new_org.save()
 
 
-@login_required
+@verified_email_required
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -604,7 +612,7 @@ def organization_details(request, organization_id):
 ########################################################################
 
 
-@login_required
+@verified_email_required
 def user_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -674,7 +682,7 @@ def user_list(request):
     return render(request, "crm/user_list.html", locals())
 
 
-@login_required
+@verified_email_required
 def user_update(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -760,7 +768,7 @@ def user_update(request, user_id=None):
     return render(request, "crm/user_update.html", locals())
 
 
-@login_required
+@verified_email_required
 def user_deactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -776,7 +784,7 @@ def user_deactivate(request, user_id=None):
     return render(request, "crm/user_deactivate.html", locals())
 
 
-@login_required
+@verified_email_required
 def user_reactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -794,7 +802,7 @@ def user_reactivate(request, user_id=None):
     return render(request, "crm/user_reactivate.html", locals())
 
 
-@login_required
+@verified_email_required
 def user_set_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -817,7 +825,7 @@ def user_set_advisor(request, user_id=None):
     return render(request, "crm/user_set_advisor.html", locals())
 
 
-@login_required
+@verified_email_required
 def user_unset_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
@@ -836,7 +844,7 @@ def user_unset_advisor(request, user_id=None):
     return render(request, "crm/user_unset_advisor.html", locals())
 
 
-@login_required
+@verified_email_required
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 

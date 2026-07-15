@@ -1,5 +1,5 @@
+from allauth.account.decorators import verified_email_required
 from django import forms
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -20,7 +20,7 @@ class OrganizationForm(forms.ModelForm):
         fields = ["name", "departments"]
 
 
-@login_required
+@verified_email_required
 def organization_create(request):
     """Create a new Organization"""
     has_perm_or_403(request.user, "change_addressbook", request.site)
@@ -50,7 +50,7 @@ def organization_create(request):
     return render(request, "addressbook/organization_create.html", locals())
 
 
-@login_required
+@verified_email_required
 def organization_update(request, organization_id=None):
     """Update an Organization"""
     has_perm_or_403(request.user, "change_addressbook", request.site)
@@ -70,7 +70,7 @@ def organization_update(request, organization_id=None):
     return render(request, "addressbook/organization_update.html", locals())
 
 
-@login_required
+@verified_email_required
 def organization_list(request):
     """Return the Organization list"""
 
@@ -91,7 +91,7 @@ def organization_list(request):
     )
 
 
-@login_required
+@verified_email_required
 def organization_details(request, organization_id):
     """Return the details for a given Organization"""
     has_perm_or_403(request.user, "use_addressbook", request.site)
@@ -123,7 +123,7 @@ class ContactForm(forms.ModelForm):
         ]
 
 
-@login_required
+@verified_email_required
 def contact_list(request):
     """Return the Contact list"""
     has_perm_or_403(request.user, "use_addressbook", request.site)
@@ -131,7 +131,7 @@ def contact_list(request):
     return render(request, "addressbook/contact_list.html", locals())
 
 
-@login_required
+@verified_email_required
 def contact_create(request, organization_id: int):
     """Create a new Contact"""
     has_perm_or_403(request.user, "change_addressbook", request.site)
@@ -153,7 +153,7 @@ def contact_create(request, organization_id: int):
     return render(request, "addressbook/contact_create.html", locals())
 
 
-@login_required
+@verified_email_required
 def contact_update(request, contact_id=None):
     """Update a Contact"""
     has_perm_or_403(request.user, "change_addressbook", request.site)

@@ -11,7 +11,7 @@ import csv
 import datetime
 from collections import defaultdict
 
-from django.contrib.auth.decorators import login_required
+from allauth.account.decorators import verified_email_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -27,7 +27,7 @@ from .. import forms, models
 ########################################################################
 
 
-@login_required
+@verified_email_required
 def survey_details(request, survey_id=None):
     """List question sets for given survey"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -42,7 +42,7 @@ def survey_details(request, survey_id=None):
 ########################################################################
 
 
-@login_required
+@verified_email_required
 def question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -56,7 +56,7 @@ def question_set_details(request, question_set_id=None):
     return render(request, "survey/editor/question_set/details.html", locals())
 
 
-@login_required
+@verified_email_required
 def question_set_update(request, question_set_id=None):
     """Update informations for question_set"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -79,7 +79,7 @@ def question_set_update(request, question_set_id=None):
     return render(request, "survey/editor/question_set/update.html", locals())
 
 
-@login_required
+@verified_email_required
 def question_set_create(request, survey_id=None):
     """Create new question_set"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -103,7 +103,7 @@ def question_set_create(request, survey_id=None):
     return render(request, "survey/editor/question_set/create.html", locals())
 
 
-@login_required
+@verified_email_required
 def question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -128,7 +128,7 @@ def question_set_delete(request, question_set_id=None):
 #######################################################################
 
 
-@login_required
+@verified_email_required
 def question_update(request, question_id=None):
     """Update informations for question"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -151,7 +151,7 @@ def question_update(request, question_id=None):
     return render(request, "survey/editor/question/update.html", locals())
 
 
-@login_required
+@verified_email_required
 def question_create(request, question_set_id=None):
     """Create new question"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -174,7 +174,7 @@ def question_create(request, question_set_id=None):
     return render(request, "survey/editor/question/create.html", locals())
 
 
-@login_required
+@verified_email_required
 def question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -218,7 +218,7 @@ def get_answers_for_question(site, question):
     return dict(answers), db_answers.count()
 
 
-@login_required
+@verified_email_required
 def question_results(request, question_id=None):
     """Show question results"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -233,7 +233,7 @@ def question_results(request, question_id=None):
     return render(request, "survey/editor/question/results.html", locals())
 
 
-@login_required
+@verified_email_required
 def question_results_as_csv(request, question_id=None):
     """Show question results"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -281,7 +281,7 @@ def question_results_as_csv(request, question_id=None):
 #######################################################################
 
 
-@login_required
+@verified_email_required
 def choice_update(request, choice_id=None):
     """Update informations for choice"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -307,7 +307,7 @@ def choice_update(request, choice_id=None):
     return render(request, "survey/editor/choice/update.html", locals())
 
 
-@login_required
+@verified_email_required
 def choice_create(request, question_id=None):
     """Create new choice"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
@@ -335,7 +335,7 @@ def choice_create(request, question_id=None):
     return render(request, "survey/editor/choice/create.html", locals())
 
 
-@login_required
+@verified_email_required
 def choice_delete(request, choice_id=None):
     """Delete choice (mark as deleted)"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)

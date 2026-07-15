@@ -5,7 +5,9 @@ from allauth.account import app_settings
 from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.utils import user_email, user_username
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
@@ -100,3 +102,12 @@ def send_confirmation_email(request, user, signup=False):
 def confirm_email(request, user):
     email_address = EmailAddress.objects.filter(email=user.email).first()
     UVAccountAdapter().confirm_email(request, email_address)
+
+
+class VerifiedEmailRequiredMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not EmailAddress.objects.filter(user=request.user, verified=True).exists():
+            send_confirmation_email(request, request.user)
+            # same behavior as verified_email_required decorator
+            return render(request, "account/verified_email_required.html")
+        return super().dispatch(request, *args, **kwargs)

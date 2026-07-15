@@ -7,9 +7,9 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 from actstream import action
+from allauth.account.decorators import verified_email_required
 from django.contrib import messages
 from django.contrib.auth import models as auth_models
-from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -55,7 +55,7 @@ from ..utils import (
 ########################################################################
 
 
-@login_required
+@verified_email_required
 def project_administration(request, project_id):
     """Handle ACL for a project"""
 
@@ -237,7 +237,7 @@ def access_invite(request, role, project):
     return redirect(reverse("projects-project-detail-overview", args=[project.pk]))
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_revoke_invite(request, project_id, invite_id):
     """Revoke an invitation for a collectivity member"""
@@ -273,7 +273,7 @@ def access_revoke_invite(request, project_id, invite_id):
 ##############################################################################
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def promote_collaborator_as_referent(request, project_id, user_id=None):
     """Promote a collectivity member to referent role"""
@@ -313,7 +313,7 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def promote_collaborator_as_advisor(request, project_id, user_id=None):
     """Promote a collectivity member to referent role"""
@@ -333,7 +333,7 @@ def promote_collaborator_as_advisor(request, project_id, user_id=None):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_collaborator_invite(request, project_id):
     """Invite a collectivity member"""
@@ -355,7 +355,7 @@ def access_collaborator_invite(request, project_id):
     return access_invite(request, "COLLABORATOR", project)
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_collaborator_resend_invite(request, project_id, invite_id):
     """Resend invitation for a collectivity member"""
@@ -388,7 +388,7 @@ def access_collaborator_resend_invite(request, project_id, invite_id):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_collaborator_delete(request, project_id: int, username: str):
     """Delete a collectivity member from the project ACL"""
@@ -440,7 +440,7 @@ def access_collaborator_delete(request, project_id: int, username: str):
 ##############################################################################
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_advisor_invite(request, project_id):
     """Invite an advisor"""
@@ -461,7 +461,7 @@ def access_advisor_invite(request, project_id):
     return access_invite(request, "OBSERVER", project)
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_advisor_resend_invite(request, project_id, invite_id):
     """Resend invitation for an advisor"""
@@ -504,7 +504,7 @@ def access_advisor_resend_invite(request, project_id, invite_id):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def access_advisor_delete(request, project_id: int, username: str):
     """Delete an advisor from the project ACL"""
@@ -555,7 +555,7 @@ def access_advisor_delete(request, project_id: int, username: str):
 #############################################################
 # Suspend/Delete/Danger zone
 #############################################################
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def set_project_inactive(request, project_id: int):
     """Declare a project inactive. This means no more notifications for collaborators
@@ -593,7 +593,7 @@ def set_project_inactive(request, project_id: int):
     return redirect(reverse("projects-project-administration", args=(project.id,)))
 
 
-@login_required
+@verified_email_required
 @require_http_methods(["POST"])
 def set_project_active(request, project_id: int):
     """Declare a project active"""

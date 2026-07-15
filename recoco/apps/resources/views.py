@@ -10,11 +10,10 @@ created : 2021-06-16 10:59:08 CEST
 import datetime
 
 import reversion
+from allauth.account.decorators import verified_email_required
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (
-    LoginRequiredMixin,
     PermissionRequiredMixin,
     UserPassesTestMixin,
 )
@@ -40,6 +39,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.demarches_simplifiees.models import DSMapping, DSResource
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.hitcount.models import HitCount
+from recoco.apps.home.adapters import VerifiedEmailRequiredMixin
 from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
@@ -281,7 +281,7 @@ class BaseResourceDetailView(DetailView):
 
 
 class DuplicateResourceView(
-    LoginRequiredMixin, PermissionRequiredMixin, SingleObjectMixin, View
+    VerifiedEmailRequiredMixin, PermissionRequiredMixin, SingleObjectMixin, View
 ):
     model = models.Resource
     permission_required = "sites.manage_resources"
@@ -416,7 +416,7 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
 ########################################################################
 
 
-@login_required
+@verified_email_required
 def resource_update(request, resource_id=None):
     """Update informations for resource"""
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
@@ -471,7 +471,7 @@ def resource_update(request, resource_id=None):
     return render(request, "resources/resource/update.html", locals())
 
 
-@login_required
+@verified_email_required
 def resource_create(request):
     """
     Create new resource
@@ -572,7 +572,9 @@ class EditResourceForm(forms.ModelForm):
 
 
 # History/Reversion
-class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, View):
+class ResourceHistoryRestoreView(
+    VerifiedEmailRequiredMixin, PermissionRequiredMixin, View
+):
     permission_required = "sites.manage_resources"
     http_method_names = ["post"]
 
@@ -602,7 +604,7 @@ class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, Vi
 
 
 class ResourceHistoryCompareView(
-    LoginRequiredMixin, PermissionRequiredMixin, HistoryCompareDetailView
+    VerifiedEmailRequiredMixin, PermissionRequiredMixin, HistoryCompareDetailView
 ):
     model = models.Resource
     permission_required = "sites.manage_resources"
@@ -644,7 +646,7 @@ class LatestResourcesFeed(Feed):
 ########################################################################
 
 
-@login_required
+@verified_email_required
 def create_bookmark(request, resource_id=None):
     """Create bookmark for resource and and connected user"""
     resource = get_object_or_404(models.Resource, pk=resource_id)
@@ -680,7 +682,7 @@ class BookmarkForm(forms.ModelForm):
         fields = ["comments"]
 
 
-@login_required
+@verified_email_required
 def delete_bookmark(request, resource_id=None):
     """Delete (soft) user bookmark associated to resource if exists"""
     if request.method == "POST":
