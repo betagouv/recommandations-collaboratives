@@ -125,16 +125,6 @@ function MapDashboard(currentSiteId, regions) {
 
 // Map base layer
 function initMap(projects) {
-  // L.tileLayer(
-  //   'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-  //   {
-  //     attribution:
-  //       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  //     subdomains: 'abcd',
-  //     maxZoom: 20,
-  //   }
-  // );
-
   // Guard against double-initialization on the same container
   const existing = L.DomUtil.get('map');
   if (existing && existing._leaflet_id) {

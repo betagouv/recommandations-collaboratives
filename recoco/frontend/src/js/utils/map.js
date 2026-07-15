@@ -127,9 +127,7 @@ function initMapLayer(lat, lng, zoom) {
   );
 }
 
-// Plan IGN v2 base layer: sober style, labels fully in French
 function initPlanIGNLayer() {
-  console.debug('initializing Plan IGN layer...');
   return L.tileLayer(
     ignServiceURL('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'essentiels', 'image/png'),
     {
