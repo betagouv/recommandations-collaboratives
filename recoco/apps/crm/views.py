@@ -11,9 +11,6 @@ from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action, target_stream
-from allauth.account.internal.flows.email_verification import (
-    send_verification_email_for_user,
-)
 from allauth.account.models import EmailAddress
 from allauth.account.utils import filter_users_by_email, setup_user_email
 from django import forms as django_forms
@@ -69,6 +66,8 @@ from recoco.apps.conversations.models import Message, RecommendationNode
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
+from recoco.apps.home.adapters import send_confirmation_email
+from recoco.apps.home.utils import deactivate_user, reactivate_user
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.plugins.manager import get_plugin_manager, get_tenant_hook
 from recoco.apps.projects.models import (
@@ -88,7 +87,6 @@ from recoco.utils import (
     make_group_name_for_site,
 )
 
-from ..home.utils import deactivate_user, reactivate_user
 from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
@@ -742,10 +740,7 @@ def user_update(request, user_id=None):
                     )
                     if email_changed:
                         setup_user_email(request, crm_user, [])
-                        # XXX this method comes from the "internal" package of allauth
-                        # and should probably not be used directly -- fixing sec bug
-                        # when moving from 65.9 to 65.12
-                        send_verification_email_for_user(request, crm_user)
+                        send_confirmation_email(request, crm_user)
 
                     messages.success(request, success_message)
                     return redirect(reverse("crm-user-details", args=[crm_user.id]))
