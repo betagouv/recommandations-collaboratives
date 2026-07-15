@@ -131,7 +131,7 @@ def test_crm_project_update_property_muted(request, client):
 @pytest.mark.django_db
 def test_crm_project_update_redirects_to_safe_next(request, client):
     site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
+    project = baker.make(projects_models.Project, sites=[site])
 
     url = reverse("crm-project-update", args=[project.id])
     safe_next = reverse("crm-list-projects-low-reach")
@@ -162,7 +162,7 @@ def test_crm_project_update_ignores_unsafe_next(request, client):
 @pytest.mark.django_db
 def test_crm_project_update_without_next_renders_page(request, client):
     site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
+    project = baker.make(projects_models.Project, sites=[site])
 
     url = reverse("crm-project-update", args=[project.id])
 
