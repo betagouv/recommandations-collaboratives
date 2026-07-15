@@ -306,7 +306,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
         .first()
     )
 
-    departments = departments = [
+    departments = [
         {"name": d.name, "code": d.code}
         for d in Department.objects.exclude(code="").order_by("code")
     ]
