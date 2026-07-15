@@ -1559,6 +1559,34 @@ def crm_list_projects_with_low_reach(request):
     )
 
 
+def _referent_csv_fields(owner):
+    """Referent columns for the low-reach CSV export, keyed by fieldname."""
+    if not owner:
+        return dict.fromkeys(
+            (
+                "referent_prenom",
+                "referent_nom",
+                "referent_organisation",
+                "referent_telephone",
+                "referent_email",
+                "referent_fonction",
+            ),
+            "",
+        )
+    profile = getattr(owner, "profile", None)
+    organization = profile.organization if profile else None
+    return {
+        "referent_prenom": owner.first_name,
+        "referent_nom": owner.last_name,
+        "referent_organisation": organization.name if organization else "",
+        "referent_telephone": (
+            profile.phone_no.as_international if profile and profile.phone_no else ""
+        ),
+        "referent_email": owner.email,
+        "referent_fonction": profile.organization_position if profile else "",
+    }
+
+
 @login_required
 def crm_projects_with_low_reach_as_csv(request):
     """Export projects that don't get a good impact in CSV"""
@@ -1609,26 +1637,6 @@ def crm_projects_with_low_reach_as_csv(request):
     }
 
     for project in low_reach_projects:
-        project_status = status_labels.get(project.status_key, "")
-        owner = project.owner
-        if owner:
-            profile = getattr(owner, "profile", None)
-            referent_first = owner.first_name
-            referent_last = owner.last_name
-            referent_org = (
-                profile.organization.name if profile and profile.organization else ""
-            )
-            referent_phone = (
-                profile.phone_no.as_international
-                if profile and profile.phone_no
-                else ""
-            )
-            referent_email = owner.email
-            referent_position = profile.organization_position if profile else ""
-        else:
-            referent_first = referent_last = referent_org = ""
-            referent_phone = referent_email = referent_position = ""
-
         writer.writerow(
             {
                 "nom_dossier": project.name,
@@ -1641,13 +1649,8 @@ def crm_projects_with_low_reach_as_csv(request):
                 "recos_total": project.reco_total,
                 "derniere_activite": project.last_members_activity_at,
                 "derniere_reco": project.last_reco_at or "",
-                "statut": project_status,
-                "referent_prenom": referent_first,
-                "referent_nom": referent_last,
-                "referent_organisation": referent_org,
-                "referent_telephone": referent_phone,
-                "referent_email": referent_email,
-                "referent_fonction": referent_position,
+                "statut": status_labels.get(project.status_key, ""),
+                **_referent_csv_fields(project.owner),
             }
         )
 
