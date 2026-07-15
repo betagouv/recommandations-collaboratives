@@ -10,6 +10,7 @@ from django.utils import timezone
 from sesame.middleware import AuthenticationMiddleware as SesameAuthenticationMiddleware
 from sesame.utils import get_user
 
+from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration, UserProfile
 
 
@@ -125,6 +126,7 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
             return None
 
         login(request, user)
+        confirm_email(request, user)  # login by email means that email is accessible
         # specific tests below comes from sesame original code
         if (
             hasattr(request, "user")
