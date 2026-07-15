@@ -2,10 +2,12 @@ from urllib import parse
 
 from allauth.account import adapter as allauth_adapter
 from allauth.account import app_settings
+from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 
 from . import utils
 from .validators import EmailValidatorForBrevo
@@ -83,3 +85,18 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
             url_str = parse.urlunsplit(parts)
 
         return url_str
+
+
+def send_confirmation_email(request, user, signup=False):
+    email_address = EmailAddress.objects.filter(user=user).first()
+    confirmation = EmailConfirmation.create(email_address)
+    confirmation.sent = timezone.now()
+    confirmation.save()
+
+    adapter = UVAccountAdapter()
+    adapter.send_confirmation_mail(request, confirmation, signup)
+
+
+def confirm_email(request, user):
+    email_address = EmailAddress.objects.filter(email=user.email).first()
+    UVAccountAdapter().confirm_email(request, email_address)
