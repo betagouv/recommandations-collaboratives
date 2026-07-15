@@ -16,6 +16,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
+from recoco.apps.projects.utils import assign_advisor
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
 
@@ -281,12 +282,7 @@ def test_low_reach_mine_only_filters_by_switchtender(
 
     advisor = baker.make(auth_models.User)
     advisor.profile.sites.add(current_site)
-    baker.make(
-        projects_models.ProjectSwitchtender,
-        site=current_site,
-        switchtender=advisor,
-        project=mine,
-    )
+    assign_advisor(advisor, mine, current_site)
 
     url = reverse("crm-list-projects-low-reach")
     with login(client, user=advisor, groups=["example_com_staff"]):
