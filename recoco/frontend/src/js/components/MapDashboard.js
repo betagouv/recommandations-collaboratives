@@ -3,6 +3,7 @@ import api, { projectsUrl } from '../utils/api';
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl';
+import mapUtils from '../utils/map';
 
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
@@ -145,7 +146,7 @@ function initMap(projects) {
 
   L.tileLayer.provider('CartoDB.Positron').addTo(map);
 
-  const markers = createMapMarkers(map, projects);
+  const markers = createMapMarkers(projects);
 
   const markersLayer = createMarkersLayer(map, markers);
 
@@ -154,7 +155,7 @@ function initMap(projects) {
 
 //Create a layer in order to zoom-in at the center of each markers
 function createMarkersLayer(map, markers) {
-  const markersLayer = new L.FeatureGroup();
+  const markersLayer = mapUtils.createMarkerClusterGroup();
   markers.forEach((marker) => {
     if (marker) markersLayer.addLayer(marker);
   });
@@ -168,7 +169,7 @@ function zoomToCentroid(map, markersLayer) {
 }
 
 // Crete layers composed with markers
-function createMapMarkers(map, projects) {
+function createMapMarkers(projects) {
   return projects.map((item) => {
     let lat = item.latitude || item.commune?.latitude;
     let long = item.longitude || item.commune?.longitude;
@@ -176,11 +177,12 @@ function createMapMarkers(map, projects) {
       lat = lat + Math.random() * 0.001;
       long = long + Math.random() * 0.001;
 
-      return L.marker([lat, long], { icon: createMarkerIcon(item) })
-        .addTo(map)
-        .bindPopup(markerPopupTemplate(item), {
+      return L.marker([lat, long], { icon: createMarkerIcon(item) }).bindPopup(
+        markerPopupTemplate(item),
+        {
           maxWidth: 'auto',
-        });
+        }
+      );
     }
   });
 }

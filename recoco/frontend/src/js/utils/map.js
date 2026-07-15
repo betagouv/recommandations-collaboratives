@@ -3,6 +3,9 @@ import GeocoderBAN from './geocoderBAN';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-providers';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 function mapLayerStyles(className) {
   return {
@@ -284,6 +287,14 @@ function createMarkerIcon(className, title) {
   return L.divIcon({ className: `map-marker ${className}`, title });
 }
 
+function createMarkerClusterGroup(options = {}) {
+  return L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 50,
+    ...options,
+  });
+}
+
 function markerPopupTemplate({
   location_x,
   location_y,
@@ -351,5 +362,6 @@ export default {
   getDefaultLatLngForMap,
   getDefaultLatLngForLayers,
   createMarkerIcon,
+  createMarkerClusterGroup,
   markerPopupTemplate,
 };
