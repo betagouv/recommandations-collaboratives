@@ -1,3 +1,5 @@
+import csv
+import io
 import re
 from datetime import timedelta
 
@@ -14,6 +16,7 @@ from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
+from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor
@@ -359,6 +362,54 @@ def test_low_reach_csv_uses_french_headers_and_filename(
         r'attachment; filename="projets-a-relancer-\d{4}-\d{2}-\d{2}-\d{6}\.csv"',
         response["Content-Disposition"],
     )
+
+
+@pytest.mark.django_db
+def test_low_reach_csv_transcribes_project_data(
+    current_site, client, project_old_recipe, public_task_recipe
+):
+    commune = baker.make(geomatics_models.Commune, name="Ville", insee="12345")
+    organization = baker.make(addressbook_models.Organization, name="Ma Collectivité")
+
+    owner = baker.make(
+        auth_models.User,
+        first_name="Jean",
+        last_name="Martin",
+        email="jean@example.org",
+    )
+    owner.profile.organization = organization
+    owner.profile.organization_position = "Chargé de mission"
+    owner.profile.phone_no = "+33612345678"
+    owner.profile.save()
+
+    project = project_old_recipe.make(name="Rénovation place", commune=commune)
+    baker.make(
+        projects_models.ProjectMember, project=project, member=owner, is_owner=True
+    )
+    # One unread public reco -> 0/1, status "0 RECO LUE".
+    public_task_recipe.make(project=project)
+
+    url = reverse("crm-projects-low-reach-csv")
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    rows = list(csv.DictReader(io.StringIO(response.content.decode("utf-8"))))
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["nom_dossier"] == "Rénovation place"
+    assert row["commune"] == "Ville"
+    assert row["insee"] == "12345"
+    assert row["recos_lues"] == "0"
+    assert row["recos_total"] == "1"
+    assert row["statut"] == "0 RECO LUE"
+    assert row["referent_prenom"] == "Jean"
+    assert row["referent_nom"] == "Martin"
+    assert row["referent_organisation"] == "Ma Collectivité"
+    assert row["referent_email"] == "jean@example.org"
+    assert row["referent_fonction"] == "Chargé de mission"
+    assert row["referent_telephone"].startswith("+33")
 
 
 # eof
