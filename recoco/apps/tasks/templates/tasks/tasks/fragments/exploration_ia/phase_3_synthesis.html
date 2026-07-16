@@ -12,9 +12,9 @@
                     Votre ressource est prête pour créer votre recommandation.
                 </template>
                 <template x-if="$store.explorationIA.getAllSelectedResources().length == 0">
-                    Aucune ressource disponible pour la création de recommandation. 
+                    Aucune ressource disponible pour la création de recommandation.
                     <button @click="$store.explorationIA.resetExploration()"
-                        class="fr-btn fr-btn--primary">
+                            class="fr-btn fr-btn--primary">
                         <span class="fr-icon-refresh-line fr-mr-1v" aria-hidden="true"></span>
                         Effectuer une nouvelle exploration ?
                     </button>
