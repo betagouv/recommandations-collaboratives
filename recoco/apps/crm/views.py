@@ -1464,6 +1464,7 @@ def make_low_reach_project_query(
             "notes",
             "switchtenders__profile__organization",
             "crm_annotations__tags",
+            Project.prefetch_owner(),
         )
         .order_by("-last_members_activity_at")
         .distinct()
@@ -1595,7 +1596,7 @@ def crm_projects_with_low_reach_as_csv(request):
         status_filter=status_filter,
         mine_only=mine_only,
         search_q=search_q,
-    ).prefetch_related("projectmember_set__member__profile__organization")
+    )
 
     timestamp = datetime.today().strftime("%Y-%m-%d-%H%M%S")
 
