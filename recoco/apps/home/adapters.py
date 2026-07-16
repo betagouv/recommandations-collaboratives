@@ -4,6 +4,7 @@ from allauth.account.utils import user_email, user_username
 from django.contrib.sites.shortcuts import get_current_site
 
 from . import utils
+from .validators import EmailValidatorForBrevo
 
 
 class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
@@ -35,3 +36,11 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
     def is_login_by_code_required(self, request, **kwargs):
         return request.user.profile.login_with_code
+
+    def clean_email(self, email: str) -> str:
+        # brevo conditions:
+        # - Longueur totale de l’adresse ≤ 254 caractères
+        # - Partie locale (avant @) ≤ 64 caractères
+        # - Domaine valide (chaque label ≤ 63 caractères, caractères autorisés uniquement, pas d’espace, pas de <>, etc.)
+        EmailValidatorForBrevo()(email)
+        return email
