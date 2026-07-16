@@ -1560,6 +1560,7 @@ def crm_list_projects_with_low_reach(request):
 def _referent_csv_fields(owner):
     """Referent columns for the low-reach CSV export, keyed by fieldname."""
     if not owner:
+        # empty columns
         return dict.fromkeys(
             (
                 "referent_prenom",
@@ -1571,6 +1572,7 @@ def _referent_csv_fields(owner):
             ),
             "",
         )
+
     profile = getattr(owner, "profile", None)
     organization = profile.organization if profile else None
     return {
