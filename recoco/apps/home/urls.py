@@ -100,6 +100,8 @@ urlpatterns = [
         name="advisor-access-request-moderator",
     ),
     path(r"site/create", views.SiteCreateView.as_view(), name="site-create"),
+    # I use same view name to facilitate redirects
+    path(r"2fa-config", views.TwoFAConfigView.as_view(), name="mfa_index"),
 ]
 
 if settings.ACCOUNT_LOGIN_BY_CODE_ENABLED:

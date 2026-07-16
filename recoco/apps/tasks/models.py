@@ -28,6 +28,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources
+from recoco.utils import truncate_string
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -376,22 +377,6 @@ class TaskRecommendation(models.Model):
 
 
 tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags_tagging")
-
-
-########################################################################
-# helpers / utils
-########################################################################
-
-
-def truncate_string(s, max_length):
-    """Truncate given string to max_length"""
-    if len(s) <= max_length:
-        return s
-    sub = s[:max_length]
-    if s[max_length] != " ":
-        # we are truncating last word, rewind to its begining
-        sub = sub[: sub.rfind(" ")]
-    return f"{sub}…"
 
 
 # eof

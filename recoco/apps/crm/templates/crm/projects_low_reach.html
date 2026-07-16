@@ -1,80 +1,219 @@
 {% extends "base.html" %}
-{% load django_vite %}
 {% load static %}
+{% load django_vite %}
 {% load humanize %}
-{% load crm_tags %}
+{% load gravatar %}
 {% block title %}
-    Dossiers à faible répondant - CRM
+    Dossiers à relancer - CRM
 {% endblock title %}
 {% block og_title %}
-    Dossiers à faible répondant - CRM
+    Dossiers à relancer - CRM
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/user.js' %}
+    {% vite_asset 'js/styles/project-low-reach.css.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0">
-        {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
-                <h2>Dossiers à faible répondant</h2>
-                <a href="{% url 'crm-projects-low-reach-csv' %}" class="btn btn-primary">Export CSV</a>
+    {% include "crm/fragments/navigation.html" with projects=True %}
+    <div x-data="{ breadcrumbs: { links: [{ url: '{% url 'crm-site-dashboard' %}', title: 'Admin' }, { url: '{% url 'crm-project-list' %}', title: 'Dossiers' }], current: 'Dossiers à relancer' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <div class="fr-container-fluid fr-px-5v fr-pb-5v crm">
+        <div class="d-flex justify-content-between align-items-start fr-mt-3w fr-mb-3w flex-wrap">
+            <div>
+                <a href="{% url 'crm-project-list' %}"
+                   class="fr-link fr-mb-1w d-inline-block font-size-12px">
+                   <span class="fr-icon-arrow-left-s-line fr-icon--sm"></span>
+                    Retour à tous les dossiers
+                </a>
+                <h1 class="fr-h2 fr-mb-0" data-test-id="low-reach-title">
+                    {{ total_count }} Dossier{{ total_count|pluralize }} à relancer
+                </h1>
             </div>
-            <table class="table table-striped">
-                <thead class="sticky-header">
+            <div class="project-low-reach__notice-banner">
+                <span class="fr-icon-attention fr-icon--sm project-low-reach__notice-banner-icon" aria-hidden="true"></span>
+                <p class="project-low-reach__notice-banner-text">
+                    Vous trouverez ici tous les dossiers où le demandeur n’a soit pas lu les recommandations,
+                    soit pas donné de nouvelles suite aux recommandations. Pour en savoir plus, <a href="https://reco-co.gitbook.io/reco-co/mesurer-son-impact/comprendre-la-page-dossiers-a-relancer" class="project-low-reach__notice-banner-link">lisez la doc ici&nbsp;!</a>
+                </p>
+            </div>
+        </div>
+        <form method="get" class="d-flex align-items-center gap-4 fr-mb-3w">
+            <div class="w-100 position-relative">
+                {% include "projects/project/fragments/search_bar.html" with name="q" value=search_q placeholder="Rechercher parmi les dossiers" show_search_button=True %}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <label class="fr-label fr-mb-0 text-nowrap description-help-text"
+                       for="days-filter">Dernière activité :</label>
+                <select class="fr-select fr-select--sm fr-mt-0 project-low-reach__select w-auto important-description-help-text"
+                        id="days-filter"
+                        name="days"
+                        onchange="this.form.submit()">
+                    <option value="0" {% if days == 0 %}selected{% endif %}>Tout</option>
+                    <option value="15" {% if days == 15 %}selected{% endif %}>Plus de 15 jours</option>
+                    <option value="30" {% if days == 30 %}selected{% endif %}>Plus de 30 jours</option>
+                    <option value="90" {% if days == 90 %}selected{% endif %}>Plus de 90 jours</option>
+                    <option value="180" {% if days == 180 %}selected{% endif %}>Plus de 6 mois</option>
+                </select>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <label class="fr-label fr-mb-0 text-nowrap description-help-text"
+                       for="status-filter">Statut :</label>
+                <div class="project-low-reach__status-wrapper">
+                    {% for opt in status_options %}
+                        {% if opt.value == status_filter %}
+                            <span class="project-low-reach__status-badge project-low-reach__status-badge--{{ opt.variant }}"
+                                  title="{{ opt.title }}">{{ opt.label }}</span>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
+                          aria-hidden="true"></span>
+                    <select class="fr-select fr-select--sm project-low-reach__status-select-hidden"
+                            id="status-filter"
+                            name="status"
+                            onchange="this.form.submit()">
+                        {% for opt in status_options %}
+                            <option value="{{ opt.value }}"
+                                    {% if status_filter == opt.value %}selected{% endif %}
+                                    title="{{ opt.title }}">{{ opt.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="fr-toggle fr-toggle--sm fr-toggle--label-left" x-data>
+                <input class="fr-toggle__input"
+                       type="checkbox"
+                       id="mine-only-toggle"
+                       name="mine"
+                       value="1"
+                       {% if mine_only %}checked{% endif %}
+                       @change="$el.closest('form').submit()">
+                <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes dossiers</label>
+            </div>
+            <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
+               class="fr-btn fr-btn--primary fr-btn--sm text-nowrap"
+               data-test-id="low-reach-csv-export">
+                Télécharger en CSV
+            </a>
+        </form>
+        <div class="table-responsive">
+            <table class="project-table w-100" data-test-id="low-reach-table">
+                <colgroup>
+                    <col class="col--xl">
+                    <col class="col--xl">
+                    <col class="col--small">
+                    <col class="col--small">
+                    <col class="col--xs">
+                    <col class="col--ms">
+                    <col class="col--fixed-70">
+                </colgroup>
+                <thead class="project-table__thead">
                     <tr>
-                        <th>Nom</th>
-                        <th>Conseillers</th>
-                        <th>% d'accès aux recos</th>
-                        <th>Dernière activité demandeur</th>
-                        <th>Dernière reco publiée</th>
-                        <th>Dernier msg conversation</th>
+                        <th scope="col">Dossier</th>
+                        <th scope="col">Conseillers</th>
+                        <th scope="col" title="Dernière activité du demandeur">Dernière act.</th>
+                        <th scope="col" title="Date d'émission de la dernière reco">Dernière reco.</th>
+                        <th scope="col" title="Nombre de recos lues sur nombre total de recos">Recos lues</th>
+                        <th scope="col">Statut</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for project in low_reach_projects %}
                         <tr>
                             <td>
-                                {% if project.inactive_since %}<s>{% endif %}
-                                    <a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a>
-                                    <a href="{% url 'projects-project-detail' project.pk %}"
-                                       target="_blank"
-                                       title="Ouvrir dans un nouvel onglet">
-                                        <svg class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                        </svg>
-                                    </a>
-                                    {% if project.inactive_since %}</s>{% endif %}
-                                {% with project.crm_annotations.tags.names as active_tags %}
-                                    {% for crm_tag in site_config.crm_available_tags.all %}
-                                        {% if crm_tag.name in active_tags %}
-                                            &nbsp;<span class="fr-badge--info fr-badge--sm">{{ crm_tag.name }}</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endwith %}
-                                {% if project.inactive_since %}
-                                    <br>
-                                    <span class="small">(Project désactivé: {{ project.inactive_reason|default:"Intervention humaine" }})</span>
-                                {% endif %}
+                                <a class="fr-link project-table__project-name text-wrap"
+                                   href="{% url 'crm-project-details' project.pk %}">
+                                    {% if project.owner.profile.organization %}
+                                        {{ project.owner.profile.organization.name }}
+                                    {% else %}
+                                        &mdash;
+                                    {% endif %}
+                                </a>
                                 <br>
-                                <span class="secondary small">{{ project.commune }} ({{ project.commune.postal }})</span>
+                                <span class="fr-text--sm fr-text-mention--grey font-size-12px text-wrap">{{ project.name }}</span>
                             </td>
                             <td>
-                                {% for advisor in project.switchtenders.all %}
-                                    <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
-                                    {% if not forloop.last %}-{% endif %}
+                                <div class="d-flex align-items-center flex-wrap gap-1">
+                                    {% for advisor in project.switchtenders.all|slice:":3" %}
+                                        <div x-data="User()" class="d-flex align-items-center">
+                                            <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
+                                                    :src='gravatar_url("{{ advisor.email }}", 18, "{{ advisor.first_name }}" + " " + "{{ advisor.last_name }}", stringToColor("{{ advisor.email }}") )'
+                                                    :style="{ '--current-bg-color': stringToColor('{{ advisor.email }}') }"
+                                                    data-gravatar-key="{{ advisor.email }}-18"
+                                                    alt="">
+                                            <span class="project-low-reach__user-name"><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }}</a></span>
+                                        </div>
+                                    {% endfor %}
+                                    {% with advisor_count=project.switchtenders.all|length %}
+                                        {% if advisor_count > 3 %}
+                                            <span class="crm-avatar crm-avatar--overflow">+{{ advisor_count|add:"-3" }}</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            </td>
+                            <td>{{ project.last_members_activity_at|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if project.last_reco_at %}
+                                    {{ project.last_reco_at|date:"d/m/Y" }}
+                                {% else %}
+                                    &mdash;
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong{% if project.reco_read|add:project.reco_read <= project.reco_total %} class="text-red-light"{% endif %}>{{ project.reco_read }}</strong>&nbsp;/&nbsp;{{ project.reco_total }}
+                            </td>
+                            <td>
+                                {% for opt in status_options %}
+                                    {% if opt.value == project.status_key %}
+                                        <span class="project-low-reach__status-badge project-low-reach__status-badge--{{ opt.variant }}"
+                                              title="{{ opt.title }}">{{ opt.label }}</span>
+                                    {% endif %}
                                 {% endfor %}
                             </td>
-                            <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>
-                            <td>{{ project.last_members_activity_at|timesince }}</td>
-                            <td>{{ project.last_reco_at|timesince|default:"-" }}</td>
-                            <td>{{ project.last_public_msg_at|timesince|default:"-" }}</td>
+                            <td>
+                                <div class="project-low-reach__actions d-flex align-items-center">
+                                    {# Activer / Désactiver les notifications #}
+                                    <form method="post"
+                                        action="{% url 'crm-project-update' project.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        {% if not project.exclude_stats %}
+                                            <input type="hidden" name="statistics" value="on">
+                                        {% endif %}
+                                        {% if project.muted %}
+                                            <input type="hidden" name="notifications" value="on">
+                                            <button type="submit"
+                                                    title="Activer les notifications emails"
+                                                    class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative">
+                                                Activer les notifications
+                                            </button>
+                                        {% else %}
+                                            <button type="submit"
+                                                    title="Désactiver les notifications emails"
+                                                    class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative">
+                                                Désactiver les notifications
+                                            </button>
+                                        {% endif %}
+                                    </form>
+                                    <!-- Go to project page -->
+                                    <a href="{% url 'projects-project-detail' project.id %}"
+                                        class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline"
+                                        title="Accéder à la page du dossier">Accéder à la page du dossier</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7"
+                                class="text-center fr-py-3w fr-text-mention--grey">
+                                Aucun dossier à relancer avec ces critères.
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% include "tools/paginator.html" with page_obj=page_obj %}
     </div>
 {% endblock content %}

@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0045_siteconfiguration_plugin_fields"),
+        ("home", "0046_userprofile_login_with_code"),
     ]
 
     operations = [
