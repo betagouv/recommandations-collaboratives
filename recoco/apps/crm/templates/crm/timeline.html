@@ -16,7 +16,7 @@
                         <div class="w-100 font-size-12px">
                             {% if action.actor %}
                                 <span class="d-inline-flex align-middle">
-                                    {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                                    {% include "user/user_card.html" with user=action.actor show_organization=True %}
                                 </span>
                             {% else %}
                                 <span class="actor">(compte supprimé)</span>
