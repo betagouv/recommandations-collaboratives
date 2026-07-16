@@ -980,14 +980,10 @@ wheels = [
 
 [[package]]
 name = "django-dbtemplates"
-version = "4.0"
-source = { registry = "https://pypi.org/simple" }
+version = "0.0.0"
+source = { git = "https://github.com/jazzband/django-dbtemplates.git?rev=master#eab2ce0a7edbbd593f37538be358e58a7b237af0" }
 dependencies = [
     { name = "django-appconf" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/25/11/a74dca71cc528e09fdb6655c4590f9c7963701aab80b8468050975d0f1d9/django-dbtemplates-4.0.tar.gz", hash = "sha256:e6fa3d47824183731071339a589ec1e8910ee6eef5ddad89239008a36e3c5d43", size = 76329, upload-time = "2023-04-24T17:32:57.969Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/c2/9c435dd0c78f796509ee2d48a743ff33b31476ae4008dbcb3da36f25815b/django_dbtemplates-4.0-py3-none-any.whl", hash = "sha256:a6ca7a921841a1cc411dadc7e10b61299bc4c0534b2a0ae53365e8494573bc93", size = 84199, upload-time = "2022-09-03T14:03:15.565Z" },
 ]
 
 [[package]]
@@ -3654,7 +3650,7 @@ requires-dist = [
     { name = "django-compressor", specifier = "==4.5.1" },
     { name = "django-cookie-consent", git = "https://github.com/jazzband/django-cookie-consent?rev=1ddd4717d35dc882eed1f1b1bee6970f5755ae03" },
     { name = "django-crispy-forms", specifier = "==2.0" },
-    { name = "django-dbtemplates" },
+    { name = "django-dbtemplates", git = "https://github.com/jazzband/django-dbtemplates.git?rev=master" },
     { name = "django-filter", specifier = ">=24.3" },
     { name = "django-gravatar2", specifier = ">=1.4.5" },
     { name = "django-guardian", specifier = "==2.4.0" },

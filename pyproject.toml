@@ -210,6 +210,7 @@ django-activity-stream = { git = "https://github.com/glibersat/django-activity-s
 django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "1ddd4717d35dc882eed1f1b1bee6970f5755ae03" }
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
+django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git", rev = "master" }
 
 [tool.uv.audit]
 # to set if packages have unfixed acceptable vulnerabilities
