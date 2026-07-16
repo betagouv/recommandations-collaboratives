@@ -1437,13 +1437,15 @@ def make_low_reach_project_query(
             When(reco_read=0, then=Value("zero_read")),
             When(barely_read, then=Value("low_read")),
             When(~has_engagement, then=Value("no_reaction")),
-            default=Value(""),
+            default=Value(None),
             output_field=CharField(),
         )
     )
     qs = (
         qs.filter(status_key__isnull=False)
         if status_filter == "all"
+        else qs.filter(status_key__in=["low_read", "zero_read"])
+        if status_filter == "low_read"
         else qs.filter(status_key=status_filter)
     )
 

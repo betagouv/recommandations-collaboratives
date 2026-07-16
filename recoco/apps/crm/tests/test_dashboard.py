@@ -254,11 +254,16 @@ def test_low_reach_hides_project_without_public_task(
 
 
 @pytest.mark.django_db
-def test_low_reach_low_read_filter_keeps_barely_read_only(
+def test_low_reach_low_read_filter_keeps_barely_read_and_zero_read_only(
     current_site, client, project_old_recipe, public_task_recipe
 ):
     not_read_project = project_old_recipe.make()
     public_task_recipe.make(project=not_read_project)
+
+    barely_read = project_old_recipe.make()
+    public_task_recipe.make(project=barely_read, visited=False)
+    public_task_recipe.make(project=barely_read, visited=False)
+    public_task_recipe.make(project=barely_read, visited=True)
 
     well_read = project_old_recipe.make()
     public_task_recipe.make(project=well_read, visited=True)
@@ -270,6 +275,7 @@ def test_low_reach_low_read_filter_keeps_barely_read_only(
 
     assert response.status_code == 200
     assertContains(response, not_read_project.name)
+    assertContains(response, barely_read.name)
     assertNotContains(response, well_read.name)
 
 
