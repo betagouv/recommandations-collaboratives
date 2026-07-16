@@ -93,7 +93,7 @@ p a {
 
 .normal-link-style {
   text-decoration: underline;
-  color: #0000ee;
+  color: var(--light-decisions-text-text-action-high-blue-france, #000091) !important;
 }
 
 p {
@@ -129,6 +129,18 @@ p {
   overflow: auto;
 }
 
+/* ¯¯¯ *\
+  LINK
+\* ˍˍˍ */
+.fr-link {
+  --text-spacing: 0;
+  --title-spacing: 0;
+  color: var(--text-action-high-blue-france);
+  display: inline;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0;
+}
 /* ¯¯¯ *\
   LISTS
 \* ˍˍˍ */
@@ -948,6 +960,20 @@ a.fr-text-inverted--grey {
     background: var(--light-background-alt-grey-hover, #e6e6e6);
     color: var(--light-text-default-grey-hover, #3a3a3a);
     opacity: 0.9;
+  }
+}
+
+.fr-btn--secondary {
+  &-grey {
+    border: 1px solid #E5E5E5;
+    color: var(--light-text-default-grey, #3A3A3A);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: white;
+    &:hover {
+      background-color: var(--light-background-default-grey, #eee) !important;
+    }
   }
 }
 

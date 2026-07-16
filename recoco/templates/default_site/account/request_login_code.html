@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load django_vite %}
+{% block title %}
+    Me connecter avec un code par email
+{% endblock title %}
+{% block og_title %}
+    Me connecter avec un code par email
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/styles/home-auth.css.js' %}
+    {% vite_asset 'js/styles/account-login.css.js' %}
+{% endblock js %}
+{% block content %}
+    {% include "account/fragments/request_login_code_form.html" with title="Connexion à "|add:request.site.name legend="Connectez-vous à "|add:request.site.name|add:" en utilisant votre adresse e-mail." fallback_actions=True %}
+{% endblock content %}
