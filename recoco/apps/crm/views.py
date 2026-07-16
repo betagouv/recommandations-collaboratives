@@ -1405,7 +1405,7 @@ def make_low_reach_project_query(
         )
     )
 
-    # days == 0 means "Tout" (no time filter on last members activity)
+    # last member activity in days. days == 0 means "Tout", ie no time limit
     if days:
         cutoff_date = datetime.now() - timedelta(days=days)
         qs = qs.filter(last_members_activity_at__lte=cutoff_date)
@@ -1435,21 +1435,17 @@ def make_low_reach_project_query(
     qs = qs.annotate(
         status_key=Case(
             When(reco_read=0, then=Value("zero_read")),
-            When(Q(reco_read=1, reco_total__gt=2), then=Value("low_read")),
+            When(barely_read, then=Value("low_read")),
             When(~has_engagement, then=Value("no_reaction")),
             default=Value(""),
             output_field=CharField(),
         )
     )
-
-    if status_filter == "zero_read":
-        qs = qs.filter(reco_read=0)
-    elif status_filter == "low_read":
-        qs = qs.filter(barely_read)
-    elif status_filter == "no_reaction":
-        qs = qs.exclude(has_engagement)
-    else:  # "all": every project matched by any of the filters above
-        qs = qs.filter(barely_read | ~has_engagement)
+    qs = (
+        qs.filter(status_key__isnull=False)
+        if status_filter == "all"
+        else qs.filter(status_key=status_filter)
+    )
 
     if mine_only:
         qs = qs.filter(switchtenders=request.user)
@@ -1537,9 +1533,8 @@ def crm_list_projects_with_low_reach(request):
         search_q=search_q,
     )
 
-    total_count = low_reach_projects.count()
-
     paginator = Paginator(low_reach_projects, 25)
+    total_count = paginator.count
     page_number = request.GET.get("page") or 1
     page_obj = paginator.get_page(page_number)
 
