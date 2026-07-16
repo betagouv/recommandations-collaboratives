@@ -34,6 +34,9 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
         return saved_user
 
+    def is_login_by_code_required(self, request, **kwargs):
+        return request.user.profile.login_with_code
+
     def clean_email(self, email: str) -> str:
         # brevo conditions:
         # - Longueur totale de l’adresse ≤ 254 caractères

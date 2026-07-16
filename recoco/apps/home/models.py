@@ -82,6 +82,8 @@ class SiteActionManager(CurrentSiteManager, ActionManager):
 class UserProfileManager(models.Manager):
     """Manager for active UserProfile"""
 
+    use_in_migrations = True
+
     def get_queryset(self):
         return (
             super()
@@ -152,6 +154,10 @@ class UserProfile(models.Model):
     deleted = models.DateTimeField(null=True, blank=True)
 
     disabled = models.DateTimeField(null=True, blank=True)
+
+    login_with_code = models.BooleanField(default=False)
+
+    requires_2fa = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "profil utilisateur"

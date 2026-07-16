@@ -13,6 +13,7 @@ import django.core.mail
 from actstream import action
 from allauth.account.adapter import get_adapter
 from allauth.account.views import RequestLoginCodeView
+from allauth.mfa.models import Authenticator
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
@@ -58,6 +59,7 @@ from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
     SiteCreateForm,
+    TwoFaConfigForm,
     UserPasswordFirstTimeSetupForm,
 )
 from .models import AdvisorAccessRequest
@@ -192,13 +194,13 @@ def contact(request):
             raise PermissionDenied(
                 "Le formulaire de contact n'est accessible qu'aux personnes authentifiées"
             )
-        form = ContactForm(request.user, request.POST)
+        form = ContactForm(request.POST, user=request.user)
         if form.is_valid():
             status = send_message_to_team(request, form.cleaned_data)
             notify_user_of_sending(request, status)
             return redirect(next_url)
     else:
-        form = ContactForm(request.user)
+        form = ContactForm(user=request.user)
     return render(request, "home/contact.html", locals())
 
 
@@ -492,6 +494,66 @@ class RequestLoginCodeNoStaffView(RequestLoginCodeView):
             )
             return HttpResponseRedirect(self.get_success_url())
         return super().form_valid(form)
+
+
+@method_decorator([login_required], name="dispatch")
+class TwoFAConfigView(FormView):
+    form_class = TwoFaConfigForm
+    template_name = "home/mfa-config.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_invalid(self, form):
+        # at least ensure that requires_2fa is respected
+        authenticator = Authenticator.objects.filter(
+            type=Authenticator.Type.TOTP, user=self.request.user
+        ).first()
+        if (
+            self.request.user.profile.requires_2fa
+            and not authenticator
+            and not self.request.user.profile.login_with_code
+        ):
+            self.request.user.profile.login_with_code = True
+            self.request.user.profile.save()
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        two_fa_mode = form.cleaned_data["two_fa_mode"]
+        if two_fa_mode == "none":
+            self.request.user.profile.login_with_code = False
+            self.request.user.profile.save()
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if authenticator:
+                url = reverse("mfa_deactivate_totp")
+                return redirect(url)
+        elif two_fa_mode == "totp":
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if not authenticator:
+                # removing email 2fa is done through a signal
+                url = reverse("mfa_activate_totp")
+                return redirect(url)
+            self.request.user.profile.login_with_code = False
+            self.request.user.profile.save()
+        else:  # 2fa is set to login with code. totp may or may not have been activated before
+            self.request.user.profile.login_with_code = True
+            self.request.user.profile.save()
+
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if authenticator:
+                url = reverse("mfa_deactivate_totp")
+                return redirect(url)
+
+        messages.success(self.request, "Vos paramètres ont bien été sauvegardés.")
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 # eof
