@@ -63,7 +63,7 @@
                     {% for opt in status_options %}
                         {% if opt.value == status_filter %}
                             <span class="project-low-reach__status-badge project-low-reach__status-badge--{{ opt.variant }}"
-                                  title="{{ opt.title }}">{{ opt.label }}</span>
+                                  title="{{ opt.title }}">{{ opt.label_filter|default:opt.label }}</span>
                         {% endif %}
                     {% endfor %}
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm project-low-reach__status-chevron"
@@ -75,7 +75,7 @@
                         {% for opt in status_options %}
                             <option value="{{ opt.value }}"
                                     {% if status_filter == opt.value %}selected{% endif %}
-                                    title="{{ opt.title }}">{{ opt.label }}</option>
+                                    title="{{ opt.title }}">{{ opt.label_filter|default:opt.label }}</option>
                         {% endfor %}
                     </select>
                 </div>

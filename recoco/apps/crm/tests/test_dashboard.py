@@ -409,7 +409,7 @@ def test_low_reach_csv_transcribes_project_data(
     assert row["insee"] == "12345"
     assert row["recos_lues"] == "0"
     assert row["recos_total"] == "1"
-    assert row["statut"] == "0 RECO LUE"
+    assert row["statut"] == "RECOS NON LUES"
     assert row["referent_prenom"] == "Jean"
     assert row["referent_nom"] == "Martin"
     assert row["referent_organisation"] == "Ma Collectivité"

@@ -1491,7 +1491,8 @@ LOW_REACH_STATUS_OPTIONS = [
     },
     {
         "value": "zero_read",
-        "label": "0 reco lue",
+        "label": "Recos non lues",
+        "label_filter": "0 reco lue",
         "title": "Aucune recommandation n'a été lue",
         "variant": "warning",
     },
