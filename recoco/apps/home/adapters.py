@@ -1,6 +1,7 @@
 from allauth.account import adapter as allauth_adapter
 from allauth.account import app_settings
 from allauth.account.utils import user_email, user_username
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 
 from . import utils
@@ -35,6 +36,8 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         return saved_user
 
     def is_login_by_code_required(self, request, **kwargs):
+        if settings.DEBUG:
+            return False
         return request.user.profile.login_with_code
 
     def clean_email(self, email: str) -> str:
