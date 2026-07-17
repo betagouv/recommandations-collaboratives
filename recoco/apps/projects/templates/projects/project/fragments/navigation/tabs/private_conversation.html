@@ -1,0 +1,29 @@
+{% comment %}
+    Parameter:
+        - label (string): label to display in project navigation
+{% endcomment %}
+{% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
+    <div class="fr-segmented__element"
+         {% if 'use_private_notes' not in user_project_perms %}aria-describedby="tooltip-lock-access-internal-followup"{% endif %}>
+        {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-internal-followup" %}
+        <input value="internalFollowup"
+               type="radio"
+               {% if internal_followup %}checked{% endif %}
+               aria-checked="{% if internal_followup %}true{% else %}false{% endif %}"
+               {% if 'use_private_notes' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-internal-followup' project.pk %}'" {% else %} disabled {% endif %}
+               id="segmented-control-private-conversation"
+               name="segmented-control-project">
+        <label class="fr-label" for="segmented-control-private-conversation">
+            <a class="stretched-link"
+               href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">{{ label |default:"Espace conseillers" }}
+                {% if 'use_private_notes' in user_project_perms %}
+                    {% if active_project_private_conversation_notifications_count %}
+                        <span class="badge text-bg-danger">{{ active_project_private_conversation_notifications_count }}</span>
+                    {% endif %}
+                {% else %}
+                    <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                {% endif %}
+            </a>
+        </label>
+    </div>
+{% endif %}

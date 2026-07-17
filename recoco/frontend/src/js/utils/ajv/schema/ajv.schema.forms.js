@@ -21,15 +21,11 @@ export function minLengthErrorMessage(minLength) {
 export function textOptional(minLength = 3, maxLength = 100) {
   return {
     type: 'string',
-    if: { minLength: 1 },
-    then: {
-      minLength,
-      maxLength,
-      errorMessage: {
-        minLength: minLengthErrorMessage(minLength),
-        maxLength: maxLengthErrorMessage(maxLength),
-      },
-    },
+    anyOf: [
+        { maxLength: 0 },
+        { minLength, maxLength },
+      ],
+      errorMessage:  `Entre ${minLength} et ${maxLength} caractères`,
   };
 }
 

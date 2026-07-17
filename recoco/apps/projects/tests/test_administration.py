@@ -15,6 +15,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
@@ -786,17 +787,17 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker, proje
 
 @pytest.mark.django_db
 def test_set_project_active_date_is_saved(client, project_ready, current_site):
-    project_ready.inactive_since = datetime(2024, 1, 1)
+    project_ready.inactive_since = timezone.make_aware(datetime(2024, 1, 1))
     project_ready.save()
 
-    date = datetime(2024, 1, 16)
     url = reverse("projects-project-set-active", args=[project_ready.id])
     with login(client, is_staff=True, groups=["example_com_staff"]):
         with freeze_time("2024-01-16"):
+            expected_date = timezone.now()
             client.post(url)
 
     project_ready.refresh_from_db()
-    assert project_ready.last_manual_reactivation.astimezone() == date.astimezone()
+    assert project_ready.last_manual_reactivation == expected_date
     assert project_ready.inactive_since is None
     assert project_ready.inactive_reason is None
 

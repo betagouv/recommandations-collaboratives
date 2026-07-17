@@ -2,12 +2,15 @@ from datetime import datetime, timezone
 from unittest.mock import Mock
 
 import pytest
+from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from model_bakery import baker
+from sesame.utils import get_query_string
 
+from conftest import setup_sesame_cookie
 from recoco.apps.home.middlewares import CurrentSiteConfigurationMiddleware
 from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import login
@@ -48,6 +51,112 @@ class TestCurrentSiteConfigurationMiddleware:
         middleware(request_mock)
 
         assert request_mock.site_config == site_config
+
+
+@pytest.mark.django_db
+class TestSesameWithCookie:
+    def test_login_fails_if_no_cookie(self, client):
+        user = baker.make(auth_models.User)
+        query = get_query_string(user)
+
+        url = reverse("home") + query
+        response = client.get(url)
+
+        authenticated_user = get_user(client)
+        assert authenticated_user.is_anonymous
+        assert response.status_code != 302
+
+    def test_login_fails_with_other_cookie(self, client):
+        user = baker.make(auth_models.User)
+        setup_sesame_cookie(client, baker.make(auth_models.User))
+
+        query = get_query_string(user)
+        url = reverse("home") + query
+        response = client.get(url)
+
+        authenticated_user = get_user(client)
+        assert authenticated_user.is_anonymous
+        assert response.status_code != 302
+
+    def test_succeeds_with_proper_cookie(self, client):
+        user = baker.make(auth_models.User)
+        setup_sesame_cookie(client, user)
+
+        query = get_query_string(user)
+        url = reverse("home") + query
+        response = client.get(url)
+
+        authenticated_user = get_user(client)
+        assert authenticated_user.id == user.id
+        assert response.status_code == 302
+
+    def test_does_not_logout_even_if_cookie(self, client):
+        user = baker.make(auth_models.User)
+        setup_sesame_cookie(client, user)
+        query = get_query_string(user)
+
+        with login(client) as other_user:
+            url = reverse("home") + query
+            response = client.get(url)
+
+            authenticated_user = get_user(client)
+            assert authenticated_user.id == other_user.id
+            assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestEnableSesameCookie:
+    def test_sets_cookie_if_consent(self, client):
+        cookie_url = reverse("cookie_consent_accept_all")
+        client.post(cookie_url)
+
+        with login(client) as user:
+            client.get("/")
+            assert int(client.cookies["enable-sesame-user-id"].value) == user.id
+
+    def test_persist_after_session(self, client):
+        cookie_url = reverse("cookie_consent_accept_all")
+        client.post(cookie_url)
+
+        with login(client) as user:
+            client.get("/")
+            assert int(client.cookies["enable-sesame-user-id"].value) == user.id
+            client.get(reverse("account_logout"))
+            assert int(client.cookies["enable-sesame-user-id"].value) == user.id
+
+    def test_no_cookie_if_hijacked(self, client):
+        hijacked = baker.make(auth_models.User, username="hijacked")
+        cookie_url = reverse("cookie_consent_accept_all")
+        client.post(cookie_url)
+
+        with login(client, username="hijacker", is_staff=True):
+            url = reverse("hijack:acquire")
+            client.post(url, data={"user_pk": hijacked.pk})
+            client.get("/")
+            assert "enable-sesame-user-id" not in client.cookies
+
+    def test_no_cookie_with_unset_consent(self, client):
+        with login(client):
+            client.get("/")
+            assert "enable-sesame-user-id" not in client.cookies
+
+    def test_no_cookie_without_consent(self, client):
+        cookie_url = reverse("cookie_consent_decline_all")
+        client.post(cookie_url)
+
+        with login(client):
+            client.get("/")
+            assert "enable-sesame-user-id" not in client.cookies
+
+    def test_new_cookie_replaces_old_one(self, client):
+        old_user = baker.make(auth_models.User)
+        client.cookies.load({"enable-sesame-user-id": str(old_user.id)})
+        cookie_url = reverse("cookie_consent_accept_all")
+        client.post(cookie_url)
+
+        with login(client) as new_user:
+            client.get("/")
+            assert int(client.cookies["enable-sesame-user-id"].value) == new_user.id
 
 
 @pytest.mark.django_db

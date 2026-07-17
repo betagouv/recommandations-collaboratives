@@ -3,6 +3,7 @@
 {% load waffle_tags %}
 {% load projects_extra %}
 {% load django_vite %}
+{% load crm_tags %}
 {% block js %}
     {% vite_asset 'js/styles/marianne.css.js' %}
     {% vite_asset 'js/apps/CRM/crmNavigation.js' %}
@@ -37,6 +38,20 @@
                     <a class="stretched-link" href="{% url 'crm-project-list' %}">Dossiers</a>
                 </label>
             </div>
+            {% crm_plugin_tabs 10 20 as plugin_tabs_after_dossiers %}
+            {% for tab in plugin_tabs_after_dossiers %}
+                <div class="fr-segmented__element">
+                    <input value="{{ tab.tab_key }}"
+                           type="radio"
+                           {% if tab.tab_key in request.resolver_match.app_names %}checked{% endif %}
+                           id="segmented-control-{{ tab.tab_key }}"
+                           name="segmented-control-{{ tab.tab_key }}"
+                           @click="window.location='{{ tab.url }}'">
+                    <label class="fr-label" for="segmented-control-{{ tab.tab_key }}">
+                        <a class="stretched-link" href="{{ tab.url }}">{{ tab.label }}</a>
+                    </label>
+                </div>
+            {% endfor %}
             <div class="fr-segmented__element">
                 <input value="users"
                        type="radio"
@@ -93,5 +108,13 @@
             </div>
         </div>
     </fieldset>
-    {% include "crm/fragments/general_search_input.html" %}
+    <div class="flex-grow-1">
+        <form method="get"
+              action="{% url 'crm-search' %}"
+              class="d-flex align-items-center justify-content-end">
+            <div class="d-flex align-items-center position-relative {{ width_class|default:"w-75" }}">
+                {% include "projects/project/fragments/search_bar.html" %}
+            </div>
+        </form>
+    </div>
 </div>

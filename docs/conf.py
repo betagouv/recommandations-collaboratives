@@ -39,7 +39,7 @@ extensions = [
     "sphinxcontrib_django_urls",
     "celery.contrib.sphinx",
     "sphinx_toolbox.more_autodoc.no_docstring",
-    "sphinx_js",
+    # "sphinx_js",  # disabled: requires a working JS/jsdoc toolchain
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import api, { projectsUrl } from '../../utils/api';
 import { ToastType } from '../../models/toastType';
+import { ProjectStatus } from '../../models/projectStatus.enum';
 
 Alpine.data('ProjectListCrm', (departments, regions) => ({
   dataLoaded: false,
@@ -21,61 +22,59 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     limit: 20,
     total: 0,
   },
+  ProjectStatus,
   options: [
     {
       value: 'PRE_DRAFT',
-      text: 'Incomplet',
-      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      text: ProjectStatus.PRE_DRAFT.text,
+      color: ProjectStatus.PRE_DRAFT.color,
       tooltip:
         "Le déposant n'est pas allé jusqu'au bout du dépôt de sa demande",
       dataTestId: 'status-pre-draft',
     },
     {
       value: 'DRAFT',
-      text: 'A modérer',
-      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.DRAFT.text,
+      color: ProjectStatus.DRAFT.color,
       tooltip: 'En attente de validation ou refus de votre part',
     },
     {
       value: 'TO_PROCESS',
-      text: 'A traiter',
-      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.TO_PROCESS.text,
+      color:  ProjectStatus.TO_PROCESS.color,
       tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'READY',
-      text: 'En attente',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.READY.text,
+      color: ProjectStatus.READY.color,
       tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'IN_PROGRESS',
-      text: 'En cours',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.IN_PROGRESS.text,
+      color:  ProjectStatus.IN_PROGRESS.color,
       tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'DONE',
-      text: 'Traité',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.DONE.text,
+      color: ProjectStatus.DONE.color,
       tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'STUCK',
-      text: 'Interrompu',
-      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.STUCK.text,
+      color:  ProjectStatus.STUCK.color,
       tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'REJECTED',
-      text: 'Rejeté',
-      color: 'fr-badge--error fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.REJECTED.text,
+      color:  ProjectStatus.REJECTED.color,
       tooltip: "Dossier refusé à l'étape de la modération",
     },
-  ],
+  ].map(opt => {return {...opt, color: `${opt.color} fr-badge fr-badge--no-icon font-size-10px`}}),
   displayProjectIndex: false,
   async init() {
     const projectsResponse = await this.getProjects();
@@ -243,29 +242,6 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       return `${this.projectsTotal} résultat${this.projectsTotal > 1 ? 's' : ''}`;
     } else {
       return 'Aucun résultat';
-    }
-  },
-  projectStatusLabel(status) {
-    return (
-      this.options.find((option) => option.value === status).text || status
-    );
-  },
-  projectStatusColor(status) {
-    switch (status) {
-      case 'PRE_DRAFT':
-      case 'DRAFT':
-        return 'fr-badge--new';
-      case 'TO_PROCESS':
-      case 'STUCK':
-        return 'fr-badge--info';
-      case 'READY':
-      case 'IN_PROGRESS':
-      case 'DONE':
-        return 'fr-badge--success-lighter';
-      case 'REJECTED':
-        return 'fr-badge--error';
-      default:
-        return 'fr-badge--white';
     }
   },
   projectTooltip(project) {

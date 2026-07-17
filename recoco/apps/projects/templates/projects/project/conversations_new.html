@@ -2,6 +2,7 @@
 {% load guardian_tags %}
 {% load django_vite %}
 {% load projects_extra %}
+{% load conversation_tags %}
 {% block title %}
     Conversation - {{ block.super }}
 {% endblock title %}
@@ -36,6 +37,7 @@
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
+    {% conversation_plugin_extra_html request project %}
     <div class="conversation-new d-flex"
          x-data="Conversations({{ project.id }}, {{ request.user.id }})"
          @on-click-handle-reply.window="onClickHandleReply($event.detail)">
@@ -122,10 +124,15 @@
                                     </p>
                                 </div>
                             </template>
-                            {% if not is_project_owner %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+                            {% if advising_position.is_advisor or is_switchtender or is_staff %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+                                {% comment %}
+                                advising_position.is_advisor : advisor on current project
+                                is_switchtender : advisor on current site
+                                is_staff : staff on current site
+                                {% endcomment %}
                             {% else %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
                             {% endif %}
                             <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>

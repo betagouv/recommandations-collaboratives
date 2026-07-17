@@ -3,10 +3,12 @@ from unittest.mock import ANY, Mock, patch
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery import baker
 
 from recoco.apps.projects import utils
 from recoco.apps.survey.models import Answer, Question, QuestionSet, Session, Survey
+from recoco.utils import login
 
 
 @pytest.mark.django_db
@@ -115,3 +117,97 @@ def test_survey_questions_view(api_client, current_site):
             "choices": [],
         }
     ]
+
+
+@pytest.fixture
+def project_deleted(request, make_project):
+    """Create a project on the current site with status READY"""
+    yield make_project(status="READY", deleted=timezone.now())
+
+
+@pytest.fixture
+def session_project_deleted(project_deleted):
+    session = baker.make(Session, project=project_deleted)
+    yield session
+
+
+@pytest.fixture
+def answers_project_deleted(session_project_deleted):
+    answers = baker.make(Answer, session=session_project_deleted, _quantity=2)
+    yield answers
+
+
+@pytest.mark.django_db
+def test_session_staff_can_see_deleted_if_asked(
+    request, api_client, current_site, session_project_deleted
+):
+    url = reverse("api-survey-sessions")
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(
+            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
+        )
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 1
+
+
+@pytest.mark.django_db
+def test_session_staff_dont_see_deleted_if_not_asked(
+    request, api_client, current_site, session_project_deleted
+):
+    url = reverse("api-survey-sessions")
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(
+            f"{url}?project_id={session_project_deleted.project_id}"
+        )
+        assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_session_not_staff_cant_see_deleted(
+    request, api_client, current_site, session_project_deleted
+):
+    url = reverse("api-survey-sessions")
+    with login(api_client):
+        response = api_client.get(
+            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
+        )
+        assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_session_answers_staff_can_see_deleted_if_asked(
+    request, api_client, current_site, session_project_deleted, answers_project_deleted
+):
+    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(
+            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
+        )
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 2
+
+
+@pytest.mark.django_db
+def test_session_answer_staff_dont_see_deleted_if_not_asked(
+    request, api_client, current_site, session_project_deleted, answers_project_deleted
+):
+    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
+    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+        response = api_client.get(
+            f"{url}?project_id={session_project_deleted.project_id}"
+        )
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 0
+
+
+@pytest.mark.django_db
+def test_session_answers_not_staff_cant_see_deleted(
+    request, api_client, current_site, session_project_deleted, answers_project_deleted
+):
+    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
+    with login(api_client):
+        response = api_client.get(
+            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
+        )
+        assert response.status_code == 200
+        assert len(response.data["results"]) == 0

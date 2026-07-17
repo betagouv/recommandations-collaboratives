@@ -46,6 +46,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.demarches_simplifiees.models import DSMapping, DSResource
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.hitcount.models import HitCount
+from recoco.apps.plugins.manager import get_tenant_hook
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
@@ -292,6 +293,11 @@ class BaseResourceDetailView(DetailView):
             )
         else:
             context["contacts_to_display"] = []
+
+        pm = get_tenant_hook(self.request)
+        context["resource_sidebar_panels"] = pm.hook.resource_sidebar_panels(
+            resource=self.object, request=self.request
+        )
 
         return context
 

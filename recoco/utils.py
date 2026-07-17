@@ -109,6 +109,15 @@ def check_if_advisor(user, site=None):
     return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
 
 
+def is_sensitive_account(user, site=None):
+    return (
+        user.is_staff
+        | user.is_superuser
+        | is_staff_for_site(user)
+        | is_admin_for_site(user)
+    )
+
+
 def build_absolute_url(path, auto_login_user=None, site=None):
     """
     Where we can't use request,
@@ -125,14 +134,7 @@ def build_absolute_url(path, auto_login_user=None, site=None):
 
     if auto_login_user:
         # Check if the account is sensitive and should not allow autologin
-        sensitive_account = (
-            auto_login_user.is_staff
-            | auto_login_user.is_superuser
-            | is_staff_for_site(auto_login_user)
-            | is_admin_for_site(auto_login_user)
-        )
-
-        if not sensitive_account:
+        if not is_sensitive_account(auto_login_user):
             parsed_url = urlparse(url)
             params = parse_qs(parsed_url.query)
 
@@ -172,6 +174,17 @@ def get_admin_for_site(site=None):
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("admin", site)
     return auth_models.Group.objects.get(name=group_name).user_set.all()
+
+
+def truncate_string(s, max_length):
+    """Truncate given string to max_length"""
+    if len(s) <= max_length:
+        return s
+    sub = s[:max_length]
+    if s[max_length] != " ":
+        # we are truncating last word, rewind to its begining
+        sub = sub[: sub.rfind(" ")]
+    return f"{sub}…"
 
 
 ########################################################################

@@ -27,7 +27,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         title: 'À traiter',
         color_class: 'border-secondary',
         projects: [],
-        allProjects: [],
         offset: 0,
         totalCount: 0,
         hasMore: true,
@@ -38,7 +37,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         title: 'En attente',
         color_class: 'border-info',
         projects: [],
-        allProjects: [],
         offset: 0,
         totalCount: 0,
         hasMore: true,
@@ -49,7 +47,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         title: 'En cours',
         color_class: 'border-primary',
         projects: [],
-        allProjects: [],
         offset: 0,
         totalCount: 0,
         hasMore: true,
@@ -60,7 +57,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         title: 'Traité',
         color_class: 'border-success',
         projects: [],
-        allProjects: [],
         offset: 0,
         totalCount: 0,
         hasMore: true,
@@ -71,7 +67,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         title: 'Conseil interrompu',
         color_class: 'border-dark',
         projects: [],
-        allProjects: [],
         offset: 0,
         totalCount: 0,
         hasMore: true,
@@ -96,6 +91,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
               departments: this.backendSearch.searchDepartment,
               limit: this.pageSize,
               status: [board.code],
+              myProjects: this.isDisplayingOnlyUserProjects,
             })
           );
 
@@ -106,7 +102,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
             );
 
           board.projects = mappedProjects;
-          board.allProjects = [...board.projects];
 
           // Update pagination state
           board.totalCount = response.data.count;
@@ -115,7 +110,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           board.isLoading = false;
         })
       );
-      this.filterMyProjects();
     },
     async loadMoreProjects(board) {
       if (board.isLoading || !board.hasMore) {
@@ -131,6 +125,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           limit: this.pageSize,
           offset: board.offset,
           status: [board.code],
+          myProjects: this.isDisplayingOnlyUserProjects,
         })
       );
 
@@ -140,12 +135,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           this.currentSiteId
         );
 
-      board.allProjects = [...board.allProjects, ...mappedProjects];
-      board.offset = board.allProjects.length;
+      board.projects = [...board.projects, ...mappedProjects];
+      board.offset = board.projects.length;
       board.hasMore = board.offset < board.totalCount;
       board.isLoading = false;
-
-      this.filterMyProjects();
     },
     onColumnScroll(event, board) {
       const element = event.target;
@@ -215,7 +208,9 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.currentlyHoveredElement.classList.remove('drag-target');
       this.currentlyHoveredElement = null;
 
-      const projectId = Number(event.dataTransfer.getData('application/project-id'));
+      const projectId = Number(
+        event.dataTransfer.getData('application/project-id')
+      );
       if (!projectId) {
         return;
       }
@@ -235,24 +230,13 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
 
       await this.getData();
     },
-    toggleMyProjectsFilter() {
+    async toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
       localStorage.setItem(
         'isDisplayingOnlyUserProjects',
         this.isDisplayingOnlyUserProjects
       );
-      this.filterMyProjects();
-    },
-    filterMyProjects() {
-      this.boards.forEach((board) => {
-        if (this.isDisplayingOnlyUserProjects) {
-          board.projects = board.allProjects.filter(
-            (d) => d.is_observer || d.is_switchtender
-          );
-        } else {
-          board.projects = [...board.allProjects];
-        }
-      });
+      await this.getData();
     },
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;

@@ -80,6 +80,23 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     window.addEventListener('hashchange', async () => {
       await this.detectOpenActionsFromHash();
     });
+
+    // PLUGINS: hook so a Node Renderer JS plugin can respond to a custom Node
+    // type and produce the desired rendering
+    window.addEventListener('plugin-message-create-request', async (e) => {
+      const { nodes } = e.detail;
+      await this.sendMessage(
+        {
+          nodes,
+          in_reply_to: this.messageIdToReply,
+        },
+        {
+          successCallback: () => {
+            window.dispatchEvent(new CustomEvent('plugin-message-created'));
+          },
+        }
+      );
+    });
   },
   async detectOpenActionsFromHash() {
     await this.detectTaskOpenFromHash();
@@ -225,6 +242,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     // Update the store
     if (Alpine.store('sharedContentsPanel')) {
+      Alpine.store('sharedContentsPanel').projectId = this.projectId;
       Alpine.store('sharedContentsPanel').setRecommendations(recommendations);
       Alpine.store('sharedContentsPanel').setDraftRecommendations(
         draftRecommendations
@@ -326,7 +344,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   async getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
-    if (!shortMessage) {
+    if (!shortMessage || !shortMessage.nodes?.length) {
       return '';
     }
     let contentToSummarize;
@@ -425,6 +443,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
+
   async publishDraftRecommendation(recommendation) {
     recommendation.isLoading = true;
     try {
@@ -453,14 +472,40 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async sendFormMessage() {
-    this.sendingMessage = true;
-    if (this.isEditorInEditMode) {
-      await this.sendMessage({
-        updateMessage: true,
-        messageIdToEdit: this.messageIdToEdit,
+    // Check if editor contains message
+    if (!Alpine.store('editor').currentMessageJSON) return;
+
+    // Parse message in Editor
+    const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
+      Alpine.store('editor').currentMessageJSON
+    );
+
+    // Only upload files for *new* documents
+    const documentNodesToUpload = parsedNodesFromEditor.filter(
+      (node) => node.type === 'DocumentNode' && !node.document_id && node.file
+    );
+
+    // Send documents if exists
+    let uploadResponses = [];
+    if (documentNodesToUpload.length > 0) {
+      uploadResponses = await this.sendDocuments(
+        documentNodesToUpload.map((node) => this.uploadFile(node.file))
+      );
+      documentNodesToUpload.forEach((node, index) => {
+        node.document_id = uploadResponses[index].data.id;
       });
+    }
+
+    // Create payload
+    const payload = {
+      nodes: parsedNodesFromEditor,
+      in_reply_to: this.messageIdToReply,
+    };
+
+    if (this.isEditorInEditMode) {
+      await this.updateMessage(payload);
     } else {
-      await this.sendMessage();
+      await this.sendMessage(payload);
     }
     Alpine.store('onLeaveAlert').setDirty(false);
   },
@@ -474,93 +519,85 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       },
     });
   },
-  async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
-    if (!Alpine.store('editor').currentMessageJSON) return;
-
-    const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
-      Alpine.store('editor').currentMessageJSON
-    );
-
-    // Only upload files for *new* documents
-    const documentNodesToUpload = parsedNodesFromEditor.filter(
-      (node) => node.type === 'DocumentNode' && !node.document_id && node.file
-    );
-
-    let uploadResponses = [];
-    if (documentNodesToUpload.length > 0) {
-      try {
-        uploadResponses = await Promise.all(
-          documentNodesToUpload.map((node) => this.uploadFile(node.file))
-        );
-      } catch (error) {
-        const errorMessage =
-          error.response?.data?.the_file?.[0] ||
-          "Contactez nous via le chat pour obtenir de l'aide.";
-        Alpine.store('app').displayToastMessage({
-          message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
-          timeout: 5000,
-          type: ToastType.error,
-        });
-        if (!updateMessage) {
-          throw new Error('Failed to upload documents', { error });
-        } else {
-          throw new Error('Failed to upload documents while updating message', {
-            error,
-          });
-        }
-      }
-
-      documentNodesToUpload.forEach((node, index) => {
-        node.document_id = uploadResponses[index].data.id;
-      });
-    }
-
-    const payload = {
-      nodes: parsedNodesFromEditor,
-      in_reply_to: this.messageIdToReply,
-    };
-
+  async sendMessage(payload, { successCallback, errorCallback } = {}) {
     try {
-      let messageResponse;
-      if (updateMessage) {
-        messageResponse = await api.patch(
-          conversationsMessageUrl(this.projectId, messageIdToEdit),
-          payload
-        );
+      this.sendingMessage = true;
 
-        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
-        this.replaceMessage(messageResponse.data, messageIdToEdit);
-
-        this.oldMessageToEdit = null;
-        this.messageIdToEdit = null;
-        this.isEditorInEditMode = false;
-      } else {
-        messageResponse = await api.post(
-          conversationsMessagesUrl(this.projectId),
-          payload
-        );
-        this.feed.elements.push({ ...messageResponse.data, type: 'message' });
-        this.isEditorInReplyMode = false;
-        this.scrollToNewMessage();
-      }
+      const messageResponse = await api.post(
+        conversationsMessagesUrl(this.projectId),
+        payload
+      );
+      this.feed.elements.push({ ...messageResponse.data, type: 'message' });
+      this.scrollToNewMessage();
 
       Alpine.store('editor').clearEditorContent();
       this.updateCountOfElementsInDiscussion(messageResponse.data);
-      this.messageIdToReply = null;
-      this.sendingMessage = false;
+      successCallback && successCallback();
     } catch (error) {
-      this.sendingMessage = false;
+      errorCallback && errorCallback();
+
       Alpine.store('app').displayToastMessage({
-        message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
+        message: `Erreur lors de l'envoi du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
         timeout: 5000,
         type: ToastType.error,
       });
 
+      throw new Error('Failed to send message', { cause: error });
+    } finally {
+      this.sendingMessage = false;
+      this.messageIdToReply = null;
+      this.isEditorInReplyMode = false;
+    }
+  },
+  async sendDocuments(documents) {
+    try {
+      return await Promise.all(documents);
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.the_file?.[0] ||
+        "Contactez nous via le chat pour obtenir de l'aide.";
+      Alpine.store('app').displayToastMessage({
+        message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
+        timeout: 5000,
+        type: ToastType.error,
+      });
       if (!updateMessage) {
-        throw new Error('Failed to send message', { cause: error });
+        throw new Error('Failed to upload documents', { error });
       } else {
-        throw new Error('Failed to update message', { cause: error });
+        throw new Error('Failed to upload documents while updating message', {
+          error,
+        });
       }
+    }
+  },
+  async updateMessage(payload) {
+    try {
+      this.sendingMessage = true;
+
+      const updatedMessageResponse = await api.patch(
+        conversationsMessageUrl(this.projectId, this.messageIdToEdit),
+        payload
+      );
+      // Decrease number of element in conversation (message, reco, file...)
+      this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+      this.replaceMessage(updatedMessageResponse.data, this.messageIdToEdit);
+
+      Alpine.store('editor').clearEditorContent();
+      this.updateCountOfElementsInDiscussion(updatedMessageResponse.data);
+    } catch (error) {
+      Alpine.store('app').displayToastMessage({
+        message: `Erreur lors de la modification du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
+        timeout: 5000,
+        type: ToastType.error,
+      });
+
+      throw new Error('Failed to update message', { cause: error });
+    } finally {
+      this.oldMessageToEdit = null;
+      this.messageIdToEdit = null;
+      this.isEditorInEditMode = false;
+      this.messageIdToReply = null;
+      this.sendingMessage = false;
     }
   },
   countElementsInDiscussion() {
@@ -725,13 +762,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       // Mark as visited and track analytics
       await this.onClickRessourceConsumeNotification(recommendation, message);
-      if (Alpine.store('resourcePreviewPanel')) {
-        Alpine.store('resourcePreviewPanel').open(recommendation, message);
-      } else {
-        console.error('resourcePreviewPanel store not found!');
-      }
     } catch (error) {
       console.error('Error in openResourcePreviewPanel:', error);
+    }
+    if (Alpine.store('resourcePreviewPanel')) {
+      Alpine.store('resourcePreviewPanel').open(recommendation, message);
+    } else {
+      console.error('resourcePreviewPanel store not found!');
     }
   },
   replaceMessage(message, messageIdToEdit) {

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.sites import models as sites_models
 from django.utils.safestring import mark_safe
 from markdownx.fields import MarkdownxFormField
-from taggit.forms import TagWidget
+from taggit.forms import TagField, TagWidget
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home import models as home_models
@@ -10,10 +10,17 @@ from recoco.apps.home import models as home_models
 from . import models
 
 
+class FixDisabledTagField(TagField):
+    def clean(self, value):
+        if self.disabled:
+            return value
+        return super().clean(value)
+
+
 class SiteConfigurationForm(forms.ModelForm):
-    crm_available_tags = forms.CharField(
-        max_length=255,
+    crm_available_tags = FixDisabledTagField(
         required=False,
+        disabled=True,
         widget=TagWidget(
             attrs={
                 "class": "form-control",

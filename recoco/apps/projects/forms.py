@@ -149,14 +149,6 @@ class ProjectModerationForm(forms.Form):
     join = forms.BooleanField(initial=False)
 
 
-class ProjectActiveForm(forms.ModelForm):
-    """Form to set/unset a project inactive"""
-
-    class Meta:
-        model = models.Project
-        fields = ["inactive_reason"]
-
-
 class ProjectLocationForm(forms.ModelForm):
     """Form for location update"""
 
