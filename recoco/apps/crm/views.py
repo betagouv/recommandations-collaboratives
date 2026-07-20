@@ -887,24 +887,20 @@ def user_details(request, user_id):
         )
 
     current_site_id = request.site.id
-    user_memberships = sorted(
-        crm_user.projectmember_set.select_related("project").prefetch_related(
+
+    def current_site_first(relations):
+        """Sort project relations (memberships, switchtendings) to display the current site first, then other sites"""
+        relations = relations.select_related("project").prefetch_related(
             "project__project_sites"
-        ),
-        key=lambda m: any(
-            ps.site_id == current_site_id for ps in m.project.project_sites.all()
-        ),
-        reverse=True,
-    )
-    user_switchtendings = sorted(
-        crm_user.projects_switchtended_per_site.select_related(
-            "project"
-        ).prefetch_related("project__project_sites"),
-        key=lambda s: any(
-            ps.site_id == current_site_id for ps in s.project.project_sites.all()
-        ),
-        reverse=True,
-    )
+        )
+        return sorted(
+            relations,
+            key=lambda rel: rel.project.is_on_site(current_site_id),
+            reverse=True,  # True (current site) sorts before False (other site)
+        )
+
+    user_memberships = current_site_first(crm_user.projectmember_set)
+    user_switchtendings = current_site_first(crm_user.projects_switchtended_per_site)
 
     search_form = forms.CRMSearchForm()
 
