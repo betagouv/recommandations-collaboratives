@@ -176,6 +176,17 @@ def get_admin_for_site(site=None):
     return auth_models.Group.objects.get(name=group_name).user_set.all()
 
 
+def truncate_string(s, max_length):
+    """Truncate given string to max_length"""
+    if len(s) <= max_length:
+        return s
+    sub = s[:max_length]
+    if s[max_length] != " ":
+        # we are truncating last word, rewind to its begining
+        sub = sub[: sub.rfind(" ")]
+    return f"{sub}…"
+
+
 ########################################################################
 # Test helpers
 ########################################################################

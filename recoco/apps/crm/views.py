@@ -31,6 +31,8 @@ from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
+    Case,
+    CharField,
     Count,
     Exists,
     ExpressionWrapper,
@@ -42,6 +44,7 @@ from django.db.models import (
     Q,
     Subquery,
     Value,
+    When,
 )
 from django.db.models.functions import Cast
 from django.http import Http404, HttpRequest, HttpResponse
@@ -49,6 +52,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
@@ -1075,6 +1079,13 @@ def project_update(request, project_id=None):
             if "statistics" in form.cleaned_data:
                 project.exclude_stats = not form.cleaned_data["statistics"]
             project.save()
+            next_url = request.POST.get("next", "")
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return redirect(next_url)
     else:
         form = forms.CRMProjectForm(
             initial={
@@ -1347,22 +1358,14 @@ def crm_list_recommendation_without_resources(request):
     return render(request, "crm/reco_without_resources.html", locals())
 
 
-def make_low_reach_project_query(request):
-    site_config = request.site_config
-
-    return (
+def make_low_reach_project_query(
+    request, days=15, status_filter="all", mine_only=False, search_q=""
+):
+    qs = (
         Project.on_site.filter(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
         )
-        .exclude(exclude_stats=True)
-        .prefetch_related(
-            "tasks",
-            "notes",
-            "switchtenders__profile__organization",
-            "crm_annotations__tags",
-        )
-        .select_related("commune")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1380,26 +1383,143 @@ def make_low_reach_project_query(request):
             reco_read_ratio=ExpressionWrapper(
                 Cast(F("reco_read"), FloatField()) / F("reco_total") * Value(100.0),
                 output_field=FloatField(),
-            ),  # Pc of unread reco
+            ),
             last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
             last_public_msg_at=Max(
                 "notes__created_on",
                 filter=Q(notes__public=True, notes__created_by__in=F("members__id")),
             ),
+            has_task_status=Exists(
+                Task.objects.filter(
+                    project=OuterRef("pk"),
+                    public=True,
+                ).exclude(status=Task.PROPOSED)
+            ),
+            has_impact_tags=Exists(
+                models.ProjectAnnotations.objects.filter(
+                    project=OuterRef("pk"),
+                    site=request.site,
+                    tags__isnull=False,
+                )
+            ),
         )
-        .exclude(reco_read_ratio__gte=99.9)  # Not interested if everything was read
-        .exclude(
-            last_reco_at__lte=datetime.now()
-            - timedelta(days=site_config.reminder_interval)
+    )
+
+    # last member activity in days. days == 0 means "Tout", ie no time limit
+    if days:
+        cutoff_date = datetime.now() - timedelta(days=days)
+        qs = qs.filter(last_members_activity_at__lte=cutoff_date)
+
+    # The status filters are independent dimensions:
+    # - "no_reaction" is engagement-based (no public message, no task status
+    #   other than "proposé", no impact tag),
+    # - "zero_read" and "low_read" only depend on the number of read
+    #   recommendations, regardless of any engagement,
+    # - "all" is the union of the three filters above (the default).
+    # A projet has engagement if a member posted a public message, if at least
+    # one task has a status other than "proposé", or if it has an impact tag.
+    has_engagement = (
+        Q(last_public_msg_at__isnull=False)
+        | Q(has_task_status=True)
+        | Q(has_impact_tags=True)
+    )
+    # A project barely read its recommendations if none were read, or if only
+    # one was read but there are more than 2 recommendations in total.
+    barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
+
+    # Single source of truth for the displayed status badge, following the same
+    # priority as the HTML table and the CSV export: "0 reco lue" > "recos non
+    # lues" > "aucune réaction". Consumed by both the template and the CSV via
+    # LOW_REACH_STATUS_OPTIONS, so the status is computed once and only read
+    # afterwards.
+    qs = qs.annotate(
+        status_key=Case(
+            When(reco_read=0, then=Value("zero_read")),
+            When(barely_read, then=Value("low_read")),
+            When(~has_engagement, then=Value("no_reaction")),
+            default=Value(None),
+            output_field=CharField(),
         )
-        .order_by(
-            "reco_read_ratio",
-            "last_members_activity_at",
-            "last_reco_at",
-            "last_public_msg_at",
+    )
+    qs = (
+        qs.filter(status_key__isnull=False)
+        if status_filter == "all"
+        else qs.filter(status_key__in=["low_read", "zero_read"])
+        if status_filter == "low_read"
+        else qs.filter(status_key=status_filter)
+    )
+
+    if mine_only:
+        qs = qs.filter(switchtenders=request.user)
+
+    if search_q:
+        qs = qs.filter(
+            Q(name__icontains=search_q)
+            | Q(commune__name__icontains=search_q)
+            | Q(members__profile__organization__name__icontains=search_q)
         )
+
+    return (
+        qs.select_related("commune")
+        .prefetch_related(
+            "tasks",
+            "notes",
+            "switchtenders__profile__organization",
+            "crm_annotations__tags",
+            Project.prefetch_owner(),
+        )
+        .order_by("-last_members_activity_at")
         .distinct()
     )
+
+
+# Status filters offered on the low-reach page, in display order. Drives both the
+# selected badge and the <select> options in the template, so labels/titles live
+# in one place.
+LOW_REACH_STATUS_OPTIONS = [
+    {
+        "value": "all",
+        "label": "Tous",
+        "title": "Tous les dossiers à relancer",
+        "variant": "info",
+    },
+    {
+        "value": "no_reaction",
+        "label": "Aucune réaction",
+        "title": "Pas de statut sur recommandation, de message du demandeur ou de tag d'impact",
+        "variant": "info",
+    },
+    {
+        "value": "zero_read",
+        "label": "Recos non lues",
+        "label_filter": "0 reco lue",
+        "title": "Aucune recommandation n'a été lue",
+        "variant": "warning",
+    },
+    {
+        "value": "low_read",
+        "label": "Recos non lues",
+        "title": "Aucune ou une seule recommandation a été lue",
+        "variant": "warning",
+    },
+]
+
+
+def _parse_low_reach_params(request):
+    """Extract and validate filter params from request GET for low-reach views."""
+    try:
+        days = int(request.GET.get("days", 15))
+    except ValueError:
+        days = 15
+
+    status_filter = request.GET.get("status", "all")
+    if status_filter not in [opt["value"] for opt in LOW_REACH_STATUS_OPTIONS]:
+        status_filter = "all"
+
+    mine_only = bool(request.GET.get("mine"))
+    search_q = request.GET.get("q", "").strip()
+
+    return days, status_filter, mine_only, search_q
 
 
 @login_required
@@ -1407,11 +1527,65 @@ def crm_list_projects_with_low_reach(request):
     """List projects that don't get a good impact"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    search_form = forms.CRMSearchForm()
+    days, status_filter, mine_only, search_q = _parse_low_reach_params(request)
 
-    low_reach_projects = make_low_reach_project_query(request)
+    low_reach_projects = make_low_reach_project_query(
+        request,
+        days=days,
+        status_filter=status_filter,
+        mine_only=mine_only,
+        search_q=search_q,
+    )
 
-    return render(request, "crm/projects_low_reach.html", locals())
+    paginator = Paginator(low_reach_projects, 25)
+    total_count = paginator.count
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "crm/projects_low_reach.html",
+        {
+            "low_reach_projects": page_obj.object_list,
+            "page_obj": page_obj,
+            "total_count": total_count,
+            "days": days,
+            "status_filter": status_filter,
+            "status_options": LOW_REACH_STATUS_OPTIONS,
+            "mine_only": mine_only,
+            "search_q": search_q,
+        },
+    )
+
+
+def _referent_csv_fields(owner):
+    """Referent columns for the low-reach CSV export, keyed by fieldname."""
+    if not owner:
+        # empty columns
+        return dict.fromkeys(
+            (
+                "referent_prenom",
+                "referent_nom",
+                "referent_organisation",
+                "referent_telephone",
+                "referent_email",
+                "referent_fonction",
+            ),
+            "",
+        )
+
+    profile = getattr(owner, "profile", None)
+    organization = profile.organization if profile else None
+    return {
+        "referent_prenom": owner.first_name,
+        "referent_nom": owner.last_name,
+        "referent_organisation": organization.name if organization else "",
+        "referent_telephone": (
+            profile.phone_no.as_international if profile and profile.phone_no else ""
+        ),
+        "referent_email": owner.email,
+        "referent_fonction": profile.organization_position if profile else "",
+    }
 
 
 @login_required
@@ -1419,54 +1593,66 @@ def crm_projects_with_low_reach_as_csv(request):
     """Export projects that don't get a good impact in CSV"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    low_reach_projects = make_low_reach_project_query(request)
+    days, status_filter, mine_only, search_q = _parse_low_reach_params(request)
 
-    today = datetime.today().date()
-
-    content_disposition = (
-        f'attachment; filename="projets-a-faible-repondant-{today}.csv"'
+    low_reach_projects = make_low_reach_project_query(
+        request,
+        days=days,
+        status_filter=status_filter,
+        mine_only=mine_only,
+        search_q=search_q,
     )
+
+    timestamp = datetime.today().strftime("%Y-%m-%d-%H%M%S")
+
+    content_disposition = f'attachment; filename="projets-a-relancer-{timestamp}.csv"'
+
     response = HttpResponse(
         content_type="text/csv",
-        headers={
-            "Content-Disposition": content_disposition,
-        },
+        headers={"Content-Disposition": content_disposition},
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "name",
-            "location",
-            "insee",
-            "inactive_since",
-            "advisors",
-            "reco_access_pc",
-            "reco_read",
-            "reco_total",
-            "last_member_activity",
-            "last_reco_at",
-            "last_public_msg_at",
-        ]
-    )
+    fieldnames = [
+        "nom_dossier",
+        "commune",
+        "insee",
+        "conseillers",
+        "recos_lues",
+        "recos_total",
+        "derniere_activite",
+        "derniere_reco",
+        "statut",
+        "referent_prenom",
+        "referent_nom",
+        "referent_organisation",
+        "referent_telephone",
+        "referent_email",
+        "referent_fonction",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
+
+    # Uppercase labels keyed by the status_key annotation computed in the query.
+    status_labels = {
+        opt["value"]: opt["label"].upper() for opt in LOW_REACH_STATUS_OPTIONS
+    }
 
     for project in low_reach_projects:
         writer.writerow(
-            [
-                project.name,
-                project.commune.name,
-                project.commune.insee,
-                project.inactive_since,
-                ",".join(
-                    [advisor.get_full_name() for advisor in project.switchtenders.all()]
+            {
+                "nom_dossier": project.name,
+                "commune": project.commune.name,
+                "insee": project.commune.insee,
+                "conseillers": ", ".join(
+                    a.get_full_name() for a in project.switchtenders.all()
                 ),
-                project.reco_read_ratio,
-                project.reco_read,
-                project.reco_total,
-                project.last_members_activity_at,
-                project.last_reco_at,
-                project.last_public_msg_at,
-            ]
+                "recos_lues": project.reco_read,
+                "recos_total": project.reco_total,
+                "derniere_activite": project.last_members_activity_at,
+                "derniere_reco": project.last_reco_at or "",
+                "statut": status_labels.get(project.status_key, ""),
+                **_referent_csv_fields(project.owner),
+            }
         )
 
     return response
@@ -1579,28 +1765,27 @@ def crm_list_topics_as_csv(request):
         },
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "topic",
-            "usage_count",
-            "usage_count_by_project",
-            "usage_count_by_task",
-            "project_ids",
-            "reco_ids",
-        ]
-    )
+    fieldnames = [
+        "topic",
+        "usage_count",
+        "usage_count_by_project",
+        "usage_count_by_task",
+        "project_ids",
+        "reco_ids",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for name, usage in topics.items():
         writer.writerow(
-            [
-                name,
-                usage[0],
-                usage[1],
-                usage[2],
-                [project.pk for project in usage[3]],
-                [task.pk for task in usage[4]],
-            ]
+            {
+                "topic": name,
+                "usage_count": usage[0],
+                "usage_count_by_project": usage[1],
+                "usage_count_by_task": usage[2],
+                "project_ids": [project.pk for project in usage[3]],
+                "reco_ids": [task.pk for task in usage[4]],
+            }
         )
 
     return response
@@ -1652,25 +1837,24 @@ def project_list_by_tags_as_csv(request):
         },
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "tag",
-            "usage_count",
-            "project_ids",
-            "project_names",
-        ]
-    )
+    fieldnames = [
+        "tag",
+        "usage_count",
+        "project_ids",
+        "project_names",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for tag in tags:
         projects = Project.on_site.filter(tags__name=tag.name).order_by("name")
         writer.writerow(
-            [
-                tag.name,
-                tag.project__count,
-                list(projects.values_list(flat=True)),
-                ", ".join([f'"{p.name}"' for p in projects]),
-            ]
+            {
+                "tag": tag.name,
+                "usage_count": tag.project__count,
+                "project_ids": list(projects.values_list(flat=True)),
+                "project_names": ", ".join([f'"{p.name}"' for p in projects]),
+            }
         )
 
     return response

@@ -91,17 +91,7 @@ class ProjectDetail(
                     ),
                     "project_sites",
                     "tags",
-                    Prefetch(
-                        "members",
-                        User.objects.filter(
-                            projectmember__is_owner=True
-                        ).select_related(
-                            "profile",
-                            "profile__organization",
-                            "profile__organization__group",
-                        ),
-                        to_attr="_owner",
-                    ),  # _owner is looked at in getter
+                    models.Project.prefetch_owner(),
                     "project_creation_requests",
                     "topics",
                 )
@@ -201,15 +191,7 @@ class ProjectList(ListAPIView):
                 "project_sites",
                 "tags",
                 "members",
-                Prefetch(
-                    "members",
-                    User.objects.filter(projectmember__is_owner=True).select_related(
-                        "profile",
-                        "profile__organization",
-                        "profile__organization__group",
-                    ),
-                    to_attr="_owner",
-                ),  # _owner is looked at in getter
+                models.Project.prefetch_owner(),
                 "project_creation_requests",
             )
             .select_related(

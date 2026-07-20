@@ -278,6 +278,7 @@ const config = {
           './src/js/styles/form-information.css.js'
         ),
         layoutFormStyles: resolve('./src/js/styles/layout-form.css.js'),
+        projectLowReachStyles: resolve('./src/js/styles/project-low-reach.css.js'),
         errorPageStyles: resolve('./src/js/styles/layouts/error-page.css.js'),
         crmDashboardStyles: resolve('./src/js/styles/crm_dashboard.css.js'),
         ...discoverPluginEntries(),
