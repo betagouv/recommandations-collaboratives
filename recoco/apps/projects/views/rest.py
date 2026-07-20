@@ -26,7 +26,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
-from recoco.apps.plugins.manager import get_tenant_hook
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
     VectorSearchFilter,
@@ -167,7 +167,7 @@ class ProjectList(ListAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        pm = get_tenant_hook(self.request)
+        pm = get_site_plugin_manager(self.request)
         extra_fields = []
         for fields in pm.hook.crm_project_list_extra_serializer_fields(
             request=self.request
@@ -200,7 +200,7 @@ class ProjectList(ListAPIView):
         )
 
         # Apply plugin queryset annotations (e.g. realisations_count)
-        pm = get_tenant_hook(request)
+        pm = get_site_plugin_manager(request)
         plugin_annotations = {}
         for p_annotations in pm.hook.crm_project_list_annotations(request=request):
             plugin_annotations.update(p_annotations)
