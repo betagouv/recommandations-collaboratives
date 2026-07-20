@@ -12,7 +12,7 @@ from django.contrib.sites.models import Site
 
 from recoco import utils as recoco_utils
 from recoco.apps.home.models import AdvisorAccessRequest
-from recoco.apps.plugins.manager import get_tenant_hook
+from recoco.apps.plugins.manager import get_site_plugin_manager
 
 from .. import models
 
@@ -105,7 +105,7 @@ def project_plugin_tabs(context):
             "active": current_view_name
             in (entry.get("active_url_names") or [entry["url_name"]]),
         }
-        for entry in get_tenant_hook(request).hook.project_tab_entries()
+        for entry in get_site_plugin_manager(request).hook.project_tab_entries()
     ]
 
 

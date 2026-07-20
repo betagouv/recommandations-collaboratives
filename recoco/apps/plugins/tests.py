@@ -12,11 +12,11 @@ from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import login
 
 from .hooks import CrmSpec, ProjectSpec
-from .manager import get_site_plugin_manager, get_tenant_hook
+from .manager import get_site_plugin_manager
 from .middlewares import TenantPluginSchemaMiddleware
 from .routers import TenantPluginRouter
 
-# --- Fixtures & helpers for get_tenant_hook ---
+# --- Fixtures & helpers for get_site_plugin_manager ---
 
 
 @pytest.fixture
@@ -77,7 +77,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_a"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         names = [name for name, _ in scoped.list_name_plugin()]
         assert "plugin_a" in names
@@ -92,7 +92,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_a", "plugin_b"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         names = [name for name, _ in scoped.list_name_plugin()]
         assert "plugin_a" in names
@@ -105,7 +105,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request([])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         assert scoped.list_name_plugin() == []
 
@@ -116,7 +116,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_unknown"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         assert scoped.list_name_plugin() == []
 
@@ -129,7 +129,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_a"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         results = [item for sublist in scoped.hook.get_tab_views() for item in sublist]
         assert {"name": "plugin_a"} in results

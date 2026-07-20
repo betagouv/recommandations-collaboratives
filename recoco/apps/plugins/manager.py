@@ -45,44 +45,30 @@ def _build_plugin_manager():
     return pm
 
 
-def get_site_plugin_manager(site):
-    """Return a plugin manager scoped to a site, for use outside HTTP requests.
-
-    Mirrors get_tenant_hook() but accepts a Site instance instead of a request.
-    Useful in management commands where no HTTP context is available.
-    """
-    pm = get_plugin_manager()
-    recoco_pm = _new_plugin_manager()
-
-    try:
-        site_config = SiteConfiguration.objects.get(site=site)
-    except SiteConfiguration.DoesNotExist:
-        return recoco_pm
-
-    if site_config.enabled_plugins:
-        enabled = set(site_config.enabled_plugins)
-        for name, plugin in pm.list_name_plugin():
-            if name in enabled:
-                recoco_pm.register(plugin, name=name)
-
-    return recoco_pm
-
-
-def get_tenant_hook(request):
+def get_site_plugin_manager(request=None, site=None):
     """
     Return a plugin manager scoped to the current tenant.
     The only enabled plugins come from the SiteConfiguration
+
+    if request is not available, try to to lookup the SiteConfiguration
+    from the Site. If neither is given, return a blank plugin manager.
     """
     pm = get_plugin_manager()
 
     recoco_pm = _new_plugin_manager()
 
+    site_config = None
+
+    if request:
+        site_config = getattr(request, "site_config", None)
+    elif site:
+        try:
+            site_config = SiteConfiguration.objects.get(site=site)
+        except SiteConfiguration.DoesNotExist:
+            return recoco_pm
+
     # Feed the scoped plugin manager with enabled plugins
-    if (
-        hasattr(request, "site_config")
-        and request.site_config
-        and request.site_config.enabled_plugins
-    ):
+    if site_config and site_config.enabled_plugins:
         enabled = set(request.site_config.enabled_plugins)
 
         for name, plugin in pm.list_name_plugin():
