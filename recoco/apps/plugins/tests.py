@@ -147,7 +147,7 @@ class TestGetSitePluginManager:
         with patch(
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
-            scoped = get_site_plugin_manager(current_site)
+            scoped = get_site_plugin_manager(site=current_site)
 
         names = [name for name, _ in scoped.list_name_plugin()]
         assert "plugin_a" in names
@@ -160,7 +160,7 @@ class TestGetSitePluginManager:
         with patch(
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
-            scoped = get_site_plugin_manager(current_site)
+            scoped = get_site_plugin_manager(site=current_site)
 
         assert scoped.list_name_plugin() == []
 
@@ -170,7 +170,7 @@ class TestGetSitePluginManager:
         with patch(
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
-            scoped = get_site_plugin_manager(current_site)
+            scoped = get_site_plugin_manager(site=current_site)
 
         assert scoped.list_name_plugin() == []
 

@@ -69,7 +69,7 @@ def get_site_plugin_manager(request=None, site=None):
 
     # Feed the scoped plugin manager with enabled plugins
     if site_config and site_config.enabled_plugins:
-        enabled = set(request.site_config.enabled_plugins)
+        enabled = set(site_config.enabled_plugins)
 
         for name, plugin in pm.list_name_plugin():
             if name in enabled:
