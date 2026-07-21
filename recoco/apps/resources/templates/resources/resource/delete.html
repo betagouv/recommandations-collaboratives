@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
+{% load guardian_tags %}
 {% block title %}
     Supprimer {{ resource.title }}
 {% endblock title %}
@@ -65,6 +66,10 @@
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="button red filled fr-mt-2v">Oui, je supprime cette ressource</button>
+                {% get_obj_perms request.user for request.site as "user_site_perms" %}
+                <a class="button fr-mt-2v fr-ml-2v"
+                   data-test-id="button-cancel-delete-resource"
+                   href="{% if 'manage_resources' in user_site_perms %}{% url 'crm-resource-list' %}{% else %}{% url 'resources-resource-detail' resource.pk %}{% endif %}">Annuler</a>
             </form>
         </div>
     </div>
