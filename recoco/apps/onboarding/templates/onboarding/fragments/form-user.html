@@ -9,9 +9,12 @@
            id="{{ form.helper.form_id }}_js_enabled"
            value="false">
     <fieldset class="fr-fieldset">
-        <legend class="fr-fieldset__legend--regular fr-fieldset__legend">
-            Les champs suivis d'un astérisque (*) sont obligatoires
+        <legend class="fr-fieldset__legend fr-mb-2w" id="identity-fieldset-legend">
+            <h2 class="fr-mb-0">S'inscrire en remplissant les champs suivants</h2>
         </legend>
+        <div class="fr-fieldset__element fr-mb-2w fr-italic font-size-16px">
+            <p class="fr-hint-text">Sauf mention contraire, tous les champs sont obligatoires.</p>
+        </div>
         {% if form.captcha.errors %}
             <div>
                 <p class="text-danger">Erreur : Le captcha est obligatoire</p>
