@@ -20,6 +20,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.views.generic import TemplateView
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.geomatics import models as geomatics
@@ -38,6 +39,10 @@ from recoco.utils import (
 )
 
 from . import forms, utils
+
+########################################################################
+# User driven onboarding for a new project
+########################################################################
 
 
 class OnboardingLogin(LoginView):
@@ -118,9 +123,8 @@ class OnboardingLogin(LoginView):
         return redirect(redirect_url)
 
 
-########################################################################
-# User driven onboarding for a new project
-########################################################################
+class OnboardingEmailConfirmView(TemplateView):
+    template_name = "onboarding/onboarding-email-confirm.html"
 
 
 def onboarding_signup(request):
@@ -234,7 +238,13 @@ def onboarding_signup(request):
             if "project_id" in request.session:
                 del request.session["project_id"]
 
-            return redirect(f"{reverse('onboarding-summary', args=(project.id,))}")
+            redirect_url = (
+                reverse("onboarding-confirm-email")
+                if is_new_user
+                else reverse("onboarding-summary", args=(project.id,))
+            )
+
+            return redirect(redirect_url)
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
