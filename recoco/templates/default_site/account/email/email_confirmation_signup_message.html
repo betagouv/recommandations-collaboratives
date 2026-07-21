@@ -75,34 +75,20 @@
         ------------------------------------- */
         .btn-primary {
           border-radius: 1px;
-          background: var(--light-background-active-blue-france, #000091);
-          display: flex;
-          padding: 6px 8px;
-          justify-content: center;
-          align-items: flex-start;
-          gap: 10px;
-          flex: 1 0 0;
-          width: fit-content;
-          margin: auto;
-          margin-top: 10px;
-          color: white !important;
+          background-color: #000091;
+          color: #ffffff !important;
           text-decoration: none;
           font-weight: 700;
         }
 
         .btn-secondary {
           border-radius: 1px;
-          background:white;
-          border: 1px solid var(--light-background-action-high-blue-france, #000091);
-          display: flex;
+          background-color: #ffffff;
+          border: 1px solid #000091;
+          display: inline-block;
           padding: 6px 8px;
-          justify-content: center;
-          align-items: flex-start;
-          gap: 10px;
-          flex: 1 0 0;
-          width: fit-content;
           margin: auto;
-          color: #000091;
+          color: #000091 !important;
           text-decoration: none;
           font-weight: 700;
         }
@@ -194,12 +180,7 @@
           font-size: inherit !important;
           font-weight: inherit !important;
           line-height: inherit !important;
-          text-decoration: none !important; }
-        .btn-primary table td:hover {
-          background-color: #34495e !important; }
-        .btn-primary a:hover {
-          background-color: #34495e !important;
-          border-color: #34495e !important; } }
+          text-decoration: none !important; } }
 
         /* use after email rework */
 
@@ -246,7 +227,16 @@
 
                                           <p>Pour activer votre compte, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :
                                           </p>
-                                          <a href="{{ activate_url }}" class="btn-primary">Confirmer mon email</a>
+                                          <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 10px auto 0;">
+                                              <tr>
+                                                  <td bgcolor="#000091" style="border-radius: 1px; background-color: #000091;">
+                                                      <a href="{{ activate_url }}"
+                                                         style="display: inline-block; padding: 6px 8px; font-family: sans-serif; font-weight: 700; font-size: 14px; color: #ffffff !important; text-decoration: none;">
+                                                          <span style="color: #ffffff;">Confirmer mon email</span>
+                                                      </a>
+                                                  </td>
+                                              </tr>
+                                          </table>
 
                                           <hr>
                                           <div>
