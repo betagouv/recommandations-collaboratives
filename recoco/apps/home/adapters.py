@@ -72,7 +72,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
                     else "/"
                 )
             case "account_signup":
-                url_to_redirect = reverse("advisor-access-request")
+                url_to_redirect = reverse("advisor-access-request-confirm-email")
             case "crm-user-update":
                 url_to_redirect = "/"
             case _:  # random login

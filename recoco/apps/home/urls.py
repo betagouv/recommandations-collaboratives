@@ -89,12 +89,22 @@ urlpatterns = [
         views.setup_password,
         name="home-user-setup-password",
     ),
-    path(
+    path(  # form part 2 : profile (part 1 is signup)
         r"advisor-access-request",
         views.advisor_access_request_view,
         name="advisor-access-request",
     ),
-    path(
+    path(  # form part 3 : email confirmation
+        r"advisor-access-request/confirm-email",
+        views.AdvisorAccessRequestEmailConfirmView.as_view(),
+        name="advisor-access-request-email-confirm",
+    ),
+    path(  # success page : request is pending
+        r"advisor-access-request/pending",
+        views.AdvisorAccessRequestPendingView.as_view(),
+        name="advisor-access-request-pending",
+    ),
+    path(  # moderation part
         r"advisor-access-request/<int:advisor_access_request_id>/",
         views.advisor_access_request_moderator_view,
         name="advisor-access-request-moderator",

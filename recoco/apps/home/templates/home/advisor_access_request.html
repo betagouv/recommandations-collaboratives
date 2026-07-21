@@ -13,7 +13,7 @@
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
     <div>
-        {% if advisor_access_request %}
+        {% if advisor_access_request %} {# TODO move this case to "home/advisor-access-request-pending.html" #}
             {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller" %}
         {% else %}
             {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Précisions sur votre demande" title="Devenir conseiller•e" %}

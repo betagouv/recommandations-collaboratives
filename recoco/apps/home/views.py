@@ -13,6 +13,7 @@ import django.core.mail
 from actstream import action
 from allauth.account.adapter import get_adapter
 from allauth.account.decorators import verified_email_required
+from allauth.account.models import EmailAddress
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
 from django.contrib import messages
@@ -360,6 +361,16 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
                     action_object=advisor_access_request,
                 )
 
+            email_confirmed = EmailAddress.objects.filter(
+                user=request.user, verified=True
+            ).exists()
+            success_url = reverse(
+                "advisor-access-request-pending"
+                if email_confirmed
+                else "advisor-access-request-moderator"
+            )
+            return redirect(success_url)
+
     return render(
         request,
         "home/advisor_access_request.html",
@@ -371,6 +382,14 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             "selected_departments": selected_departments,
         },
     )
+
+
+class AdvisorAccessRequestEmailConfirmView(TemplateView):
+    template_name = "home/advisor-access-request-email-confirm.html"
+
+
+class AdvisorAccessRequestPendingView(TemplateView):
+    template_name = "home/advisor-access-request-pending.html"
 
 
 @verified_email_required
