@@ -73,9 +73,9 @@ def test_who_can_read_messages(
 ):
     user = request.getfixturevalue(msg_reader)
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
-    client.force_login(user)
-    response = client.get(url)
-    assert response.status_code == res_code
+    with login(client, user=user):
+        response = client.get(url)
+        assert response.status_code == res_code
 
 
 @pytest.mark.parametrize(
@@ -92,11 +92,11 @@ def test_who_can_send_messages(
 ):
     user = request.getfixturevalue(msg_reader)
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
-    client.force_login(user)
     data = {"nodes": [ex_node_dict]}
     # when given directly, nested dict is not parsed correctly
-    response = client.post(url, json.dumps(data), content_type="application/json")
-    assert response.status_code == res_code
+    with login(client, user=user):
+        response = client.post(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == res_code
 
 
 @pytest.mark.parametrize(
@@ -116,10 +116,10 @@ def test_who_can_edit_messages(
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(user)
     data = {"nodes": [ex_node_dict]}
-    response = client.patch(url, json.dumps(data), content_type="application/json")
-    assert response.status_code == res_code
+    with login(client, user=user):
+        response = client.patch(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == res_code
 
 
 @pytest.mark.parametrize(
@@ -139,9 +139,9 @@ def test_who_can_delete_messages(
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(user)
-    response = client.delete(url)
-    assert response.status_code == res_code
+    with login(client, user=user):
+        response = client.delete(url)
+        assert response.status_code == res_code
 
 
 @pytest.mark.parametrize(
@@ -156,10 +156,9 @@ def test_who_can_delete_messages(
 def test_who_can_see_activity(msg_reader, res_code, project_ready, request, client):
     user = request.getfixturevalue(msg_reader)
     url = reverse("projects-conversations-activities-list", args=[project_ready.pk])
-    client.force_login(user)
-    response = client.get(url)
-    assert response.status_code == res_code
-    pass
+    with login(client, user=user):
+        response = client.get(url)
+        assert response.status_code == res_code
 
 
 @pytest.mark.parametrize(
@@ -185,9 +184,9 @@ def test_who_can_see_participants(
         )
     )
     url = reverse("projects-conversations-participants-list", args=[project_ready.pk])
-    client.force_login(user)
-    response = client.get(url)
-    assert response.status_code == res_code
+    with login(client, user=user):
+        response = client.get(url)
+        assert response.status_code == res_code
 
 
 #####--- actions ---#####
@@ -197,25 +196,28 @@ def test_who_can_see_participants(
 def test_cannot_send_empty_message(sender, project_ready, request, client):
     user = sender
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
-    client.force_login(user)
     data = {"nodes": []}
     # when given directly, nested dict is not parsed correctly
-    response = client.post(url, json.dumps(data), content_type="application/json")
-    assert response.status_code == 400
-    assert str(response.data["nodes"][0]) == "A message must have at least one node."
+    with login(client, user=user):
+        response = client.post(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == 400
+        assert (
+            str(response.data["nodes"][0]) == "A message must have at least one node."
+        )
 
 
 @pytest.mark.django_db
 def test_cannot_edit_empty_message(sender, project_ready, message, request, client):
-    user = sender
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(user)
     data = {"nodes": []}
-    response = client.patch(url, json.dumps(data), content_type="application/json")
-    assert response.status_code == 400
-    assert str(response.data["nodes"][0]) == "A message must have at least one node."
+    with login(client, user=sender):
+        response = client.patch(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == 400
+        assert (
+            str(response.data["nodes"][0]) == "A message must have at least one node."
+        )
 
 
 @pytest.mark.django_db
@@ -223,8 +225,8 @@ def test_delete_message(message, sender, project_ready, client):
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(sender)
-    client.delete(url)
+    with login(client, user=sender):
+        client.delete(url)
 
     msg = Message.objects.filter(pk=message.pk).first()
     msg_not_deleted = Message.not_deleted.filter(pk=message.pk).first()
@@ -255,8 +257,8 @@ def test_delete_message_deletes_notifications(sender, project_ready, client):
         "projects-conversations-messages-detail",
         args=[project_ready.pk, message_deleted.pk],
     )
-    client.force_login(sender)
-    client.delete(url)
+    with login(client, user=sender):
+        client.delete(url)
 
     assert not message_deleted.notifications.exists()
     assert message_normal.notifications.exists()
@@ -277,12 +279,14 @@ def test_post_message_with_document(project_ready, request, client, project_edit
     assert Message.objects.count() == 0
 
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
-    client.force_login(project_editor)
     data = {
         "nodes": [{"position": 1, "type": "DocumentNode", "document_id": doc.id}],
     }
     # when given directly, nested dict is not parsed correctly
-    client.post(url, json.dumps(data), content_type="application/json")
+
+    with login(client, user=project_editor):
+        client.post(url, json.dumps(data), content_type="application/json")
+
     assert Message.objects.count() == 1
     message = Message.objects.first()
     doc.refresh_from_db()
@@ -313,8 +317,8 @@ def test_delete_message_with_doc_soft_deletes_doc(
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(sender)
-    client.delete(url)
+    with login(client, user=sender):
+        client.delete(url)
 
     doc.refresh_from_db()
     assert doc.deleted is not None
@@ -323,10 +327,8 @@ def test_delete_message_with_doc_soft_deletes_doc(
 
 @pytest.mark.django_db
 def test_edit_message_removes_doc_soft_deletes_doc(
-    project_ready, message, sender, ex_node_dict, request, client
+    project_ready, message, sender, ex_node_dict, request, client, current_site
 ):
-    current_site = get_current_site(request)
-
     doc = baker.make(
         projects_models.Document,
         site=current_site,
@@ -340,8 +342,8 @@ def test_edit_message_removes_doc_soft_deletes_doc(
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(sender)
-    client.patch(url, json.dumps(data), content_type="application/json")
+    with login(client, user=sender):
+        client.patch(url, json.dumps(data), content_type="application/json")
 
     doc.refresh_from_db()
     assert doc.deleted is not None
@@ -350,10 +352,8 @@ def test_edit_message_removes_doc_soft_deletes_doc(
 
 @pytest.mark.django_db
 def test_edit_message_keeps_doc_restores_it(
-    project_ready, message, sender, request, client
+    project_ready, message, sender, request, client, current_site
 ):
-    current_site = get_current_site(request)
-
     doc = baker.make(
         projects_models.Document,
         site=current_site,
@@ -372,8 +372,8 @@ def test_edit_message_keeps_doc_restores_it(
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
-    client.force_login(sender)
-    client.patch(url, json.dumps(data), content_type="application/json")
+    with login(client, user=sender):
+        client.patch(url, json.dumps(data), content_type="application/json")
 
     doc.refresh_from_db()
     assert doc.deleted is None
@@ -388,12 +388,10 @@ def test_unread_is_zero_if_no_notifications(
 ):
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
 
-    api_client.force_login(project_reader)
-    response = api_client.get(url)
-
-    assert response.status_code == 200
-
-    assert response.json()[0]["unread"] == 0
+    with login(api_client, user=project_reader):
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert response.json()[0]["unread"] == 0
 
 
 @pytest.mark.django_db
@@ -412,12 +410,10 @@ def test_unread_counts_unread_notifications(
         unread=True,
     )
 
-    api_client.force_login(project_reader)
-    response = api_client.get(url)
-
-    assert response.status_code == 200
-
-    assert response.json()[0]["unread"] == 1
+    with login(api_client, user=project_reader):
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert response.json()[0]["unread"] == 1
 
 
 @pytest.mark.django_db
@@ -436,12 +432,10 @@ def test_unread_does_not_count_read_notifications(
         unread=False,
     )
 
-    api_client.force_login(project_reader)
-    response = api_client.get(url)
-
-    assert response.status_code == 200
-
-    assert response.json()[0]["unread"] == 0
+    with login(api_client, user=project_reader):
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert response.json()[0]["unread"] == 0
 
 
 @pytest.mark.django_db
@@ -472,12 +466,10 @@ def test_unread_considers_only_requesting_user_notifications(
         unread=True,
     )
 
-    api_client.force_login(project_reader)
-    response = api_client.get(url)
-
-    assert response.status_code == 200
-
-    assert response.json()[0]["unread"] == 1
+    with login(api_client, user=project_reader):
+        response = api_client.get(url)
+        assert response.status_code == 200
+        assert response.json()[0]["unread"] == 1
 
 
 @pytest.mark.django_db
@@ -500,13 +492,10 @@ def test_mark_message_as_read(
         unread=True,
     )
 
-    api_client.force_login(project_reader)
-
-    response = api_client.post(url)
-
-    assert response.status_code == 202
-
-    assert Notification.objects.unread().count() == 0
+    with login(api_client, user=project_reader):
+        response = api_client.post(url)
+        assert response.status_code == 202
+        assert Notification.objects.unread().count() == 0
 
 
 @pytest.mark.django_db
@@ -540,13 +529,10 @@ def test_mark_message_as_read_honors_current_user(
         unread=True,
     )
 
-    api_client.force_login(project_reader)
-
-    response = api_client.post(url)
-
-    assert response.status_code == 202
-
-    assert Notification.objects.unread().count() == 1
+    with login(api_client, user=project_reader):
+        response = api_client.post(url)
+        assert response.status_code == 202
+        assert Notification.objects.unread().count() == 1
 
 
 #####--- Notifications ---###
