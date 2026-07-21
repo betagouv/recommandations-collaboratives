@@ -25,11 +25,13 @@
                  height="auto"
                  alt="Logo {{ request.site.name }}" />
         {% endif %}
-        <h2 class="fr-mb-8w h2-rework">
-            <strong>{{ title }}</strong>
-            <br>
-            sur <span class="layout-form__site-name">{{ request.site.name }}</span>
-        </h2>
+        <h1>
+            <strong>
+                {{ title }}
+                <br>
+                sur {{ request.site.name }}
+            </strong>
+        </h1>
     </div>
     {% if stepper %}
         <div class="fr-stepper fr-mb-2w">

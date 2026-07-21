@@ -1,0 +1,23 @@
+{% extends "account/layout/layout.html" %}
+{% block layout_content %}
+    <!-- Title -->
+    <h2>Confirmez votre adresse e-mail</h2>
+    <!-- Callout -->
+    <div class="fr-background-contrast--success fr-px-3w fr-py-2w fr-my-2w d-flex">
+        <div>
+            <p class="fr-mb-1w">
+                Un e-mail de confirmation a été envoyé sur <strong>{{ request.user }}</strong>. Afin de finaliser votre demande, vous devez <strong>confirmer votre adresse e-mail en cliquant sur le lien dans cet e-mail.</strong>
+            </p>
+            <p class="fr-mb-0">
+                Ce n’est pas la bonne adresse email ? <a href="{% url 'home-contact' %}">Contacter notre équipe</a> pour la mettre à jour, nous vous guiderons pour accéder à la plateforme.
+            </p>
+        </div>
+    </div>
+    <!-- Content -->
+    <p>
+        Votre demande sera alors transférée aux administrateurs du site, qui vont la <strong>valider manuellement</strong>. Une fois votre demande validée, vous recevrez un e-mail pour vous en informer et vous inviter à vous connecter.
+    </p>
+    <p class="fr-mb-2w">
+        Vous n’avez pas reçu d’e-mail ? N’oubliez pas de vérifier dans vos spams (courriers indésirables) ou cliquez sur le bouton ci-dessous pour recevoir un nouvel e-mail de confirmation.
+    </p>
+{% endblock layout_content %}
