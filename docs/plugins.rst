@@ -277,6 +277,26 @@ a quick index.
 
 See `Conversation Hooks & JS Integration`_ below for a worked example.
 
+``DigestSpec``
+-------------
+
+``send_digests_for_staff_users(site, user, dry_run)``
+    Called once per staff user in ``senddigests``, before the standard digest
+    loop. Implementations must query ``user.notifications(manager="on_site").unsent()``
+    filtered to the verbs they own, send their email, then call
+    ``notifications.mark_as_sent()`` to prevent double-delivery. Return the
+    count of notifications consumed (0 if nothing was sent).
+
+    The hook is called via the site-scoped plugin manager, so only plugins
+    enabled for the current site are invoked.
+
+    Example::
+
+        @hookimpl
+        def send_digests_for_staff_users(self, site, user, dry_run):
+            from .digests import send_my_digest
+            return send_my_digest(site, user, dry_run)
+
 ``CrmSpec``
 -----------
 

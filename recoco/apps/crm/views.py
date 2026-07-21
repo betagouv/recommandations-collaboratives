@@ -73,7 +73,7 @@ from recoco.apps.home.adapters import (
 )
 from recoco.apps.home.utils import deactivate_user, reactivate_user
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.plugins.manager import get_plugin_manager, get_tenant_hook
+from recoco.apps.plugins.manager import get_plugin_manager, get_site_plugin_manager
 from recoco.apps.projects.models import (
     Document,
     Project,
@@ -1007,7 +1007,7 @@ def project_list(request):
         .order_by("name")
     )
 
-    plugin_columns = get_tenant_hook(request).hook.crm_project_list_columns(
+    plugin_columns = get_site_plugin_manager(request).hook.crm_project_list_columns(
         request=request
     )
 
