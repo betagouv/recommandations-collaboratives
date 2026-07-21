@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -199,10 +200,13 @@ def login(
     user=None,
     groups=None,
     username="test",
-    email="test@example.com",
+    email=None,
+    email_verified=True,
 ):
     """Create a user and sign her into the application"""
     groups = groups or []
+    if email is None:
+        email = username + "@example.com"
     if not user:
         user = auth.User.objects.create_user(
             username=username, email=email, is_staff=is_staff
@@ -210,6 +214,10 @@ def login(
     for name in groups:
         group = auth.Group.objects.get(name=name)
         group.user_set.add(user)
+    if email_verified:
+        EmailAddress.objects.get_or_create(
+            user=user, email=user.email, verified=True, primary=True
+        )
     client.force_login(user)
     yield user
 
