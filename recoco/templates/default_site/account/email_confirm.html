@@ -1,36 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
-TODO
-{# {% if confirmation %}#}
-{#        {% if can_confirm %} Je n'ai pas fluidement trouvé ce que ça voulait dire ce combo de conditions. J'ai l'impression qu'en pratique on est juste redirigé #}
-{#            {% element p %}#}
-{#                {% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.{% endblocktrans %}#}
-{#            {% endelement %}#}
-{#            {% url 'account_confirm_email' confirmation.key as action_url %}#}
-{#            {% element form method="post" action=action_url %}#}
-{#                {% slot actions %}#}
-{#                    {% csrf_token %}#}
-{#                    {{ redirect_field }}#}
-{#                    {% element button type="submit" %}#}
-{#                        {% trans 'Confirm' %}#}
-{#                    {% endelement %}#}
-{#                {% endslot %}#}
-{#            {% endelement %}#}
-{#        {% else %}#}
-{#            {% element p %}#}
-{#                {% blocktrans %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktrans %}#}
-{#            {% endelement %}#}
-{#        {% endif %}#}
-{#    {% else %}#}
-{#        {% url 'account_email' as email_url %}#}
-{#        {% element p %}#}
-{#            {% blocktrans %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.{% endblocktrans %}#}
-{#        {% endelement %}#}
-{#    {% endif %}#}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "account/fragments/email_confirm_content.html" with title="Confirmation d'adresse e-mail" %}
+{% endblock content %}
