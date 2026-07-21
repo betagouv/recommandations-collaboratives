@@ -100,7 +100,7 @@ def send_confirmation_email(request, user, signup=False):
 
 
 def confirm_email(request, user):
-    email_address = EmailAddress.objects.filter(email=user.email).first()
+    email_address, _ = EmailAddress.objects.get_or_create(user=user, email=user.email)
     UVAccountAdapter().confirm_email(request, email_address)
 
 
