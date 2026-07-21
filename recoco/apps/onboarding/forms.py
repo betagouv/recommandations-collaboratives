@@ -130,7 +130,7 @@ class OnboardingProject(DsrcBaseForm):
             self.fields.pop("captcha")
 
     name = forms.CharField(
-        label="Nom de votre dossier *",
+        label="Nom de votre dossier",
         initial="",
         required=True,
         help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
@@ -141,7 +141,7 @@ class OnboardingProject(DsrcBaseForm):
         required=False,
         help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
     )
-    postcode = forms.CharField(label="Code postal *", initial="", required=True)
+    postcode = forms.CharField(label="Code postal", initial="", required=True)
 
     insee = forms.CharField(
         max_length=5,
@@ -150,7 +150,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé de votre demande *",
+        label="Résumé de votre demande",
         initial="",
         required=True,
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
@@ -158,7 +158,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email",
         required=True,
         help_text="Format attendu : prenom.nom@domaine.fr",
     )

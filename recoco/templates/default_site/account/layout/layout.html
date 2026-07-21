@@ -8,6 +8,7 @@
         - step_number (int): current step number
         - current_step_title (str): current step title
         - next_step_title (str): next step title
+        - title_new_line (boolean): if false, delete the new line in title
 
 {% endcomment %}
 {% load static %}
@@ -28,7 +29,7 @@
         <h1>
             <strong>
                 {{ title }}
-                <br>
+                {% if title_new_line is not False %}<br>{% endif %}
                 sur {{ request.site.name }}
             </strong>
         </h1>
