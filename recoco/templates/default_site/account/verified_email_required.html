@@ -10,5 +10,9 @@
 {% endblock og_title %}
 
 {% block content %}
-    {% include "account/fragments/confirm_email_form.html" with title="Connexion" stepper=True total_steps=3 step_number=3 current_step_title="Confirmation de l'adresse e-mail" %}
+    {% if request.resolver_match.url_name == "onboarding-summary" %}
+        {% include "account/fragments/confirm_email_form.html" with title="Déposer une demande" title_new_line=False stepper=True total_steps=3 step_number=3 current_step_title="Confirmation de l'adresse e-mail" %}
+    {% else %}
+        {% include "account/fragments/confirm_email_form.html" with title="Connexion" title_new_line=False %}
+    {% endif %}
 {% endblock content %}
