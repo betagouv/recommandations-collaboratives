@@ -100,6 +100,30 @@ class ConversationSpec(HookSpec):
         """
 
 
+class DigestSpec(HookSpec):
+    @hookspec
+    def send_digests_for_staff_users(self, site, user, dry_run):
+        """Called once per staff user before the standard digest loop.
+
+        Implementations should:
+
+        - Query ``user.notifications(manager="on_site").unsent()`` filtered to
+          the verbs they own.
+        - Build and send their email.
+        - Call ``notifications.mark_as_sent()`` to prevent double-delivery by
+          the standard digest loop that runs afterwards.
+
+        Return the count of notifications consumed (0 if nothing was sent).
+
+        Example::
+
+            @hookimpl
+            def send_digests_for_staff_users(self, site, user, dry_run):
+                from .digests import send_my_digest
+                return send_my_digest(site, user, dry_run)
+        """
+
+
 class CrmSpec(HookSpec):
     @hookspec
     def crm_navigation_tabs(self, request):
