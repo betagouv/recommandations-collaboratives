@@ -1252,4 +1252,27 @@ def test_embedded_resource_detail_ds_prefill_button(request, client):
         )
 
 
+# Revisions / patches
+@pytest.mark.django_db
+def test_try_to_update_non_pending_revision(request, client):
+    site = get_current_site(request)
+    resource = Recipe(models.Resource, sites=[site]).make()
+    patch = Recipe(
+        models.ResourceRevisionMeta,
+        resource=resource,
+        status=models.ResourceRevisionMeta.ACCEPTED,
+    ).make()
+
+    url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"action": "accept"})
+
+    assertRedirects(response, reverse("resources-patches-list"))
+
+    patch.refresh_from_db()
+    assert patch.status == models.ResourceRevisionMeta.ACCEPTED
+    assert patch.reviewed_by is None
+
+
 # eof
