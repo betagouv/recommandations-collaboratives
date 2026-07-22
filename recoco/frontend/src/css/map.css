@@ -2,7 +2,8 @@
   height: calc(100vh - 150px);
 }
 
-.map-marker {
+.project-map .map-marker,
+.project-map-container .map-marker {
   /* background-color: white; */
   border-radius: 50%;
   box-sizing: content-box;
@@ -12,7 +13,8 @@
   z-index: 100;
 }
 
-.map-marker:after {
+.project-map .map-marker:after,
+.project-map-container .map-marker:after {
   content: '';
 
   position: absolute;
@@ -32,7 +34,8 @@
   z-index: 10;
 }
 
-.marker-onclick:after {
+.project-map .marker-onclick:after,
+.project-map-container .marker-onclick:after {
   content: '';
   color: #222;
   background-color: white;
@@ -146,4 +149,8 @@
 
 .map-marker.bg-dark:after {
   background-color: #212529;
+}
+
+.basemap-grayscale {
+  filter: grayscale(1) contrast(0.9) brightness(1.05);
 }

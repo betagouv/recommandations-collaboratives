@@ -44,7 +44,7 @@ def unread_notifications_processor(request):
 
     unread_notifications = (
         notifications_models.Notification.on_site.unread()
-        .filter(recipient=request.user, public=True)
+        .filter(recipient=request.user)
         .prefetch_related("actor__profile__organization")
         .prefetch_related("action_object")
         .prefetch_related("target")
