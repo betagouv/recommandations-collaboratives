@@ -104,9 +104,13 @@ def confirm_email(request, user):
     UVAccountAdapter().confirm_email(request, email_address)
 
 
+def is_user_validated(user):
+    return EmailAddress.objects.filter(user=user, verified=True).exists()
+
+
 class VerifiedEmailRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
-        if not EmailAddress.objects.filter(user=request.user, verified=True).exists():
+        if not is_user_validated(request.user):
             send_confirmation_email(request, request.user)
             # same behavior as verified_email_required decorator
             return render(request, "account/verified_email_required.html")

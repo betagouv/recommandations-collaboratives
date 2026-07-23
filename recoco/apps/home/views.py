@@ -57,7 +57,7 @@ from recoco.utils import (
 
 from ... import verbs
 from . import models
-from .adapters import VerifiedEmailRequiredMixin
+from .adapters import VerifiedEmailRequiredMixin, is_user_validated
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
@@ -76,6 +76,9 @@ class HomePageView(TemplateView):
 @method_decorator([login_required], name="dispatch")
 class LoginRedirectView(View):
     def dispatch(self, request, *args, **kwargs):
+        if not is_user_validated(request.user):
+            return render(request, "account/verified_email_required.html")
+
         if check_if_advisor(request.user) or can_administrate_project(
             project=None, user=request.user
         ):
