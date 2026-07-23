@@ -543,6 +543,19 @@ def organization_details(request, organization_id):
         profile__in=organization.registered_profiles.all()
     )
 
+    last_members_activity_at = participants.aggregate(
+        last=Max("profile__previous_activity_at")
+    )["last"]
+    last_members_login_at = participants.aggregate(last=Max("last_login"))["last"]
+
+    next_members_reminder = (
+        reminders_models.Reminder.on_site.filter(
+            project__projectmember__member__in=participants, sent_on=None
+        )
+        .order_by("deadline")
+        .first()
+    )
+
     advised_projects = Project.on_site.filter(switchtenders__in=participants)
 
     org_departments = organization.departments.all()

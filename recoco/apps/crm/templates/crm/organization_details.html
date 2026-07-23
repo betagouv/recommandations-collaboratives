@@ -32,7 +32,7 @@
                 <!-- Name -->
                 <h1 class="user-crm__user-name fr-mb-0">{{ organization.name }}</h1>
                 <!-- Departments -->
-                <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-3v d-flex align-items-center text-nowrap">Départements :
+                <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-1v d-flex align-items-center text-nowrap">Départements :
                     {% for department in org_departments|slice:":5" %}
                         {{ department.code }}
                         {% if not forloop.last %},{% endif %}
@@ -44,6 +44,18 @@
                               title="{% for department in org_departments|slice:'5:' %}{{ department.code }}{% if not forloop.last %}, {% endif %}{% endfor %}">+{{ org_departments|length|add:"-5" }}</span>
                     {% endif %}
                 </span>
+                <!-- Last members activity -->
+                {% if last_members_activity_at %}
+                    <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière activité il y a {{ last_members_activity_at|timesince }}</span>
+                {% endif %}
+                <!-- Last members login -->
+                {% if last_members_login_at %}
+                    <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière connexion il y a {{ last_members_login_at|timesince }}</span>
+                {% endif %}
+                <!-- Next members reminder -->
+                {% if next_members_reminder %}
+                    <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel le {{ next_members_reminder.deadline|date:"j F Y" }}</span>
+                {% endif %}
             </div>
             <!-- Members -->
             <div>
