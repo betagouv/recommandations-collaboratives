@@ -76,12 +76,12 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
             case "crm-user-update":
                 url_to_redirect = "/"
             case _:  # random login
-                url_to_redirect = request.resolver_match.route
+                url_to_redirect = request.path
 
         if url_to_redirect:
             url = parse.urlsplit(url_str)
             qs = parse.parse_qs(url.query)
-            qs["next"] = [url_to_redirect]
+            qs["next"] = url_to_redirect
             qs_str = parse.urlencode(qs)
             parts = (url.scheme, url.netloc, url.path, qs_str, url.fragment)
             url_str = parse.urlunsplit(parts)
