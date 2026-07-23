@@ -87,21 +87,6 @@
                     </div>
                 {% endfor %}
             </div>
-            <!-- Unadvised regional projects -->
-            <div>
-                <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="user-crm__section-title">Dossiers régionaux non suivis ({{ unadvised_projects|length }})</span>
-                </div>
-                {% for project in unadvised_projects %}
-                    <div class="user-crm__section-container fr-px-3w fr-py-2w">
-                        {% include "crm/fragments/project/project_card.html" with project=project %}
-                    </div>
-                {% empty %}
-                    <div class="fr-px-3w fr-py-2w">
-                        <span class="fr-text--sm text-muted">Aucun dossier régional non suivi</span>
-                    </div>
-                {% endfor %}
-            </div>
         </div>
         <!-- Right column -->
         <div class="user-crm-right-col">
