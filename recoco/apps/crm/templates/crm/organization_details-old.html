@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_vite %}
+{% block title %}
+    {{ organization.name }} - CRM
+{% endblock title %}
+{% block og_title %}
+    {{ organization.name }} - CRM
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/crm.js' %}
+{% endblock js %}
+{% block content %}
+    <div x-data="Crm" class="d-flex fr-px-0">
+        {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
+        <div class="w-75 d-flex flex-column justify-content-start">
+            <div class="crm-header fr-px-3w fr-py-2w fr-pt-3w {% if active_project %}mb-3{% endif %}">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="d-flex align-items-center">
+                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                            </svg>
+                            <span>{{ organization.name }}</span>
+                        </h3>
+                        <ul class="d-flex align-items-center list-unstyled flex-wrap organization-specific-pl-0">
+                            {% for department in org_departments %}
+                                <li class="fr-mr-2v crm-region-tag">
+                                    <span>{{ department.name }}</span>
+                                    <strong>({{ department.code }})</strong>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'crm-organization-update' organization.pk %}"
+                               class="btn btn-outline-secondary"
+                               aria-current="page">Gérer l'organisation</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if unread_notifications %}
+                <div class="fr-px-3w fr-py-3w bg-light">
+                    <h4>
+                        <svg class="align-middle bi text-warning"
+                             width="20px"
+                             height="20px"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell" />
+                        </svg>
+                        {{ unread_notifications.count }} Notification(s)
+                    </h4>
+                    <ul class="list-group">
+                        {% for notification in unread_notifications %}
+                            <li class="d-flex flex-columns list-group-item">{{ notification }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper relative">
+                <a class="btn btn-primary fr-mb-3w"
+                   href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
+                {% for note in sticky_notes.all %}
+                    {% include "crm/note.html" with pinned=True get_user_profile=True %}
+                {% endfor %}
+                {% for note in notes.all %}
+                    {% include "crm/note.html" with get_user_profile=True %}
+                {% endfor %}
+            </div>
+            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
+                <h4>Activité</h4>
+                {% include "crm/timeline.html" with wrap=True %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
