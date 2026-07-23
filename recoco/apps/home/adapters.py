@@ -63,7 +63,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         url_to_redirect = ""
         match request.resolver_match.view_name:
             #                        setup_user_email(request, crm_user, [])
-            case "onboarding":
+            case "onboarding-signup":
                 url_to_redirect = (
                     reverse(
                         "onboarding-summary",
