@@ -140,7 +140,7 @@
             <div class="fr-alert fr-alert--info fr-mt-3w">
                 <p>
                     Proposition {{ patch.get_status_display|lower }}
-                    {% if patch.reviewed_by %}par {{ patch.reviewed_by.get_full_name }}{% endif %}
+                    {% if patch.reviewed_by %}par {{ patch.reviewed_by.get_full_name|default:patch.proposed_by.username}}{% endif %}
                     {% if patch.reviewed_on %}le {{ patch.reviewed_on|date:"d/m/Y" }}{% endif %}.
                 </p>
                 {% if patch.review_comment %}<p>Commentaire&nbsp;: {{ patch.review_comment }}</p>{% endif %}

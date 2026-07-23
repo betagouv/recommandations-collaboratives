@@ -333,8 +333,8 @@ class ResourceRevisionMeta(models.Model):
 
     STATUS_CHOICES = (
         (PENDING, "En attente"),
-        (ACCEPTED, "Accepté"),
-        (REJECTED, "Rejeté"),
+        (ACCEPTED, "Acceptée"),
+        (REJECTED, "Rejetée"),
     )
 
     revision = models.OneToOneField(
