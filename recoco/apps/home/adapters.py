@@ -2,14 +2,13 @@ from urllib import parse
 
 from allauth.account import adapter as allauth_adapter
 from allauth.account import app_settings
-from allauth.account.models import EmailAddress, EmailConfirmation
+from allauth.account.models import EmailAddress
 from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 
 from . import utils
 from .models import AdvisorAccessRequest
@@ -97,12 +96,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
 def send_confirmation_email(request, user, signup=False):
     email_address = EmailAddress.objects.filter(user=user).first()
-    confirmation = EmailConfirmation.create(email_address)
-    confirmation.sent = timezone.now()
-    confirmation.save()
-
-    adapter = UVAccountAdapter()
-    adapter.send_confirmation_mail(request, confirmation, signup)
+    email_address.send_confirmation(request, signup)
 
 
 def confirm_email(request, user):
