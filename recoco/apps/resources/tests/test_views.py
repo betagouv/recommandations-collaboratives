@@ -1322,6 +1322,27 @@ def test_reject_pending_revision(request, client):
 
 
 @pytest.mark.django_db
+def test_resource_history_hides_patch_revisions(request, client):
+    site = get_current_site(request)
+    resource = Recipe(models.Resource, title="ancien titre", sites=[site]).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+
+    patch = make_pending_patch(resource, baker.make(User), title="nouveau titre")
+
+    url = reverse("resources-resource-history", args=[resource.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    listed = [action["version"].revision for action in response.context["action_list"]]
+    assert len(listed) > 0
+    assert patch.revision not in listed
+
+
+@pytest.mark.django_db
 def test_accept_pending_revision_existing_resource(request, client):
     site = get_current_site(request)
     resource = Recipe(models.Resource, title="ancien titre", sites=[site]).make()

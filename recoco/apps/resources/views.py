@@ -639,6 +639,17 @@ class ResourceHistoryCompareView(
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
 
+    def _get_action_list(self):
+        """Return the resource versions, excluding the suggested patches."""
+        versions = self._order_version_queryset(
+            Version.objects.get_for_object(self.get_object())
+            .exclude(revision__resource_patch_meta__isnull=False)
+            .select_related("revision__user")
+        )
+        return [
+            {"version": version, "revision": version.revision} for version in versions
+        ]
+
 
 ########################################################################
 # Resource patch moderation
@@ -691,9 +702,12 @@ class ResourcePatchReviewView(
         )
 
     def _get_versions(self, resource, patch):
+        # ordered by -pk: most recent first
         all_versions = Version.objects.get_for_object(resource)
         pending_version = all_versions.filter(revision=patch.revision).first()
-        previous_version = all_versions.exclude(revision=patch.revision).first()
+        if pending_version is None:
+            return None, None
+        previous_version = all_versions.filter(pk__lt=pending_version.pk).first()
         return pending_version, previous_version
 
     def _diff_context(self, resource, pending_version, previous_version):
