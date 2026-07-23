@@ -97,10 +97,10 @@ urlpatterns = [
     path(  # form part 3 : email confirmation
         r"advisor-access-request/confirm-email",
         views.AdvisorAccessRequestEmailConfirmView.as_view(),
-        name="advisor-access-request-email-confirm",
+        name="advisor-access-request-confirm-email",
     ),
     path(  # success page : request is pending
-        r"advisor-access-request/pending",
+        r"advisor-access-request/pending/<int:advisor_access_request_id>/",
         views.AdvisorAccessRequestPendingView.as_view(),
         name="advisor-access-request-pending",
     ),

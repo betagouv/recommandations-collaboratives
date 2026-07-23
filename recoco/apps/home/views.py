@@ -19,7 +19,7 @@ from allauth.mfa.models import Authenticator
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
@@ -367,7 +367,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             success_url = reverse(
                 "advisor-access-request-pending"
                 if email_confirmed
-                else "advisor-access-request-moderator"
+                else "advisor-access-request-confirm-email"
             )
             return redirect(success_url)
 
@@ -384,12 +384,28 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
 
-class AdvisorAccessRequestEmailConfirmView(TemplateView):
-    template_name = "home/advisor-access-request-email-confirm.html"
+class AdvisorAccessRequestEmailConfirmView(LoginRequiredMixin, TemplateView):
+    template_name = "home/advisor-access-request-confirm-email.html"
+    login_url = "/accounts/signup"
 
 
-class AdvisorAccessRequestPendingView(TemplateView):
+class AdvisorAccessRequestPendingView(VerifiedEmailRequiredMixin, TemplateView):
     template_name = "home/advisor-access-request-pending.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["advisor_access_request"] = get_object_or_404(
+            AdvisorAccessRequest.objects.prefetch_related(
+                Prefetch(
+                    "departments",
+                    queryset=Department.objects.order_by("code"),
+                )
+            )
+            .select_related("user")
+            .filter(user=self.request.user, site=self.request.site),
+            pk=kwargs.get("advisor_access_request_id"),
+        )
+        return context
 
 
 @verified_email_required
