@@ -57,7 +57,7 @@
             {% endif %}
         {% elif compare_data %}
             <h3>Modifications proposées</h3>
-            {% include "reversion-compare/compare_partial.html" %}
+            {% include "reversion-compare/compare_partial.html" with hide_restore_buttons=True %}
         {% else %}
             <p class="fr-text--sm fr-text--mention-grey">Impossible de calculer le diff (version de référence introuvable).</p>
         {% endif %}
