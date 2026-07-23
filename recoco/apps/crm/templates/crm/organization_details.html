@@ -31,13 +31,17 @@
                 <!-- Name -->
                 <h1 class="user-crm__user-name fr-mb-0">{{ organization.name }}</h1>
                 <!-- Departments -->
-                <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-3v">Départements :
-                    {% for department in org_departments %}
+                <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-3v d-flex align-items-center text-nowrap">Départements :
+                    {% for department in org_departments|slice:":5" %}
                         {{ department.code }}
                         {% if not forloop.last %},{% endif %}
                     {% empty %}
                         Aucun département
                     {% endfor %}
+                    {% if org_departments|length > 5 %}
+                        <span class="crm-avatar crm-avatar--overflow fr-ml-1v"
+                              title="{% for department in org_departments|slice:'5:' %}{{ department.code }}{% if not forloop.last %}, {% endif %}{% endfor %}">+{{ org_departments|length|add:"-5" }}</span>
+                    {% endif %}
                 </span>
             </div>
             <!-- Members -->
