@@ -7,6 +7,11 @@
         ins { background-color: #e6ffe6; text-decoration: none; color: #000; }
         pre.highlight { max-width: 900px; white-space: pre-line; }
         sup.follow { color: #5555ff; }
+        .amend-form {
+            border: 1px solid var(--border-default-grey);
+            border-radius: .5rem;
+            background-color: var(--background-alt-grey);
+        }
     </style>
 {% endblock css %}
 {% block content %}
@@ -89,49 +94,137 @@
                 </div>
 
                 {# ── Amend form (collapsed by default) ── #}
-                <div x-show="showAmend" x-cloak class="fr-mt-4w fr-p-3w" style="border: 1px solid #ddd;">
-                    <h4>Amender le contenu avant acceptation</h4>
-                    <p class="fr-text--sm fr-text--mention-grey">
+                <div x-show="showAmend"
+                     x-cloak
+                     class="fr-mt-4w fr-p-3w amend-form">
+                    <h4 class="fr-h5">Amender la fiche avant acceptation</h4>
+                    <p class="fr-text--sm fr-text--mention-grey fr-mb-3w">
                         Les champs ci-dessous sont pré-remplis avec les valeurs proposées.
                         Modifiez-les si nécessaire, puis cliquez sur « Accepter (version amendée) ».
                     </p>
 
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.title.id_for_label }}">Titre</label>
-                        {{ amend_form.title }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.subtitle.id_for_label }}">Sous-titre</label>
-                        {{ amend_form.subtitle }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.summary.id_for_label }}">Résumé</label>
-                        {{ amend_form.summary }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.category.id_for_label }}">Catégorie</label>
-                        {{ amend_form.category }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.departments.id_for_label }}">Départements</label>
-                        {{ amend_form.departments }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.contacts.id_for_label }}">Contacts</label>
-                        {{ amend_form.contacts }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.expires_on.id_for_label }}">Date d'expiration</label>
-                        {{ amend_form.expires_on }}
-                    </div>
-                    <div class="fr-input-group">
-                        <label class="fr-label" for="{{ amend_form.content.id_for_label }}">Contenu</label>
-                        {{ amend_form.content|safe }}
+                    {% if amend_form.non_field_errors %}
+                        <div class="fr-alert fr-alert--error fr-mb-2w">
+                            {% for error in amend_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="fr-grid-row fr-grid-row--gutters">
+                        {# ── Main column ── #}
+                        <div class="fr-col-12 fr-col-md-8">
+                            <div class="fr-input-group {% if amend_form.title.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_title">
+                                    Titre <span class="fr-hint-text">Obligatoire</span>
+                                </label>
+                                <input type="text"
+                                       name="title"
+                                       id="id_title"
+                                       class="fr-input"
+                                       required
+                                       maxlength="256"
+                                       value="{{ amend_form.title.value|default:'' }}">
+                                {% for error in amend_form.title.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.subtitle.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_subtitle">Sous-titre</label>
+                                <input type="text"
+                                       name="subtitle"
+                                       id="id_subtitle"
+                                       class="fr-input"
+                                       maxlength="512"
+                                       value="{{ amend_form.subtitle.value|default:'' }}">
+                                {% for error in amend_form.subtitle.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.summary.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_summary">Résumé</label>
+                                <textarea name="summary"
+                                          id="id_summary"
+                                          class="fr-input"
+                                          rows="3"
+                                          maxlength="400">{{ amend_form.summary.value|default:'' }}</textarea>
+                                {% for error in amend_form.summary.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.content.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_content">Contenu</label>
+                                {% include "tools/editor.html" with input_name=amend_form.content.name initial_content=amend_form.content.value|default:'' input_required=True initial_content_escapejs=True %}
+                                {% for error in amend_form.content.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                        </div>
+
+                        {# ── Side column ── #}
+                        <div class="fr-col-12 fr-col-md-4">
+                            <div class="fr-select-group {% if amend_form.status.errors %}fr-select-group--error{% endif %}">
+                                <label class="fr-label" for="id_status">État</label>
+                                <select name="status" id="id_status" class="fr-select">
+                                    {% for value, label in amend_form.fields.status.choices %}
+                                        <option value="{{ value }}"
+                                                {% if amend_form.status.value|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% for error in amend_form.status.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-select-group {% if amend_form.category.errors %}fr-select-group--error{% endif %}">
+                                <label class="fr-label" for="id_category">Catégorie</label>
+                                <select name="category" id="id_category" class="fr-select">
+                                    <option value="">(Aucune)</option>
+                                    {% for category in amend_form.category.field.queryset %}
+                                        <option value="{{ category.pk }}"
+                                                {% if amend_form.category.value|stringformat:'s' == category.pk|stringformat:'s' %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% for error in amend_form.category.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.tags.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_tags">
+                                    Mots-clés <span class="fr-hint-text">Séparés par des virgules</span>
+                                </label>
+                                <input type="text"
+                                       name="tags"
+                                       id="id_tags"
+                                       class="fr-input"
+                                       value="{{ resource.tags.all|join:', ' }}">
+                                {% for error in amend_form.tags.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.support_orga.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_support_orga">Structure porteuse</label>
+                                <input type="text"
+                                       name="support_orga"
+                                       id="id_support_orga"
+                                       class="fr-input"
+                                       maxlength="256"
+                                       value="{{ amend_form.support_orga.value|default:'' }}">
+                                {% for error in amend_form.support_orga.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.expires_on.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="id_expires_on">Date d'expiration</label>
+                                <input type="date"
+                                       name="expires_on"
+                                       id="id_expires_on"
+                                       class="fr-input"
+                                       value="{{ amend_form.expires_on.value|date:'Y-m-d'|default:'' }}">
+                                {% for error in amend_form.expires_on.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.departments.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="{{ amend_form.departments.id_for_label }}">Territoire</label>
+                                {{ amend_form.departments }}
+                                {% for error in amend_form.departments.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                            <div class="fr-input-group {% if amend_form.contacts.errors %}fr-input-group--error{% endif %}">
+                                <label class="fr-label" for="{{ amend_form.contacts.id_for_label }}">Contacts</label>
+                                {{ amend_form.contacts }}
+                                {% for error in amend_form.contacts.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                            </div>
+                        </div>
                     </div>
 
-                    <button type="submit" name="action" value="accept_amended" class="fr-btn fr-mt-2w">
-                        Accepter (version amendée)
-                    </button>
+                    <button type="submit"
+                            name="action"
+                            value="accept_amended"
+                            class="fr-btn fr-mt-3w">Accepter (version amendée)</button>
                 </div>
 
             </form>

@@ -763,7 +763,8 @@ class ResourcePatchReviewView(
                 "is_new_resource": is_new_resource,
                 "proposed_data": pending_version.field_dict if pending_version else {},
                 "amend_form": EditResourceForm(
-                    initial=self._amend_form_initial(pending_version)
+                    instance=resource,
+                    initial=self._amend_form_initial(pending_version),
                 ),
             }
         )
