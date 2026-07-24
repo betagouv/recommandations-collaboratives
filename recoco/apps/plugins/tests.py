@@ -211,9 +211,11 @@ class TestTenantPluginSchemaMiddleware:
 
             middleware(request_mock)
 
-            cursor_instance.execute.assert_called_once_with(
+            cursor_instance.execute.assert_any_call(
                 SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
             )
+            # search_path is reset to public once the response has been generated
+            cursor_instance.execute.assert_called_with("SET search_path TO public")
 
 
 @pytest.mark.django_db
