@@ -134,11 +134,7 @@
                             <td class="text-ellipsis" title="{{ crm_user.email }}">
                                 <a class="fr-link project-table__project-name"
                                     href="{% url 'crm-user-details' crm_user.pk %}">
-                                    {% if crm_user.profile.email_validated %}
-                                        <span class="fr-icon-checkbox-fill fr-text-default--success fr-icon--sm" aria-hidden="true" title="Adresse e-mail validée"></span>
-                                    {% else %}
-                                        <span class="fr-icon-close-circle-fill fr-text-default--warning fr-icon--sm" aria-hidden="true" title="Adresse e-mail non validée"></span>
-                                    {% endif %}
+                                    {% include "account/fragments/unvalidated_email_indicator.html" with user=crm_user %}
                                     {{ crm_user.email }}</a>
                             </td>
                             <td class="text-ellipsis">

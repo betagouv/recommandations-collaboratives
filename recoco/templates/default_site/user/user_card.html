@@ -54,6 +54,7 @@ Parameter Django:
                     <span class="user-card__org-name fw-normal font-italic font-size-12px">{{ project.org_name }}</span>
                 {% endif %}
             {% endif %}
+            {% include "account/fragments/unvalidated_email_indicator.html" %}
         </button>
         {% if 'use_crm' in user_site_perms and user_activity %}
             {% if not disable_links %}
