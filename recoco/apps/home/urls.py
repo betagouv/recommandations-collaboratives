@@ -100,7 +100,7 @@ urlpatterns = [
         name="advisor-access-request-confirm-email",
     ),
     path(  # success page : request is pending
-        r"advisor-access-request/pending/<int:advisor_access_request_id>/",
+        r"advisor-access-request/pending",
         views.AdvisorAccessRequestPendingView.as_view(),
         name="advisor-access-request-pending",
     ),

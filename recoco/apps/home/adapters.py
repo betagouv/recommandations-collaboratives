@@ -11,7 +11,6 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from . import utils
-from .models import AdvisorAccessRequest
 from .validators import EmailValidatorForBrevo
 
 
@@ -72,12 +71,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
                     else "/"
                 )
             case "account_signup":
-                advisor_request = AdvisorAccessRequest.objects.filter(
-                    user=request.user, site=request.site
-                ).first()
-                url_to_redirect = reverse(
-                    "advisor-access-request-pending", args=[advisor_request.id]
-                )
+                url_to_redirect = reverse("advisor-access-request-pending")
             case "crm-user-update":
                 url_to_redirect = "/"
             case _:  # random login

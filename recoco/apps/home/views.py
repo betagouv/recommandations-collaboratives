@@ -398,15 +398,16 @@ class AdvisorAccessRequestPendingView(VerifiedEmailRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context["advisor_access_request"] = get_object_or_404(
-            AdvisorAccessRequest.objects.prefetch_related(
+            AdvisorAccessRequest.objects.filter(
+                user=self.request.user, site=self.request.site, status="PENDING"
+            )
+            .prefetch_related(
                 Prefetch(
                     "departments",
                     queryset=Department.objects.order_by("code"),
                 )
             )
             .select_related("user")
-            .filter(user=self.request.user, site=self.request.site),
-            pk=kwargs.get("advisor_access_request_id"),
         )
         return context
 
