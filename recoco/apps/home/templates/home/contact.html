@@ -14,17 +14,19 @@
             </svg>
             Contacter l'équipe {{ request.site.name }}
         </h2>
-        {# quick fix to unlock brevo {% if user.is_authenticated %} #}
-            <p class="text-secondary">
-                Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez
-                copier-coller notre adresse email :
-                {% with request.site.configuration.contact_form_recipient as email %}
-                    <a class="fw-bold" href="mailto:{{ email }}">{{ email }}</a>
-                {% endwith %}
-            </p>
-        {# quick fix to unlock brevo {% endif %} #}
 
-        {% if user.is_authenticated %} {# condition is quick fix to unlock brevo #}
+        <p class="text-secondary">
+            {% if user.is_authenticated and user.profile.email_validated %} {# condition is quick fix to unlock brevo #}
+                Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez copier-coller notre adresse email :
+            {% else %}
+                Vous pouvez nous contacter à l'adresse e-mail suivante :
+            {% endif %}
+            {% with request.site.configuration.contact_form_recipient as email %}
+                <a class="fw-bold" href="mailto:{{ email }}">{{ email }}</a>
+            {% endwith %}
+        </p>
+
+        {% if user.is_authenticated and user.profile.email_validated %} {# condition is quick fix to unlock brevo #}
         <form method="post" data-test-id="contact-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}" />
