@@ -687,6 +687,10 @@ class ResourcePatchReviewView(
     context_object_name = "patch"
     permission_required = "sites.manage_resources"
     template_name = "resources/patches/review.html"
+    # Restrict the diff to reversion-tracked fields. Otherwise CompareMixin walks
+    # every model field, and untracked foreign keys (created_by, ...) are wrongly
+    # reported as changed and rendered as None (reversion-compare __eq__ quirk).
+    compare_fields = models.RESOURCE_REVISION_FIELDS
 
     def has_permission(self):
         return self.request.user.has_perm(
@@ -707,7 +711,16 @@ class ResourcePatchReviewView(
         pending_version = all_versions.filter(revision=patch.revision).first()
         if pending_version is None:
             return None, None
-        previous_version = all_versions.filter(pk__lt=pending_version.pk).first()
+        # Compare against the baseline, not the previous version: pending proposals
+        # stack up in the history, so skip any version tied to a proposal.
+        patch_revision_ids = models.ResourceRevisionMeta.objects.filter(
+            resource=resource
+        ).values_list("revision_id", flat=True)
+        previous_version = (
+            all_versions.filter(pk__lt=pending_version.pk)
+            .exclude(revision_id__in=patch_revision_ids)
+            .first()
+        )
         return pending_version, previous_version
 
     def _diff_context(self, resource, pending_version, previous_version):
@@ -795,6 +808,17 @@ class ResourcePatchReviewView(
                 messages.error(request, "Version proposée introuvable.")
                 return redirect(reverse("resources-patches-list"))
 
+            # revert() rebuilds the resource from tracked fields only, resetting
+            # untracked scalar fields (created_by, created_on, site_origin, ...) to
+            # their defaults. Snapshot them so we can restore the ones the proposal
+            # must not touch.
+            tracked = set(models.RESOURCE_REVISION_FIELDS)
+            untracked_values = {
+                field.attname: getattr(resource, field.attname)
+                for field in models.Resource._meta.local_concrete_fields
+                if not field.primary_key and field.name not in tracked
+            }
+
             with transaction.atomic():
                 with reversion.create_revision():
                     if previous_version is None:
@@ -804,6 +828,11 @@ class ResourcePatchReviewView(
                     else:
                         # Existing resource patch: apply proposed version via revert()
                         pending_version.revert()
+                        # Restore untracked scalar fields revert() reset to defaults,
+                        # without creating a new revision.
+                        models.Resource.objects.filter(pk=resource.pk).update(
+                            **untracked_values
+                        )
                     reversion.set_user(request.user)
                     reversion.set_comment(f"Proposition #{patch.pk} acceptée")
                 patch.status = models.ResourceRevisionMeta.ACCEPTED

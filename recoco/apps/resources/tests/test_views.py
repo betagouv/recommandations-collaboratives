@@ -1345,7 +1345,10 @@ def test_resource_history_hides_patch_revisions(request, client):
 @pytest.mark.django_db
 def test_accept_pending_revision_existing_resource(request, client):
     site = get_current_site(request)
-    resource = Recipe(models.Resource, title="ancien titre", sites=[site]).make()
+    author = baker.make(User)
+    resource = Recipe(
+        models.Resource, title="ancien titre", created_by=author, sites=[site]
+    ).make()
     patch = make_pending_patch(resource, baker.make(User), title="nouveau titre")
 
     url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
@@ -1365,6 +1368,8 @@ def test_accept_pending_revision_existing_resource(request, client):
     assert patch.reviewed_by == reviewer
     assert patch.review_comment == "ok pour moi"
     assert resource.title == "nouveau titre"
+    # accepting must not wipe untracked scalar fields (revert() side effect)
+    assert resource.created_by == author
 
     # accepting applies the proposal as a new revision on top of the history
     versions = Version.objects.get_for_object(resource)
