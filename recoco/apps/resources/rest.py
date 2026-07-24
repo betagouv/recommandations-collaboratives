@@ -167,6 +167,16 @@ class ResourceViewSet(viewsets.ModelViewSet):
         https://github.com/etianen/django-reversion/issues/727"""
         data = serializer.validated_data
 
+        # revert() below rebuilds the resource from the reversion-tracked fields only,
+        # resetting every untracked scalar field (created_on, created_by, site_origin,
+        # support_orga, ...) to its default. Snapshot the original scalar values so we
+        # can restore the live resource untouched afterwards.
+        original_values = {
+            field.attname: getattr(resource, field.attname)
+            for field in Resource._meta.local_concrete_fields
+            if not field.primary_key
+        }
+
         with transaction.atomic():
             current_versions = Version.objects.get_for_object(resource)
             current_version = current_versions.first()
@@ -209,6 +219,10 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
             # Revert the live object to its state before the proposal
             current_version.revert()
+
+            # Restore the untracked scalar fields revert() reset to their defaults,
+            # without creating a new revision.
+            Resource.objects.filter(pk=resource.pk).update(**original_values)
 
         return meta
 
