@@ -36,10 +36,10 @@
     </div>
     {% if stepper %}
         <div class="fr-stepper fr-mb-2w">
-            <h3 class="fr-stepper__title dsfr-stepper__title-resize">
+            <p class="fr-stepper__title dsfr-stepper__title-resize">
                 {{ current_step_title }}
                 <span class="fr-stepper__state specific-color-3a">Étape {{ step_number }} sur {{ total_steps }}</span>
-            </h3>
+            </p>
             <div class="fr-stepper__steps"
                  data-fr-current-step="{{ step_number }}"
                  data-fr-steps="{{ total_steps }}"></div>
