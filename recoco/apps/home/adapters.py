@@ -67,7 +67,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
                         "onboarding-summary",
                         args=(request.session["project_id"],),
                     )
-                    if request.session["project_id"]
+                    if "project_id" in request.session
                     else "/"
                 )
             case "account_signup":
