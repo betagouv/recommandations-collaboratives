@@ -6,6 +6,7 @@ from allauth.account.forms import (
     ResetPasswordKeyForm,
     SignupForm,
 )
+from allauth.mfa.models import Authenticator
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
@@ -86,7 +87,8 @@ class ContactForm(forms.Form):
 
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
         if user.is_authenticated:
             del self.fields["name"]
@@ -175,3 +177,42 @@ class SiteCreateForm(forms.ModelForm):
     subdomain = forms.CharField(
         label="Sous-domaine recoconseil. Ex: bidule si bidule.recoconseil.fr"
     )
+
+
+class TwoFaConfigForm(forms.Form):
+    two_fa_mode = forms.ChoiceField(
+        label="Quelle double authentification",
+        help_text="La double authentification par application externe est plus sécurisée",
+        choices=[
+            ("totp", "Application externe"),
+            ("login_with_code", "Envoi d'un code par mail"),
+            ("none", "Aucun"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        if user.is_authenticated and user.profile.requires_2fa:
+            self.fields["two_fa_mode"].choices = [
+                c for c in self.fields["two_fa_mode"].choices if c[0] != "none"
+            ]
+        if user.profile.login_with_code:
+            self.fields["two_fa_mode"].initial = "login_with_code"
+        if Authenticator.objects.filter(
+            type=Authenticator.Type.TOTP, user=user
+        ).exists():
+            self.fields["two_fa_mode"].initial = "totp"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if (
+            self.user.is_authenticated
+            and self.user.profile.requires_2fa
+            and self.data.get("two_fa_mode") == "none"
+        ):
+            self.add_error(
+                "two_fa_mode", "Sélectionnez un mode de double authentification"
+            )
+        return cleaned_data

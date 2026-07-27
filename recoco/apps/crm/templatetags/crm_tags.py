@@ -14,7 +14,7 @@ from django.urls import NoReverseMatch, reverse
 
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.crm.models import Note
-from recoco.apps.plugins.manager import get_tenant_hook
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects.models import Project
 
 register = template.Library()
@@ -50,7 +50,9 @@ def crm_plugin_tabs(context, min_index, max_index):
     if request is None:
         return []
     tabs = []
-    for tab in get_tenant_hook(request).hook.crm_navigation_tabs(request=request):
+    for tab in get_site_plugin_manager(request).hook.crm_navigation_tabs(
+        request=request
+    ):
         if min_index < tab["index"] < max_index:
             try:
                 tab = {**tab, "url": reverse(tab["url_name"])}

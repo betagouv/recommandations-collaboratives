@@ -41,24 +41,6 @@
                     </div>
                 </div>
             </div>
-            {% if unread_notifications %}
-                <div class="fr-px-3w fr-py-3w bg-light">
-                    <h4>
-                        <svg class="align-middle bi text-warning"
-                             width="20px"
-                             height="20px"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell" />
-                        </svg>
-                        {{ unread_notifications.count }} Notification(s)
-                    </h4>
-                    <ul class="list-group">
-                        {% for notification in unread_notifications %}
-                            <li class="d-flex flex-columns list-group-item">{{ notification }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
             <div class="fr-px-3w fr-pt-3w crm-notes-wrapper relative">
                 <a class="btn btn-primary fr-mb-3w"
                    href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
