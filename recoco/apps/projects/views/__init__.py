@@ -8,8 +8,8 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 from actstream import action
-from allauth.account.decorators import verified_email_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
@@ -79,7 +79,7 @@ def mark_general_notifications_as_seen(user):
 # -----
 
 
-@verified_email_required
+@login_required
 def project_moderation_list(request):
     is_project_moderator_or_403(request.user, request.site)
 
@@ -114,7 +114,7 @@ def project_moderation_list(request):
     )
 
 
-@verified_email_required
+@login_required
 def project_moderation_project_refuse(request: HttpRequest, project_id: int):
     is_project_moderator_or_403(request.user, request.site)
 
@@ -157,7 +157,7 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
     return redirect(reverse("projects-moderation-list"))
 
 
-@verified_email_required
+@login_required
 def project_moderation_project_accept(request: HttpRequest, project_id: int):
     is_project_moderator_or_403(request.user, request.site)
 
@@ -258,7 +258,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
     return redirect(reverse("projects-moderation-list"))
 
 
-@verified_email_required
+@login_required
 @require_http_methods(["POST"])
 def project_moderation_advisor_refuse(
     request: HttpRequest, advisor_access_request_id: int
@@ -304,7 +304,7 @@ def project_moderation_advisor_refuse(
     return redirect(reverse("projects-moderation-list"))
 
 
-@verified_email_required
+@login_required
 @require_http_methods(["POST"])
 def project_moderation_advisor_accept(
     request: HttpRequest, advisor_access_request_id: int
@@ -358,7 +358,7 @@ def project_moderation_advisor_accept(
     return redirect(reverse("projects-moderation-list"))
 
 
-@verified_email_required
+@login_required
 @require_http_methods(["POST"])
 def project_moderation_advisor_modify(
     request: HttpRequest, advisor_access_request_id: int
@@ -388,12 +388,12 @@ def project_moderation_advisor_modify(
 # ----
 # List, dashboards
 # ----
-@verified_email_required
+@login_required
 def project_list_for_staff(request):
     return redirect("projects-project-list")
 
 
-@verified_email_required
+@login_required
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     return redirect("projects-project-list")
@@ -422,7 +422,7 @@ def territory_filtering_queryset(user: User) -> QuerySet:
     )
 
 
-@verified_email_required
+@login_required
 @ensure_csrf_cookie
 def project_list(request):
     """
@@ -450,7 +450,7 @@ def project_list(request):
     return render(request, "projects/project/list-kanban.html", context)
 
 
-@verified_email_required
+@login_required
 @ensure_csrf_cookie
 def project_maplist(request):
     """Return the projects for the switchtender as a map"""
@@ -472,7 +472,7 @@ def project_maplist(request):
 # ----
 # Joining projects
 # ----
-@verified_email_required
+@login_required
 def project_switchtender_join(request, project_id=None):
     """Join as switchtender"""
 
@@ -504,7 +504,7 @@ def project_switchtender_join(request, project_id=None):
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
 
-@verified_email_required
+@login_required
 def project_observer_join(request, project_id=None):
     """Join as observer"""
     project = get_object_or_404(models.Project, pk=project_id)
@@ -535,7 +535,7 @@ def project_observer_join(request, project_id=None):
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
 
-@verified_email_required
+@login_required
 def project_switchtender_leave(request, project_id=None):
     """Leave switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
@@ -563,7 +563,7 @@ def project_switchtender_leave(request, project_id=None):
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
 
-@verified_email_required
+@login_required
 def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
     has_perm_or_403(request.user, "sites.delete_projects", request.site)

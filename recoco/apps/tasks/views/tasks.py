@@ -9,8 +9,8 @@ created : 2021-05-26 15:56:20 CEST
 
 import datetime
 
-from allauth.account.decorators import verified_email_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -45,7 +45,7 @@ from ..forms import (
 ########################################################################
 
 
-@verified_email_required
+@login_required
 def create_task(request):
     """Create task"""
 
@@ -137,7 +137,7 @@ def create_task(request):
     return render(request, "tasks/tasks/task_create.html", locals())
 
 
-@verified_email_required
+@login_required
 def visit_task(request, task_id):
     """Visit the content of a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -161,7 +161,7 @@ def visit_task(request, task_id):
     return redirect(url)
 
 
-@verified_email_required
+@login_required
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -194,7 +194,7 @@ def toggle_done_task(request, task_id):
     )
 
 
-@verified_email_required
+@login_required
 def refuse_task(request, task_id):
     """Mark task refused for a project (user not interested)"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -213,7 +213,7 @@ def refuse_task(request, task_id):
     )
 
 
-@verified_email_required
+@login_required
 def already_done_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -232,7 +232,7 @@ def already_done_task(request, task_id):
     )
 
 
-@verified_email_required
+@login_required
 def sort_task(request, task_id, order):
     """Update an existing task for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -254,7 +254,7 @@ def sort_task(request, task_id, order):
     )
 
 
-@verified_email_required
+@login_required
 def update_task(request, task_id=None):
     """Update an existing task for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -306,7 +306,7 @@ def update_task(request, task_id=None):
     return render(request, "tasks/tasks/task_update.html", locals())
 
 
-@verified_email_required
+@login_required
 @require_http_methods(["GET"])
 def task_generate_ds_prefill(request, task_id):
     """Generates a link to a prefilled ds demande and redirect to it"""
@@ -320,7 +320,7 @@ def task_generate_ds_prefill(request, task_id):
 
 
 # liste de preflechage des recommendations
-@verified_email_required
+@login_required
 def task_recommendation_list(request):
     """List task recommendations for a project"""
     is_staff_for_site_or_403(request.user)
@@ -335,7 +335,7 @@ def task_recommendation_list(request):
 
 
 # ajout d'un  preflechage de recommendations
-@verified_email_required
+@login_required
 def task_recommendation_create(request):
     """Create a new task recommendation for a project"""
     is_staff_for_site_or_403(request.user)
@@ -354,7 +354,7 @@ def task_recommendation_create(request):
 
 
 # mise à jour d'un  preflechage de recommendations
-@verified_email_required
+@login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
 
@@ -375,7 +375,7 @@ def task_recommendation_update(request, recommendation_id):
     return render(request, "tasks/tasks/recommendation_update.html", locals())
 
 
-@verified_email_required
+@login_required
 @require_http_methods(["POST"])
 def task_recommendation_delete(request, recommendation_id):
     """Delete a task recommendation"""
@@ -396,7 +396,7 @@ def task_recommendation_delete(request, recommendation_id):
 
 
 # retourne pour le dossier les suggestions du système
-@verified_email_required
+@login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
     project = get_object_or_404(
@@ -458,7 +458,7 @@ def presuggest_task(request, project_id):
     return render(request, "tasks/tasks/task_suggest.html", locals())
 
 
-@verified_email_required
+@login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
 
@@ -473,7 +473,7 @@ def delete_task(request, task_id=None):
     return redirect(next_url)
 
 
-@verified_email_required
+@login_required
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -497,7 +497,7 @@ def followup_task(request, task_id=None):
     )
 
 
-@verified_email_required
+@login_required
 def followup_task_update(request, followup_id=None):
     """Update a followup for task"""
     followup = get_object_or_404(

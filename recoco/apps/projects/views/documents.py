@@ -7,8 +7,8 @@ author  : guillaume.libersat@beta.gouv.fr
 created : 2022-11-28 14:14:20 CEST
 """
 
-from allauth.account.decorators import verified_email_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -27,7 +27,7 @@ from ..forms import DocumentUploadForm
 from ..utils import get_advising_context_for_project, is_regional_actor_for_project
 
 
-@verified_email_required
+@login_required
 def document_list(request, project_id=None):
     """Manage files and links for project"""
 
@@ -96,7 +96,7 @@ def document_list(request, project_id=None):
     )
 
 
-@verified_email_required
+@login_required
 def document_upload(request, project_id):
     """Upload a new document for a project"""
     project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
@@ -141,7 +141,7 @@ def document_upload(request, project_id):
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))
 
 
-@verified_email_required
+@login_required
 def document_delete(request, project_id, document_id):
     """Delete a document for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
@@ -163,7 +163,7 @@ def document_delete(request, project_id, document_id):
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))
 
 
-@verified_email_required
+@login_required
 def document_pin_unpin(request, project_id, document_id):
     """Delete a document for a project"""
     project = get_object_or_404(models.Project, pk=project_id)

@@ -10,7 +10,7 @@ created : 2023-01-10 17:20:20 CEST
 import csv
 import datetime
 
-from allauth.account.decorators import verified_email_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse
 from django.urls import reverse
@@ -28,7 +28,7 @@ from ..utils import (
 )
 
 
-@verified_email_required
+@login_required
 @ensure_csrf_cookie
 def project_list_export_csv(request):
     """Export the projects for the switchtender as CSV"""

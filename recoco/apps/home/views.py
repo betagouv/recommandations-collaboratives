@@ -12,7 +12,6 @@ import urllib
 import django.core.mail
 from actstream import action
 from allauth.account.adapter import get_adapter
-from allauth.account.decorators import verified_email_required
 from allauth.account.models import EmailAddress
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
@@ -57,7 +56,6 @@ from recoco.utils import (
 
 from ... import verbs
 from . import models
-from .adapters import VerifiedEmailRequiredMixin
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
@@ -384,12 +382,14 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
 
-class AdvisorAccessRequestEmailConfirmView(LoginRequiredMixin, TemplateView):
+@login_required
+class AdvisorAccessRequestEmailConfirmView(TemplateView):
     template_name = "home/advisor-access-request-confirm-email.html"
     login_url = "/accounts/signup"
+    #  todo give user context
 
 
-class AdvisorAccessRequestPendingView(VerifiedEmailRequiredMixin, TemplateView):
+class AdvisorAccessRequestPendingView(LoginRequiredMixin, TemplateView):
     template_name = "home/advisor-access-request-pending.html"
 
     def get_context_data(self, **kwargs):
@@ -409,7 +409,7 @@ class AdvisorAccessRequestPendingView(VerifiedEmailRequiredMixin, TemplateView):
         return context
 
 
-@verified_email_required
+@login_required
 def advisor_access_request_moderator_view(
     request: HttpRequest, advisor_access_request_id: int
 ) -> HttpResponse:
@@ -471,7 +471,7 @@ def advisor_access_request_moderator_view(
 ### Site Creation
 ### 3 tests are at least required: permission enforcement, site creation and
 ### site creation error (domain already used for eg)
-class SiteCreateView(VerifiedEmailRequiredMixin, PermissionRequiredMixin, FormView):
+class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     form_class = SiteCreateForm
     permission_required = "sites.add_site"
     template_name = "home/site_create.html"
