@@ -297,6 +297,24 @@ See `Conversation Hooks & JS Integration`_ below for a worked example.
             from .digests import send_my_digest
             return send_my_digest(site, user, dry_run)
 
+``NotificationSpec``
+--------------------
+
+``notification_project_verbs()``
+    Return a list of notification verb strings (see ``recoco.verbs``) to add
+    to ``show_project_verb_list`` - the notifications shown grouped under a
+    project in the notifications UI.
+
+    The hook is called via the site-scoped plugin manager from
+    ``unread_notifications_processor`` (``recoco/apps/projects/context_processors.py``),
+    so only plugins enabled for the current site contribute their verbs.
+
+    Example::
+
+        @hookimpl
+        def notification_project_verbs(self):
+            return [PluginVerbs.GIPHY_ADDED]
+
 ``CrmSpec``
 -----------
 
