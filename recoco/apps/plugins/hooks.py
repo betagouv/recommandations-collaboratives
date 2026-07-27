@@ -124,6 +124,20 @@ class DigestSpec(HookSpec):
         """
 
 
+class NotificationSpec(HookSpec):
+    @hookspec
+    def notification_project_verbs(self):
+        """Return a list of notification verb strings (see ``recoco.verbs``) to add
+        to ``show_project_verb_list``, i.e. the notifications that should be shown
+        grouped under a project in the notifications UI.
+
+        Example:
+            @hookimpl
+            def notification_project_verbs(self):
+                return [PluginVerbs.GIPHY_ADDED]
+        """
+
+
 class CrmSpec(HookSpec):
     @hookspec
     def crm_navigation_tabs(self, request):
