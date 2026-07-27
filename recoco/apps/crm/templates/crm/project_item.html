@@ -1,14 +1,13 @@
 {% load static %}
-{% load crm_tags %}
-{% project_other_site_config project as other_portal %}
-<li>
-    {% if other_portal %}
-        <span class="d-flex align-items-center">
-            {% if other_portal.logo_small %}
+{% with origin_site=project.project_sites.origin.site %}
+    <li>
+        <a class="d-flex align-items-center"
+           {% if origin_site == request.site %}href="{% url 'crm-project-details' project.pk %}"{% endif %}>
+            {% if origin_site != request.site and origin_site.configuration.logo_small %}
                 <img class="crm-project-item__portal-logo fr-mr-2v"
-                     src="{{ other_portal.logo_small.url }}"
-                     alt="{{ other_portal.site.name }}"
-                     title="Dossier actif sur {{ other_portal.site.name }}">
+                     src="{{ origin_site.configuration.logo_small.url }}"
+                     alt="{{ origin_site.name }}"
+                     title="Dossier actif sur {{ origin_site.name }}">
             {% else %}
                 <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
@@ -19,18 +18,6 @@
             {% else %}
                 <span>{{ project.name }}</span>
             {% endif %}
-        </span>
-    {% else %}
-        <a class="d-flex align-items-center"
-           href="{% url 'crm-project-details' project.pk %}">
-            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-            </svg>
-            {% if project.deleted %}
-                <span class="text-decoration-line-through">{{ project.name }}</span>
-            {% else %}
-                <span>{{ project.name }}</span>
-            {% endif %}
         </a>
-    {% endif %}
-</li>
+    </li>
+{% endwith %}

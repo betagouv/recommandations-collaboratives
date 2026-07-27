@@ -68,21 +68,6 @@ def projects_for_tag(tag_name):
     return Project.on_site.filter(tags__name=tag_name).order_by("name")
 
 
-@register.simple_tag(takes_context=True)
-def project_other_site_config(context, project):
-    """return the configuration of the project on another site if it is not on the current site, else return None"""
-    current_site_id = context["request"].site.id
-    if project.is_on_site(current_site_id):
-        return None
-
-    project_sites = list(project.project_sites.all())
-    origin = next(
-        (ps for ps in project_sites if ps.is_origin),
-        project_sites[0] if project_sites else None,
-    )
-    return getattr(origin.site, "configuration", None) if origin else None
-
-
 @register.simple_tag
 def get_note_update_url(note: Note) -> str | None:
     project_ct = ContentType.objects.get_for_model(Project)

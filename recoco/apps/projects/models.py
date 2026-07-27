@@ -375,10 +375,6 @@ class Project(models.Model):
             return self.site_status
         return self.project_sites.current().status
 
-    def is_on_site(self, site_id) -> bool:
-        """True if the project has a ProjectSite for the given site."""
-        return any(ps.site_id == site_id for ps in self.project_sites.all())
-
     @property
     def all_topics(self):
         """Return all topics associated w/ project or its tasks"""

@@ -835,6 +835,20 @@ def user_unset_advisor(request, user_id=None):
     return render(request, "crm/user_unset_advisor.html", locals())
 
 
+def current_site_first(relations, site_id):
+    """Sort project relations (memberships, switchtendings) to display the current site first, then other sites"""
+    relations = relations.select_related("project").prefetch_related(
+        "project__project_sites"
+    )
+    return sorted(
+        relations,
+        key=lambda rel: any(
+            ps.site_id == site_id for ps in rel.project.project_sites.all()
+        ),
+        reverse=True,  # True (current site) sorts before False (other site)
+    )
+
+
 @login_required
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -884,21 +898,10 @@ def user_details(request, user_id):
             .first()
         )
 
-    current_site_id = request.site.id
-
-    def current_site_first(relations):
-        """Sort project relations (memberships, switchtendings) to display the current site first, then other sites"""
-        relations = relations.select_related("project").prefetch_related(
-            "project__project_sites"
-        )
-        return sorted(
-            relations,
-            key=lambda rel: rel.project.is_on_site(current_site_id),
-            reverse=True,  # True (current site) sorts before False (other site)
-        )
-
-    user_memberships = current_site_first(crm_user.projectmember_set)
-    user_switchtendings = current_site_first(crm_user.projects_switchtended_per_site)
+    user_memberships = current_site_first(crm_user.projectmember_set, request.site.id)
+    user_switchtendings = current_site_first(
+        crm_user.projects_switchtended_per_site, request.site.id
+    )
 
     search_form = forms.CRMSearchForm()
 
