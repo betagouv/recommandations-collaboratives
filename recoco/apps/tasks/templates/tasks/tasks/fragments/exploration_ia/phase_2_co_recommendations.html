@@ -100,7 +100,7 @@
                                     <!-- Titre -->
                                     <div class="card-resource__title">
                                         <button class="fr-link"
-                                           @click.prevent.stop="$store.explorationIA.openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'resource', label: 'co-reco' })"
+                                           @click="$store.explorationIA.openResourceModal({ resource_id: resource.resourceId, title: resource.title, content: resource.content, source_type: 'resource', label: 'co-reco' })"
                                            x-text="$store.explorationIA.truncate(resource.title, 80)"></button>
                                     </div>
                                     <!-- Description -->

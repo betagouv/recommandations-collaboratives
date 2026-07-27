@@ -1,11 +1,13 @@
 import Alpine from 'alpinejs';
 import MiniSearch from 'minisearch';
 import api, { postExternalRessourceUrl, resourcesUrl } from '../utils/api';
+import { truncate } from '../utils/text-parsing';
 
 import { ToastType } from '../models/toastType';
 
 Alpine.data('ActionPusher', () => {
   return {
+    truncate,
     isBusy: true,
     isBusyExternalResource: false,
     canLoadNewExternalResource: false,
@@ -79,9 +81,6 @@ Alpine.data('ActionPusher', () => {
       this.suggestions = this.db.autoSuggest(text, { fuzzy: 0.2 }).slice(0, 2);
 
       return true;
-    },
-    truncate(input, size = 30) {
-      return input.length > size ? `${input.substring(0, size)}...` : input;
     },
     handleFileUpload() {
       if (this.$refs.fileUploadInput.files.length > 0) {

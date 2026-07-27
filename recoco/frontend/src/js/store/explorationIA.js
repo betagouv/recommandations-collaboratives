@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify';
 import { askLLM, fetchCoRecommendations } from '../utils/llmClient';
 import api, { resourceUrl, taskUrl } from '../utils/api';
 import { ToastType } from '../models/toastType';
+import { truncate } from '../utils/text-parsing';
 
 /**
  * Global store for the AI-assisted exploration page.
@@ -15,6 +16,7 @@ import { ToastType } from '../models/toastType';
  * @store explorationIA
  */
 Alpine.store('explorationIA', {
+  truncate,
   // === CONFIGURATION (injected by the orchestrator component via setup()) ===
   projectId: null,
   projectContext: '',
@@ -634,13 +636,6 @@ Alpine.store('explorationIA', {
       }
     }
     return DOMPurify.sanitize(html, { ADD_ATTR: ['start'] });
-  },
-
-  truncate(text, maxLength = 100) {
-    if (!text) return '';
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + '...'
-      : text;
   },
 
   getPhaseTitle(phase) {
