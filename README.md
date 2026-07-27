@@ -138,7 +138,7 @@ cd recoco/frontend
 yarn install
 ```
 
-- montez le serveur dev des static sur le port `3000`. Ce serveur **ne sert que pour les `static`**, cela ne sert à rien d’ouvril `localhost:3000` sur votre navigateur :
+- montez le serveur dev des static sur le port `3000`. Ce serveur **ne sert que pour les `static`**, cela ne sert à rien d’ouvrir `localhost:3000` sur votre navigateur :
 
 ```sh
 cd recoco/frontend && yarn dev
