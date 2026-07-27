@@ -1,6 +1,4 @@
 import Alpine from 'alpinejs';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
 import { askLLM, fetchCoRecommendations } from '../utils/llmClient';
 import api, { resourceUrl, taskUrl } from '../utils/api';
 import { ToastType } from '../models/toastType';
