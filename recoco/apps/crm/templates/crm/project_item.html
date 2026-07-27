@@ -1,4 +1,3 @@
-{% load static %}
 {% with origin_site=project.project_sites.origin.site %}
     <li>
         <a class="d-flex align-items-center"
@@ -9,9 +8,7 @@
                      alt="{{ origin_site.name }}"
                      title="Dossier actif sur {{ origin_site.name }}">
             {% else %}
-                <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-                </svg>
+                <span class="fr-icon-folder-2-fill fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
             {% endif %}
             {% if project.deleted %}
                 <span class="text-decoration-line-through">{{ project.name }}</span>
