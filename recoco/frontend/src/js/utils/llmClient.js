@@ -1,24 +1,20 @@
 import api, { askRecommendationsUrl, corecommendationsUrl } from './api';
 /**
- * Client pour l'API LLM externe (service ML Recoco).
+ * Client for the external LLM API (Recoco ML service).
  *
- * Utilitaire pur, sans dépendance à Alpine, réutilisable depuis n'importe
- * quel composant, store, ou code hors Alpine.
- *
- * Toutes les options peuvent être surchargées via le paramètre `opts`.
+ * Every option can be overridden through the `opts` parameter.
  */
 
 /**
- * Pose une question libre à la LLM avec un contexte facultatif.
+ * Asks the LLM a free-form question with an optional context.
  *
- * @param {string} query - La requête de l'utilisateur.
- * @param {string} [context] - Contexte additionnel (ex: description d'un projet).
+ * @param {string} query - The user's query.
+ * @param {string} [context] - Additional context (e.g. a project description).
  * @param {object} [opts]
- * @param {number} [opts.projectId] - Id du projet courant
- * @param {AbortSignal} [opts.signal] - Pour annuler la requête.
+ * @param {number} [opts.projectId] - Id of the current project
+ * @param {AbortSignal} [opts.signal] - To cancel the request.
  * @returns {Promise<{ answer_chunks: Array, citations: Array, found_answer: boolean }>}
- *   La réponse JSON brute de l'API.
- * @throws {Error} Si la requête échoue ou que la réponse n'est pas OK.
+ * @throws {Error}
  */
 export async function askLLM(query, context = '', opts = {}) {
   if (!opts.projectId) throw new Error('Project Id required');
@@ -42,15 +38,15 @@ export async function askLLM(query, context = '', opts = {}) {
 }
 
 /**
- * Récupère les ressources fréquemment co-recommandées avec un ensemble de
- * ressources données.
+ * Fetches the resources frequently co-recommended with a given set of
+ * resources.
  *
- * @param {Array<number|string>} resourceIds - Identifiants des ressources sources.
+ * @param {Array<number|string>} resourceIds - Identifiers of the source resources.
  * @param {object} [opts]
- * @param {number} [opts.projectId] - Id du projet courant
+ * @param {number} [opts.projectId] - Id of the current project
  * @param {AbortSignal} [opts.signal]
  * @returns {Promise<Array<{ resource_id: number, co_occurrence_score: number }>>}
- * @throws {Error} Si la requête échoue.
+ * @throws {Error} If the request fails.
  */
 export async function fetchCoRecommendations(resourceIds, opts = {}) {
   if (!opts.projectId) throw new Error('Project Id required');
