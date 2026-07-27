@@ -35,7 +35,6 @@ frontend_tests/cypress/downloads
 .tool-versions
 .python-version
 .env
-plugins
 
 ## Ignore Jupyter Notebooks files
 # see: https://jupytext.readthedocs.io/en/latest/
