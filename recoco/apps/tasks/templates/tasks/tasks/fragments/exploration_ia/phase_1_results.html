@@ -57,7 +57,7 @@
                                         </div>
                                         <div class="flex-grow-1">
                                             <div class="exploration-ia-chunk__text"
-                                                 x-html="$store.explorationIA.parseMarkdown(item.chunk.text)"></div>
+                                                 x-html="$store.explorationIA.renderMarkdown(item.chunk.text)"></div>
                                             <div class="exploration-ia-chunk__sources fr-mt-1w"
                                                  x-show="item.chunk.sources && item.chunk.sources.length > 0">
                                                 <template x-for="sourceLabel in item.chunk.sources" :key="sourceLabel">

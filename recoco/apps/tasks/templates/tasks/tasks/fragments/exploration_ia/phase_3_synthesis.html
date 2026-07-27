@@ -81,7 +81,7 @@
                                 <div class="col-12 col-lg-5">
                                     <h4 class="card-title fr-text--md fr-mb-2w" x-text="resource.title"></h4>
                                     <p class="card-text fr-text--sm text-secondary"
-                                       x-html="$store.explorationIA.parseMarkdown($store.explorationIA.truncate(resource.content, 200))">
+                                       x-html="$store.explorationIA.renderMarkdown($store.explorationIA.truncate(resource.content, 200))">
                                     </p>
                                     <!-- Tags -->
                                     <div class="fr-mt-2w" x-show="resource.tags && resource.tags.length > 0">
@@ -115,7 +115,7 @@
                                             <div class="fr-mb-2w"
                                                  :class="{ 'fr-pb-2w border-bottom': idx < resource.chunkTexts.length - 1 }">
                                                 <div class="fr-text--sm"
-                                                     x-html="$store.explorationIA.parseMarkdown(chunkText)"></div>
+                                                     x-html="$store.explorationIA.renderMarkdown(chunkText)"></div>
                                             </div>
                                         </template>
                                     </div>

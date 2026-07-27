@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         <div class="exploration-ia-modal__content"
-                             x-html="$store.explorationIA.parseMarkdown($store.explorationIA.resourceModal.resource?.content || $store.explorationIA.resourceModal.resource?.text || $store.explorationIA.resourceModal.resource?.summary || '')"></div>
+                             x-html="$store.explorationIA.renderMarkdown($store.explorationIA.resourceModal.resource?.content || $store.explorationIA.resourceModal.resource?.text || $store.explorationIA.resourceModal.resource?.summary || '')"></div>
                         <div class="fr-mt-3w" x-show="$store.explorationIA.resourceModal.resource?.url">
                             <a :href="$store.explorationIA.resourceModal.resource?.url"
                                class="fr-link fr-link--sm"
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                         <div class="exploration-ia-modal__content"
-                             x-html="$store.explorationIA.parseMarkdown($store.explorationIA.resourceModal.recommendation?.content || $store.explorationIA.resourceModal.recommendation?.comment || $store.explorationIA.resourceModal.recommendation?.intent || '')"></div>
+                             x-html="$store.explorationIA.renderMarkdown($store.explorationIA.resourceModal.recommendation?.content || $store.explorationIA.resourceModal.recommendation?.comment || $store.explorationIA.resourceModal.recommendation?.intent || '')"></div>
                     </div>
                 </template>
             </div>

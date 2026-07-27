@@ -5,7 +5,7 @@ import { askLLM, fetchCoRecommendations } from '../utils/llmClient';
 import api, { resourceUrl, taskUrl } from '../utils/api';
 import { ToastType } from '../models/toastType';
 import { truncate } from '../utils/text-parsing';
-
+import {renderMarkdown } from '../utils/markdown';
 /**
  * Global store for the AI-assisted exploration page.
  *
@@ -17,6 +17,7 @@ import { truncate } from '../utils/text-parsing';
  */
 Alpine.store('explorationIA', {
   truncate,
+  renderMarkdown,
   // === CONFIGURATION (injected by the orchestrator component via setup()) ===
   projectId: null,
   projectContext: '',
@@ -624,19 +625,6 @@ Alpine.store('explorationIA', {
   // ============================================================
   // SHARED UTILITIES
   // ============================================================
-
-  parseMarkdown(text) {
-    if (!text) return '';
-    let html = marked.parse(text, { breaks: true });
-    const listStartMatch = text.match(/^(\d+)\.\s/);
-    if (listStartMatch) {
-      const startNum = parseInt(listStartMatch[1], 10);
-      if (startNum > 1) {
-        html = html.replace(/^<ol>/, `<ol start="${startNum}">`);
-      }
-    }
-    return DOMPurify.sanitize(html, { ADD_ATTR: ['start'] });
-  },
 
   getPhaseTitle(phase) {
     const titles = {
