@@ -192,7 +192,7 @@ Pour créer les bons alias dans l'interface d'administration, exécuter depuis l
 ```python
 run scripts/create_site_localhost_aliases.py
 ```
-Pour vérifier que ça a bien fonctionner, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
+Pour vérifier que ç'a bien fonctionné, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
 
 ## Environnement de développement
 
