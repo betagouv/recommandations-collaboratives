@@ -42,6 +42,8 @@
             </li>
         </ul>
     </form>
+
+  {% if fallback_actions %}
     <ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--icon-left justify-content-center">
         <li>
             <a type="submit"
@@ -49,4 +51,5 @@
                href="{% url 'account_logout' %}?next={% url 'account_login' %}">Renseigner mon mot de passe</a>
         </li>
     </ul>
+  {% endif %}
 {% endblock main_form %}

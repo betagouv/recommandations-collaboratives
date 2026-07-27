@@ -12,13 +12,16 @@
   &__section {
     width: 70%;
   }
+  &__card-container {
+    width: 32%;
+    max-width: 320px;
+  }
   &__card {
     border-radius: 2px;
     border: 1px solid var(--light-border-default-grey, #E5E5E5);
     background: var(--light-background-default-grey, #FFF);
     box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.10);
     display: flex;
-    width: 320px;
     padding: 12px;
     align-items: flex-start;
     &--icon {

@@ -1,6 +1,7 @@
 {% load crm_tags %}
 {% project_other_site_config project as other_portal %}
 <div class="crm-project-card d-flex flex-column">
+    {% comment %} TODO a fusionner {% endcomment %}
     <span class="crm-project-card__name d-flex align-items-center gap-2">
         {% if other_portal %}
             <span>{{ project.name }}</span>
@@ -17,6 +18,15 @@
                {% if project.deleted %}class="text-decoration-line-through"{% endif %}>{{ project.name }}</a>
         {% endif %}
     </span>
+    {% comment %} TODO a fusionner {% endcomment %}
+    <a class="crm-project-card__name fr-link"{% if project.project_sites.origin.site == request.site %}href="{% url 'crm-project-details' project.pk %}"{% endif %}>
+        {{ project.name }}
+        {% if project.project_sites.origin.site != request.site %}
+        <span class="fw-400">
+            (Portail {{ project.project_sites.origin.site.name }})
+        </span>
+        {% endif %}
+    </a>
     {% if project.commune %}
         <span class="crm-project-card__org fr-icon-people fr-icon--sm fr-btn--icon-left">{{ project.commune }}</span>
     {% endif %}

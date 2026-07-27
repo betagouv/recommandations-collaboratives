@@ -13,5 +13,7 @@
     {% vite_asset 'js/apps/auth.js' %}
 {% endblock js %}
 {% block content %}
-    {% include "account/fragments/confirm_login_code_form.html" with title="Connexion à "|add:request.site.name legend="Connectez-vous à "|add:request.site.name|add:" en utilisant le code reçu par e-mail." fallback_actions=True %}
+  {% with initiated_by_user=view.stage.state.initiated_by_user %}
+    {% include "account/fragments/confirm_login_code_form.html" with title="Connexion à "|add:request.site.name legend="Connectez-vous à "|add:request.site.name|add:" en utilisant le code reçu par e-mail." fallback_actions=initiated_by_user %}
+  {% endwith %}
 {% endblock content %}

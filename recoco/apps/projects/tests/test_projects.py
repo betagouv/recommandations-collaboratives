@@ -71,6 +71,8 @@ def test_other_projects_are_not_stored_in_session(client):
 ######
 # Sharing link
 ######
+
+
 @pytest.mark.django_db
 def test_project_access_proper_sharing_link(request, client):
     current_site = get_current_site(request)

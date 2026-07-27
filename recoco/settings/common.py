@@ -333,7 +333,8 @@ ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "login-redirect"
 LOGIN_REDIRECT_URL = "login-redirect"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
-ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 3600  # 1 hour in seconds
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 60 * 60  # 1 hour in seconds
+ACCOUNT_LOGIN_TIMEOUT = 60 * 60
 
 # Common signup form shared by account and socialaccount
 ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"

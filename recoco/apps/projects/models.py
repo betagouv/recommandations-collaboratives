@@ -21,7 +21,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
-from django.db.models.query import QuerySet
+from django.db.models.query import Prefetch, QuerySet
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
@@ -410,12 +410,25 @@ class Project(models.Model):
 
     @property
     def owner(self):
-        if hasattr(self, "_owner") and len(self._owner):
-            try:
-                return self._owner[0]
-            except IndexError:
-                return None
+        # `_owner` may be populated in bulk (use prefetch_owner below) to avoid N+1 queries
+        # an empty list means "no owner", not "not prefetched".
+        if hasattr(self, "_owner"):
+            return self._owner[0] if self._owner else None
         return self.members.filter(projectmember__is_owner=True).first()
+
+    @staticmethod
+    def prefetch_owner():
+        return Prefetch(
+            "members",
+            auth_models.User.objects.filter(
+                projectmember__is_owner=True
+            ).select_related(
+                "profile",
+                "profile__organization",
+                "profile__organization__group",
+            ),
+            to_attr="_owner",
+        )  # _owner is looked at in getter
 
     ro_key = models.CharField(
         max_length=32,
@@ -1079,17 +1092,6 @@ class ProjectSearchAdapter(watson.SearchAdapter):
     def prepare_content(self, content):
         content = super().prepare_content(content)
         return strip_accents(content)
-
-
-def truncate_string(s, max_length):
-    """Truncate given string to max_length"""
-    if len(s) <= max_length:
-        return s
-    sub = s[:max_length]
-    if s[max_length] != " ":
-        # we are truncating last word, rewind to its begining
-        sub = sub[: sub.rfind(" ")]
-    return f"{sub}…"
 
 
 # eof
