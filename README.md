@@ -36,7 +36,7 @@ Deux choix :
 1.  Via virtualenv et uv
 2.  Via Docker
 
-### Virtualenv
+### Via virtualenv
 
 #### Prérequis
 
@@ -65,7 +65,7 @@ Il faut aussi une base de données postgres. Configurez-là pour le projet:
 ```sh
 sudo -u postgres psql < sql/init.sql
 ```
-La base ainsi créée s'appelle `recoco` et appartient à un utilisateur nommé `recoco` avec le mot de passe `recoco`. À ne laisser tel quel ue pour un environement de développement pour des raisons de sécurité.
+La base ainsi créée s'appelle `recoco` et appartient à un utilisateur nommé `recoco` avec le mot de passe `recoco`. À ne laisser tel quel que pour un environement de développement pour des raisons de sécurité.
 
 Les modules suivants sont installés en production et peuvent être requis (à affiner, plusieurs ne sont plus vraiment utilisés) :
 * agestore
@@ -138,7 +138,7 @@ cd recoco/frontend
 yarn install
 ```
 
-- montez le serveur dev des static sur le port 3000:
+- montez le serveur dev des static sur le port `3000`. Ce serveur **ne sert que pour les `static`**, cela ne sert à rien d’ouvrir `localhost:3000` sur votre navigateur :
 
 ```sh
 cd recoco/frontend && yarn dev
@@ -152,11 +152,11 @@ Puis, exécutez le backend :
 ./manage.py runserver 0.0.0.0:8000
 ```
 
-Vous devriez pouvoir vous connecter sur http://localhost:8000 !
+Vous devriez pouvoir vous connecter sur http://localhost:8000, mais la page sera truffée d'erreurs. Il faut charger les données (étape suivante).
 
 ## Chargement de données
 
-### données de démo
+### Option : données de démo
 
 ```bash
 ./manage.py loaddata data/geomatics.json
@@ -174,16 +174,17 @@ site = utils.make_new_site("Example", "example.com", "sender@example.com", "Send
 site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ```
 
-### données de la prod
+### Option : données de la prod
 
 Avec un dump de db de prod, vous pouvez restaurer ces donnés:
 
 ```bash
-sudo -u postgres psql < [path vers le dump]
+psql -U recoco < [path vers le dump]
 ```
 
 
 ### Récupérer les portails existants
+
 Plusieurs portails (ie sites) ont déjà été configurés et sont disponibles sur le dépôt [recoco-portails](https://github.com/betagouv/recoco-portails). Pour y avoir accès en local, il faut cloner ce dépôt dans un dossier `multisites` à la racine du projet global.
 
 Pour créer les bons alias dans l'interface d'administration, exécuter depuis le shell django
@@ -191,7 +192,7 @@ Pour créer les bons alias dans l'interface d'administration, exécuter depuis l
 ```python
 run scripts/create_site_localhost_aliases.py
 ```
-Pour vérifier que ç'a bien fonctionner, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
+Pour vérifier que ç'a bien fonctionné, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
 
 ## Environnement de développement
 
