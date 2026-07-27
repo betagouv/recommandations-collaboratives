@@ -382,7 +382,6 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
 
-@login_required
 class AdvisorAccessRequestEmailConfirmView(TemplateView):
     template_name = "home/advisor-access-request-confirm-email.html"
     login_url = "/accounts/signup"
