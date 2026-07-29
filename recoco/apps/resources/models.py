@@ -144,18 +144,23 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     pass
 
 
+# Fields tracked by reversion for Resource. Reused by the patch-diff view so the
+# comparison only shows tracked fields (see ResourcePatchReviewView).
+RESOURCE_REVISION_FIELDS = (
+    "status",
+    "expires_on",
+    "title",
+    "subtitle",
+    "summary",
+    "content",
+    "category",
+    "contacts",
+    "departments",
+)
+
+
 @reversion.register(
-    fields=(
-        "status",
-        "expires_on",
-        "title",
-        "subtitle",
-        "summary",
-        "content",
-        "category",
-        "contacts",
-        "departments",
-    ),
+    fields=RESOURCE_REVISION_FIELDS,
     follow=("category",),
 )
 class Resource(CloneMixin, models.Model):
@@ -333,8 +338,8 @@ class ResourceRevisionMeta(models.Model):
 
     STATUS_CHOICES = (
         (PENDING, "En attente"),
-        (ACCEPTED, "Accepté"),
-        (REJECTED, "Rejeté"),
+        (ACCEPTED, "Acceptée"),
+        (REJECTED, "Rejetée"),
     )
 
     revision = models.OneToOneField(

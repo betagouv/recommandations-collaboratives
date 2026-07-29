@@ -25,6 +25,26 @@
                 <form method="post" enctype="multipart/form-data" class="fr-form">
                     {% csrf_token %}
                     {% crispy form "dsrc_crispy_forms_no_js" %}
+                    <div class="fr-mb-3w">
+                        <h6 class="fr-mb-1w">Plugins activés</h6>
+                        {% with plugins=request.site.configuration.enabled_plugins %}
+                        {% if plugins %}
+                        <ul class="fr-tags-group">
+                            {% for plugin in plugins %}
+                            <li>
+                                {% if plugin in registered_plugins %}
+                                <p class="fr-tag">{{ plugin }}</p>
+                                {% else %}
+                                <p class="fr-tag fr-background-flat--error fr-text-inverted--error" title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="fr-text--sm fr-text--mention-grey">Aucun plugin activé sur ce site.</p>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
                     <button class="fr-btn" type="submit">Sauvegarder</button>
                 </form>
             </div>

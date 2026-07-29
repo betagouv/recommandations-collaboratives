@@ -3,7 +3,6 @@
 {% load django_vite %}
 {% load humanize %}
 {% load training %}
-{% load hijack %}
 {% block title %}
     Organisations - CRM
 {% endblock title %}
@@ -12,71 +11,118 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/CRM/organizationListCrm.js' %}
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with organizations=True %}
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Organisations' } }"
-         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div x-data="Crm" class="d-flex fr-px-0">
-        <div class="w-100 d-flex flex-column justify-content-start">
-            <div class="fr-px-3w fr-pt-3w fr-mb-2w">
-                {% with organizations.form as form %}
-                    <form class="row g-3"
-                          method="get"
-                          action="{% url 'crm-organization-list' %}">
-                        {{ form.non_field_errors }}
-                        <div class="col-md-6">
-                            <div class="input-group fr-mb-2w">
-                                <input type="text"
-                                       class="form-control"
-                                       name="{{ form.name.name }}"
-                                       id="{{ form.name.id }}"
-                                       placeholder="Nom de l'organisation"
-                                       aria-label="Recherche"
-                                       value="{{ form.name.value|default:"" }}"
-                                       aria-describedby="button-search">
-                                <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
-                            </div>
-                        </div>
-                    </form>
-                {% endwith %}
+    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm org-list-scroll">
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Organisations' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+        <h1 class="fr-h3 fr-px-5v fr-pt-1w">Liste des organisations</h1>
+        <div class="project-list-crm w-100" x-data="OrgMergeSelection({{ just_merged|yesno:'true,false' }})">
+            <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
+                <span class="project-list-crm__projects-count-label">
+                    {% with count=paginator.count %}
+                        {% if count > 0 %}
+                            {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                        {% else %}
+                            Aucun résultat
+                        {% endif %}
+                    {% endwith %}
+                </span>
+                {# Filter form (search + geographic filter) #}
+                <form method="get"
+                      action="{% url 'crm-organization-list' %}"
+                      class="d-flex align-items-center flex-grow-1 gap-3 fr-m-0">
+                    <div class="position-relative flex-grow-1">
+                        {% include "projects/project/fragments/search_bar.html" with name="name" value=organizations.form.name.value placeholder="Taper le nom d'une organisation" show_search_button=True %}
+                    </div>
+                    <div x-data="DepartmentsFilterWrapper({{ selected_departments|default:'[]' }})"
+                         @is-select-all-departments="onSelectAll($event.detail)"
+                         @selected-departments="onSelected($event.detail)"
+                         @user-close-selector="$nextTick(() => $el.closest('form').submit())">
+                        <template x-for="code in (allSelected ? [] : selectedCodes)" :key="code">
+                            <input type="hidden" name="departments" :value="code">
+                        </template>
+                        {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" %}
+                    </div>
+                </form>
+                {# Merge action (drives the table form below through the form= attribute) #}
+                <div class="d-flex align-items-center gap-3 text-nowrap">
+                    <span class="text-secondary font-size-14px"
+                          x-show="selected.length > 0"
+                          x-text="`${selected.length} organisation${selected.length > 1 ? 's' : ''} sélectionnée${selected.length > 1 ? 's' : ''}`"></span>
+                    <button type="submit"
+                            form="org-merge-form"
+                            class="fr-btn fr-btn--sm"
+                            :disabled="selected.length < 2">Fusionner les organisations</button>
+                </div>
             </div>
-            <div class="fr-mb-2w table-responsive fr-px-3w">
-                <form method="get" action="{% url 'crm-organization-merge' %}">
-                    <table class="table table-striped table-hover caption-top">
-                        <div class="d-flex justify-content-between fr-mx-2v">
-                            {% with organizations.qs.count as organizations_count %}
-                                {% if organizations_count > 0 %}
-                                    <span class="fr-ml-2v text-secondary">{{ organizations_count }} résultat{{ organizations_count|pluralize }}</span>
+            <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
+                <form id="org-merge-form"
+                      method="get"
+                      action="{% url 'crm-organization-merge' %}">
+                    {# Submit every selected org (incl. other pages) from persisted state #}
+                    <template x-for="id in selected" :key="id">
+                        <input type="hidden" name="org_ids" :value="id">
+                    </template>
+                    <table class="project-table w-100">
+                        <caption class="fr-ml-2v">
+                            {% with count=paginator.count %}
+                                {% if count > 0 %}
+                                    {{ count }} résultat{{ count|pluralize }}
                                 {% else %}
-                                    <caption class="fr-ml-2v">Aucun résultat</caption>
+                                    Aucun résultat
                                 {% endif %}
                             {% endwith %}
-                            <div class="btn-group">
-                                <button class="btn btn-outline-primary">Fusionner</button>
-                            </div>
-                        </div>
-                        <thead>
+                        </caption>
+                        <colgroup>
+                            <col class="col--medium">
+                            <col class="col--xxl">
+                            <col class="col--xxs">
+                            <col class="col--xxs">
+                            <col class="col--xxs">
+                        </colgroup>
+                        <thead class="project-table__thead">
                             <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Nom</th>
+                                <th scope="col">Organisation</th>
                                 <th scope="col">Départements</th>
+                                <th scope="col">Membres</th>
+                                <th scope="col">Dossiers</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for organization in organizations.qs %}
-                                <tr>
-                                    <td>
-                                        <input name="org_ids" type="checkbox" value="{{ organization.pk }}">
+                            {% for organization in page_obj %}
+                                <tr :class="{ 'is-selected': selected.includes('{{ organization.pk }}') }">
+                                    <td title="{{ organization.name }}">
+                                        <div class="org-name-cell d-flex align-items-center gap-2">
+                                            <input class="flex-shrink-0"
+                                                   type="checkbox"
+                                                   value="{{ organization.pk }}"
+                                                   x-model="selected">
+                                            <a class="fr-link project-table__project-name text-ellipsis"
+                                               href="{% url 'crm-organization-details' organization.pk %}">{{ organization.name }}</a>
+                                        </div>
                                     </td>
                                     <td>
-                                        <a href="{% url 'crm-organization-details' organization.pk %}">{{ organization.name|truncatechars:48 }}</a>
+                                        {% with departments=organization.departments.all %}
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for dpt in departments|slice:":8" %}
+                                                    <span>{{ dpt.name }} ({{ dpt.code }}){% if not forloop.last %}, {% endif %}</span>
+                                                {% empty %}
+                                                    <span>-</span>
+                                                {% endfor %}
+                                                {% if departments|length > 8 %}<span class="fw-bold">+ {{ departments|length|add:"-8" }}</span>{% endif %}
+                                            </div>
+                                        {% endwith %}
                                     </td>
+                                    <td>{{ organization.members_count|default_if_none:"-" }}</td>
+                                    <td>{{ organization.projects_count|default_if_none:"-" }}</td>
                                     <td>
-                                        {% for dpt in organization.departments.all %}
-                                            {{ dpt.name }} ({{ dpt.code }})
-                                            {% if not forloop.last %},{% endif %}
-                                        {% endfor %}
+                                        <a href="{% url 'crm-organization-update' organization.pk %}"
+                                           title="Modifier l'organisation"
+                                           class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline">Modifier</a>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -87,6 +133,7 @@
                         </tbody>
                     </table>
                 </form>
+                {% include "tools/paginator.html" with page_obj=page_obj %}
             </div>
         </div>
     </div>

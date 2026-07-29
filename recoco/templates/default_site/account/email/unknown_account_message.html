@@ -1,0 +1,295 @@
+{% load i18n %}
+{% load waffle_tags %}
+<!DOCTYPE html>
+<html>
+    {# todo refactor email styles #}
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Votre demande de nouveau mot de passe</title>
+        <style>
+      /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+      .container {
+          display: block;
+          margin: 0 auto !important;
+          /* makes it centered */
+          max-width: 580px;
+          padding: 10px;
+          width: 580px;
+      }
+
+      /* This should also be a block element, so that it will fill 100% of the .container */
+      .content {
+          box-sizing: border-box;
+          display: block;
+          margin: 0 auto;
+          max-width: 580px;
+          padding: 10px;
+      }
+
+      /* -------------------------------------
+          HEADER, FOOTER, MAIN
+      ------------------------------------- */
+
+
+      .wrapper {
+          box-sizing: border-box;
+          padding: 20px;
+      }
+
+      .footer {
+          text-align: center;
+          background-color: #f6f6f6;
+          padding: 15px;
+      }
+
+      .banner {
+          background-color: #f6f6f6;
+          display: flex;
+          justify-content: center !important;
+          padding: 15px;
+      }
+
+      .banner p {
+          vertical-align: middle;
+          margin-left: 10px;
+      }
+
+      /* -------------------------------------
+          TYPOGRAPHY
+      ------------------------------------- */
+
+      p a {
+          color: #3498db;
+      }
+
+      strong a {
+          color: #3498db;
+      }
+
+      /* -------------------------------------
+          BUTTONS
+      ------------------------------------- */
+      .btn-primary {
+          border-radius: 1px;
+          background-color: #000091;
+          color: #ffffff !important;
+          text-decoration: none;
+          font-weight: 700;
+      }
+
+      .btn-secondary {
+          border-radius: 1px;
+          background-color: #ffffff;
+          border: 1px solid #000091;
+          display: inline-block;
+          padding: 6px 8px;
+          margin: auto;
+          color: #000091 !important;
+          text-decoration: none;
+          font-weight: 700;
+      }
+
+      /* -------------------------------------
+          OTHER STYLES THAT MIGHT BE USEFUL
+      ------------------------------------- */
+      .align-center {
+          text-align: center;
+      }
+
+      .mt0 {
+          margin-top: 0;
+      }
+
+      .mb0 {
+          margin-bottom: 0;
+      }
+
+      .text-strong {
+          font-size: 140%;
+          font-weight: 700;
+      }
+
+      .text-small {
+          font-size: 75%;
+      }
+
+      hr {
+          border: 0;
+          border-bottom: 1px solid #f6f6f6;
+          Margin: 20px 0;
+      }
+
+
+      /* -------------------------------------
+        RESPONSIVE AND MOBILE FRIENDLY STYLES
+      ------------------------------------- */
+      @media only screen and (max-width: 620px) {
+          table[class=body] h1 {
+              font-size: 28px !important;
+              margin-bottom: 10px !important;
+          }
+
+          table[class=body] p,
+          table[class=body] ul,
+          table[class=body] ol,
+          table[class=body] td,
+          table[class=body] span,
+          table[class=body] a {
+              font-size: 16px !important;
+          }
+
+          table[class=body] .wrapper,
+          table[class=body] .article {
+              padding: 10px !important;
+          }
+
+          table[class=body] .content {
+              padding: 0 !important;
+          }
+
+          table[class=body] .container {
+              padding: 0 !important;
+              width: 100% !important;
+          }
+
+          table[class=body] .main {
+              border-left-width: 0 !important;
+              border-radius: 0 !important;
+              border-right-width: 0 !important;
+          }
+
+          table[class=body] .btn table {
+              width: 100% !important;
+          }
+
+          table[class=body] .btn a {
+              width: 100% !important;
+          }
+
+          table[class=body] .img-responsive {
+              height: auto !important;
+              max-width: 100% !important;
+              width: auto !important;
+          }
+      }
+
+      /* -------------------------------------
+        PRESERVE THESE STYLES IN THE HEAD
+      ------------------------------------- */
+      @media all {
+          .ExternalClass {
+              width: 100%;
+          }
+
+          .ExternalClass,
+          .ExternalClass p,
+          .ExternalClass span,
+          .ExternalClass font,
+          .ExternalClass td,
+          .ExternalClass div {
+              line-height: 100%;
+          }
+
+          .apple-link a {
+              color: inherit !important;
+              font-family: inherit !important;
+              font-size: inherit !important;
+              font-weight: inherit !important;
+              line-height: inherit !important;
+              text-decoration: none !important;
+          }
+      }
+
+      /* use after email rework */
+
+      body {
+          margin: 0;
+          font-family: sans-serif;
+      }
+
+      table {
+          width: 100%;
+      }
+        </style>
+    </head>
+    <body>
+        <div class="banner">
+            {% if current_site.configuration.email_logo %}
+                <img src="https://{{ current_site.domain }}{{ current_site.configuration.email_logo.url }}"
+                     width="auto"
+                     height="40px"
+                     alt="" />
+            {% else %}
+                <p>{{ current_site.name }}</p>
+            {% endif %}
+        </div>
+        <table border="0" cellpadding="0" cellspacing="0" class="body">
+            <tr>
+                <td>&nbsp;</td>
+                <td class="container">
+                    <div class="content">
+                        <!-- START CENTERED WHITE CONTAINER -->
+                        <table class="main">
+                            <!-- START MAIN CONTENT AREA -->
+                            <tr>
+                                <td class="wrapper">
+                                    <table border="0" cellpadding="6" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <p>Bonjour,</p>
+                                                <p>
+                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe ou un code pour vous connecter
+                                                    sur {{ current_site.name }}. Cependant, nous n'avons pas de compte utilisateur associé à votre
+                                                    adresse.
+                                                </p>
+                                                <p>Pour créer votre compte, vous pouvez :</p>
+                                                <ul>
+                                                    {% flag "enable_submit_new_project" %}
+                                                        <li>
+                                                            <a class="fr-link"
+                                                            href="https://{{ current_site.domain }}{% url 'onboarding-project' %}">déposer
+                                                            une demande d'accompagnement</a>
+                                                        </li>
+                                                    {% endflag %}
+                                                    <li>
+                                                        <a class="fr-link"
+                                                           href="https://{{ current_site.domain }}{% url 'account_signup' %}?next=/advisor-access-request">demander un
+                                                        accès en tant que conseiller aux dossiers de votre territoire sur {{ current_site.name }}</a>
+                                                    </li>
+                                                    <li>
+                                                        vous faire inviter sur un dossier déjà existant. Pour cela, rapprochez-vous de personnes déjà
+                                                        membres du dossier sur {{ current_site.name }} pour qu'elles vous y invitent.
+                                                    </li>
+                                                </ul>
+                                                <p>
+                                                    En cas de difficulté, vous pouvez joindre les administrateurs du service
+                                                    sur <a href="mailto:{{ current_site.configuration.contact_form_recipient }}">{{ current_site.configuration.contact_form_recipient }}</a>.
+                                                </p>
+                                                <p>
+                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe ou de connexion, vous pouvez
+                                                    ignorer cet email.
+                                                </p>
+                                                <p>
+                                                    Cordialement,
+                                                    <br>
+                                                    L'équipe de {{ current_site.name }}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- END MAIN CONTENT AREA -->
+                        </table>
+                        <!-- END CENTERED WHITE CONTAINER -->
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="footer">
+            <p>{{ current_site.name }}</p>
+            <p>Cet email a été adressé à {{ user.email }}</p>
+        </div>
+    </body>
+</html>

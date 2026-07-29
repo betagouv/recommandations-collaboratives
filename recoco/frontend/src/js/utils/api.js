@@ -43,6 +43,7 @@ export function projectsUrl({
   limit = 2000,
   offset = 0,
   page = 1,
+  myProjects = false,
   status = [
     'PRE_DRAFT',
     'DRAFT',
@@ -75,6 +76,9 @@ export function projectsUrl({
   if (status.length) {
     status = status.map((status) => `status=${status}`).join('&');
     url = url + '&' + status;
+  }
+  if (myProjects) {
+    url = url + '&my_projects=true';
   }
   return url;
 }
@@ -291,14 +295,6 @@ export function editTaskUrl(taskId, next = null) {
 
 export function deleteTaskUrl(taskId) {
   return `/task/${taskId}/delete/`;
-}
-
-export function deleteTaskReminderUrl(taskId) {
-  return `/task/${taskId}/remind-delete/`;
-}
-
-export function editReminderUrl(taskId) {
-  return `/task/${taskId}/remind/`;
 }
 
 // Conversations

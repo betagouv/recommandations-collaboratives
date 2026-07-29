@@ -16,7 +16,6 @@ from actstream import models as action_models
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
-from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -27,12 +26,10 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
-from recoco.apps.demarches_simplifiees.models import DSResource
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models, utils
-from recoco.apps.resources.models import Resource
 from recoco.apps.tasks import models as task_models
 from recoco.apps.tasks import signals
 from recoco.utils import get_group_for_site, login
@@ -74,6 +71,8 @@ def test_other_projects_are_not_stored_in_session(client):
 ######
 # Sharing link
 ######
+
+
 @pytest.mark.django_db
 def test_project_access_proper_sharing_link(request, client):
     current_site = get_current_site(request)
@@ -93,35 +92,6 @@ def test_project_fails_unknown_sharing_link(request, client):
     url = reverse("projects-project-sharing-link", kwargs={"project_ro_key": "unkown"})
     response = client.get(url)
     assert response.status_code == 404
-
-
-########################################################################
-# login
-########################################################################
-
-
-@pytest.mark.django_db
-@override_settings(DEBUG=True)
-def test_existing_user_receives_email_on_login(client, settings, mailoutbox):  # noqa
-    user = Recipe(auth.User, email="jdoe@example.com").make()
-    url = reverse("magicauth-login")
-
-    response = client.post(url, data={"email": user.email})
-
-    assert response.status_code == 302
-    assert len(mailoutbox) == 1
-    assert user.email in mailoutbox[0].to
-
-
-@pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client, mailoutbox):
-    email = "jdoe@example.com"
-    url = reverse("magicauth-login")
-    response = client.post(url, data={"email": email})
-    assert response.status_code == 302
-    assert auth.User.objects.get(email=email)
-    assert len(mailoutbox) == 1
-    assert email in mailoutbox[0].to
 
 
 ########################################################################
@@ -372,81 +342,18 @@ def test_project_knowledge_allows_empty_questionset(request, client, project):
     assert response.status_code == 200
 
 
-# actions
+# actions (legacy URL — redirect to conversations tab with action panel open)
 @pytest.mark.django_db
-@pytest.mark.skip
-def test_project_actions_not_available_for_non_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+def test_project_actions_redirects_to_conversations(request, client, project):
     url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-@pytest.mark.skip
-def test_project_actions_available_for_owner(request, client, project):
+    expected = (
+        reverse("projects-project-detail-conversations", args=[project.id]) + "#actions"
+    )
     with login(client) as user:
         utils.assign_collaborator(user, project)
-        url = reverse("projects-project-detail-actions", args=[project.id])
         response = client.get(url)
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-@pytest.mark.skip
-def test_project_actions_available_for_switchtender(request, client, project):
-    site = get_current_site(request)
-    url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["example_com_advisor"]) as user:
-        utils.assign_advisor(user, project, site)
-        response = client.get(url)
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-@pytest.mark.skip
-def test_project_actions_available_for_restricted_switchtender(
-    request, client, make_project
-):
-    other = Recipe(geomatics.Department, code="02").make()
-    site = get_current_site(request)
-    project = make_project(
-        commune__departments__code="01",
-        site=site,
-    )
-    url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["example_com_advisor"]) as user:
-        utils.assign_advisor(user, project, site)
-        user.profile.departments.add(other)
-        response = client.get(url)
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-@pytest.mark.skip
-def test_project_actions_with_has_ds_resource(request, client, project):
-    site = get_current_site(request)
-    resource = Recipe(
-        Resource,
-        sites=[site],
-        status=Resource.PUBLISHED,
-    ).make()
-    baker.make(
-        DSResource,
-        resource=resource,
-        schema={"number": 42},
-    )
-    Recipe(task_models.Task, resource=resource, project=project).make()
-
-    url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["example_com_advisor"]) as user:
-        utils.assign_advisor(user, project, site)
-        response = client.get(url)
-        assert response.context["project"].tasks.first().resource.has_dsresource
-        assert reverse("projects-task-ds-prefill", args=(0,)) in str(
-            response.content
-        )  # 0 because it is modified by js
+    assert response.status_code == 302
+    assert response.url == expected
 
 
 # conversations
@@ -651,22 +558,6 @@ def test_project_detail_contains_informations(request, client, project):
     assertContains(response, project.description)
     assertContains(response, task.content)
     assertContains(response, note.content)
-
-
-@pytest.mark.skip(reason="waiting for UI fix")
-@pytest.mark.django_db
-def test_project_detail_contains_actions_for_assigned_advisor(request, client, project):
-    site = get_current_site(request)
-
-    url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client) as user:
-        utils.assign_advisor(user, project, site)
-
-        response = client.get(url)
-    assert response.status_code == 200
-
-    add_task_url = reverse("projects-create-task")
-    assertContains(response, add_task_url)
 
 
 ########################################################################

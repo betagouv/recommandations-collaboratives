@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from notifications import models as notifications_models
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
@@ -11,6 +12,18 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
+
+
+class TopicSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Topic
+
+        fields = ["name"]
+
+
+class TopicListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.name
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -78,14 +91,23 @@ class ProjectSerializer(
             "advisors_note",
             "exclude_stats",
             "muted",
+            "deleted",
+            "topics",
+            "orga_owner",
+        ]
+
+        read_only_fields = [
+            "exclude_stats",
+            "muted",
+            "deleted",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
     tags = TagListSerializerField()
+    project_sites = InlineProjectSiteSerializer(read_only=True, many=True)
+    commune = CommuneSerializer(read_only=True)
 
     recommendation_count = serializers.SerializerMethodField()
-
-    project_sites = InlineProjectSiteSerializer(read_only=True, many=True)
 
     def get_recommendation_count(self, obj):
         return task_models.Task.on_site.published().filter(project=obj).count()
@@ -99,8 +121,6 @@ class ProjectSerializer(
 
     def get_private_message_count(self, obj):
         return Note.on_site.private().filter(project=obj).count()
-
-    commune = CommuneSerializer(read_only=True)
 
     latitude = serializers.SerializerMethodField()
 
@@ -120,15 +140,16 @@ class ProjectSerializer(
         ):
             return obj.advisors_note
 
-    exclude_stats = serializers.SerializerMethodField()
+    topics = TopicListingField(read_only=True, many=True)
 
-    def get_exclude_stats(self, obj):
-        return obj.exclude_stats
+    orga_owner = SerializerMethodField()
 
-    muted = serializers.SerializerMethodField()
-
-    def get_muted(self, obj):
-        return obj.muted
+    def get_orga_owner(self, obj):
+        return (
+            obj.owner.profile.organization.name
+            if obj.owner and obj.owner.profile.organization
+            else ""
+        )
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -207,7 +228,7 @@ class ProjectForListSerializer(BaseSerializerMixin):
         commune = data.commune
         commune_data = format_commune(commune)
 
-        return {
+        result = {
             "id": data.id,
             "name": data.name,
             "description": data.description,
@@ -229,7 +250,20 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "owner": format_owner(data),
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,
+            "advisors_note": data.advisors_note,
+            "deleted": data.deleted,
+            "topics": [t.name for t in data.topics.all()],
+            "orga_owner": (
+                data.owner.profile.organization.name
+                if data.owner and data.owner.profile.organization
+                else ""
+            ),
         }
+
+        for field_name in self.context.get("plugin_extra_fields", []):
+            result[field_name] = getattr(data, field_name, None)
+
+        return result
 
 
 class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
@@ -348,13 +382,6 @@ def format_sites(project):
         }
         for ps in project.project_sites.all()
     ]
-
-
-class TopicSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Topic
-
-        fields = ["name"]
 
 
 # eof

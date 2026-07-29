@@ -92,7 +92,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                           :key="reco.id">
                                     <div class="fr-mb-3v">
                                         <!-- Date header with grouping -->
-                                        <template x-if="index === 0 || formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
+                                        <template x-if="index === 0 || formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' }) !== formatDate($store.sharedContentsPanel.recommendations[index - 1]?.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                             <p class="shared-contents-panel__date-header"
                                                x-text="formatDate(reco.messageCreated, { year: 'numeric', month: 'long', day: 'numeric' })">
                                             </p>

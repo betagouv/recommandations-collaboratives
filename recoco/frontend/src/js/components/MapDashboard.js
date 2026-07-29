@@ -3,10 +3,10 @@ import api, { projectsUrl } from '../utils/api';
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl';
+import mapUtils from '../utils/map';
 
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
-import 'leaflet-providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import _ from 'lodash';
@@ -73,47 +73,40 @@ function MapDashboard(currentSiteId, regions) {
           searchText: searchText,
           departments: searchDepartment,
           status: ['TO_PROCESS', 'STUCK', 'READY', 'IN_PROGRESS', 'DONE'],
+          myProjects: this.isDisplayingOnlyUserProjects,
         })
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(
         projects.data.results,
         this.currentSiteId
       );
-      this.projectListFiltered = [...this.projectList];
-      this.filterMyProjects();
+      this.renderMap();
     },
 
-    filterMyProjects() {
-      if (this.isDisplayingOnlyUserProjects) {
-        this.projectListFiltered = this.projectList.filter(
-          (d) => d.is_observer || d.is_switchtender
-        );
-      } else {
-        this.projectListFiltered = [...this.projectList];
-      }
+    renderMap() {
       if (this.map) {
         this.map.remove();
       }
       if (this.markersLayer) {
         this.markersLayer.remove();
       }
-      const { map, markersLayer } = initMap(this.projectListFiltered);
+      const { map, markersLayer } = initMap(this.projectList);
       this.map = map;
       this.markersLayer = markersLayer;
-      if (this.projectListFiltered.length > 0) {
+      if (this.projectList.length > 0) {
         zoomToCentroid(this.map, this.markersLayer);
       } else {
         setTimeout(() => this.map.invalidateSize(), 251);
       }
     },
 
-    toggleMyProjectsFilter() {
+    async toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
       localStorage.setItem(
         'isDisplayingOnlyUserProjects',
         this.isDisplayingOnlyUserProjects
       );
-      this.filterMyProjects();
+      await this.getDataFiltered();
     },
 
     async onSearch(event) {
@@ -132,16 +125,6 @@ function MapDashboard(currentSiteId, regions) {
 
 // Map base layer
 function initMap(projects) {
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }
-  );
-
   // Guard against double-initialization on the same container
   const existing = L.DomUtil.get('map');
   if (existing && existing._leaflet_id) {
@@ -150,9 +133,9 @@ function initMap(projects) {
   }
   const map = L.map('map').setView([48.51, 10.2], 2);
 
-  L.tileLayer.provider('CartoDB.Positron').addTo(map);
+  mapUtils.initPlanIGNLayer().addTo(map);
 
-  const markers = createMapMarkers(map, projects);
+  const markers = createMapMarkers(projects);
 
   const markersLayer = createMarkersLayer(map, markers);
 
@@ -161,7 +144,7 @@ function initMap(projects) {
 
 //Create a layer in order to zoom-in at the center of each markers
 function createMarkersLayer(map, markers) {
-  const markersLayer = new L.FeatureGroup();
+  const markersLayer = mapUtils.createMarkerClusterGroup();
   markers.forEach((marker) => {
     if (marker) markersLayer.addLayer(marker);
   });
@@ -175,7 +158,7 @@ function zoomToCentroid(map, markersLayer) {
 }
 
 // Crete layers composed with markers
-function createMapMarkers(map, projects) {
+function createMapMarkers(projects) {
   return projects.map((item) => {
     let lat = item.latitude || item.commune?.latitude;
     let long = item.longitude || item.commune?.longitude;
@@ -183,11 +166,12 @@ function createMapMarkers(map, projects) {
       lat = lat + Math.random() * 0.001;
       long = long + Math.random() * 0.001;
 
-      return L.marker([lat, long], { icon: createMarkerIcon(item) })
-        .addTo(map)
-        .bindPopup(markerPopupTemplate(item), {
+      return L.marker([lat, long], { icon: createMarkerIcon(item) }).bindPopup(
+        markerPopupTemplate(item),
+        {
           maxWidth: 'auto',
-        });
+        }
+      );
     }
   });
 }

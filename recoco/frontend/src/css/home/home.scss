@@ -135,6 +135,9 @@ span.step {
 
   &__sub-container {
     position: relative;
+    max-width: 78rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   &__text-part {

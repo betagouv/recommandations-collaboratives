@@ -34,6 +34,7 @@ from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+from recoco.utils import make_site_slug
 
 from . import apps
 
@@ -80,6 +81,8 @@ class SiteActionManager(CurrentSiteManager, ActionManager):
 
 class UserProfileManager(models.Manager):
     """Manager for active UserProfile"""
+
+    use_in_migrations = True
 
     def get_queryset(self):
         return (
@@ -151,6 +154,10 @@ class UserProfile(models.Model):
     deleted = models.DateTimeField(null=True, blank=True)
 
     disabled = models.DateTimeField(null=True, blank=True)
+
+    login_with_code = models.BooleanField(default=False)
+
+    requires_2fa = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "profil utilisateur"
@@ -277,6 +284,24 @@ class SiteConfiguration(models.Model):
         default=True,
         verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
+
+    schema_name = models.SlugField(
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Le schema PgSQL pour ce portail.",
+    )
+
+    enabled_plugins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Liste des plugins activés sur ce portail",
+    )
+
+    def save(self, *args, **kwargs):
+        if self.enabled_plugins and not self.schema_name:
+            self.schema_name = make_site_slug(self.site)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"

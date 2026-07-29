@@ -9,6 +9,7 @@
 {% load common_tags %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/styles/crm_dashboard.css.js' %}
 {% endblock js %}
 {% block title %}
     CRM
@@ -20,188 +21,191 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% get_verbs as verbs %}
+    {% if 'moderate_projects' in user_site_perms %}
+        {% get_project_moderation_count as projects_to_moderate_count %}
+        {% get_advisor_access_requests_count as advisor_access_requests_count %}
+    {% endif %}
     {% include "crm/fragments/navigation.html" with dashboard=True %}
-    <div x-data="Crm" class="fr-px-0">
-        <div class="w-100 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-3w fr-py-2w fr-pt-3w {% if active_project %}fr-mb-2w{% endif %}">
-                <h3 class="d-flex align-items-center">
-                    <span class="fs-3">
-                        <img src="{% gravatar_url user.email 40 %}"
-                             alt="{{ user.get_full_name }}"
-                             class="fr-mr-2v rounded-circle align-middle img-specific-size" />
-                        <span class="align-middle">Salut, {{ request.user.first_name|default:request.user.username }} !</span>
-                    </span>
-                </h3>
-                <span class="fs-5 text-secondary">Bienvenue dans l'interface de gestion du portail {{ request.site.name }}</span>
-            </div>
-            <div class="d-flex flex-column">
-                <div class="fr-pt-2w fr-px-3w fr-pb-2w">
-                    <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                        <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil" />
-                        </svg>
-                        <span>Gestion</span>
-                    </h5>
-                    <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                        <li class="fr-mr-2v col-2">
-                            {% url 'crm-user-list' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Utilisateur·trice·s" icon="person-circle" %}
-                        </li>
-                        <li class="fr-mr-2v col-2">
-                            {% url 'crm-project-list' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Dossiers" icon="folder-fill" %}
-                        </li>
-                        <li class="fr-mr-2v col-2">
-                            {% url 'crm-organization-list' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Organisations" icon="building" %}
-                        </li>
-                    </ul>
-                </div>
-                <div class="fr-px-3w fr-pb-2w">
-                    <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                        <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bar-chart-fill" />
-                        </svg>
-                        <span>Métriques</span>
-                    </h5>
-                    <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                        <li class="fr-mr-2v col-2">
-                            {% url 'crm-project-list-by-tags' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Tags / Projects" icon="tag-fill" %}
-                        </li>
-                        <li class="fr-mr-2v col-2 ">
-                            {% url 'crm-list-projects-low-reach' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Dossiers à faible répondant" icon="chat-square-dots" %}
-                        </li>
-                        <li class="fr-mr-2v col-2 ">
-                            {% url 'crm-list-tags' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des tags du crm" icon="activity" %}
-                        </li>
-                        <li class="fr-mr-2v col-2 ">
-                            {% url 'crm-list-topics' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des thématiques" icon="boxes" %}
-                        </li>
-                        <li class="fr-mr-2v col-2 ">
-                            {% url 'crm-reco-without-resources' as url %}
-                            {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Recos sans ressource" icon="suit-club" %}
-                        </li>
-                    </ul>
-                </div>
-                {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.access_admin %}
-                    <div class="fr-pb-2w fr-px-3w">
-                        <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                            <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sliders" />
-                            </svg>
-                            <span>Configuration</span>
-                        </h5>
-                        <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                            {% if "manage_configuration" in user_site_perms %}
-                                <li class="fr-mr-2v col-2">
-                                    {% url 'crm-site-configuration' as url %}
-                                    {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Paramètres du Site" icon="gear" %}
-                                </li>
-                            {% endif %}
-                            {% if perms.wagtailadmin.access_admin %}
-                                <li class="fr-mr-2v col-2">
-                                    {% url 'wagtailadmin_home' as url %}
-                                    {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pages Statiques" icon="pen" %}
-                                </li>
-                            {% endif %}
-                            <li class="fr-mr-2v col-2">
-                                {% url 'projects-task-recommendation-list' as url %}
-                                {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" %}
-                            </li>
-                            {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
-                                <li class="fr-mr-2v col-2">
-                                    {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}
-                                    {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Questionnaire" icon="question-circle" %}
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                {% endif %}
-                {% if is_staff %}
-                    <div class="fr-pb-2w fr-px-3w">
-                        <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
-                            <svg class="fr-mr-2v bi align-middle" width="18" height="18">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#people-fill" />
-                            </svg>
-                            <span>Compte</span>
-                        </h5>
-                        <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                            <li class="fr-mr-2v col-2">
-                                {% url 'mfa_activate_totp' as url %}
-                                {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Authentification forte" icon="lock-fill" %}
-                            </li>
-                            <li class="fr-mr-2v col-2">
-                                {% url 'account_email' as email_url_ %}
-                                {% include "crm/fragments/crm_icon_button.html" with link_url=email_url_ name="Vérifier l'adresse email" icon="envelope-fill" %}
-                            </li>
-                            <li class="fr-mr-2v col-2">
-                                {% url 'mfa_index' as mfa_url_ %}
-                                {% include "crm/fragments/crm_icon_button.html" with link_url=mfa_url_ name="Gestion de la double authentification" icon="lock-fill" %}
-                            </li>
-                        </ul>
-                    </div>
-                {% endif %}
-            </div>
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Accueil' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}
+    </div>
+    <div class="crm-home fr-p-5v">
+        <div class="crm-header">
+            <h3 class="crm-header__title">
+                Bienvenue sur l’Administration
+            </h3>
         </div>
-        <div class="w-100 fr-px-3w fr-pt-1v bg-light crm-timeline-min-height">
-            <h3 class="fr-mt-2w">
-                <svg class="bi align-middle" width="24" height="24">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightning-fill" />
-                </svg>
-                <span class="align-middle">Activité de l'ensemble des dossiers</span>
-            </h3>
-            <ul class="bg-white fr-pt-2w fr-px-3w border rounded crm-activity">
-                <div class="fr-p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
-                    <article class="overflow-hidden">
-                        {% for action in site_action_stream|slice:":30" %}
-                            {% include "crm/fragments/activity_action.html" %}
-                        {% empty %}
-                            -- Pas encore d'activité de la part du staff --
-                        {% endfor %}
-                    </article>
-                    <a class="button filled grey small inherit fw-bold fr-mt-3w fr-mb-3w"
-                       href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
-                </div>
-            </ul>
-            <h3 class="fr-mt-2w">
-                <svg class="bi align-middle" width="24" height="24">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#people" />
-                </svg>
-                <span class="align-middle">Connexions</span>
-            </h3>
-            {% activity_stream "model_actions" user_model %}
-            <ul class="list-group">
-                {% for action in stream|slice:":200" %}
-                    {% if action.verb == verbs.User.LOGIN %}
-                        <li class="list-group-item">
-                            <span class="text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
-                            <a class="font-small"
-                               href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
-                            {{ action.actor.last_name|default:"" }}</a>
-                            <span class="font-small">{{ action.verb }}</span>
-                        </li>
+        <div x-data="Crm" class="fr-px-0 d-flex">
+            <div class="crm-home__section d-flex flex-column justify-content-start">
+                <div class="d-flex flex-column">
+                    {% if projects_to_moderate_count or advisor_access_requests_count %}
+                        <div class="fr-pb-4w">
+                            <h4 class="crm-home__subtitle fr-mb-1v">
+                                Alertes
+                            </h4>
+                            <div class="gap-2 d-flex flex-wrap">
+                                <div class="crm-home__card-container">
+                                    {% url "projects-moderation-list" as url %}
+                                    {% with text="Nouveaux dossiers ou demandes d’accès conseiller à modérer" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url anchor=advisor_access_requests_count|yesno:"?view=advisor,?view=projects" name="Nouvelles demandes à modérer" icon="fr-icon-error-warning-line" text=text is_alert=True nb_alert=projects_to_moderate_count|add:advisor_access_requests_count %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
-                {% empty %}
-                    -- Pas encore d'activité, revenez plus tard ! --
-                {% endfor %}
-            </ul>
-            <h3 class="fr-mt-2w d-inline-block">
-                <svg class="bi align-middle" width="24" height="24">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#journal-check" />
-                </svg>
-                <span class="align-middle">Mes dernières actions</span>
-            </h3>
-            <ul class="list-group">
-                {% for task in request.user.tasks_created.all|slice:":200" %}
-                    <li class="list-group-item font-small">
-                        <a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})
-                    </li>
-                {% endfor %}
-            </ul>
+                    <div class="fr-pb-4w">
+                        <h4 class="crm-home__subtitle fr-mb-1v">
+                            Tâches récurrentes
+                        </h4>
+                        <div class="gap-2 d-flex flex-wrap">
+                            <div class="crm-home__card-container">
+                                {% url 'crm-list-projects-low-reach' as url %}
+                                {% with text="Rappelez les demandeurs qui n’ont pas lu les recommandations ou donné de nouvelles" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers à relancer" icon="fr-icon-phone-line" text=text %}
+                                {% endwith %}
+                            </div>
+                            <div class="crm-home__card-container">
+                                {% url 'crm-reco-without-resources' as url %}
+                                {% with text="Transformez les recommandations de texte libre en ressources réutilisables" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Recommandations sans ressource" icon="fr-icon-book" text=text %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fr-pb-4w">
+                        <h4 class="crm-home__subtitle fr-mb-1v">
+                            Données
+                        </h4>
+                        <div class="gap-2 d-flex flex-wrap">
+                            <div class="crm-home__card-container">
+                                {% url 'crm-user-list' as url %}
+                                {% with text="Gestion de vos utilisateurs, suivi de leur activité" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Utilisateurs" icon="fr-icon-group" text=text %}
+                                {% endwith %}
+                            </div>
+                            <div class="crm-home__card-container">
+                                {% url 'crm-project-list' as url %}
+                                {% with text="Gestion de vos dossiers, suivi de leur activité" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Dossiers" icon="fr-icon-file" %}
+                                {% endwith %}
+                            </div>
+                            <div class="crm-home__card-container">
+                                {% url 'crm-organization-list' as url %}
+                                {% with text="Gestion de vos organisations, suivi d’activité et possibilité de les fusionner" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Organisations" icon="fr-icon-building-line" text=text %}
+                                {% endwith %}
+                            </div>
+                            <div class="crm-home__card-container">
+                                {% url 'crm-project-list-by-tags' as url %}
+                                {% with text="Usage des tags et sur quels dossiers ils sont employés" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags sur les dossiers" icon="fr-icon-tag-line" text=text %}
+                                {% endwith %}
+                            </div>
+                            <div class="crm-home__card-container">
+                                {% url 'crm-list-tags' as url %}
+                                {% with text="Usage des tags employés dans les notes du CRM" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Tags des notes CRM" icon="fr-icon-tag-line" %}
+                                {% endwith %}
+                            </div>
+                            <div class="crm-home__card-container">
+                                {% url 'crm-list-topics' as url %}
+                                {% with text="Usage des thématiques employées sur les dossiers et sur les recommandations" %}
+                                    {% include "crm/fragments/crm_home_card.html" with link_url=url name="Thématiques des dossiers et recos" icon="fr-icon-books" text=text %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.access_admin %}
+                        <div class="fr-pb-4w">
+                            <h4 class="crm-home__subtitle fr-mb-1v">
+                                Configuration du portail
+                            </h4>
+                            <div class="gap-2 d-flex flex-wrap">
+                                {% if "manage_configuration" in user_site_perms %}
+                                    <div class="crm-home__card-container">
+                                        {% url 'crm-site-configuration' as url %}
+                                        {% with text="Infos légales, email de contact, logos utilisés, tags d’impact etc" %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Paramètres du portail" icon="fr-icon-settings" text=text %}
+                                        {% endwith %}
+                                    </div>
+                                {% endif %}
+                                {% if perms.wagtailadmin.access_admin %}
+                                    <div class="crm-home__card-container">
+                                        {% url 'wagtailadmin_home' as url %}
+                                        {% with text="Création et modification des pages-vitrines (cas d’usage, actualités etc.)" %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="CMS Pages-vitrines" icon="fr-icon-article" text=text %}
+                                        {% endwith %}
+                                    </div>
+                                {% endif %}
+                                <div class="crm-home__card-container">
+                                    {% url 'projects-task-recommendation-list' as url %}
+                                    {% with text="Scénarios qui permettent de suggérer aux conseillers des ressources à recommander" %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=url name="Pré-fléchage de ressources" icon="fr-icon-swap-lines" text=text %}
+                                    {% endwith %}
+                                </div>
+                                {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
+                                    <div class="crm-home__card-container">
+                                        {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}
+                                        {% with text="Gestion des questions, choix de réponses et réponses affichées du questionnaire initial" %}
+                                            {% include "crm/fragments/crm_home_card.html" with link_url=url name="Questionnaire d’état des lieux" icon="fr-icon-questionnaire" text=text %}
+                                        {% endwith %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if is_staff %}
+                        <div class="fr-pb-4w">
+                            <h4 class="crm-home__subtitle fr-mb-1v">
+                                Sécurité de votre compte
+                            </h4>
+                            <div class="gap-2 d-flex flex-wrap">
+                                <div class="crm-home__card-container">
+                                    {% url 'account_email' as email_url_ %}
+                                    {% with text="Confirmez que vous avez accès à votre adresse email" %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=email_url_ name="Vérification de l'adresse email" icon="fr-icon-mail-line" text=text %}
+                                    {% endwith %}
+                                </div>
+                                <div class="crm-home__card-container">
+                                    {% url 'mfa_index' as mfa_url_ %}
+                                    {% with text="Gérez la double authentification pour protéger l’accès à votre compte" %}
+                                        {% include "crm/fragments/crm_home_card.html" with link_url=mfa_url_ name="Double authentification" icon="fr-icon-fingerprint" text=text %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <h3 class="fr-mt-2w">
+                    <span class="align-middle">Connexions</span>
+                </h3>
+                {% activity_stream "model_actions" user_model %}
+                <ul class="list-group">
+                    {% for action in stream|slice:":200" %}
+                        {% if action.verb == verbs.User.LOGIN %}
+                            <li class="list-group-item">
+                                <span class="text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
+                                <a class="font-small"
+                                href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
+                                {{ action.actor.last_name|default:"" }}</a>
+                                <span class="font-small">{{ action.verb }}</span>
+                            </li>
+                        {% endif %}
+                    {% empty %}
+                        -- Pas encore d'activité, revenez plus tard ! --
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="crm-home__sidebar fr-px-3w fr-pt-1v crm-timeline-min-height d-flex flex-column">
+                <h3 class="crm-home__subtitle fr-mt-2w">Activité de l'ensemble des dossiers</h3>
+                <div class="crm-home__timeline">
+                    {% include "crm/timeline.html" with actions=site_action_stream %}
+                </div>
+                <div class="d-flex justify-content-center">
+                    <a class="button filled grey small inherit fw-bold fr-mt-3w fr-mb-3w"
+                        href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}

@@ -39,10 +39,20 @@
             <div class="d-flex flex-column justify-content-between align-items-start">
                 <h2 class="fr-mb-3v d-flex align-items-center">Connexion à {{ site.name }}</h2>
                 <p class="fr-mb-4v">
-                    Connectez vous à votre espace {{ site.name }} en utilisant vos identifiants ou votre compte ProConnect
+                    Connectez vous à votre espace {{ site.name }} en utilisant
+                    {% flag "login_with_credentials" %}
+                        vos identifiants
+                    {% endflag %}
+                    {% flag "login_with_credentials" and "proconnect_login" %}
+                        ou
+                    {% endflag %}
+                    {% flag "proconnect_login" %}
+                        votre compte ProConnect
+                    {% endflag %}
                 </p>
             </div>
             <div class="d-flex justify-content-center">
+                {% flag "login_with_credentials" %}
                 <div class="{% flag "proconnect_login" %}w-50 {% else %}w-100 {% endflag %}fr-p-4v">
                     {% comment %} <div class="w-50 fr-p-4v"> {% endcomment %}
                     <form class="login fr-form-group"
@@ -87,7 +97,7 @@
                                                href="{% url 'account_reset_password' %}">Réinitialisez votre mot de passe</a>
                                         </p>
                                         <p class="font-size-14px fr-mb-0">
-                                            Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="/login/">Connectez-vous par email</a>
+                                            Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="{% url 'account_request_login_code' %}">Connectez-vous par email</a>
                                         </p>
                                     </div>
                                 </div>
@@ -95,9 +105,10 @@
                         </fieldset>
                     </form>
                 </div>
+                {% endflag %}
                 <!-- Proconnect -->
                 {% flag "proconnect_login" %}
-                <div class="w-50 fr-ml-5v login-page__proconnect">
+                <div class="{% flag "login_with_credentials" %}w-50 fr-ml-5v {% else %}w-100 {% endflag %} login-page__proconnect">
                     <h3 class="fr-mb-2w d-block login-page__title">Pro Connect</h3>
                     <div class="fr-connect-group text-align-center fr-m-auto">
                         <form action="{% provider_login_url 'proconnect' process='process' %}">
@@ -121,15 +132,17 @@
         <div class="d-flex fr-mt-1v">
             <div class="fr-form-group">
                 <fieldset>
-                    <h3 class="d-block fr-mb-1w">Vous n'avez pas de compte {{ site.name }} ?</h3>
-                    <p class="font-size-14px fr-mb-1w">
-                        Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut déposer une demande :
-                    </p>
-                    <div class="fr-fieldset__content fr-m-0">
-                        <div class="fr-input-group">
-                            <a class="fr-btn" href="{% url 'onboarding-project' %}">Déposer une demande</a>
+                    <h3 class="d-block fr-mb-1w">Vous n'avez pas de compte sur {{ site.name }} ?</h3>
+                    {% flag "enable_submit_new_project" %}
+                        <p class="font-size-14px fr-mb-1w">
+                            Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut déposer une demande :
+                        </p>
+                        <div class="fr-fieldset__content fr-m-0">
+                            <div class="fr-input-group">
+                                <a class="fr-btn" href="{% url 'onboarding-project' %}">Déposer une demande</a>
+                            </div>
                         </div>
-                    </div>
+                    {% endflag %}
                     <p class="font-size-14px fr-mt-1w fr-mb-0">
                         Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez <a class="font-size-14px" href="{% url 'advisor-access-request' %}">faire une demande de compte conseiller.</a>
                     </p>

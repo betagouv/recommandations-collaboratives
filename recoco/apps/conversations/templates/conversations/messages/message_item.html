@@ -1,5 +1,6 @@
 <div class="observed-element"
-     :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type})">
+     :data-element-id="element.id"
+     :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type, charNum: getNumCharInMessage(element)})">
     <div class="message-item"
          :id="`message-${element.id}`"
          :class="{ 'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w fr-pt-3v fr-pr-3v fr-my-3v': {{ request.user.id }} != element.posted_by, 'answering-my-message': {{ request.user.id }} != element.posted_by && {{ request.user.id }} == getMessageById(element.in_reply_to)?.posted_by, 'fr-p-0': element.deleted, 'fr-pt-3v fr-pl-3v fr-my-3v': !element.deleted && {{ request.user.id }} == element.posted_by }">
