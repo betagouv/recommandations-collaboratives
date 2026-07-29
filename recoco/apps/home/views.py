@@ -316,8 +316,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
 
     if SIGNUP_USER_ID_SESSION_KEY not in request.session:
         return redirect(
-            reverse("accounts-signup"),
-            +f"?{urlencode({'next': reverse('advisor-access-request')})}",
+            f"{reverse('account_signup')}?{urlencode({'next': reverse('advisor-access-request')})}",
         )
 
     user = User.objects.get(pk=request.session[SIGNUP_USER_ID_SESSION_KEY])
