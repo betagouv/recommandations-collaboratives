@@ -218,11 +218,7 @@ def onboarding_signup(request):
             utils.notify_new_project(request.site, project, user)
             utils.email_owner_of_project(request.site, project, user)
 
-            redirect_url = (
-                reverse("onboarding-confirm-email")
-                if is_new_user
-                else reverse("onboarding-summary", args=(project.id,))
-            )
+            redirect_url = reverse("onboarding-summary", args=(project.id,))
 
             request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
             request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY] = "onboarding"
