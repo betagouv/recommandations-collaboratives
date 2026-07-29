@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from . import utils
-from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY
+from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
 from .validators import EmailValidatorForBrevo
 
 
@@ -105,6 +105,10 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
             return redirect(redirect_url)
         if not user.is_active:
             return self.respond_user_inactive(request, user)
+
+    def respond_email_verification_sent(self, request, user):
+        request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
+        return super().respond_email_verification_sent(request, user)
 
 
 def send_confirmation_email(request, user, signup=False):
