@@ -115,8 +115,7 @@
                         </div>
                         <div class="fr-px-2v w-100 d-flex justify-content-between align-items-start fr-mt-10v">
                             <div class="d-flex flex-column align-items-start">
-                                {% comment %} TODO Add next {% endcomment %}
-                                <a class="link-underline-primary" href="/login/">Recevoir un lien de connexion par email</a>
+                                <a class="link-underline-primary" href="/login/{% if next_query_param %}?{{ next_query_param }}{% endif %}">Recevoir un lien de connexion par email</a>
                                 <a id="forgot-password" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
                             </div>
                             <div class="fr-input-group d-flex justify-content-end flex-column align-items-end">

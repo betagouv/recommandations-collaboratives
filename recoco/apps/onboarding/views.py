@@ -60,7 +60,7 @@ class OnboardingLogin(LoginView):
         )
 
         context["user_other_sites"] = []
-        if onboarding_uuid_str is not None:
+        if onboarding_uuid_str is not None:  # currently creating project
             try:
                 project_creation_request = projects.ProjectCreationRequest.objects.get(
                     site=self.request.site, uuid=uuid.UUID(onboarding_uuid_str)
@@ -71,6 +71,14 @@ class OnboardingLogin(LoginView):
                 context["onboarding_email"] = onboarding_user.email
                 context["user_other_sites"] = onboarding_user.profile.sites.exclude(
                     id=current_site.id
+                )
+                context["next_query_param"] = urlencode(
+                    {
+                        "next": reverse(
+                            "onboarding-summary",
+                            args=(project_creation_request.project_id,),
+                        )
+                    }
                 )
             except projects.ProjectCreationRequest.DoesNotExist:
                 pass
