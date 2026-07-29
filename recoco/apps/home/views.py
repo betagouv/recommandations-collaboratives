@@ -302,9 +302,9 @@ class EmailVerificationSentView(AllauthEmailVerificationSentView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_to_validate"] = get_object_or_404(
-            User, pk=self.request.session.get(SIGNUP_USER_ID_SESSION_KEY, None)
-        )
+        context["user_to_validate"] = User.objects.filter(
+            pk=self.request.session.get(SIGNUP_USER_ID_SESSION_KEY, None)
+        ).first()
         return context
 
 
