@@ -6,9 +6,11 @@ from allauth.account.models import EmailAddress
 from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from . import utils
+from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY
 from .validators import EmailValidatorForBrevo
 
 
@@ -57,9 +59,8 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
         # redirect according to context
         url_to_redirect = ""
-        match request.resolver_match.view_name:
-            #                        setup_user_email(request, crm_user, [])
-            case "onboarding-signup":
+        match request.session.get(EMAIL_CONFIRMATION_FLOW_SESSION_KEY, None):
+            case "onboarding":
                 url_to_redirect = (
                     reverse(
                         "onboarding-summary",
@@ -68,12 +69,14 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
                     if "project_id" in request.session
                     else "/"
                 )
-            case "account_signup":
+            case "advisor":
                 url_to_redirect = reverse("advisor-access-request-pending")
-            case "crm-user-update":
-                url_to_redirect = "/"
-            case _:  # random login
-                url_to_redirect = request.path
+            case _:
+                # the email confirmation was sent because an admin changed the user's email
+                if request.resolver_match.view_name == "crm-user-update":
+                    url_to_redirect = "/"
+                else:  # random login
+                    url_to_redirect = request.path
 
         if url_to_redirect:
             url = parse.urlsplit(url_str)
@@ -84,6 +87,24 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
             url_str = parse.urlunsplit(parts)
 
         return url_str
+
+    def pre_login(
+        self,
+        request,
+        user,
+        *,
+        email_verification,
+        signal_kwargs,
+        email,
+        signup,
+        redirect_url,
+    ):
+        # this is to easily skip to controlled second step signup form.
+        # might be cleaner through a custom login stage conditionned by signup arg
+        if redirect_url == "/advisor-access-request":
+            return redirect(redirect_url)
+        if not user.is_active:
+            return self.respond_user_inactive(request, user)
 
 
 def send_confirmation_email(request, user, signup=False):

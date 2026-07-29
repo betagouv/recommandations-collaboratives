@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 
 from recoco.apps.geomatics.models import Department
 
+from .config import SIGNUP_USER_ID_SESSION_KEY
 from .models import SiteConfiguration
 
 
@@ -42,6 +43,10 @@ class UVSignupForm(SignupForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+
+    def custom_signup(self, request, user):
+        super().custom_signup(request, user)
+        request.session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
 
 
 class UVLoginForm(LoginForm):

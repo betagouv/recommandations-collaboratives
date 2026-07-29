@@ -9,9 +9,8 @@ created: 2023-07-17 20:39:35 CEST
 
 import uuid
 
-from allauth.account.utils import setup_user_email
+from allauth.account.utils import complete_signup, perform_login
 from allauth.account.views import LoginView
-from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
@@ -20,11 +19,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.views.generic import TemplateView
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.geomatics import models as geomatics
-from recoco.apps.home.adapters import UVAccountAdapter, send_confirmation_email
+from recoco.apps.home.config import (
+    EMAIL_CONFIRMATION_FLOW_SESSION_KEY,
+    SIGNUP_USER_ID_SESSION_KEY,
+)
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -123,10 +124,6 @@ class OnboardingLogin(LoginView):
         return redirect(redirect_url)
 
 
-class OnboardingEmailConfirmView(TemplateView):
-    template_name = "onboarding/onboarding-email-confirm.html"
-
-
 def onboarding_signup(request):
     """
     Return the onboarding signup page and process onboarding signup submission.
@@ -184,10 +181,6 @@ def onboarding_signup(request):
                 }
             )
             return redirect(f"{login_url}?{next_args}")
-        else:
-            setup_user_email(request, user, [])
-            if not UVAccountAdapter().is_email_verified(request, user.email):
-                send_confirmation_email(request, user, True)
 
         user.set_password(form.cleaned_data.get("password"))
         user = update_user(
@@ -199,10 +192,6 @@ def onboarding_signup(request):
             org_position=form.cleaned_data.get("role"),
             phone=form.cleaned_data.get("phone"),
         )
-
-        log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
-        ##--- Starting this point, we are logged in as the submitter ---##
 
         try:
             project = projects.Project.objects.get(
@@ -229,22 +218,22 @@ def onboarding_signup(request):
             utils.notify_new_project(request.site, project, user)
             utils.email_owner_of_project(request.site, project, user)
 
-            refresh_user_projects_in_session(request, user)
-
-            # Cleanup session
-            if "onboarding_uuid" in request.session:
-                del request.session["onboarding_uuid"]
-
-            if "project_id" in request.session:
-                del request.session["project_id"]
-
             redirect_url = (
                 reverse("onboarding-confirm-email")
                 if is_new_user
                 else reverse("onboarding-summary", args=(project.id,))
             )
 
-            return redirect(redirect_url)
+            request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
+            request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY] = "onboarding"
+            if is_new_user:
+                return complete_signup(
+                    request,
+                    user=user,
+                    email_verification=None,
+                    success_url=redirect_url,
+                )
+            return perform_login(request, user, redirect_url=redirect_url)
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
@@ -366,6 +355,18 @@ def onboarding_summary(request, project_id=None):
             }
         )
         next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
+
+    refresh_user_projects_in_session(request, request.user)
+
+    # Cleanup session
+    if "onboarding_uuid" in request.session:
+        del request.session["onboarding_uuid"]
+    if "project_id" in request.session:
+        del request.session["project_id"]
+    if SIGNUP_USER_ID_SESSION_KEY in request.session:
+        del request.session[SIGNUP_USER_ID_SESSION_KEY]
+    if EMAIL_CONFIRMATION_FLOW_SESSION_KEY in request.session:
+        del request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY]
 
     context = {"project": project, "next_url": next_url, "site_config": site_config}
 

@@ -33,11 +33,7 @@ urlpatterns = [
         views.OnboardingLogin.as_view(),
         name="onboarding-signin",
     ),
-    path(  # step 3 through email confirmation for new users
-        r"onboarding/confirm-email",
-        views.OnboardingEmailConfirmView.as_view(),
-        name="onboarding-confirm-email",
-    ),
+    # step 3 for email confirmation is included in login stage
     path(  # step 4 and final
         r"onboarding/summary/<int:project_id>",
         views.onboarding_summary,

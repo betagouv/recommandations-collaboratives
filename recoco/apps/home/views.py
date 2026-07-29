@@ -12,13 +12,17 @@ import urllib
 import django.core.mail
 from actstream import action
 from allauth.account.adapter import get_adapter
-from allauth.account.models import EmailAddress
+from allauth.account.utils import complete_signup, perform_login
+from allauth.account.views import (
+    EmailVerificationSentView as AllauthEmailVerificationSentView,
+)
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
@@ -32,13 +36,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_403_TEMPLATE_NAME
 from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 from notifications.signals import notify
 
+from recoco import verbs
 from recoco.apps.geomatics.models import Department
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
@@ -54,8 +59,8 @@ from recoco.utils import (
     is_sensitive_account,
 )
 
-from ... import verbs
 from . import models
+from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
@@ -285,18 +290,43 @@ def setup_password(request):
     return render(request, "home/user_setup_password.html", locals())
 
 
-@login_required(login_url="/accounts/signup")
+class EmailVerificationSentView(AllauthEmailVerificationSentView):
+    def get_template_names(self):
+        match self.request.session.get(EMAIL_CONFIRMATION_FLOW_SESSION_KEY, None):
+            case "onboarding":
+                return ["onboarding/onboarding-email-confirm.html"]
+            case "advisor":
+                return ["home/advisor-access-request-confirm-email.html"]
+            case _:
+                return super().get_template_names()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user"] = get_object_or_404(
+            User, pk=self.request.session.get(SIGNUP_USER_ID_SESSION_KEY, None)
+        )
+        return context
+
+
 def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     redirect_url = request.GET.get("next")
     site_config = request.site.configuration
     if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
         redirect_url = reverse("home")
 
-    if check_if_advisor(request.user):
+    if SIGNUP_USER_ID_SESSION_KEY not in request.session:
+        return redirect(
+            reverse("accounts-signup"),
+            +f"?{urlencode({'next': reverse('advisor-access-request')})}",
+        )
+
+    user = User.objects.get(pk=request.session[SIGNUP_USER_ID_SESSION_KEY])
+
+    if check_if_advisor(user):
         return redirect(redirect_url)
 
     advisor_access_request = (
-        AdvisorAccessRequest.objects.filter(user=request.user, site=request.site)
+        AdvisorAccessRequest.objects.filter(user=user, site=request.site)
         .prefetch_related(
             Prefetch(
                 "departments",
@@ -334,7 +364,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             new_request = not advisor_access_request
             if new_request:
                 advisor_access_request = AdvisorAccessRequest(
-                    site=request.site, user=request.user
+                    site=request.site, user=user
                 )
 
             advisor_access_request.comment = form.cleaned_data.get("comment", "")
@@ -359,15 +389,19 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
                     action_object=advisor_access_request,
                 )
 
-            email_confirmed = EmailAddress.objects.filter(
-                user=request.user, verified=True
-            ).exists()
-            success_url = reverse(
-                "advisor-access-request-pending"
-                if email_confirmed
-                else "advisor-access-request-confirm-email"
+            request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY] = "advisor"
+            if new_request:
+                return complete_signup(
+                    request,
+                    user=user,
+                    email_verification=None,
+                    success_url=reverse("advisor-access-request-pending"),
+                )
+            return perform_login(
+                request,
+                user,
+                redirect_url=reverse("advisor-access-request-pending"),
             )
-            return redirect(success_url)
 
     return render(
         request,
@@ -382,14 +416,15 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
 
-class AdvisorAccessRequestEmailConfirmView(TemplateView):
-    template_name = "home/advisor-access-request-confirm-email.html"
-    login_url = "/accounts/signup"
-    #  todo give user context
-
-
 class AdvisorAccessRequestPendingView(LoginRequiredMixin, TemplateView):
     template_name = "home/advisor-access-request-pending.html"
+
+    def get(self, request, *args, **kwargs):
+        if SIGNUP_USER_ID_SESSION_KEY in self.request.session:
+            del self.request.session[SIGNUP_USER_ID_SESSION_KEY]
+        if EMAIL_CONFIRMATION_FLOW_SESSION_KEY in self.request.session:
+            del self.request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY]
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()

@@ -94,11 +94,7 @@ urlpatterns = [
         views.advisor_access_request_view,
         name="advisor-access-request",
     ),
-    path(  # form part 3 : email confirmation
-        r"advisor-access-request/confirm-email",
-        views.AdvisorAccessRequestEmailConfirmView.as_view(),
-        name="advisor-access-request-confirm-email",
-    ),
+    # step 3 for email confirmation is included in login stage
     path(  # success page : request is pending
         r"advisor-access-request/pending",
         views.AdvisorAccessRequestPendingView.as_view(),
@@ -112,6 +108,11 @@ urlpatterns = [
     path(r"site/create", views.SiteCreateView.as_view(), name="site-create"),
     # I use same view name to facilitate redirects
     path(r"2fa-config", views.TwoFAConfigView.as_view(), name="mfa_index"),
+    path(
+        "accounts/confirm-email/",
+        views.EmailVerificationSentView.as_view(),
+        name="account_email_verification_sent",
+    ),
 ]
 
 if settings.ACCOUNT_LOGIN_BY_CODE_ENABLED:
