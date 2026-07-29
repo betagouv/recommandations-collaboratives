@@ -16,7 +16,7 @@
         </h2>
 
         <p class="text-secondary">
-            {% if user.is_authenticated and user.profile.email_validated %} {# condition is quick fix to unlock brevo #}
+            {% if not user.is_authenticated %} {# condition is quick fix to unlock brevo after spam was sent from insufficient captcha security #}
                 Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez copier-coller notre adresse email :
             {% else %}
                 Vous pouvez nous contacter à l'adresse e-mail suivante :
@@ -26,7 +26,7 @@
             {% endwith %}
         </p>
 
-        {% if user.is_authenticated and user.profile.email_validated %} {# condition is quick fix to unlock brevo #}
+        {% if user.is_authenticated %} {# condition is quick fix to unlock brevo after spam was sent from insufficient captcha security #}
         <form method="post" data-test-id="contact-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}" />
