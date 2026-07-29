@@ -15,7 +15,8 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
 from recoco.apps.communication import digests
-from recoco.apps.plugins.manager import get_site_plugin_manager
+from recoco.apps.plugins.manager import get_site_configuration, get_site_plugin_manager
+from recoco.apps.plugins.schema import tenant_schema_context
 from recoco.apps.projects import models as project_models
 from recoco.utils import get_group_for_site
 
@@ -53,6 +54,7 @@ class Command(BaseCommand):
         advisor_group = get_group_for_site("advisor", site, create=True)
         staff_group = get_group_for_site("staff", site, create=True)
 
+        site_config = get_site_configuration(site)
         pm = get_site_plugin_manager(site)
 
         # only send emails to active users and those actually linked to the current site
@@ -86,14 +88,15 @@ class Command(BaseCommand):
         # Plugin digests for staff users (run first so they can consume notifications
         # before the standard digest loop sees them)
         logger.info("** Sending plugin digests for staff **")
-        for user in user_qs.filter(groups__in=[staff_group]):
-            for count in pm.hook.send_digests_for_staff_users(
-                site=site, user=user, dry_run=dry_run
-            ):
-                if count:
-                    logger.info(
-                        f"Plugin sent staff digest ({count} notifications) for {user}"
-                    )
+        with tenant_schema_context(site_config):
+            for user in user_qs.filter(groups__in=[staff_group]):
+                for count in pm.hook.send_digests_for_staff_users(
+                    site=site, user=user, dry_run=dry_run
+                ):
+                    if count:
+                        logger.info(
+                            f"Plugin sent staff digest ({count} notifications) for {user}"
+                        )
 
         # Digests for non switchtenders
         logger.info("** Sending general digests **")
