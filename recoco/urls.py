@@ -35,8 +35,8 @@ admin.autodiscover()
 admin.site.login = secure_admin_login(admin.site.login)
 
 urlpatterns = [
-    path("accounts/", include("allauth.urls")),
     path("api/", include(rest_api_urls)),
+    path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("hijack/", include("hijack.urls")),
@@ -58,9 +58,6 @@ urlpatterns.extend(survey_urls)
 urlpatterns.extend(invites_urls)
 urlpatterns.extend(crm_urls)
 urlpatterns.extend(hitcount_urls)
-
-# Placed after this app's own urls so that any routes they override under
-# accounts/ (e.g. home's email verification sent view) take precedence.
 
 if settings.DEBUG:
     import debug_toolbar
