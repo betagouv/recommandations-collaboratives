@@ -34,7 +34,7 @@ class TenantCommand(BaseCommand):
 
     @property
     def plugin_manager(self):
-        return get_site_plugin_manager(self.site_config.site)
+        return get_site_plugin_manager(site=self.site_config.site)
 
     def execute(self, *args, **options):
         schema = self.get_schema(options)

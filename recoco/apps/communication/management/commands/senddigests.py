@@ -55,7 +55,7 @@ class Command(BaseCommand):
         staff_group = get_group_for_site("staff", site, create=True)
 
         site_config = get_site_configuration(site)
-        pm = get_site_plugin_manager(site)
+        pm = get_site_plugin_manager(site=site)
 
         # only send emails to active users and those actually linked to the current site
         user_qs = auth_models.User.objects
