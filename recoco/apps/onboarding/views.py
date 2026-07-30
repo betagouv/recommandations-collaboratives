@@ -9,7 +9,7 @@ created: 2023-07-17 20:39:35 CEST
 
 import uuid
 
-from allauth.account.utils import complete_signup, perform_login
+from allauth.account.utils import complete_signup
 from allauth.account.views import LoginView
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
@@ -190,6 +190,7 @@ def onboarding_signup(request):
             )
             return redirect(f"{login_url}?{next_args}")
 
+        # user is new from here otherwise it would have been redirected to login
         user.set_password(form.cleaned_data.get("password"))
         user = update_user(
             site=request.site,
@@ -230,14 +231,12 @@ def onboarding_signup(request):
 
             request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
             request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY] = "onboarding"
-            if is_new_user:
-                return complete_signup(
-                    request,
-                    user=user,
-                    email_verification=None,
-                    success_url=redirect_url,
-                )
-            return perform_login(request, user, redirect_url=redirect_url)
+            return complete_signup(
+                request,
+                user=user,
+                email_verification=None,
+                success_url=redirect_url,
+            )
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)

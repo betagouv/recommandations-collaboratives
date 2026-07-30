@@ -125,8 +125,8 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
             # we rely that the 403 page reminds the user of the authentication status
             return None
 
-        login(request, user)
         confirm_email(request, user)  # login by email means that email is accessible
+        login(request, user)
         # specific tests below comes from sesame original code
         if (
             hasattr(request, "user")

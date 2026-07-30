@@ -314,12 +314,19 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
         redirect_url = reverse("home")
 
-    if SIGNUP_USER_ID_SESSION_KEY not in request.session:
+    if (
+        SIGNUP_USER_ID_SESSION_KEY not in request.session
+        and not request.user.is_authenticated
+    ):
         return redirect(
             f"{reverse('account_signup')}?{urlencode({'next': reverse('advisor-access-request')})}",
         )
 
-    user = User.objects.get(pk=request.session[SIGNUP_USER_ID_SESSION_KEY])
+    user = (
+        request.user
+        if request.user.is_authenticated
+        else User.objects.get(pk=request.session[SIGNUP_USER_ID_SESSION_KEY])
+    )
 
     if check_if_advisor(user):
         return redirect(redirect_url)

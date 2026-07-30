@@ -109,7 +109,7 @@ urlpatterns = [
     # I use same view name to facilitate redirects
     path(r"2fa-config", views.TwoFAConfigView.as_view(), name="mfa_index"),
     path(
-        "accounts/confirm-email/",
+        "confirm-email/",
         views.EmailVerificationSentView.as_view(),
         name="account_email_verification_sent",
     ),

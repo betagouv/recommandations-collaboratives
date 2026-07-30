@@ -46,6 +46,7 @@ class UVSignupForm(SignupForm):
 
     def custom_signup(self, request, user):
         super().custom_signup(request, user)
+        # sets up session data to prefill advisor access request form
         request.session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
 
 
