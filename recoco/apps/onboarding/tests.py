@@ -4,6 +4,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.core import mail
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
@@ -370,15 +371,9 @@ def setups_onboarding_signup(current_site, client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_signup_create_a_new_user_and_logs_in(
-    request, client, current_site
-):
+def test_performing_onboarding_signup_create_a_new_user(request, client, current_site):
     user_data = setups_onboarding_signup(current_site, client)
-    response = client.post(reverse("onboarding-signup"), data=user_data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-
-    assert last_url == reverse("onboarding-confirm-email")
+    client.post(reverse("onboarding-signup"), data=user_data, follow=True)
 
     # the user and profile are filled according to provided information
     user = auth.User.objects.get(username=user_data["email"])
@@ -390,9 +385,6 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(
     assert user.profile.organization_position == user_data["role"]
     assert user.profile.phone_no == user_data["phone"]
 
-    # present if logged_in
-    assert int(client.session["_auth_user_id"]) == user.pk
-
 
 @pytest.mark.django_db
 def test_onboarding_confirm_email_redirects_to_summary(
@@ -400,7 +392,12 @@ def test_onboarding_confirm_email_redirects_to_summary(
 ):
     spy_adapter = mocker.spy(UVAccountAdapter, "get_email_confirmation_url")
     user_data = setups_onboarding_signup(current_site, client)
-    client.post(reverse("onboarding-signup"), data=user_data, follow=True)
+    response = client.post(reverse("onboarding-signup"), data=user_data, follow=True)
+
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("account_email_verification_sent")
+    assert len(mail.outbox) == 2  # one new for project's owner
 
     project = projects_models.Project.objects.last()
 

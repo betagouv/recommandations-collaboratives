@@ -3,28 +3,39 @@ from unittest.mock import Mock, patch
 import pytest
 from actstream import models as action_models
 from django.contrib.auth.models import User
+from django.core import mail
 from django.urls import reverse
 from model_bakery import baker
 from notifications import models as notifications_models
 
 from recoco import verbs
 from recoco.apps.geomatics.models import Department
+from recoco.apps.home.adapters import UVAccountAdapter
+from recoco.apps.home.config import SIGNUP_USER_ID_SESSION_KEY
 from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
-from recoco.utils import login
+from recoco.utils import confirm_mail, login
+
+
+def _set_signup_user_id_in_session(client, user):
+    session = client.session
+    session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
+    session.save()
 
 
 class TestAdvisorAccessRequestView:
     @pytest.mark.django_db
     def test_redirect_anonymous(self, client, current_site):
+        baker.make(SiteConfiguration, site=current_site)
         response = client.get(reverse("advisor-access-request"))
         assert response.status_code == 302
-        assert response.url == "/accounts/signup?next=/advisor-access-request"
+        assert response.url == "/accounts/signup/?next=%2Fadvisor-access-request"
 
     @pytest.mark.django_db
     def test_redirect_advisor(self, client, current_site):
         baker.make(SiteConfiguration, site=current_site)
 
         with login(client, groups=["example_com_advisor"]):
+            # _set_signup_user_id_in_session(client, user)
             response = client.get(reverse("advisor-access-request"))
             assert response.status_code == 302
             assert response.url == "/"
@@ -35,6 +46,7 @@ class TestAdvisorAccessRequestView:
         baker.make(SiteConfiguration, site=current_site)
         baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         baker.make(Department, code="33", name="Gironde")
+        _set_signup_user_id_in_session(client, user)
 
         advisor_access_request = baker.make(
             AdvisorAccessRequest, site=current_site, user=user
@@ -43,128 +55,168 @@ class TestAdvisorAccessRequestView:
             baker.make(Department, code="40", name="Landes")
         )
 
-        with login(client, user=user):
-            response = client.get(reverse("advisor-access-request"))
-            assert response.status_code == 200
-            assert response.context["advisor_access_request"] == advisor_access_request
-            assert response.context["form"] is not None
-            assert response.context["departments"] == [
-                {"name": "Gironde", "code": "33"},
-                {"name": "Landes", "code": "40"},
-                {"name": "Pyrénées-Atlantiques", "code": "64"},
-            ]
-            assert response.context["selected_departments"] == ["40"]
+        response = client.get(reverse("advisor-access-request"))
+        assert response.status_code == 200
+        assert response.context["advisor_access_request"] == advisor_access_request
+        assert response.context["form"] is not None
+        assert response.context["departments"] == [
+            {"name": "Gironde", "code": "33"},
+            {"name": "Landes", "code": "40"},
+            {"name": "Pyrénées-Atlantiques", "code": "64"},
+        ]
+        assert response.context["selected_departments"] == ["40"]
 
     @pytest.mark.django_db(transaction=True)
     def test_post_request(self, client, current_site, staff_user, admin_user):
+        user = baker.make(User)
         baker.make(SiteConfiguration, site=current_site)
         baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         baker.make(Department, code="33", name="Gironde")
         baker.make(Department, code="40", name="Landes")
+        _set_signup_user_id_in_session(client, user)
 
-        with login(client) as user:
-            response = client.get(reverse("advisor-access-request"))
-            assert response.status_code == 200
-            assert response.context.get("advisor_access_request") is None
+        response = client.get(reverse("advisor-access-request"))
+        assert response.status_code == 200
+        assert response.context.get("advisor_access_request") is None
 
-            assert AdvisorAccessRequest.objects.count() == 0
+        assert AdvisorAccessRequest.objects.count() == 0
 
-            response = client.post(
-                reverse("advisor-access-request"),
-                data={
-                    "advisor_access_type": "Regional",
-                    "departments": ["64", "33"],
-                    "comment": "Merci pour votre aide !",
-                },
-            )
-            assert response.status_code == 200
+        response = client.post(
+            reverse("advisor-access-request"),
+            data={
+                "advisor_access_type": "Regional",
+                "departments": ["64", "33"],
+                "comment": "Merci pour votre aide !",
+            },
+        )
+        assert response.status_code == 302
+        assert response.url == reverse("account_email_verification_sent")
 
-            advisor_access_request = (
-                AdvisorAccessRequest.objects.filter(site=current_site)
-                .prefetch_related("departments")
-                .first()
-            )
-            assert advisor_access_request is not None
-            assert advisor_access_request.user == user
-            assert advisor_access_request.status == "PENDING"
-            assert advisor_access_request.departments.count() == 2
-            assert advisor_access_request.comment == "Merci pour votre aide !"
+        advisor_access_request = (
+            AdvisorAccessRequest.objects.filter(site=current_site)
+            .prefetch_related("departments")
+            .first()
+        )
+        assert advisor_access_request is not None
+        assert advisor_access_request.user == user
+        assert advisor_access_request.status == "PENDING"
+        assert advisor_access_request.departments.count() == 2
+        assert advisor_access_request.comment == "Merci pour votre aide !"
 
-            assert (
-                action_models.Action.objects.filter(
-                    verb=verbs.User.ADVISOR_REQUEST
-                ).count()
-                == 1
-            )
-            assert (
-                notifications_models.Notification.objects.filter(
-                    verb=verbs.User.ADVISOR_REQUEST
-                ).count()
-                == 2
-            )  # one for admin and one for staff
+        assert (
+            action_models.Action.objects.filter(verb=verbs.User.ADVISOR_REQUEST).count()
+            == 1
+        )
+        assert (
+            notifications_models.Notification.objects.filter(
+                verb=verbs.User.ADVISOR_REQUEST
+            ).count()
+            == 2
+        )  # one for admin and one for staff
 
-            response = client.post(
-                reverse("advisor-access-request"),
-                data={
-                    "advisor_access_type": "Regional",
-                    "departments": ["64", "33", "40"],
-                    "comment": "Test comment",
-                },
-            )
-            assert response.status_code == 200
+        response = client.post(
+            reverse("advisor-access-request"),
+            data={
+                "advisor_access_type": "Regional",
+                "departments": ["64", "33", "40"],
+                "comment": "Test comment",
+            },
+        )
 
-            advisor_access_request.refresh_from_db()
-            assert AdvisorAccessRequest.objects.count() == 1
-            assert advisor_access_request.departments.count() == 3
-            assert advisor_access_request.comment == "Test comment"
+        confirm_mail(user)
 
-            # should not notify again if request is only modified
-            assert (
-                action_models.Action.objects.filter(
-                    verb=verbs.User.ADVISOR_REQUEST
-                ).count()
-                == 1
-            )
-            assert (
-                notifications_models.Notification.objects.filter(
-                    verb=verbs.User.ADVISOR_REQUEST
-                ).count()
-                == 2
-            )  # one for admin and one for staff
+        # updating an already-pending request logs the (verified) user
+        # in again and redirects to the pending page, same as above.
+        assert response.status_code == 302
+        assert response.url == reverse("advisor-access-request-pending")
+
+        advisor_access_request.refresh_from_db()
+        assert AdvisorAccessRequest.objects.count() == 1
+        assert advisor_access_request.departments.count() == 3
+        assert advisor_access_request.comment == "Test comment"
+
+        # should not notify again if request is only modified
+        assert (
+            action_models.Action.objects.filter(verb=verbs.User.ADVISOR_REQUEST).count()
+            == 1
+        )
+        assert (
+            notifications_models.Notification.objects.filter(
+                verb=verbs.User.ADVISOR_REQUEST
+            ).count()
+            == 2
+        )  # one for admin and one for staff
 
     @pytest.mark.django_db(transaction=True)
     def test_post_request_national_no_dep_ok(
         self, client, current_site, staff_user, admin_user
     ):
+        user = baker.make(User)
         baker.make(SiteConfiguration, site=current_site)
         baker.make(Department, code="40", name="Landes")
+        _set_signup_user_id_in_session(client, user)
 
-        with login(client) as user:
-            response = client.get(reverse("advisor-access-request"))
-            assert response.status_code == 200
-            assert response.context.get("advisor_access_request") is None
+        response = client.get(reverse("advisor-access-request"))
+        assert response.status_code == 200
+        assert response.context.get("advisor_access_request") is None
 
-            assert AdvisorAccessRequest.objects.count() == 0
+        assert AdvisorAccessRequest.objects.count() == 0
 
-            response = client.post(
-                reverse("advisor-access-request"),
-                data={
-                    "advisor_access_type": "National",
-                    "comment": "Merci pour votre aide !",
-                },
-            )
-            assert response.status_code == 200
+        response = client.post(
+            reverse("advisor-access-request"),
+            data={
+                "advisor_access_type": "National",
+                "comment": "Merci pour votre aide !",
+            },
+        )
 
-            advisor_access_request = (
-                AdvisorAccessRequest.objects.filter(site=current_site)
-                .prefetch_related("departments")
-                .first()
-            )
-            assert advisor_access_request is not None
-            assert advisor_access_request.user == user
-            assert advisor_access_request.status == "PENDING"
-            assert advisor_access_request.departments.count() == 0
-            assert advisor_access_request.comment == "Merci pour votre aide !"
+        assert response.status_code == 302
+        assert response.url == reverse("account_email_verification_sent")
+
+        advisor_access_request = (
+            AdvisorAccessRequest.objects.filter(site=current_site)
+            .prefetch_related("departments")
+            .first()
+        )
+        assert advisor_access_request is not None
+        assert advisor_access_request.user == user
+        assert advisor_access_request.status == "PENDING"
+        assert advisor_access_request.departments.count() == 0
+        assert advisor_access_request.comment == "Merci pour votre aide !"
+
+    @pytest.mark.django_db(transaction=True)
+    def test_full_flow_redirect_proper_success_page(
+        self, client, current_site, mocker, staff_user, admin_user
+    ):
+        baker.make(SiteConfiguration, site=current_site)
+        baker.make(Department, code="40", name="Landes")
+        user = baker.make(User, email="not-null@email.address")
+        _set_signup_user_id_in_session(client, user)
+
+        spy_adapter = mocker.spy(UVAccountAdapter, "get_email_confirmation_url")
+
+        response = client.get(reverse("advisor-access-request"))
+        assert response.status_code == 200
+        assert response.context.get("advisor_access_request") is None
+
+        response = client.post(
+            reverse("advisor-access-request"),
+            data={
+                "advisor_access_type": "National",
+                "comment": "Merci pour votre aide !",
+            },
+        )
+
+        # waits for email validation
+        assert response.status_code == 302
+        assert response.url == reverse("account_email_verification_sent")
+        assert len(mail.outbox) == 1
+        assert "Confirmez votre adresse email" in mail.outbox[0].subject
+
+        confirm_email_url = spy_adapter.spy_return
+        response = client.get(confirm_email_url, follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        assert last_url == reverse("advisor-access-request-pending")
 
 
 class TestAdvisorAccessRequestModeratorView:
