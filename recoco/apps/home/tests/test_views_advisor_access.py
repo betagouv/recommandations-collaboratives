@@ -114,6 +114,9 @@ class TestAdvisorAccessRequestView:
             == 2
         )  # one for admin and one for staff
 
+        # second post with verified user who already submissed request so it should be updated
+        confirm_mail(user)
+
         response = client.post(
             reverse("advisor-access-request"),
             data={
@@ -122,8 +125,6 @@ class TestAdvisorAccessRequestView:
                 "comment": "Test comment",
             },
         )
-
-        confirm_mail(user)
 
         # updating an already-pending request logs the (verified) user
         # in again and redirects to the pending page, same as above.
