@@ -193,6 +193,18 @@ def truncate_string(s, max_length):
 ########################################################################
 
 
+def confirm_mail(user):
+    """tool for testing"""
+    EmailAddress.objects.get_or_create(
+        user=user, email=user.email, verified=True, primary=True
+    )
+
+
+def check_email_verified(user):
+    """tool for testing"""
+    return EmailAddress.objects.filter(user=user, verified=True).exists()
+
+
 @contextmanager
 def login(
     client,
@@ -215,9 +227,7 @@ def login(
         group = auth.Group.objects.get(name=name)
         group.user_set.add(user)
     if email_verified:
-        EmailAddress.objects.get_or_create(
-            user=user, email=user.email, verified=True, primary=True
-        )
+        confirm_mail(user)
     client.force_login(user)
     yield user
 
