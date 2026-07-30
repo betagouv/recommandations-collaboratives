@@ -60,35 +60,40 @@ class Command(BaseCommand):
         # only send emails to active users and those actually linked to the current site
         user_qs = auth_models.User.objects
 
-        if user_id is not None:
-            user_qs = user_qs.filter(pk=user_id)
-
-            logger.info("Specific user required. Ignoring whatsup by project digests")
-        else:
-            user_qs = user_qs.filter(is_active=True, profile__sites=site)
-
-            # Send reminders (new recommendation + whatsup)
-            logger.info("** Sending Project Reminders **")
-            for project in project_models.Project.on_site.all():
-                digests.send_reminder_digests_by_project(project, dry_run)
-
-            # Send project collaborators new recommendations digest
-            logger.info("** Sending new recommendations digests **")
-            for project in (
-                project_models.Project.on_site.all()
-            ):  # FIXME include inactive project?
-                for user in project.members.filter(is_active=True):
-                    if digests.send_digests_for_new_recommendations_by_user(
-                        user, dry_run
-                    ):
-                        logger.info(
-                            f"Sent new reco digest for {user} on {project.name}"
-                        )
-
-        # Plugin digests for staff users (run first so they can consume notifications
-        # before the standard digest loop sees them)
-        logger.info("** Sending plugin digests for staff **")
+        # Notifications may reference plugin models (e.g. through a
+        # notification's action_object), so the whole digest run must
+        # happen with the tenant schema on the search_path.
         with tenant_schema_context(site_config):
+            if user_id is not None:
+                user_qs = user_qs.filter(pk=user_id)
+
+                logger.info(
+                    "Specific user required. Ignoring whatsup by project digests"
+                )
+            else:
+                user_qs = user_qs.filter(is_active=True, profile__sites=site)
+
+                # Send reminders (new recommendation + whatsup)
+                logger.info("** Sending Project Reminders **")
+                for project in project_models.Project.on_site.all():
+                    digests.send_reminder_digests_by_project(project, dry_run)
+
+                # Send project collaborators new recommendations digest
+                logger.info("** Sending new recommendations digests **")
+                for project in (
+                    project_models.Project.on_site.all()
+                ):  # FIXME include inactive project?
+                    for user in project.members.filter(is_active=True):
+                        if digests.send_digests_for_new_recommendations_by_user(
+                            user, dry_run
+                        ):
+                            logger.info(
+                                f"Sent new reco digest for {user} on {project.name}"
+                            )
+
+            # Plugin digests for staff users (run first so they can consume
+            # notifications before the standard digest loop sees them)
+            logger.info("** Sending plugin digests for staff **")
             for user in user_qs.filter(groups__in=[staff_group]):
                 for count in pm.hook.send_digests_for_staff_users(
                     site=site, user=user, dry_run=dry_run
@@ -98,21 +103,21 @@ class Command(BaseCommand):
                             f"Plugin sent staff digest ({count} notifications) for {user}"
                         )
 
-        # Digests for non switchtenders
-        logger.info("** Sending general digests **")
-        for user in user_qs.exclude(groups__in=[advisor_group]):
-            if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
-                logger.info(f"Sent general digest for {user}")
+            # Digests for non switchtenders
+            logger.info("** Sending general digests **")
+            for user in user_qs.exclude(groups__in=[advisor_group]):
+                if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
+                    logger.info(f"Sent general digest for {user}")
 
-        # Digests for switchtenders
-        logger.info("** Sending general switchtender digests **")
-        # XXX pourquoi groups__in=[] et non groups=advisor_group
-        for user in user_qs.filter(groups__in=[advisor_group]):
-            if digests.send_digests_for_new_sites_by_user(user, dry_run):
-                logger.info(f"* Sent new site digest for {user}")
+            # Digests for switchtenders
+            logger.info("** Sending general switchtender digests **")
+            # XXX pourquoi groups__in=[] et non groups=advisor_group
+            for user in user_qs.filter(groups__in=[advisor_group]):
+                if digests.send_digests_for_new_sites_by_user(user, dry_run):
+                    logger.info(f"* Sent new site digest for {user}")
 
-            if digests.send_digest_for_switchtender_by_user(user, dry_run):
-                logger.info(f"* Sent general digest for switchtender (to {user})")
+                if digests.send_digest_for_switchtender_by_user(user, dry_run):
+                    logger.info(f"* Sent general digest for switchtender (to {user})")
 
 
 # eof
