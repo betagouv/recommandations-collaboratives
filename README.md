@@ -229,6 +229,37 @@ Pour lancer les tests back end, vous pouvez utiliser la commande suivante :
 pytest --create-db
 ```
 
+## Déploiement
+
+Le déploiement se fait avec [Fabric](https://www.fabfile.org/) via le fichier
+[`fabfile.py`](./fabfile.py). Installez `fabric` (inclus dans les dépendances de dev) puis
+utilisez la commande `fab` depuis la racine du projet, en précisant l'hôte cible avec `--hosts`.
+
+### Préparer un nouveau serveur
+
+```sh
+fab setup --site={production,development} --hosts=user@serveur
+```
+
+Crée l'arborescence attendue (`recoco-{site}/dist`) et installe un virtualenv avec `uv`.
+
+### Déployer une nouvelle version
+
+```sh
+fab deploy --site={production,development} --hosts=user@serveur
+```
+
+Cette commande, exécutée depuis votre poste :
+
+1. build le front (`yarn build`) et le package python (`uv build`) en local ;
+2. envoie l'archive générée vers le serveur ;
+3. installe le package avec `uv pip install`, exécute les migrations, `compilescss` et
+   `collectstatic` sur le serveur ;
+4. copie le `manifest.json` du front dans le dossier des statics.
+
+`site` doit valoir soit `production` soit `development` : la commande détermine ainsi le
+dossier cible (`recoco-production` ou `recoco-development`) sur le serveur.
+
 ## En cas de difficultés
 
 Dans le cas où vous rencontrez une difficulté, n'hésitez pas à ouvrir une `issue` sur
