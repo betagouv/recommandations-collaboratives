@@ -7,10 +7,12 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2021-10-11 19:06:54 CEST
 """
 
+import importlib
 import io
 from unittest.mock import mock_open, patch
 
 import pytest
+from django.apps import apps as global_apps
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from model_bakery import baker
@@ -59,10 +61,6 @@ def test_region_can_be_scoped_to_a_country():
 @pytest.mark.django_db
 def test_seed_france_country_migration_backfills_regions():
     """The 0007 data migration seeds France and attaches it to pre-existing regions."""
-    import importlib
-
-    from django.apps import apps as global_apps
-
     migration_0007 = importlib.import_module(
         "recoco.apps.geomatics.migrations.0007_seed_france_country"
     )
