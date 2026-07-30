@@ -138,6 +138,7 @@ class AdvisorAccessRequestForm(forms.Form):
 
     departments = forms.ModelMultipleChoiceField(
         queryset=Department.objects.all(),
+        to_field_name="code",
         label="Départements",
         widget=forms.CheckboxSelectMultiple,
         required=False,

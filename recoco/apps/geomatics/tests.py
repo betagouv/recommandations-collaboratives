@@ -15,6 +15,7 @@ import pytest
 from django.apps import apps as global_apps
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.db import IntegrityError
 from model_bakery import baker
 
 from recoco.apps.geomatics.management.commands.loadcommunes import (
@@ -43,9 +44,10 @@ def test_country_str_returns_name():
 
 
 @pytest.mark.django_db
-def test_region_country_is_optional():
-    region = baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes")
-    assert region.country is None
+def test_region_requires_a_country():
+    """Phase 2 tightens country to non-null now that every region is backfilled."""
+    with pytest.raises(IntegrityError):
+        baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes", country=None)
 
 
 @pytest.mark.django_db
@@ -59,19 +61,33 @@ def test_region_can_be_scoped_to_a_country():
 
 
 @pytest.mark.django_db
-def test_seed_france_country_migration_backfills_regions():
-    """The 0007 data migration seeds France and attaches it to pre-existing regions."""
-    migration_0007 = importlib.import_module(
-        "recoco.apps.geomatics.migrations.0007_seed_france_country"
+def test_two_regions_can_share_a_code_across_countries():
+    """`code` is only unique per-country now (region/department use surrogate ids)."""
+    france = baker.make(models.Country, code="FR", name="France")
+    belgium = baker.make(models.Country, code="BE", name="Belgique")
+    baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes", country=france)
+    same_code_other_country = baker.make(
+        models.Region, code="84", name="Some Belgian region", country=belgium
     )
+    assert same_code_other_country.pk is not None
 
-    baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes", country=None)
 
-    migration_0007.seed_france_and_backfill_regions(global_apps, None)
+@pytest.mark.django_db
+def test_two_departments_can_share_a_code_across_regions():
+    region_a = baker.make(models.Region, code="84", name="Auvergne-Rhône-Alpes")
+    region_b = baker.make(models.Region, code="11", name="Île-de-France")
+    baker.make(models.Department, code="01", name="Ain", region=region_a)
+    same_code_other_region = baker.make(
+        models.Department, code="01", name="Some other department", region=region_b
+    )
+    assert same_code_other_region.pk is not None
 
+
+@pytest.mark.django_db
+def test_seed_france_country_migration_seeds_france():
+    """The 0007 data migration seeds a France Country row."""
     france = models.Country.objects.get(code="FR")
     assert france.name == "France"
-    assert models.Region.objects.get(code="84").country == france
 
 
 ##### Loading ######
