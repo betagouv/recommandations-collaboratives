@@ -1,6 +1,6 @@
 import importlib
 
-from django.urls import path
+from django.urls import include, path
 from notifications import views as notifications_views
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -213,6 +213,18 @@ def _collect_plugin_rest_urls():
     return urls
 
 
+m2m_urls = [
+    path(
+        "m2m/",
+        include("recoco.rest_api.m2m.urls"),
+    ),
+]
+
 urlpatterns = (
-    router.urls + api_urls + auth_urls + survey_urls + _collect_plugin_rest_urls()
+    router.urls
+    + api_urls
+    + auth_urls
+    + survey_urls
+    + m2m_urls
+    + _collect_plugin_rest_urls()
 )

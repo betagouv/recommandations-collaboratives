@@ -1,10 +1,14 @@
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
+from django.db import transaction
 from notifications import models as notifications_models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
+from recoco.apps.geomatics.models import Commune
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.tasks import models as task_models
@@ -12,6 +16,7 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
+from .utils import assign_collaborator
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -215,6 +220,75 @@ class UserProjectSerializer(ProjectSerializer):
             "unread_private_messages": unread_private_messages.count(),
             "new_recommendations": new_recommendations.count(),
         }
+
+
+class NewProjectSerializer(ProjectSerializer):
+    """Create an already validated project, on the current site
+
+    The commune is given as an insee code rather than as a primary key: it is
+    what identifies a commune unambiguously for an API client. The owner is
+    given as an email, and its account is created if it does not exist yet.
+    """
+
+    class Meta(ProjectSerializer.Meta):
+        fields = ProjectSerializer.Meta.fields + ["insee", "owner_email"]
+        read_only_fields = ProjectSerializer.Meta.read_only_fields + [
+            "created_on",
+            "updated_on",
+        ]
+
+    insee = serializers.CharField(max_length=5, write_only=True)
+    owner_email = serializers.EmailField(write_only=True)
+
+    description = serializers.CharField(required=True)
+    tags = TagListSerializerField(required=False)
+
+    @staticmethod
+    def get_or_create_user_on_site(email: str, site: Site) -> User:
+        """Return the user of given email, creating its account if needed"""
+        user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
+        user.profile.sites.add(site)
+
+        return user
+
+    def validate_owner_email(self, value):
+        return value.lower()
+
+    def validate(self, data):
+        insee = data["insee"]
+
+        commune = Commune.get_by_insee_code(insee)
+        if commune is None:
+            raise serializers.ValidationError(
+                {"insee": f"No commune found for insee code '{insee}'."}
+            )
+
+        # commune is read only on the parent serializer, it is only writable
+        # here, through the insee code
+        data["commune"] = commune
+
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data.pop("insee")
+        owner_email = validated_data.pop("owner_email")
+
+        # the caller submits the project on behalf of its owner,
+        # cf. onboarding.views.prefill_project_submit
+        validated_data["submitted_by"] = self.current_user
+
+        project = super().create(validated_data)
+
+        # the project skips moderation, it is created already validated
+        project.project_sites.create(
+            site=self.current_site, status="TO_PROCESS", is_origin=True
+        )
+
+        owner = self.get_or_create_user_on_site(owner_email, self.current_site)
+        assign_collaborator(owner, project, is_owner=True)
+
+        return project
 
 
 class ProjectForListSerializer(BaseSerializerMixin):

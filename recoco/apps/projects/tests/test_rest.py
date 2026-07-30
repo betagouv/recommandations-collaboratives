@@ -20,11 +20,13 @@ from django.utils import timezone
 from freezegun import freeze_time
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
+from notifications import models as notifications_models
 from notifications.signals import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
 from recoco.apps.conversations import models as conversations_models
+from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
 
@@ -675,6 +677,110 @@ def check_project_content(project, data):
         "unread_private_messages": 0,
         "unread_public_messages": 1,
     }
+
+
+########################################################################
+# create project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_use_project_create_api(api_client):
+    url = reverse("m2m:projects-create")
+    response = api_client.post(url, data={"name": "a project"})
+
+    assert response.status_code == 403
+    assert not models.Project.objects.exists()
+
+
+@pytest.mark.django_db
+def test_unknown_insee_code_is_reported_by_project_create_api(api_client):
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    api_client.force_authenticate(user)
+
+    url = reverse("m2m:projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "insee": "00000",
+            "owner_email": "owner@example.com",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "insee" in response.data
+    assert not models.Project.objects.exists()
+
+
+@pytest.mark.django_db
+def test_project_is_created_already_validated_by_project_create_api(
+    request, api_client
+):
+    site = get_current_site(request)
+    commune = baker.make(geomatics_models.Commune, insee="62000")
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    api_client.force_authenticate(user)
+
+    url = reverse("m2m:projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "location": "somewhere",
+            "insee": commune.insee,
+            "owner_email": "OWNER@example.com",
+        },
+    )
+
+    assert response.status_code == 201
+
+    project = models.Project.objects.get(pk=response.data["id"])
+    assert project.name == "a project"
+    assert project.description == "a description"
+    assert project.commune == commune
+    assert project.submitted_by == user
+
+    # the project skips moderation, hence nobody is notified of its submission
+    project_site = project.project_sites.get(site=site)
+    assert project_site.status == "TO_PROCESS"
+    assert project_site.is_origin is True
+    assert notifications_models.Notification.objects.count() == 0
+
+    # the owner account is created on the fly, w/ a lowercased email
+    owner = auth_models.User.objects.get(username="owner@example.com")
+    assert project.owner == owner
+    assert site in owner.profile.sites.all()
+
+
+@pytest.mark.django_db
+def test_existing_owner_account_is_reused_by_project_create_api(request, api_client):
+    commune = baker.make(geomatics_models.Commune, insee="62000")
+    owner = baker.make(auth_models.User, username="owner@example.com")
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    api_client.force_authenticate(user)
+
+    url = reverse("m2m:projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "insee": commune.insee,
+            "owner_email": "owner@example.com",
+        },
+    )
+
+    assert response.status_code == 201
+    assert auth_models.User.objects.filter(username="owner@example.com").count() == 1
+
+    project = models.Project.objects.get(pk=response.data["id"])
+    assert project.owner == owner
 
 
 ########################################################################

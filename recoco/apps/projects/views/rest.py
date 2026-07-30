@@ -20,7 +20,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -54,6 +54,7 @@ from ..filters import (
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
+    NewProjectSerializer,
     ProjectForListSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -132,6 +133,17 @@ class ProjectDetail(
             #     )
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectCreate(CreateAPIView):
+    """Create a project on the current site
+
+    The project skips moderation: it is created already validated, and no one
+    is notified of its submission.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = NewProjectSerializer
 
 
 class ProjectList(ListAPIView):
