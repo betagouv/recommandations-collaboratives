@@ -664,3 +664,56 @@ def test_message_notification_is_filled_with_metadata_upon_creation(
     assert notification
 
     assert "annotations" in notification.data.keys()
+
+
+@pytest.mark.django_db
+def test_notification_annotation_updated_on_message_edit(
+    project_ready, project_editor, request, client
+):
+    current_site = get_current_site(request)
+
+    # Add a member to receive notifications
+    member = baker.make(auth_models.User)
+    assign_collaborator(member, project_ready)
+    client.force_login(project_editor)
+
+    # Create a message with only a text node (no documents)
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    data = {"nodes": [{"position": 1, "type": "MarkdownNode", "text": "Hello"}]}
+    response = client.post(url, json.dumps(data), content_type="application/json")
+    assert response.status_code == 201
+
+    message = Message.objects.last()
+
+    # Assert notification with POST_MESSAGE verb was created, with 0 documents
+    notification = Notification.objects.filter(
+        verb=verbs.Conversation.POST_MESSAGE,
+        recipient=member,
+    ).last()
+    assert notification is not None
+    assert notification.data["annotations"]["documents"]["count"] == 0
+
+    # Create a document and edit the message to include it
+    doc = baker.make(
+        projects_models.Document,
+        site=current_site,
+        project=project_ready,
+        uploaded_by=project_editor,
+        the_link="http://un.site.fr",
+    )
+    edit_url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    edit_data = {
+        "nodes": [
+            {"position": 1, "type": "DocumentNode", "document_id": doc.id},
+        ]
+    }
+    response = client.patch(
+        edit_url, json.dumps(edit_data), content_type="application/json"
+    )
+    assert response.status_code == 200
+
+    # Assert the action stream annotation was updated to reflect the new document count
+    notification.refresh_from_db()
+    assert notification.data["annotations"]["documents"]["count"] == 1

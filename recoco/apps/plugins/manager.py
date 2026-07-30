@@ -45,6 +45,14 @@ def _build_plugin_manager():
     return pm
 
 
+def get_site_configuration(site):
+    """Return the SiteConfiguration for a given Site, or None if absent."""
+    try:
+        return SiteConfiguration.objects.get(site=site)
+    except SiteConfiguration.DoesNotExist:
+        return None
+
+
 def get_site_plugin_manager(request=None, site=None):
     """
     Return a plugin manager scoped to the current tenant.
@@ -62,9 +70,8 @@ def get_site_plugin_manager(request=None, site=None):
     if request:
         site_config = getattr(request, "site_config", None)
     elif site:
-        try:
-            site_config = SiteConfiguration.objects.get(site=site)
-        except SiteConfiguration.DoesNotExist:
+        site_config = get_site_configuration(site)
+        if site_config is None:
             return recoco_pm
 
     # Feed the scoped plugin manager with enabled plugins
