@@ -199,9 +199,11 @@ def is_member(user, project, allow_draft):
     )  # noqa: F841
 
 
+# FIXME no callers found anywhere in the codebase (incl. templates) as of
+# the geomatics i18n Phase 2 migration (may be dead code)
 def in_allowed_departments(user, project):
     """return true if project is in allowed departments for user"""
-    allowed = user.profile.departments.values_list("code", flat=True)
+    allowed = user.profile.departments.values_list("id", flat=True)
     if not allowed:  # empty list means full access
         return True
     return project.commune and (project.commune.department_id in allowed)

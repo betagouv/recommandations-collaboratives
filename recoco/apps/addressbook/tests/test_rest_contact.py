@@ -164,14 +164,14 @@ def test_organization_start_with_filter(
 def test_organization_department(
     api_client, staff_user, current_site, query_params, expected_result
 ):
-    baker.make(Department, code=33, name="Corusant")
-    baker.make(Department, code=14, name="Yavin")
-    baker.make(Department, code=31, name="Tatoine")
+    dept_corusant = baker.make(Department, code=33, name="Corusant")
+    dept_yavin = baker.make(Department, code=14, name="Yavin")
+    dept_tatoine = baker.make(Department, code=31, name="Tatoine")
 
     jedi_organization = baker.make(
         Organization, name="Conseil des Jedi", sites=[current_site]
     )
-    jedi_organization.departments.add(33, 14)
+    jedi_organization.departments.add(dept_corusant, dept_yavin)
     baker.make(
         Contact,
         first_name="obiwan",
@@ -182,7 +182,7 @@ def test_organization_department(
     sith_organization = baker.make(
         Organization, name="Empire Sith", sites=[current_site]
     )
-    sith_organization.departments.add(31)
+    sith_organization.departments.add(dept_tatoine)
     baker.make(
         Contact,
         first_name="vador",

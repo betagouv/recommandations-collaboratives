@@ -29,7 +29,7 @@ class OrganizationFilter(django_filters.FilterSet):
 
     departments = django_filters.ModelMultipleChoiceFilter(
         label="Départements concernés",
-        field_name="departments",
+        field_name="departments__code",
         to_field_name="code",
         queryset=geomatics_models.Department.objects.all(),
     )
@@ -65,7 +65,7 @@ class UserFilter(django_filters.FilterSet):
 
     departments = django_filters.ModelMultipleChoiceFilter(
         label="Départements conseillés",
-        field_name="profile__departments",
+        field_name="profile__departments__code",
         to_field_name="code",
         queryset=geomatics_models.Department.objects.all(),
     )
