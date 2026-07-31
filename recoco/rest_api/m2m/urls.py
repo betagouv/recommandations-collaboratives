@@ -1,29 +1,12 @@
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework import routers
 
 from recoco.apps.projects.views import rest as projects_rest
 from recoco.rest_api.permissions import IsM2MPartner
 
 app_name = "m2m"
 
-
-class M2MAPIRootView(routers.APIRootView):
-    """List the endpoints of the m2m api"""
-
-    permission_classes = [IsM2MPartner]
-
-
-class M2MRouter(routers.DefaultRouter):
-    """Router whose root view is restricted to the m2m partners, as the rest"""
-
-    APIRootView = M2MAPIRootView
-
-
-router = M2MRouter()
-
-
-m2m_urls = [
+api_urls = [
     path(
         "projects/",
         projects_rest.ProjectCreate.as_view(),
@@ -35,8 +18,6 @@ m2m_urls = [
         name="projects-members-create",
     ),
 ]
-
-api_urls = router.urls + m2m_urls
 
 # Restrict the schema to the m2m endpoints only, mounted under their real
 # prefix so generated paths match the ones clients actually call.
