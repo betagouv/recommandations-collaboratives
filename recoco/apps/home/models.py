@@ -58,6 +58,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.change_addressbook",
         "sites.manage_resources",
     ),
+    "m2m_partner": ("sites.use_m2m_api",),
 }
 
 
@@ -71,6 +72,12 @@ def create_site_permissions(sender, **kwargs):
     auth_models.Permission.objects.get_or_create(
         codename="manage_configuration",
         name="Can manage the configuration",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="use_m2m_api",
+        name="Can use the machine to machine API",
         content_type=site_ct,
     )
 

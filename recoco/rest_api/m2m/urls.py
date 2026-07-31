@@ -11,14 +11,14 @@ router = routers.DefaultRouter()
 
 m2m_urls = [
     path(
-        "projects/<int:pk>/",
-        projects_rest.ProjectDetail.as_view(),
-        name="projects-detail",
-    ),
-    path(
         "projects/",
         projects_rest.ProjectCreate.as_view(),
         name="projects-create",
+    ),
+    path(
+        "projects/<int:pk>/members/",
+        projects_rest.ProjectMembershipCreate.as_view(),
+        name="projects-members-create",
     ),
 ]
 

@@ -11,12 +11,13 @@ from recoco import verbs
 from recoco.apps.geomatics.models import Commune
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
+from recoco.apps.invites.models import Invite
 from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
-from .utils import assign_collaborator
+from .utils import assign_advisor, assign_collaborator, assign_observer
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -222,6 +223,14 @@ class UserProjectSerializer(ProjectSerializer):
         }
 
 
+def get_or_create_user_on_site(email: str, site: Site) -> User:
+    """Return the user of given email, creating its account if needed"""
+    user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
+    user.profile.sites.add(site)
+
+    return user
+
+
 class NewProjectSerializer(ProjectSerializer):
     """Create an already validated project, on the current site
 
@@ -242,14 +251,6 @@ class NewProjectSerializer(ProjectSerializer):
 
     description = serializers.CharField(required=True)
     tags = TagListSerializerField(required=False)
-
-    @staticmethod
-    def get_or_create_user_on_site(email: str, site: Site) -> User:
-        """Return the user of given email, creating its account if needed"""
-        user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
-        user.profile.sites.add(site)
-
-        return user
 
     def validate_owner_email(self, value):
         return value.lower()
@@ -285,10 +286,43 @@ class NewProjectSerializer(ProjectSerializer):
             site=self.current_site, status="TO_PROCESS", is_origin=True
         )
 
-        owner = self.get_or_create_user_on_site(owner_email, self.current_site)
+        owner = get_or_create_user_on_site(owner_email, self.current_site)
         assign_collaborator(owner, project, is_owner=True)
 
         return project
+
+
+class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Attach someone, given by email, to a project with the given role
+
+    The roles are the ones of an invitation, but the account is created if it
+    does not exist yet and the person is attached right away: no invitation is
+    sent, and nothing is to be accepted.
+    """
+
+    email = serializers.EmailField()
+    role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
+
+    @property
+    def project(self) -> Project:
+        return self.context["project"]
+
+    def validate_email(self, value):
+        return value.lower()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = get_or_create_user_on_site(validated_data["email"], self.current_site)
+        role = validated_data["role"]
+
+        if role == "COLLABORATOR":
+            assign_collaborator(user, self.project)
+        elif role == "SWITCHTENDER":
+            assign_advisor(user, self.project, site=self.current_site)
+        else:
+            assign_observer(user, self.project, site=self.current_site)
+
+        return validated_data
 
 
 class ProjectForListSerializer(BaseSerializerMixin):
