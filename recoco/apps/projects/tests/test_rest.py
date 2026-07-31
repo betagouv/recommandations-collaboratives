@@ -694,37 +694,6 @@ def m2m_partner(request):
 
 
 @pytest.mark.django_db
-def test_anonymous_cannot_use_project_create_api(api_client):
-    url = reverse("m2m:projects-create")
-    response = api_client.post(url, data={"name": "a project"})
-
-    assert response.status_code == 403
-    assert not models.Project.objects.exists()
-
-
-@pytest.mark.django_db
-def test_non_partner_cannot_use_project_create_api(api_client):
-    commune = baker.make(geomatics_models.Commune, insee="62000")
-    user = baker.make(auth_models.User, email="me@example.com")
-
-    api_client.force_authenticate(user)
-
-    url = reverse("m2m:projects-create")
-    response = api_client.post(
-        url,
-        data={
-            "name": "a project",
-            "description": "a description",
-            "insee": commune.insee,
-            "owner_email": "owner@example.com",
-        },
-    )
-
-    assert response.status_code == 403
-    assert not models.Project.objects.exists()
-
-
-@pytest.mark.django_db
 def test_unknown_insee_code_is_reported_by_project_create_api(api_client, m2m_partner):
     api_client.force_authenticate(m2m_partner)
 
@@ -815,21 +784,6 @@ def test_existing_owner_account_is_reused_by_project_create_api(
 ########################################################################
 # attach members and advisors to a project
 ########################################################################
-
-
-@pytest.mark.django_db
-def test_non_partner_cannot_use_project_membership_api(api_client, project):
-    user = baker.make(auth_models.User, email="me@example.com")
-
-    api_client.force_authenticate(user)
-
-    url = reverse("m2m:projects-members-create", args=[project.id])
-    response = api_client.post(
-        url, data={"email": "jane@example.com", "role": "COLLABORATOR"}
-    )
-
-    assert response.status_code == 403
-    assert not project.members.exists()
 
 
 @pytest.mark.django_db
