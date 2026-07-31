@@ -46,6 +46,7 @@ schema_urls = [
     path(
         "schema/",
         SpectacularAPIView.as_view(
+            permission_classes=[IsM2MPartner],
             urlconf=schema_urlconf,
             custom_settings={
                 "TITLE": "Recoco M2M API",
@@ -57,7 +58,9 @@ schema_urls = [
     ),
     path(
         "schema/swagger-ui/",
-        SpectacularSwaggerView.as_view(url_name="m2m:schema"),
+        SpectacularSwaggerView.as_view(
+            permission_classes=[IsM2MPartner], url_name="m2m:schema"
+        ),
         name="swagger-ui",
     ),
 ]
