@@ -99,9 +99,8 @@
                 </div>
                 <!-- Empty state -->
                 {% if not notes.all and not sticky_notes.all %}
-                    <div class="fr-p-3w text-center text-muted">
-                        <p class="fr-text--sm">Aucune note pour cette organisation</p>
-                    </div>
+                    {% url 'crm-organization-note-create' organization.pk as create_note_url %}
+                    {% include "crm/fragments/notes/empty_state.html" with create_note_url=create_note_url %}
                 {% endif %}
                 <!-- Pinned notes -->
                 {% for note in sticky_notes.all %}
