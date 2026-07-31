@@ -1,0 +1,21 @@
+<div class="fr-checkbox-group">
+    <input id="accept-cgu"
+            x-model="acceptCgu"
+            type="checkbox"
+            required
+            aria-describedby="accept-cgu-messages">
+    <label class="fr-label" for="accept-cgu">
+        J'accepte les&nbsp;
+        <a href="https://recommandations-collaboratives.beta.gouv.fr/cgu/" target="_blank" class="fr-link text-underline">
+            Conditions générales d'utilisation
+            <span class="fr-sr-only">Lien s'ouvrant dans un autre onglet</span>
+        </a>
+        &nbsp;et la&nbsp;
+        <a href="https://recommandations-collaboratives.beta.gouv.fr/confidentialite/" target="_blank" class="fr-link text-underline">
+            Politique de confidentialité
+            <span class="fr-sr-only">Lien s'ouvrant dans un autre onglet</span>
+        </a>
+        &nbsp;du service {{ request.site.name }}
+    </label>
+    <div class="fr-messages-group" id="accept-cgu-messages" aria-live="polite"></div>
+</div>
