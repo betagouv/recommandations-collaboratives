@@ -543,10 +543,12 @@ def organization_details(request, organization_id):
         profile__in=organization.registered_profiles.all()
     )
 
-    last_members_activity_at = participants.aggregate(
-        last=Max("profile__previous_activity_at")
-    )["last"]
-    last_members_login_at = participants.aggregate(last=Max("last_login"))["last"]
+    members_stats = participants.aggregate(
+        last_activity=Max("profile__previous_activity_at"),
+        last_login=Max("last_login"),
+    )
+    last_members_activity_at = members_stats["last_activity"]
+    last_members_login_at = members_stats["last_login"]
 
     next_members_reminder = (
         reminders_models.Reminder.on_site.filter(
