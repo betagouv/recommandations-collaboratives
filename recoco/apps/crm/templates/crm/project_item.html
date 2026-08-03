@@ -10,11 +10,7 @@
             {% else %}
                 <span class="fr-icon-folder-2-fill fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
             {% endif %}
-            {% if project.deleted %}
-                <span class="text-decoration-line-through">{{ project.name }}</span>
-            {% else %}
-                <span>{{ project.name }}</span>
-            {% endif %}
+            <span {% if project.deleted %}class="text-decoration-line-through"{% endif %}>{{ project.name }}</span>
         </a>
     </li>
 {% endwith %}
