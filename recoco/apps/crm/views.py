@@ -10,7 +10,7 @@ from collections import Counter, OrderedDict, defaultdict
 from datetime import datetime, timedelta
 
 from actstream import action
-from actstream.models import Action, target_stream
+from actstream.models import Action
 from allauth.account.internal.flows.email_verification import (
     send_verification_email_for_user,
 )
@@ -582,12 +582,6 @@ def organization_details(request, organization_id):
 
     organization_ct = ContentType.objects.get_for_model(Organization)
 
-    unread_notifications = (
-        notifications_models.Notification.on_site.unread()
-        .filter(recipient=request.user, public=False)
-        .filter(target_content_type=organization_ct, target_object_id=organization.pk)
-    )
-
     org_notes = (
         models.Note.on_site.filter(
             object_id=organization.pk,
@@ -1041,11 +1035,13 @@ def project_details(request, project_id):
 
     site_origin = project.project_sites.get(is_origin=True)
 
-    actions = target_stream(project)
+    project_ct = ContentType.objects.get_for_model(Project)
 
     user_ct = ContentType.objects.get_for_model(User)
 
-    project_ct = ContentType.objects.get_for_model(Project)
+    actions = Action.objects.filter(
+        site=request.site, target_content_type=project_ct, target_object_id=project.pk
+    )
 
     conversation_stats = {
         "messages_count": Message.not_deleted.filter(project=project).count(),
