@@ -43,7 +43,7 @@
                             <h4 class="crm-home__subtitle fr-mb-1v">
                                 Alertes
                             </h4>
-                            <div class="gap-2 d-flex flex-wrap">
+                            <div class="gap-4 d-flex flex-wrap">
                                 <div class="crm-home__card-container">
                                     {% url "projects-moderation-list" as url %}
                                     {% with text="Nouveaux dossiers ou demandes d’accès conseiller à modérer" %}
@@ -57,7 +57,7 @@
                         <h4 class="crm-home__subtitle fr-mb-1v">
                             Tâches récurrentes
                         </h4>
-                        <div class="gap-2 d-flex flex-wrap">
+                        <div class="gap-4 d-flex flex-wrap">
                             <div class="crm-home__card-container">
                                 {% url 'crm-list-projects-low-reach' as url %}
                                 {% with text="Rappelez les demandeurs qui n’ont pas lu les recommandations ou donné de nouvelles" %}
@@ -76,7 +76,7 @@
                         <h4 class="crm-home__subtitle fr-mb-1v">
                             Données
                         </h4>
-                        <div class="gap-2 d-flex flex-wrap">
+                        <div class="gap-4 d-flex flex-wrap">
                             <div class="crm-home__card-container">
                                 {% url 'crm-user-list' as url %}
                                 {% with text="Gestion de vos utilisateurs, suivi de leur activité" %}
@@ -120,7 +120,7 @@
                             <h4 class="crm-home__subtitle fr-mb-1v">
                                 Configuration du portail
                             </h4>
-                            <div class="gap-2 d-flex flex-wrap">
+                            <div class="gap-4 d-flex flex-wrap">
                                 {% if "manage_configuration" in user_site_perms %}
                                     <div class="crm-home__card-container">
                                         {% url 'crm-site-configuration' as url %}
@@ -159,7 +159,7 @@
                             <h4 class="crm-home__subtitle fr-mb-1v">
                                 Sécurité de votre compte
                             </h4>
-                            <div class="gap-2 d-flex flex-wrap">
+                            <div class="gap-4 d-flex flex-wrap">
                                 <div class="crm-home__card-container">
                                     {% url 'account_email' as email_url_ %}
                                     {% with text="Confirmez que vous avez accès à votre adresse email" %}

@@ -22,7 +22,7 @@
     background: var(--light-background-default-grey, #FFF);
     box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.10);
     display: flex;
-    padding: 12px;
+    padding: 14px;
     align-items: flex-start;
     &--icon {
       flex-shrink: 0;
@@ -37,15 +37,15 @@
     &--arrow {
         width: 20px;
         height: 20px;
-        right: 12px;
-        top: 12px;
+        right: 14px;
+        top: 14px;
     }
     &--text {
         display: block;
         color: var(--light-text-mention-grey, #666);
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 400;
-        line-height: 16px;
+        line-height: 22px;
     }
   }
 
