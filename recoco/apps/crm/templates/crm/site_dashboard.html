@@ -35,7 +35,15 @@
                 Bienvenue sur l’Administration
             </h3>
         </div>
-        <div x-data="Crm" class="fr-px-0 d-flex">
+        <div x-data="Crm" class="fr-px-0 d-flex flex-column">
+            <div class="fr-pb-4w">
+                <h4 class="crm-home__subtitle fr-mb-1v">Activité de l'ensemble des dossiers</h4>
+                {% include "crm/timeline.html" with actions=site_action_stream|slice:":3" %}
+                <div>
+                    <a class="button filled grey small inherit fw-bold fr-mt-1w"
+                       href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
+                </div>
+            </div>
             <div class="crm-home__section d-flex flex-column justify-content-start">
                 <div class="d-flex flex-column">
                     {% if projects_to_moderate_count or advisor_access_requests_count %}
@@ -195,16 +203,6 @@
                         -- Pas encore d'activité, revenez plus tard ! --
                     {% endfor %}
                 </ul>
-            </div>
-            <div class="crm-home__sidebar fr-px-3w fr-pt-1v crm-timeline-min-height d-flex flex-column">
-                <h3 class="crm-home__subtitle fr-mt-2w">Activité de l'ensemble des dossiers</h3>
-                <div class="crm-home__timeline">
-                    {% include "crm/timeline.html" with actions=site_action_stream %}
-                </div>
-                <div class="d-flex justify-content-center">
-                    <a class="button filled grey small inherit fw-bold fr-mt-3w fr-mb-3w"
-                        href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
-                </div>
             </div>
         </div>
     </div>

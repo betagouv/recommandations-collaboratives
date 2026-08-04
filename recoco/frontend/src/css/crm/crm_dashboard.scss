@@ -10,7 +10,7 @@
     text-transform: uppercase;
   }
   &__section {
-    width: 70%;
+    width: 100%;
   }
   &__card-container {
     width: 32%;
@@ -47,16 +47,6 @@
         font-weight: 400;
         line-height: 22px;
     }
-  }
-
-  &__sidebar {
-    width: 30%
-  }
-
-  &__timeline {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
   }
 }
 
