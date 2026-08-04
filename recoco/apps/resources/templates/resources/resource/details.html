@@ -97,9 +97,11 @@
     </style>
 {% endblock css %}
 {% block content %}
-    <div class="row fr-py-6w" id="resource-main-content">
-        <div class="col-9 fr-px-6w fr-mx-auto font-marianne" id="resource-main">
-            {% include "resources/resource/fragments/breadcrumb.html" %}
+<div class="fr-p-5v">
+    {% include "resources/resource/fragments/breadcrumb.html" %}
+</div>
+    <div class="row fr-px-10w" id="resource-main-content">
+        <div class="col-8 fr-px-6w fr-mx-auto font-marianne" id="resource-main">
             <div class="d-flex align-items-center fr-mb-2w" id="resource-details">
                 {% include "resources/resource/fragments/category_list.html" %}
                 {% include "resources/resource/fragments/author.html" %}
@@ -114,7 +116,7 @@
             Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'">nous interpeller</a>.
             </div> {% endcomment %}
         </div>
-        <div class="col-3 fr-mx-auto" id="resource-footer">
+        <div class="col-4 fr-mx-auto" id="resource-footer">
             <!-- Sidebar -->
             <div class="admin-sidebar">
                 <!-- User actions -->

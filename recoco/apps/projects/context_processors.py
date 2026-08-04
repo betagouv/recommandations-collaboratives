@@ -7,6 +7,7 @@ from django.utils.timezone import localtime
 from notifications import models as notifications_models
 
 from recoco import verbs
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.utils import check_if_advisor, is_admin_for_site, is_staff_for_site
 
 from .utils import can_administrate_project
@@ -83,6 +84,11 @@ def unread_notifications_processor(request):
         verbs.Project.SET_ACTIVE,
         verbs.Project.EDITED,
     ]
+
+    for plugin_verbs in get_site_plugin_manager(
+        request
+    ).hook.notification_project_verbs():
+        show_project_verb_list.extend(plugin_verbs)
 
     for notification in unread_notifications:
         date = localtime(notification.timestamp).date()
