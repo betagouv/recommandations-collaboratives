@@ -80,6 +80,10 @@
                     </template>
                     {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" show_count_label=True %}
                 </div>
+                <a href="{% url 'crm-user-list' %}"
+                   class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+                   title="Réinitialiser la recherche et les filtres"
+                   data-test-id="reset-filters">Réinitialiser</a>
             </div>
         </form>
         <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">

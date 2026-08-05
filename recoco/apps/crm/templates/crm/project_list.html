@@ -42,6 +42,10 @@
                     <label class="filter__label">Statut:</label>
                     {% include "tools/multi_select.html" %}
                 </div>
+                <a href="{% url 'crm-project-list' %}"
+                   class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+                   title="Réinitialiser la recherche et les filtres"
+                   data-test-id="reset-filters">Réinitialiser</a>
                 {% comment %} TODO Add CSV download button with backend functionnality {% endcomment %}
                 {% comment %} <button class="fr-btn fr-btn--sm no-wrap" title="Télécharger en CSV">🚧Télécharger en CSV</button> {% endcomment %}
             </div>

@@ -90,6 +90,10 @@
                        @change="$el.closest('form').submit()">
                 <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes dossiers</label>
             </div>
+            <a href="{% url 'crm-list-projects-low-reach' %}"
+               class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+               title="Réinitialiser la recherche et les filtres"
+               data-test-id="reset-filters">Réinitialiser</a>
             <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
                class="fr-btn fr-btn--primary fr-btn--sm text-nowrap"
                data-test-id="low-reach-csv-export">

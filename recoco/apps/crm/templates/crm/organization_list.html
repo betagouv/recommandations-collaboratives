@@ -46,6 +46,10 @@
                         </template>
                         {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
+                    <a href="{% url 'crm-organization-list' %}"
+                       class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+                       title="Réinitialiser la recherche et les filtres"
+                       data-test-id="reset-filters">Réinitialiser</a>
                 </form>
                 {# Merge action (drives the table form below through the form= attribute) #}
                 <div class="d-flex align-items-center gap-3 text-nowrap">
