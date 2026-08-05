@@ -24,10 +24,12 @@
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
                     {% with count=paginator.count %}
-                        {% if count > 0 %}
+                        {% if count == 0 %}
+                            Aucun résultat
+                        {% elif paginator.num_pages > 1 %}
                             {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
                         {% else %}
-                            Aucun résultat
+                            {{ count }} résultat{{ count|pluralize }}
                         {% endif %}
                     {% endwith %}
                 </span>
@@ -74,10 +76,12 @@
                     <table class="project-table w-100">
                         <caption class="fr-ml-2v">
                             {% with count=paginator.count %}
-                                {% if count > 0 %}
-                                    {{ count }} résultat{{ count|pluralize }}
-                                {% else %}
+                                {% if count == 0 %}
                                     Aucun résultat
+                                {% elif paginator.num_pages > 1 %}
+                                    {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                                {% else %}
+                                    {{ count }} résultat{{ count|pluralize }}
                                 {% endif %}
                             {% endwith %}
                         </caption>

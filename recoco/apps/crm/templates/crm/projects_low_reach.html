@@ -101,6 +101,16 @@
                 Télécharger en CSV
             </a>
         </form>
+        <span class="fr-text--sm fr-text-mention--grey d-block fr-mb-1w"
+              data-test-id="low-reach-count-label">
+            {% if total_count == 0 %}
+                Aucun résultat
+            {% elif page_obj.paginator.num_pages > 1 %}
+                {{ page_obj.object_list|length }} sur {{ total_count }} résultat{{ total_count|pluralize }}
+            {% else %}
+                {{ total_count }} résultat{{ total_count|pluralize }}
+            {% endif %}
+        </span>
         <div class="table-responsive">
             <table class="project-table w-100" data-test-id="low-reach-table">
                 <colgroup>
