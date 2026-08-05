@@ -25,15 +25,13 @@
               class="w-100 d-flex flex-column justify-content-start project-list-crm">
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
-                    {% with users.qs.count as users_count %}
-                        {% if users_count > 0 %}
-                            {% if not has_active_filter and users_count > max_users_without_filter %}
-                                {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }}
-                            {% else %}
-                                {{ users_count }} résultat{{ users_count|pluralize }}
-                            {% endif %}
-                        {% else %}
+                    {% with count=paginator.count %}
+                        {% if count == 0 %}
                             Aucun résultat
+                        {% elif paginator.num_pages > 1 %}
+                            {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                        {% else %}
+                            {{ count }} résultat{{ count|pluralize }}
                         {% endif %}
                     {% endwith %}
                 </span>
@@ -91,15 +89,13 @@
         <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
             <table class="project-table w-100">
                 <caption class="fr-ml-2v">
-                    {% with users.qs.count as users_count %}
-                        {% if users_count > 0 %}
-                            {% if not has_active_filter and users_count > max_users_without_filter %}
-                                {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }} — utilisez les filtres pour affiner
-                            {% else %}
-                                {{ users_count }} résultat{{ users_count|pluralize }}
-                            {% endif %}
-                        {% else %}
+                    {% with count=paginator.count %}
+                        {% if count == 0 %}
                             Aucun résultat
+                        {% elif paginator.num_pages > 1 %}
+                            {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                        {% else %}
+                            {{ count }} résultat{{ count|pluralize }}
                         {% endif %}
                     {% endwith %}
                 </caption>
@@ -129,7 +125,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for crm_user in display_qs %}
+                    {% for crm_user in page_obj %}
                         <tr>
                             <td class="text-ellipsis">
                                 <a class="fr-link project-table__project-name"
@@ -174,6 +170,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% include "tools/paginator.html" with page_obj=page_obj %}
         </div>
     </div>
 {% endblock content %}
