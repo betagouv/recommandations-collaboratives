@@ -18,7 +18,7 @@
     {% include "crm/fragments/navigation.html" with users=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Utilisateurs' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm">
+    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm crm-list-scroll">
         <h1 class="fr-h3 fr-px-5v fr-pt-1w">Liste des utilisateurs</h1>
         <form method="get"
               action="{% url 'crm-user-list' %}"

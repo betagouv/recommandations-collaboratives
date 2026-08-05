@@ -19,7 +19,7 @@
     {% include "crm/fragments/navigation.html" with projects=True %}
     <div x-data="{ breadcrumbs: { links: [{ url: '{% url 'crm-site-dashboard' %}', title: 'Admin' }, { url: '{% url 'crm-project-list' %}', title: 'Dossiers' }], current: 'Dossiers à relancer' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div class="fr-container-fluid fr-px-5v fr-pb-5v crm">
+    <div class="fr-container-fluid fr-px-5v fr-pb-5v crm crm-list-scroll">
         <div class="d-flex justify-content-between align-items-start fr-mt-3w fr-mb-3w flex-wrap">
             <div>
                 <a href="{% url 'crm-project-list' %}"

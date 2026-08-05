@@ -23,7 +23,7 @@
     {{ regions|json_script:"regionsArray" }}
     <span x-text="departmentsArray.textContent"></span>
     <span x-text="regionsArray.textContent"></span>
-    <div x-data="Crm({{ request.site.id }})" class="d-flex fr-px-0 crm">
+    <div x-data="Crm({{ request.site.id }})" class="d-flex fr-px-0 crm crm-list-scroll">
         <div x-data="ProjectListCrm(departmentsArray, regionsArray)"
              @selected-departments="saveSelectedDepartment($event)"
              @multi-select-change="saveSelectedStatus($event)"
