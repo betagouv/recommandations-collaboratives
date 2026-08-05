@@ -126,9 +126,18 @@
                     <tr>
                         <th scope="col">Dossier</th>
                         <th scope="col">Conseillers</th>
-                        <th scope="col" title="Dernière activité du demandeur">Dernière act.</th>
-                        <th scope="col" title="Date d'émission de la dernière reco">Dernière reco.</th>
-                        <th scope="col" title="Nombre de recos lues sur nombre total de recos">Recos lues</th>
+                        <th scope="col">
+                            Dernière act.
+                            {% include "crm/fragments/th_info.html" with text="Dernière activité du demandeur" %}
+                        </th>
+                        <th scope="col">
+                            Dernière reco.
+                            {% include "crm/fragments/th_info.html" with text="Date d'émission de la dernière recommandation" %}
+                        </th>
+                        <th scope="col">
+                            Recos lues
+                            {% include "crm/fragments/th_info.html" with text="Nombre de recommandations lues sur le nombre total de recommandations envoyées" %}
+                        </th>
                         <th scope="col">Statut</th>
                         <th scope="col">Actions</th>
                     </tr>

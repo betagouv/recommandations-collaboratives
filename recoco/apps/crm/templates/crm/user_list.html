@@ -120,11 +120,10 @@
                         <th scope="col">Email</th>
                         <th scope="col">Organisation</th>
                         <th scope="col">Statut</th>
-                        <th scope="col"
-                            data-bs-toggle="tooltip"
-                            data-bs-title="Nombre de dossiers dont la personne est membre"
-                            data-bs-placement="top"
-                            title="Nombre de dossiers dont la personne est membre">Dossiers</th>
+                        <th scope="col">
+                            Dossiers
+                            {% include "crm/fragments/th_info.html" with text="Nombre de dossiers dont la personne est membre" %}
+                        </th>
                         <th scope="col" class="text-ellipsis">Dernière connexion</th>
                         <th scope="col">Inscription</th>
                     </tr>

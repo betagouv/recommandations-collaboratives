@@ -89,7 +89,10 @@
                             <th scope="col">Catégorie</th>
                             <th scope="col">Date d'expiration</th>
                             <th scope="col">Statut</th>
-                            <th scope="col">Nb d'utilisations</th>
+                            <th scope="col">
+                                Nb d'utilisations
+                                {% include "crm/fragments/th_info.html" with text="Nombre de recommandations utilisant cette ressource" %}
+                            </th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>

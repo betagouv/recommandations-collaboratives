@@ -96,8 +96,14 @@
                             <tr>
                                 <th scope="col">Organisation</th>
                                 <th scope="col">Départements</th>
-                                <th scope="col">Membres</th>
-                                <th scope="col">Dossiers</th>
+                                <th scope="col">
+                                    Membres
+                                    {% include "crm/fragments/th_info.html" with text="Nombre de membres inscrits sur le site rattachés à l'organisation" %}
+                                </th>
+                                <th scope="col">
+                                    Dossiers
+                                    {% include "crm/fragments/th_info.html" with text="Nombre de dossiers du site portés par un membre de l'organisation" %}
+                                </th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
