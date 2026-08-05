@@ -37,7 +37,7 @@
                     <span class="project-list-crm__projects-count-label" x-show="!dataLoaded">Chargement</span>
                 </div>
                 <div class="w-100 position-relative">
-                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher parmi les dossiers" %}
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher parmi les dossiers" show_search_button=True %}
                 </div>
                 {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" label_filter="Localisation :" filter_by_regions=True zone_objects="regions" select_all=True %}
                 <div class="d-flex align-items-center w-100" x-data="{ selected: [] }">

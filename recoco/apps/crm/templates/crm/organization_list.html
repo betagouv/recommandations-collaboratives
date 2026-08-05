@@ -38,7 +38,7 @@
                       action="{% url 'crm-organization-list' %}"
                       class="d-flex align-items-center flex-grow-1 gap-3 fr-m-0">
                     <div class="position-relative flex-grow-1">
-                        {% include "projects/project/fragments/search_bar.html" with name="name" value=organizations.form.name.value placeholder="Taper le nom d'une organisation" show_search_button=True %}
+                        {% include "projects/project/fragments/search_bar.html" with name="name" value=organizations.form.name.value placeholder="Rechercher parmi les organisations" show_search_button=True %}
                     </div>
                     <div x-data="DepartmentsFilterWrapper({{ selected_departments|default:'[]' }})"
                          @is-select-all-departments="onSelectAll($event.detail)"
