@@ -32,7 +32,9 @@
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "consent/banner.html" %}
         {% endif %}
-        <h1 class="visually-hidden">{{ request.site.name }}</h1>
+        {% block hidden_site_title %}
+            <h1 class="visually-hidden">{{ request.site.name }}</h1>
+        {% endblock hidden_site_title %}
         {% include "header/skip-links.html" %}
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "header/menu-top.html" %}
