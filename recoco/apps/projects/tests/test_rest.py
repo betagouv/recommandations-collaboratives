@@ -28,7 +28,7 @@ from recoco import verbs
 from recoco.apps.conversations import models as conversations_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.tasks import models as tasks_models
-from recoco.utils import login
+from recoco.utils import get_group_for_site, login
 
 from .. import models, utils
 from ..models import Document
@@ -685,19 +685,39 @@ def check_project_content(project, data):
 
 
 @pytest.fixture
-def m2m_partner(request):
-    """Return a user allowed to use the m2m api on the current site"""
+def api_user(request):
+    """Return the staff user making the api calls"""
     user = baker.make(auth_models.User, email="me@example.com")
-    assign_perm("use_m2m_api", user, get_current_site(request))
+    user.groups.add(get_group_for_site("staff", get_current_site(request)))
 
     return user
 
 
 @pytest.mark.django_db
-def test_unknown_insee_code_is_reported_by_project_create_api(api_client, m2m_partner):
-    api_client.force_authenticate(m2m_partner)
+def test_non_staff_cannot_use_project_create_api(api_client):
+    url = reverse("projects-create")
+    data = {
+        "name": "a project",
+        "description": "a description",
+        "insee": "62000",
+        "owner_email": "owner@example.com",
+    }
 
-    url = reverse("m2m:projects-create")
+    # anonymous
+    assert api_client.post(url, data=data).status_code == 403
+
+    # authenticated, but not staff for the current site
+    api_client.force_authenticate(baker.make(auth_models.User))
+    assert api_client.post(url, data=data).status_code == 403
+
+    assert not models.Project.objects.exists()
+
+
+@pytest.mark.django_db
+def test_unknown_insee_code_is_reported_by_project_create_api(api_client, api_user):
+    api_client.force_authenticate(api_user)
+
+    url = reverse("projects-create")
     response = api_client.post(
         url,
         data={
@@ -715,14 +735,14 @@ def test_unknown_insee_code_is_reported_by_project_create_api(api_client, m2m_pa
 
 @pytest.mark.django_db
 def test_project_is_created_already_validated_by_project_create_api(
-    request, api_client, m2m_partner
+    request, api_client, api_user
 ):
     site = get_current_site(request)
     commune = baker.make(geomatics_models.Commune, insee="62000")
 
-    api_client.force_authenticate(m2m_partner)
+    api_client.force_authenticate(api_user)
 
-    url = reverse("m2m:projects-create")
+    url = reverse("projects-create")
     response = api_client.post(
         url,
         data={
@@ -740,7 +760,7 @@ def test_project_is_created_already_validated_by_project_create_api(
     assert project.name == "a project"
     assert project.description == "a description"
     assert project.commune == commune
-    assert project.submitted_by == m2m_partner
+    assert project.submitted_by == api_user
 
     # the project skips moderation, hence nobody is notified of its submission
     project_site = project.project_sites.get(site=site)
@@ -755,15 +775,13 @@ def test_project_is_created_already_validated_by_project_create_api(
 
 
 @pytest.mark.django_db
-def test_existing_owner_account_is_reused_by_project_create_api(
-    api_client, m2m_partner
-):
+def test_existing_owner_account_is_reused_by_project_create_api(api_client, api_user):
     commune = baker.make(geomatics_models.Commune, insee="62000")
     owner = baker.make(auth_models.User, username="owner@example.com")
 
-    api_client.force_authenticate(m2m_partner)
+    api_client.force_authenticate(api_user)
 
-    url = reverse("m2m:projects-create")
+    url = reverse("projects-create")
     response = api_client.post(
         url,
         data={
@@ -787,14 +805,29 @@ def test_existing_owner_account_is_reused_by_project_create_api(
 
 
 @pytest.mark.django_db
+def test_non_staff_cannot_use_project_membership_api(api_client, project):
+    url = reverse("projects-members-create", args=[project.id])
+    data = {"email": "jane@example.com", "role": "COLLABORATOR"}
+
+    # anonymous
+    assert api_client.post(url, data=data).status_code == 403
+
+    # authenticated, but not staff for the current site
+    api_client.force_authenticate(baker.make(auth_models.User))
+    assert api_client.post(url, data=data).status_code == 403
+
+    assert not models.ProjectMember.objects.exists()
+
+
+@pytest.mark.django_db
 def test_collaborator_is_attached_by_project_membership_api(
-    request, api_client, m2m_partner, project
+    request, api_client, api_user, project
 ):
     site = get_current_site(request)
 
-    api_client.force_authenticate(m2m_partner)
+    api_client.force_authenticate(api_user)
 
-    url = reverse("m2m:projects-members-create", args=[project.id])
+    url = reverse("projects-members-create", args=[project.id])
     response = api_client.post(
         url, data={"email": "JANE@example.com", "role": "COLLABORATOR"}
     )
@@ -818,14 +851,14 @@ def test_collaborator_is_attached_by_project_membership_api(
     "role,is_observer", [("SWITCHTENDER", False), ("OBSERVER", True)]
 )
 def test_advisor_is_attached_by_project_membership_api(
-    request, api_client, m2m_partner, project, role, is_observer
+    request, api_client, api_user, project, role, is_observer
 ):
     site = get_current_site(request)
     advisor = baker.make(auth_models.User, username="john@example.com")
 
-    api_client.force_authenticate(m2m_partner)
+    api_client.force_authenticate(api_user)
 
-    url = reverse("m2m:projects-members-create", args=[project.id])
+    url = reverse("projects-members-create", args=[project.id])
     response = api_client.post(url, data={"email": "john@example.com", "role": role})
 
     assert response.status_code == 201

@@ -36,7 +36,7 @@ from recoco.rest_api.pagination import (
     LargeResultsSetPagination,
     StandardResultsSetPagination,
 )
-from recoco.rest_api.permissions import BaseConversationPermission, IsM2MPartner
+from recoco.rest_api.permissions import BaseConversationPermission, IsStaffForSite
 from recoco.utils import (
     get_group_for_site,
     has_perm,
@@ -155,11 +155,10 @@ class ProjectCreate(CreateAPIView):
     Both are write-only: the created project is returned with its full
     `commune` representation, and without the owner email.
 
-    The caller must be an m2m partner of the current site, that is hold the
-    `sites.use_m2m_api` permission on it.
+    The caller must be staff for the current site.
     """
 
-    permission_classes = [IsM2MPartner]
+    permission_classes = [IsStaffForSite]
     serializer_class = NewProjectSerializer
 
 
@@ -178,12 +177,11 @@ class ProjectMembershipCreate(CreateAPIView):
     there is nothing to accept. Attaching someone who already holds the role
     on this project is a no-op, and still answers a `201`.
 
-    The project has to be one of the current site, and the caller must be an
-    m2m partner of that site, that is hold the `sites.use_m2m_api` permission
-    on it.
+    The project has to be one of the current site, and the caller must be
+    staff for that site.
     """
 
-    permission_classes = [IsM2MPartner]
+    permission_classes = [IsStaffForSite]
     serializer_class = ProjectMembershipSerializer
 
     def get_serializer_context(self):

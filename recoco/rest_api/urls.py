@@ -1,6 +1,6 @@
 import importlib
 
-from django.urls import include, path
+from django.urls import path
 from notifications import views as notifications_views
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -127,6 +127,16 @@ api_urls = [
         projects_rest.ProjectList.as_view(),
         name="projects-list",
     ),
+    path(
+        "projects/create/",
+        projects_rest.ProjectCreate.as_view(),
+        name="projects-create",
+    ),
+    path(
+        "projects/<int:pk>/members/",
+        projects_rest.ProjectMembershipCreate.as_view(),
+        name="projects-members-create",
+    ),
     # path(
     #     "projects/my_departments",
     #     projects_rest.ProjectDepartmentList.as_view(),
@@ -213,18 +223,6 @@ def _collect_plugin_rest_urls():
     return urls
 
 
-m2m_urls = [
-    path(
-        "m2m/",
-        include("recoco.rest_api.m2m.urls"),
-    ),
-]
-
 urlpatterns = (
-    router.urls
-    + api_urls
-    + auth_urls
-    + survey_urls
-    + m2m_urls
-    + _collect_plugin_rest_urls()
+    router.urls + api_urls + auth_urls + survey_urls + _collect_plugin_rest_urls()
 )

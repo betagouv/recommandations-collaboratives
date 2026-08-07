@@ -1,14 +1,12 @@
 from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.test.client import RequestFactory
-from guardian.shortcuts import assign_perm
 from model_bakery import baker
 
 from ..permissions import (
-    IsM2MPartner,
     IsStaffForSite,
     IsStaffForSiteOrIsAuthenticatedReadOnly,
     IsStaffForSiteOrReadOnly,
@@ -118,40 +116,3 @@ def test_is_staff_for_site_or_is_authenticated_read_only(
 
         permission = IsStaffForSiteOrIsAuthenticatedReadOnly()
         assert permission.has_permission(std_request, None) is expected_result
-
-
-@pytest.mark.django_db
-def test_is_m2m_partner():
-    site = Site.objects.get_current()
-    other_site = baker.make(Site)
-
-    partner = baker.make(User)
-    assign_perm("use_m2m_api", partner, site)
-
-    other_partner = baker.make(User)
-    assign_perm("use_m2m_api", other_partner, other_site)
-
-    request = RequestFactory().post("/")
-    request.site = site
-
-    permission = IsM2MPartner()
-
-    # nobody gets in without an account
-    request.user = AnonymousUser()
-    assert permission.has_permission(request, None) is False
-
-    # being authenticated is not enough, the permission is required
-    request.user = baker.make(User)
-    assert permission.has_permission(request, None) is False
-
-    # the permission is held on a site: a partner of another one is a stranger here
-    request.user = other_partner
-    assert permission.has_permission(request, None) is False
-
-    # our partner holds it on the site being requested
-    request.user = partner
-    assert permission.has_permission(request, None) is True
-
-    # ... and only opens that very site, not the neighbouring ones
-    request.site = other_site
-    assert permission.has_permission(request, None) is False
