@@ -63,6 +63,11 @@ urlpatterns = [
         views.siteconfiguration_tags,
         name="crm-site-configuration-tags",
     ),
+    path(
+        "crm/site_config/toggle_stopped",
+        views.siteconfiguration_toggle_stopped,
+        name="crm-site-configuration-toggle-stopped",
+    ),
     #
     # users
     path(

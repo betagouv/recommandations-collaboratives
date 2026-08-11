@@ -1,0 +1,8 @@
+{% if request.site.configuration.stopped_at == None %}
+    {% if user.is_authenticated %}
+        {% url 'onboarding' as onboarding_url %}
+        {% include "home/fragments/new_project_button.html" with button_url=onboarding_url|add:"?prefill=true" label="" %}
+    {% else %}
+        {% include "home/fragments/new_project_button.html" with label="" %}
+    {% endif %}
+{% endif %}

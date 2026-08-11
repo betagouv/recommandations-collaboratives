@@ -47,6 +47,15 @@ main {
   user-select: none;
 }
 
+.portal-stopped-banner {
+  top: 65px;
+  z-index: 1019;
+
+  &--anonymous {
+    top: 0;
+  }
+}
+
 @media (min-width: 768px) {
   .bd-placeholder-img-lg {
     font-size: 3.5rem;

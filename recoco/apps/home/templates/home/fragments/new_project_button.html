@@ -1,0 +1,10 @@
+{% url 'onboarding-project' as default_url %}
+<a href="{{ button_url|default:default_url }}"
+   class="{{ class_css|default:'fr-btn fr-text--xl' }}"
+   data-test-id="button-need-help">
+    {% if label %}
+        {{ label }}
+    {% else %}
+        Solliciter {{ request.site.name }}
+    {% endif %}
+</a>

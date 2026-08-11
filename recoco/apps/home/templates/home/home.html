@@ -23,20 +23,9 @@
                     <p class="fr-text--lg fr-my-3w">
                         Porteurs de dossiers, recevez des conseils personnalisés des conseillers compétents.
                     </p>
+                    
                     {% flag "enable_submit_new_project" %}
-                        <ul class="fr-btns-group fr-btns-group--inline" data-test-id="intro-uv">
-                            <li>
-                                {% if user.is_authenticated %}
-                                    <a href="{% url 'onboarding' %}?prefill=true"
-                                    class="fr-btn fr-text--xl"
-                                    data-test-id="button-need-help">Solliciter {{ request.site.name }}</a>
-                                {% else %}
-                                    <a href="{% url 'onboarding-project' %}"
-                                    class="fr-btn fr-text--xl"
-                                    data-test-id="button-need-help">Solliciter {{ request.site.name }}</a>
-                                {% endif %}
-                            </li>
-                        </ul>
+                        {% include "home/fragments/new_project_button_container.html" %}
                     {% endflag %}
                 </div>
             </div>

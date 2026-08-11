@@ -1,0 +1,77 @@
+{% load static %}
+<dialog class="fr-modal"
+        aria-labelledby="siteconfiguration-toggle-stopped-modal-title"
+        role="dialog"
+        id="siteconfiguration-toggle-stopped-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn--close fr-btn"
+                                title="Fermer la fenêtre modale"
+                                aria-controls="siteconfiguration-toggle-stopped-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h1 id="siteconfiguration-toggle-stopped-modal-title"
+                            class="fr-modal__title">
+                            <span class="fr-icon-arrow-right-line fr-icon--lg"></span>
+                            {% if request.site.configuration.stopped_at == None %}
+                                Mise à l'arrêt du portail
+                            {% else %}
+                                Réactivation du portail
+                            {% endif %}
+                        </h1>
+                        {% if request.site.configuration.stopped_at == None %}
+                            <p>
+                                Attention, vous allez mettre ce portail à l'arrêt. Cela implique que :
+                                <ul>
+                                    <li>tous les dossiers dessus seront classés En pause (les demandeurs ne recevront plus d'emails du site)</li>
+                                    <li>le bouton pour déposer un dossier sera retiré de la page d'accueil</li>
+                                    <li>un bandeau sur la page d'accueil indiquera que le service est arrêté.</li>
+                                </ul>
+                            </p>
+                        {% else %}
+                            <p>
+                                Attention, vous allez réactiver ce portail à l'arrêt. Cela implique que :
+                                <ul>
+                                    <li>le bouton pour déposer un dossier sera à nouveau affiché sur la page d'accueil</li>
+                                    <li>le bandeau sur la page d'accueil qui indique que le service est arrêté sera retiré</li>
+                                    <li>
+                                        tous les dossiers En pause le resteront, soit jusqu'à la prochaine activité des demandeurs, soit jusqu'à réactivation manuelle par un·e admin ou staff de portail.
+                                    </li>
+                                </ul>
+                            </p>
+                        {% endif %}
+                        <form method="post"
+                              id="siteconfiguration-toggle-stopped-form"
+                              action="{% url 'crm-site-configuration-toggle-stopped' %}">
+                            {% csrf_token %}
+                            {% if request.site.configuration.stopped_at == None %}
+                                <input type="hidden" name="action" value="stop">
+                            {% else %}
+                                <input type="hidden" name="action" value="reactivate">
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="fr-modal__footer">
+                        <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
+                            <button class="fr-btn fr-icon-checkbox-circle-line fr-btn--icon-left"
+                                    form="siteconfiguration-toggle-stopped-form"
+                                    type="submit">
+                                {% if request.site.configuration.stopped_at == None %}
+                                    Oui, mettre à l'arrêt
+                                {% else %}
+                                    Oui, réactiver
+                                {% endif %}
+                            </button>
+                            <button class="fr-btn fr-icon-checkbox-circle-line fr-btn--icon-left fr-btn--secondary"
+                                    type="button"
+                                    aria-controls="siteconfiguration-toggle-stopped-modal">Annuler</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
