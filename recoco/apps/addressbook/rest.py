@@ -93,7 +93,7 @@ class ByDepartmentFilterBackend(BaseFilterBackend):
         departments = request.query_params.getlist("departments")
         if not departments:
             return queryset
-        return queryset.filter(organization__departments__in=departments)
+        return queryset.filter(organization__departments__code__in=departments)
 
 
 class ContactViewSet(ModelViewSet):

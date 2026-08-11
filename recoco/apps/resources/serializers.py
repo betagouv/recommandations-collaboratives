@@ -62,8 +62,12 @@ class ResourceSerializer(
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
-    departments = serializers.PrimaryKeyRelatedField(
-        queryset=Department.objects, many=True
+    # SlugRelatedField(slug_field="code") rather than PrimaryKeyRelatedField:
+    # keeps the API accepting/returning department codes (e.g. "01") instead
+    # of the internal surrogate id, unaffected by Department.code no longer
+    # being the primary key (caused by the geomatics i18n migration).
+    departments = serializers.SlugRelatedField(
+        slug_field="code", queryset=Department.objects.all(), many=True
     )
     nb_uses = serializers.IntegerField(required=False)
 

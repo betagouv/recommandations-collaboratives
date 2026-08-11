@@ -10,15 +10,36 @@ created: 2021-07-12 12:05:28 CEST
 from django.db import models
 
 
-class Region(models.Model):
-    """Represents a Region"""
+class Country(models.Model):
+    """Represents a Country (ISO 3166-1 alpha-2 code)"""
 
     code = models.CharField(max_length=2, primary_key=True)
     name = models.CharField(max_length=64)
 
     class Meta:
+        verbose_name = "pays"
+        verbose_name_plural = "pays"
+
+    def __str__(self):  # pragma: nocover
+        return self.name
+
+
+class Region(models.Model):
+    """Represents a Region"""
+
+    country = models.ForeignKey(
+        "Country",
+        on_delete=models.CASCADE,
+        related_name="regions",
+    )
+
+    code = models.CharField(max_length=2)
+    name = models.CharField(max_length=64)
+
+    class Meta:
         verbose_name = "région"
         verbose_name_plural = "régions"
+        unique_together = [["country", "code"]]
 
     def __str__(self):  # pragma: nocover
         return self.name
@@ -38,12 +59,13 @@ class Department(models.Model):
         "Region", on_delete=models.CASCADE, related_name="departments"
     )
 
-    code = models.CharField(max_length=3, primary_key=True)
+    code = models.CharField(max_length=3)
     name = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = "département"
         verbose_name_plural = "départements"
+        unique_together = [["region", "code"]]
 
     def __str__(self):  # pragma: nocover
         return self.name
