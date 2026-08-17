@@ -578,10 +578,6 @@ def organization_details(request, organization_id):
 
     org_departments = organization.departments.all()
 
-    unadvised_projects = Project.on_site.filter(
-        commune__department__in=org_departments
-    ).exclude(switchtenders__in=participants)
-
     participant_ids = list(participants.values_list("id", flat=True))
 
     user_ct = ContentType.objects.get_for_model(User)
@@ -620,8 +616,6 @@ def organization_details(request, organization_id):
 
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
-
-    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/organization_details.html", locals())
 
