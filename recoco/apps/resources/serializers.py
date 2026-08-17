@@ -93,11 +93,15 @@ class ResourceDetailSerializer(ResourceSerializer):
 
 class ResourceWritableSerializer(ResourceDetailSerializer):
     class Meta(ResourceDetailSerializer.Meta):
+        fields = ResourceDetailSerializer.Meta.fields + ["as_patch"]
         read_only_fields = []
 
+    as_patch = serializers.BooleanField(write_only=True, default=False, required=False)
     category = PrimaryKeyRelatedField(queryset=Category.objects)
 
     def save(self, **kwargs):
+        # as_patch is consumed by the viewset; strip it before the model is touched
+        self.validated_data.pop("as_patch", None)
         return super().save(
             created_by=self.current_user, sites=[self.current_site], **kwargs
         )

@@ -25,6 +25,7 @@ from django.utils import timezone
 from markdownx.utils import markdownify
 from model_clone.models import CloneMixin
 from model_utils.models import TimeStampedModel
+from reversion.models import Revision
 from taggit.managers import TaggableManager
 from watson import search as watson
 
@@ -143,18 +144,23 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     pass
 
 
+# Fields tracked by reversion for Resource. Reused by the patch-diff view so the
+# comparison only shows tracked fields (see ResourcePatchReviewView).
+RESOURCE_REVISION_FIELDS = (
+    "status",
+    "expires_on",
+    "title",
+    "subtitle",
+    "summary",
+    "content",
+    "category",
+    "contacts",
+    "departments",
+)
+
+
 @reversion.register(
-    fields=(
-        "status",
-        "expires_on",
-        "title",
-        "subtitle",
-        "summary",
-        "content",
-        "category",
-        "contacts",
-        "departments",
-    ),
+    fields=RESOURCE_REVISION_FIELDS,
     follow=("category",),
 )
 class Resource(CloneMixin, models.Model):
@@ -321,6 +327,63 @@ class ResourceAddon(TimeStampedModel):
         verbose_name_plural = "Addons de ressources"
         ordering = ["-created"]
         unique_together = ["recommendation", "nature"]
+
+
+class ResourceRevisionMeta(models.Model):
+    """Tracks a pending/accepted/rejected version proposal for a Resource."""
+
+    PENDING = 0
+    ACCEPTED = 1
+    REJECTED = 2
+
+    STATUS_CHOICES = (
+        (PENDING, "En attente"),
+        (ACCEPTED, "Acceptée"),
+        (REJECTED, "Rejetée"),
+    )
+
+    revision = models.OneToOneField(
+        Revision,
+        on_delete=models.CASCADE,
+        related_name="resource_patch_meta",
+    )
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="patches",
+    )
+    MODIFICATION = "modification"
+    CREATION = "creation"
+
+    KIND_CHOICES = (
+        (MODIFICATION, "Modification"),
+        (CREATION, "Création"),
+    )
+
+    status = models.IntegerField(choices=STATUS_CHOICES, default=PENDING)
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=MODIFICATION)
+    proposed_by = models.ForeignKey(
+        auth.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="proposed_resource_patches",
+    )
+    reviewed_by = models.ForeignKey(
+        auth.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_resource_patches",
+    )
+    reviewed_on = models.DateTimeField(null=True, blank=True)
+    review_comment = models.TextField(default="", blank=True)
+
+    class Meta:
+        verbose_name = "proposition de modification"
+        verbose_name_plural = "propositions de modification"
+
+    def __str__(self):
+        return f"ResourcePatch #{self.pk} sur « {self.resource.title} »"
 
 
 class BookmarkManager(models.Manager):
