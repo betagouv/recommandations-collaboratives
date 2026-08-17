@@ -1,5 +1,0 @@
-{
-  "realisationsMap": "js/plugins/components/realisationsMap.js",
-  "realisationListCrm": "js/plugins/apps/realisationListCrm.js",
-  "realisationInviteOnTaskDone": "js/plugins/utils/RealisationInviteOnTaskDone.js"
-}
