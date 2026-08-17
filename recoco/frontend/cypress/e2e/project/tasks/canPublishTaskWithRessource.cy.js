@@ -1,32 +1,18 @@
-// TODO Réécrire : la création de tâche redirige désormais vers /conversations
-describe.skip('I can attach miscellanious ressource to task @page-projet-recommandations-creation @page-projet-recommandations', () => {
-  it('publishes a task with resource comment / no comment', () => {
+describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation @page-projet-recommandations', () => {
+  it('publishes a recommendation with a resource', () => {
     cy.login('conseiller1');
 
     cy.visit(`/projects/action/?project_id=25&resource_id=2`);
-    cy.get('[data-test-id="publish-draft-task-button"]').should('be.enabled');
-    cy.get('[data-cy="button-submit-task"]').should('be.enabled');
-    cy.get('[data-cy="reco-pusher-selected-project"]').contains(
-      'commune de test - Projet avec une reco qui a une resource qui a des contacts'
-    );
 
     cy.get('[data-cy="radio-push-reco-single-resource"]').should('be.checked');
-
-    cy.get('[data-test-id="search-resource-input"]').type('res', { delay: 0 });
-    cy.get('[data-cy="radio-resource-list-task"]')
-      .first()
-      .check({ force: true });
-
-    // Test with no comment
+    cy.get('[data-test-id="publish-draft-task-button"]').should('be.enabled');
     cy.get('[data-cy="button-submit-task"]').should('be.enabled');
 
-    // Test with comment
-    cy.get('.ProseMirror p').click();
-    cy.focused().type('text', 'reco test from action description');
+    cy.typeInTiptapEditor('reco test from action description');
 
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
-    cy.url().should('include', '/actions');
+    cy.url().should('include', '/conversations');
   });
 
   it('cannot select a draft resource and see warning', () => {
@@ -60,15 +46,14 @@ describe.skip('I can attach miscellanious ressource to task @page-projet-recomma
     cy.get('[data-cy="button-external-resource-load"]').click();
     cy.get('[data-cy="radio-resource-list-task"]').check({ force: true });
 
-    cy.get('.ProseMirror p').click();
-    cy.focused().type('text', 'reco test from action description');
+    cy.typeInTiptapEditor('reco test from action description');
 
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
-    cy.url().should('include', '/actions');
+    cy.url().should('include', '/conversations');
   });
 
-  it('publishes a task with no resource', () => {
+  it('publishes a recommendation with no resource', () => {
     cy.login('conseiller1');
     cy.visit(`/projects/action/?project_id=25`);
 
@@ -77,14 +62,13 @@ describe.skip('I can attach miscellanious ressource to task @page-projet-recomma
       .check({ force: true })
       .should('be.checked');
 
-    cy.get('.ProseMirror p').click();
-    cy.focused().type('text', 'reco test with no resource');
+    cy.typeInTiptapEditor('reco test with no resource');
 
     cy.get('[data-cy="input-title-task"]').type('reco test with no resource', {
       delay: 0,
     });
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
-    cy.url().should('include', '/actions');
+    cy.url().should('include', '/conversations');
   });
 });

@@ -1,31 +1,33 @@
 import resources from '../../../../fixtures/resources/resources.json';
+import projects from '../../../../fixtures/projects/projects.json';
+import sharedContentsPanel from '../../../../support/tools/sharedContentsPanel';
+import resourcePreviewPanel from '../../../../support/tools/resourcePreviewPanel';
 
-const currentResource = resources[4];
-const taskName = 'task intent';
-let currentProjectId;
+const currentResource = resources[4]; // "Resource 1 - publiée" (pk 2)
+// pk 37 - conseiller1 advisor, published fixture reco with resource pk
+const currentProject = projects.find((p) => p.pk === 37);
 
-// TODO Réécrire : list-tasks-switch-button n'existe plus, /actions redirige vers /conversations
-describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-modal', () => {
+describe('I can see a recommendation resource with its initial comment @page-projet-recommandations @page-projet-recommandations-modal', () => {
   beforeEach(() => {
     cy.login('conseiller1');
-    cy.createProject('new task').then((projectId) => {
-      currentProjectId = projectId;
-    });
   });
 
-  it('creates a task with a resource and see the initial comment', () => {
-    cy.visit(`/project/${currentProjectId}`);
-    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du dossier
+  it('sees the initial comment, title and subtitle of a recommendation with a resource', () => {
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
-    cy.visit(`/project/${currentProjectId}/actions`);
+    // The resource title and subtitle are shown on the recommendation card.
+    sharedContentsPanel.openFromTopic('recommendations');
+    sharedContentsPanel
+      .getRecommendationCards()
+      .should('contain.text', currentResource.fields.title)
+      .and('contain.text', currentResource.fields.subtitle);
 
-    cy.createTask(taskName, '', true);
-    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
-
-    cy.get('[data-test-id="task-initial-comment"]').should('exist');
-    cy.contains(currentResource.fields.subtitle);
-    cy.contains(currentResource.fields.title);
+    // The detail panel shows the advisor initial comment.
+    sharedContentsPanel.consultRecommendation(0);
+    resourcePreviewPanel.expectOpen();
+    cy.get('[data-test-id="resource-preview-panel"]').should(
+      'contain.text',
+      'Commentaire initial fixture'
+    );
   });
 });
-
-// page recommandation

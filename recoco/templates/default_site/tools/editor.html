@@ -175,6 +175,7 @@ Parameters:
                             class="common-dropdown common-dropdown__top-menu list-unstyled flex-column item-no-space">
                             <li>
                                 <button class="fr-btn fr-btn--sm fr-btn--secondary w-100 justify-content-center"
+                                        data-test-id="create-blank-recommendation"
                                         @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}&content=${encodeURIComponent(markdownContent || '')}`)">
                                     Recommandation vierge
                                 </button>

@@ -1,25 +1,33 @@
-describe.skip('I can search and share a contact on a message editor @page-projet-recommandations-modification', () => {
-  beforeEach(() => {
-    cy.login('staff');
-  });
+import projects from '../../../../fixtures/projects/projects.json';
 
-  // TODO Réécrire : task-item et la preview modal ont été supprimés
-  it.skip('can search, select and share a contact on a followup', () => {
-    cy.visit(`/project/2/actions#`);
-    //click on recommandation
-    cy.get('[data-test-id="task-item"]').first().click({ force: true });
+const currentProject = projects[1]; // pk 2 - conseiller1 advisor
+// pk 36 - conseiller1 advisor, published fixture reco "Reco à suivre fixture".
+const advisorTestProject = projects.find((p) => p.pk === 36);
 
-    //fonction to search and attach a contact
+describe('I can search and share a contact on a message editor @page-projet-recommandations-modification', () => {
+  it('can search, select and share a contact on a reply to a recommendation', () => {
+    const now = new Date();
+    cy.login('conseiller1');
+    cy.visit(`/project/${advisorTestProject.pk}/conversations`);
+
+    cy.get('[data-test-id="message-reply-button"]').first().click({
+      force: true,
+    });
     cy.shareContact('Lala');
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(
+      `Voici mon contact ${now}`,
+      { force: true }
+    );
+    cy.get('[data-test-id="send-message-conversation"]').click({
+      force: true,
+    });
 
-    //validate message followup
-    cy.get('[data-test-id="button-submit-new"]').click({ force: true });
-    //my contact should be visible on the followup
     cy.get('[data-test-id="contact-card"]').should('be.visible');
   });
 
   it('can search, select and share a contact on a conversation', () => {
-    cy.visit(`/project/2/conversations`);
+    cy.login('staff');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
     //fonction to search and attach a contact
     cy.shareContact('Lala');
@@ -37,7 +45,8 @@ describe.skip('I can search and share a contact on a message editor @page-projet
   });
 
   it('can search, select and share a contact on advisor space', () => {
-    cy.visit(`/project/2/suivi`);
+    cy.login('staff');
+    cy.visit(`/project/${currentProject.pk}/suivi`);
 
     //fonction to search and attach a contact
     cy.shareContact('Lala');
@@ -57,68 +66,5 @@ describe.skip('I can search and share a contact on a message editor @page-projet
     cy.get('[data-test-id="contact-card"]').should('be.visible');
   });
 
-  // TODO Réécrire : create-task-button n'est plus accessible depuis /actions (page redirigée)
-  it.skip('can create a contact, an organization and a national group and share the contact on a new task', () => {
-    cy.visit(`/project/2/actions#`);
-    //click on create recommandation
-    cy.get('[data-test-id="create-task-button"]').click({ force: true });
-
-    //create a recommandation without resource
-    cy.get('[data-cy="radio-push-reco-no-resource"]').click({
-      force: true,
-    });
-    //write resource title
-    cy.get('[data-cy="input-title-task"]').type('Test contact');
-    //write a message
-    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(
-      'Here is my contact',
-      { force: true }
-    );
-    //click on add contact button
-    cy.get('[data-test-id="button-add-contact-in-editor"]').click({
-      force: true,
-    });
-    //create a contact
-    cy.get('[data-test-id="button-create-contact"]').click({
-      force: true,
-    });
-    //search an non existing organization
-    cy.get('#search-organization-input').type('Test organization');
-    //create an organization
-    cy.get('[data-test-id="button-create-organization"]').click({
-      force: true,
-    });
-    cy.get('#natGroup-yes').click({
-      force: true,
-    });
-    cy.get('[data-test-id="search-group-input"]').type('Test group');
-    //create a national group
-    cy.get('[data-test-id="button-create-organization-group"]').click({
-      force: true,
-    });
-    // create organization
-    cy.get('[data-test-id="button-create-new-organization"]').click({
-      force: true,
-    });
-    //create contact
-    cy.get('[data-test-id="last-name"]').type('Test');
-    cy.get('[data-test-id="first-name"]').type('Contact');
-    cy.get('[data-test-id="job"]').type('testeur');
-    cy.get('[data-test-id="email"]').type('test@test.test');
-    cy.get('[data-test-id="phone"]').type('0123456789');
-    cy.get('[data-test-id="create-contact-button"]').click({
-      force: true,
-    });
-    cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
-      force: true,
-    });
-
-    //save resource as draft
-    cy.get('[data-test-id="publish-draft-task-button"]').click({
-      force: true,
-    });
-
-    //my contact should be visible on the followup
-    cy.get('[data-test-id="contact-card"]').should('be.visible');
-  });
+  it.skip('can create a contact, an organization and a national group and share the contact on a new task', () => {});
 });
