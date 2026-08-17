@@ -135,6 +135,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "recoco.apps.home.middlewares.EmbedMiddleware",
     "recoco.apps.home.middlewares.SetEnableSesameCookieMiddleware",
     "recoco.apps.home.middlewares.PreviousActivityMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
@@ -159,6 +160,7 @@ TEMPLATES = [
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
                 "recoco.apps.projects.context_processors.matomo_context_processor",
+                "recoco.apps.home.context_processors.embed",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
