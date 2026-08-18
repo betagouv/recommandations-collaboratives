@@ -4,7 +4,6 @@ from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 
-from . import utils
 from .validators import EmailValidatorForBrevo
 
 
@@ -25,7 +24,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         This is a hook that can be overridden to programatically
         set the 'from' email address for sending emails
         """
-        return utils.get_current_site_sender()
+        return settings.DEFAULT_FROM_EMAIL
 
     def save_user(self, request, user, form):
         saved_user = super().save_user(request, user, form)

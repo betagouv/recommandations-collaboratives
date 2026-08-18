@@ -25,7 +25,6 @@ from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from recoco.apps.home import models as home_models
-from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
 from recoco.utils import assign_site_admin, login
@@ -46,35 +45,6 @@ def test_logged_in_user_can_access_home_page(client):
     with login(client):
         response = client.get(url)
         assert response.status_code == 200
-
-
-########################################################################
-# utility functions
-########################################################################
-
-
-@pytest.mark.django_db
-def test_get_current_site_sender_with_configuration(request):
-    current_site = get_current_site(request)
-
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    site_config = baker.make(
-        home_models.SiteConfiguration,
-        site=current_site,
-        onboarding=onboarding,
-    )
-
-    sender = utils.get_current_site_sender()
-
-    assert site_config.sender_email in sender
-    assert site_config.sender_name in sender
-
-
-@pytest.mark.django_db
-def test_get_current_site_sender_without_configuration(request):
-    sender = utils.get_current_site_sender()
-    assert sender == settings.DEFAULT_FROM_EMAIL
 
 
 ################################################
