@@ -38,8 +38,6 @@ from . import models
 def make_new_site(
     name: str,
     domain: str,
-    sender_email: str,
-    sender_name: str,
     contact_form_recipient: str,
     legal_address: str,
     admin_user: Optional[User] = None,
@@ -72,8 +70,6 @@ def make_new_site(
         site_config = models.SiteConfiguration.objects.create(
             site=site,
             project_survey=survey,
-            sender_email=sender_email,
-            sender_name=sender_name,
             contact_form_recipient=contact_form_recipient,
             legal_address=legal_address,
         )

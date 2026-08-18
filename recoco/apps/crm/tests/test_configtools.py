@@ -56,8 +56,6 @@ def test_crm_site_configuration(request, client):
     baker.make(
         home_models.SiteConfiguration,
         site=site,
-        sender_email="yyo@yo.com",
-        sender_name="Yoo",
         contact_form_recipient="othr@yo.com",
     )
 
@@ -75,8 +73,6 @@ def test_crm_site_configuration(request, client):
         response = client.post(
             url,
             data={
-                "sender_email": "yyo@yo.com",
-                "sender_name": "Yoo",
                 "contact_form_recipient": "othr@yo.com",
                 "reminder_interval": 42,
                 "logo_small": logo,
@@ -94,8 +90,6 @@ def test_crm_site_configuration_crisp_integration(request, client, settings):
     baker.make(
         home_models.SiteConfiguration,
         site=site,
-        sender_email="yyo@yo.com",
-        sender_name="Yoo",
         contact_form_recipient="othr@yo.com",
         crisp_token=None,
     )
@@ -112,8 +106,6 @@ def test_crm_site_configuration_crisp_integration(request, client, settings):
         response = client.post(
             url,
             data={
-                "sender_email": "yyo@yo.com",
-                "sender_name": "Yoo",
                 "contact_form_recipient": "othr@yo.com",
                 "reminder_interval": 42,
                 "crisp_token": crisp_token,

@@ -28,8 +28,6 @@ def test_site_can_be_created(mock_make_new_site, current_site, client):
     form_data = {
         "name": "My Site",
         "subdomain": "mytestsite",
-        "sender_email": "test@example.com",
-        "sender_name": "Test Sender",
         "contact_form_recipient": "contact@example.com",
         "legal_address": "123 Salome Street",
     }
@@ -45,8 +43,6 @@ def test_site_can_be_created(mock_make_new_site, current_site, client):
     mock_make_new_site.assert_called_once_with(
         name="My Site",
         domain="mytestsite.recoconseil.fr",
-        sender_email="test@example.com",
-        sender_name="Test Sender",
         contact_form_recipient="contact@example.com",
         legal_address="123 Salome Street",
         admin_user=user,
@@ -69,8 +65,6 @@ def test_duplicate_site_domain_fails(mock_make_new_site, current_site, client):
     form_data = {
         "name": "Duplicate Site",
         "subdomain": "existingdomain",
-        "sender_email": "dupe@example.com",
-        "sender_name": "Duplicate Sender",
         "contact_form_recipient": "contact@dupe.com",
         "legal_address": "456 Salome Street",
     }

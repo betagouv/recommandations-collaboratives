@@ -19,20 +19,6 @@ class Command(BaseCommand):
             required=True,
         )
         parser.add_argument(
-            "-se",
-            "--sender-email",
-            type=str,
-            help="The email address used as the sender for emails sent from the site",
-            required=True,
-        )
-        parser.add_argument(
-            "-sn",
-            "--sender-name",
-            type=str,
-            help="The name used as the sender for emails sent from the site",
-            required=True,
-        )
-        parser.add_argument(
             "-cr",
             "--contact-form-recipient",
             type=str,
@@ -64,8 +50,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         name = options["name"]
         domain = options["domain"]
-        sender_email = options["sender_email"]
-        sender_name = options["sender_name"]
         contact_form_recipient = options["contact_form_recipient"]
         legal_address = options["legal_address"]
         email_logo = options["email_logo"]
@@ -78,8 +62,6 @@ class Command(BaseCommand):
             site = utils.make_new_site(
                 name,
                 domain,
-                sender_email,
-                sender_name,
                 contact_form_recipient,
                 legal_address,
                 admin_user,
