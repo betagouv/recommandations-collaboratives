@@ -63,7 +63,7 @@ from .forms import (
     UserPasswordFirstTimeSetupForm,
 )
 from .models import AdvisorAccessRequest
-from .utils import get_current_site_sender_email, make_new_site
+from .utils import make_new_site
 
 
 class HomePageView(TemplateView):
@@ -117,11 +117,6 @@ class SecurityPageView(TemplateView):
 
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["sender_email"] = get_current_site_sender_email()
-        return context
 
 
 class MutliAnnualSchemaPageView(TemplateView):
