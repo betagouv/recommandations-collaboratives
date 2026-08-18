@@ -46,7 +46,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -385,18 +385,34 @@ def organization_list(request):
 
     # organization from addressbook current site or w/ user on site
     qs = get_queryset_for_site_organizations(request.site).annotate(
-        members_count=Count(
-            "registered_profiles",
-            filter=Q(registered_profiles__sites=request.site),
-            distinct=True,
+        members_count=Coalesce(
+            Subquery(
+                home_models.UserProfile.objects.filter(
+                    sites=request.site, organization_id=OuterRef("pk")
+                )
+                .values("organization_id")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            ),
+            0,
         ),
-        projects_count=Subquery(
-            Project.on_site.filter(members__profile__organization=OuterRef("pk"))
-            .order_by()
-            .values("members__profile__organization")
-            .annotate(count=Count("pk", distinct=True))
-            .values("count")
-        ),
+        projects_count=Coalesce(
+            Subquery(
+                Project.on_site.filter(
+                    Q(switchtenders__profile__organization=OuterRef("pk"))
+                    # | Q(commune__department__organizations=OuterRef("pk"))
+                )
+                .order_by()
+                .values(
+                    "switchtenders__profile__organization"
+                )  # remove this to also count unfollowed projects
+                # .annotate(v=Value(1))
+                # .values("v")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            ),
+            0,
+        ),  # uncomment upside to count also unfollowed projects
     )
 
     organizations = filters.OrganizationFilter(
@@ -540,16 +556,27 @@ def organization_details(request, organization_id):
     organization = get_object_or_404(qs, pk=organization_id)
 
     participants = User.objects.filter(
-        profile__in=organization.registered_profiles.all()
+        profile__in=organization.registered_profiles.all(), profile__sites=request.site
+    )
+
+    members_stats = participants.aggregate(
+        last_activity=Max("profile__previous_activity_at"),
+        last_login=Max("last_login"),
+    )
+    last_members_activity_at = members_stats["last_activity"]
+    last_members_login_at = members_stats["last_login"]
+
+    next_members_reminder = (
+        reminders_models.Reminder.on_site.filter(
+            project__projectmember__member__in=participants, sent_on=None
+        )
+        .order_by("deadline")
+        .first()
     )
 
     advised_projects = Project.on_site.filter(switchtenders__in=participants)
 
     org_departments = organization.departments.all()
-
-    unadvised_projects = Project.on_site.filter(
-        commune__department__in=org_departments
-    ).exclude(switchtenders__in=participants)
 
     participant_ids = list(participants.values_list("id", flat=True))
 
@@ -589,8 +616,6 @@ def organization_details(request, organization_id):
 
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
-
-    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/organization_details.html", locals())
 
