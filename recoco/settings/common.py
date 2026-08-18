@@ -273,7 +273,8 @@ SASS_PROCESSOR_INCLUDE_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email Configuration
-EMAIL_FROM = "Recoco <no-reply@recoco.fr>"
+DEFAULT_FROM_EMAIL = "Recoco <noreply@recoconseil.fr>"
+DEFAULT_SENDER_EMAIL = "nonoreply@recoconseil.fr"
 
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
