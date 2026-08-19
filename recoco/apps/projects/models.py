@@ -413,9 +413,10 @@ class Project(models.Model):
         return self.members.filter(projectmember__is_owner=True).first()
 
     @staticmethod
-    def prefetch_owner():
+    def prefetch_owner(prefix=""):
+        lookup = f"{prefix}__members" if prefix else "members"
         return Prefetch(
-            "members",
+            lookup,
             auth_models.User.objects.filter(
                 projectmember__is_owner=True
             ).select_related(
