@@ -113,8 +113,15 @@ def site_action_stream(site):
         # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
         .prefetch_related(
             GenericPrefetch("actor", [User.objects.all()]),
-            "action_object",  # todo GenericPrefetch list querysets of relevant ob
-            GenericPrefetch("target", [Project.on_site.all(), Site.objects.all()]),
+            "action_object",  # todo GenericPrefetch list querysets of relevant objects
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to not silently miss projects
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
         )
     )
 
@@ -580,7 +587,19 @@ def organization_details(request, organization_id):
         .first()
     )
 
-    advised_projects = Project.on_site.filter(switchtenders__in=participants_everywhere)
+    advised_projects = (
+        Project.on_site.filter(switchtenders__in=participants_everywhere)
+        .annotate(
+            is_current_site=Subquery(
+                Exists(
+                    ProjectSite.objects.filter(
+                        project=OuterRef("pk"), site=request.site.id
+                    )
+                )
+            )
+        )
+        .distinct()
+    )
 
     org_departments = organization.departments.all()
 
