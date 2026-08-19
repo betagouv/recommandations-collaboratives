@@ -42,6 +42,7 @@ from django.db.models import (
     Func,
     Max,
     OuterRef,
+    Prefetch,
     Q,
     Subquery,
     Value,
@@ -76,6 +77,7 @@ from recoco.apps.projects.models import (
     Document,
     Project,
     ProjectMember,
+    ProjectSite,
     ProjectSwitchtender,
     Topic,
 )
@@ -838,33 +840,43 @@ def user_unset_advisor(request, user_id=None):
 
 def rich_project_relations(relations, model, site_id):
     relations = (
-        relations.select_related("project", "project__commune")
-        .prefetch_related(
+        relations.prefetch_related(
+            Prefetch(
+                "project",
+                Project._base_manager.select_related("commune")
+                .prefetch_related(Project.prefetch_owner())
+                .annotate(
+                    is_current_site=Subquery(
+                        Exists(
+                            ProjectSite.objects.filter(
+                                project=OuterRef("pk"), site=site_id
+                            )
+                        )
+                    ),
+                ),
+            ),
             "project__project_sites__site",
-            Project.prefetch_owner("project"),
         )
         .annotate(
-            current_site=Subquery(
-                Exists(
-                    model.objects.filter(
-                        pk=OuterRef("pk"), project__project_sites__site=site_id
-                    )
-                )
-            ),
-            current_origin_site=Subquery(
-                Exists(
-                    model.objects.filter(
-                        pk=OuterRef("pk"),
-                        project__project_sites__is_origin=True,
-                        project__project_sites__site=site_id,
-                    )
-                )
-            ),
             is_deleted=ExpressionWrapper(
                 ~Q(project__deleted=None), output_field=BooleanField()
             ),
+            is_origin_current_site=Exists(
+                ProjectSite.objects.filter(
+                    project=OuterRef("project_id"),
+                    site=site_id,
+                    is_origin=True,
+                )
+            ),
+            is_current_site=Exists(
+                ProjectSite.objects.filter(project=OuterRef("project_id"), site=site_id)
+            ),
         )
-        .order_by("is_deleted", "current_origin_site", "current_site")
+        .order_by(
+            "is_deleted",
+            "-is_origin_current_site",
+            "-is_current_site",
+        )
     )
     return relations
 
