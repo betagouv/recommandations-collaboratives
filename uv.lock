@@ -21,6 +21,7 @@ constraints = [
     { name = "pyjwt", specifier = ">=2.13.0" },
     { name = "redis", specifier = "==5.0.4" },
     { name = "soupsieve", specifier = ">=2.8.4" },
+    { name = "sqlparse", specifier = ">=0.6.0" },
     { name = "tornado", specifier = ">=6.5.7" },
     { name = "urllib3", specifier = ">=2.7" },
 ]
