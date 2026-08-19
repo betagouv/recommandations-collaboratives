@@ -9,13 +9,14 @@
 {% block og_title %}
     Organisations - CRM
 {% endblock og_title %}
+{% block hidden_site_title %}{% endblock hidden_site_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/apps/CRM/organizationListCrm.js' %}
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with organizations=True %}
-    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm org-list-scroll">
+    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm crm-list-scroll">
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Organisations' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
         <h1 class="fr-h3 fr-px-5v fr-pt-1w">Liste des organisations</h1>
@@ -23,10 +24,12 @@
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
                     {% with count=paginator.count %}
-                        {% if count > 0 %}
+                        {% if count == 0 %}
+                            Aucun résultat
+                        {% elif paginator.num_pages > 1 %}
                             {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
                         {% else %}
-                            Aucun résultat
+                            {{ count }} résultat{{ count|pluralize }}
                         {% endif %}
                     {% endwith %}
                 </span>
@@ -35,7 +38,7 @@
                       action="{% url 'crm-organization-list' %}"
                       class="d-flex align-items-center flex-grow-1 gap-3 fr-m-0">
                     <div class="position-relative flex-grow-1">
-                        {% include "projects/project/fragments/search_bar.html" with name="name" value=organizations.form.name.value placeholder="Taper le nom d'une organisation" show_search_button=True %}
+                        {% include "projects/project/fragments/search_bar.html" with name="name" value=organizations.form.name.value placeholder="Rechercher parmi les organisations" show_search_button=True %}
                     </div>
                     <div x-data="DepartmentsFilterWrapper({{ selected_departments|default:'[]' }})"
                          @is-select-all-departments="onSelectAll($event.detail)"
@@ -46,6 +49,10 @@
                         </template>
                         {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
+                    <a href="{% url 'crm-organization-list' %}"
+                       class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+                       title="Réinitialiser la recherche et les filtres"
+                       data-test-id="reset-filters">Réinitialiser</a>
                 </form>
                 {# Merge action (drives the table form below through the form= attribute) #}
                 <div class="d-flex align-items-center gap-3 text-nowrap">
@@ -69,10 +76,12 @@
                     <table class="project-table w-100">
                         <caption class="fr-ml-2v">
                             {% with count=paginator.count %}
-                                {% if count > 0 %}
-                                    {{ count }} résultat{{ count|pluralize }}
-                                {% else %}
+                                {% if count == 0 %}
                                     Aucun résultat
+                                {% elif paginator.num_pages > 1 %}
+                                    {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                                {% else %}
+                                    {{ count }} résultat{{ count|pluralize }}
                                 {% endif %}
                             {% endwith %}
                         </caption>
@@ -87,8 +96,14 @@
                             <tr>
                                 <th scope="col">Organisation</th>
                                 <th scope="col">Départements</th>
-                                <th scope="col">Membres</th>
-                                <th scope="col">Dossiers</th>
+                                <th scope="col">
+                                    Membres
+                                    {% include "crm/fragments/th_info.html" with text="Nombre de membres inscrits sur le site rattachés à l'organisation" %}
+                                </th>
+                                <th scope="col">
+                                    Dossiers
+                                    {% include "crm/fragments/th_info.html" with text="Nombre de dossiers du site portés par un membre de l'organisation" %}
+                                </th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>

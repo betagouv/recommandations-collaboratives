@@ -9,6 +9,7 @@
 {% block og_title %}
     Utilisateurs - CRM
 {% endblock og_title %}
+{% block hidden_site_title %}{% endblock hidden_site_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/apps/CRM/userListCrm.js' %}
@@ -17,21 +18,20 @@
     {% include "crm/fragments/navigation.html" with users=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Utilisateurs' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm">
+    <div x-data="Crm" class="d-flex flex-column fr-px-0 crm crm-list-scroll">
+        <h1 class="fr-h3 fr-px-5v fr-pt-1w">Liste des utilisateurs</h1>
         <form method="get"
               action="{% url 'crm-user-list' %}"
               class="w-100 d-flex flex-column justify-content-start project-list-crm">
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <span class="project-list-crm__projects-count-label">
-                    {% with users.qs.count as users_count %}
-                        {% if users_count > 0 %}
-                            {% if not has_active_filter and users_count > max_users_without_filter %}
-                                {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }}
-                            {% else %}
-                                {{ users_count }} résultat{{ users_count|pluralize }}
-                            {% endif %}
-                        {% else %}
+                    {% with count=paginator.count %}
+                        {% if count == 0 %}
                             Aucun résultat
+                        {% elif paginator.num_pages > 1 %}
+                            {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                        {% else %}
+                            {{ count }} résultat{{ count|pluralize }}
                         {% endif %}
                     {% endwith %}
                 </span>
@@ -80,20 +80,22 @@
                     </template>
                     {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" show_count_label=True %}
                 </div>
+                <a href="{% url 'crm-user-list' %}"
+                   class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+                   title="Réinitialiser la recherche et les filtres"
+                   data-test-id="reset-filters">Réinitialiser</a>
             </div>
         </form>
         <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
             <table class="project-table w-100">
                 <caption class="fr-ml-2v">
-                    {% with users.qs.count as users_count %}
-                        {% if users_count > 0 %}
-                            {% if not has_active_filter and users_count > max_users_without_filter %}
-                                {{ max_users_without_filter }} sur {{ users_count }} résultat{{ users_count|pluralize }} — utilisez les filtres pour affiner
-                            {% else %}
-                                {{ users_count }} résultat{{ users_count|pluralize }}
-                            {% endif %}
-                        {% else %}
+                    {% with count=paginator.count %}
+                        {% if count == 0 %}
                             Aucun résultat
+                        {% elif paginator.num_pages > 1 %}
+                            {{ page_obj.object_list|length }} sur {{ count }} résultat{{ count|pluralize }}
+                        {% else %}
+                            {{ count }} résultat{{ count|pluralize }}
                         {% endif %}
                     {% endwith %}
                 </caption>
@@ -114,17 +116,16 @@
                         <th scope="col">Email</th>
                         <th scope="col">Organisation</th>
                         <th scope="col">Statut</th>
-                        <th scope="col"
-                            data-bs-toggle="tooltip"
-                            data-bs-title="Nombre de dossiers dont la personne est membre"
-                            data-bs-placement="top"
-                            title="Nombre de dossiers dont la personne est membre">Dossiers</th>
+                        <th scope="col">
+                            Dossiers
+                            {% include "crm/fragments/th_info.html" with text="Nombre de dossiers dont la personne est membre" %}
+                        </th>
                         <th scope="col" class="text-ellipsis">Dernière connexion</th>
                         <th scope="col">Inscription</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for crm_user in display_qs %}
+                    {% for crm_user in page_obj %}
                         <tr>
                             <td class="text-ellipsis">
                                 <a class="fr-link project-table__project-name"
@@ -169,6 +170,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% include "tools/paginator.html" with page_obj=page_obj %}
         </div>
     </div>
 {% endblock content %}

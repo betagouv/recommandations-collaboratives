@@ -25,7 +25,8 @@ variables to pass :
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
 <span class="fr-icon-search-line correct-position" aria-hidden="true"></span>
 {% if show_search_button %}
-    <button type="submit"
+    <button type="{% if action_search %}button{% else %}submit{% endif %}"
+            {% if action_search %}@click="{{ action_search }}"{% endif %}
             class="searchbar-button fr-btn fr-btn--sm"
             title="Rechercher">
         <span class="sr-only">Rechercher</span>
