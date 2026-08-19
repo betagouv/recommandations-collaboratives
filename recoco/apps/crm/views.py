@@ -31,6 +31,7 @@ from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
+    BooleanField,
     Case,
     CharField,
     Count,
@@ -835,18 +836,37 @@ def user_unset_advisor(request, user_id=None):
     return render(request, "crm/user_unset_advisor.html", locals())
 
 
-def current_site_first(relations, site_id):
-    """Sort project relations (memberships, switchtendings) to display the current site first, then other sites"""
-    relations = relations.select_related("project").prefetch_related(
-        "project__project_sites"
+def rich_project_relations(relations, model, site_id):
+    relations = (
+        relations.select_related("project", "project__commune")
+        .prefetch_related(
+            "project__project_sites__site",
+            Project.prefetch_owner("project"),
+        )
+        .annotate(
+            current_site=Subquery(
+                Exists(
+                    model.objects.filter(
+                        pk=OuterRef("pk"), project__project_sites__site=site_id
+                    )
+                )
+            ),
+            current_origin_site=Subquery(
+                Exists(
+                    model.objects.filter(
+                        pk=OuterRef("pk"),
+                        project__project_sites__is_origin=True,
+                        project__project_sites__site=site_id,
+                    )
+                )
+            ),
+            is_deleted=ExpressionWrapper(
+                ~Q(project__deleted=None), output_field=BooleanField()
+            ),
+        )
+        .order_by("is_deleted", "current_origin_site", "current_site")
     )
-    return sorted(
-        relations,
-        key=lambda rel: any(
-            ps.site_id == site_id for ps in rel.project.project_sites.all()
-        ),
-        reverse=True,  # True (current site) sorts before False (other site)
-    )
+    return relations
 
 
 @login_required
@@ -865,11 +885,33 @@ def user_details(request, user_id):
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     actions = (
-        crm_user.actor_actions.exclude(
-            verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+        (
+            crm_user.actor_actions.exclude(
+                verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+            )
+            | crm_user.action_object_actions.all()
         )
-        | crm_user.action_object_actions.all()
-    ).order_by("-timestamp")[:50]
+        .order_by("-timestamp")[:50]
+        .prefetch_related(
+            GenericPrefetch(
+                "actor",
+                [
+                    User.objects.select_related(
+                        "profile__organization", "profile__organization__group"
+                    )
+                ],
+            ),
+            "action_object",
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to actually have all projects for rendering
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
+        )
+    )
 
     user_ct = ContentType.objects.get_for_model(User)
 
@@ -880,9 +922,15 @@ def user_details(request, user_id):
         action_object_content_type=user_ct, action_object_object_id=crm_user.pk
     ).mark_all_as_read()
 
-    all_notes = models.Note.on_site.filter(
-        object_id=crm_user.pk, content_type=user_ct
-    ).order_by("-updated_on")
+    all_notes = (
+        models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
+        .select_related(
+            "created_by__profile__organization",
+            "created_by__profile__organization__group",
+        )
+        .prefetch_related("tags")
+        .order_by("-updated_on")
+    )
     sticky_notes = all_notes.filter(sticky=True)
     notes = all_notes.exclude(sticky=True)
 
@@ -898,9 +946,11 @@ def user_details(request, user_id):
             .first()
         )
 
-    user_memberships = current_site_first(crm_user.projectmember_set, request.site.id)
-    user_switchtendings = current_site_first(
-        crm_user.projects_switchtended_per_site, request.site.id
+    user_memberships = rich_project_relations(
+        crm_user.projectmember_set, ProjectMember, request.site.id
+    )
+    user_switchtendings = rich_project_relations(
+        crm_user.projects_switchtended_per_site, ProjectSwitchtender, request.site.id
     )
 
     search_form = forms.CRMSearchForm()
