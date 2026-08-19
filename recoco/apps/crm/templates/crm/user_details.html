@@ -106,7 +106,7 @@
         {% endif %}
     </div>
     <!-- Dossiers conseillés -->
-    {% if crm_user_is_advisor %}
+    {% if user_switchtendings %}
         <div>
             <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
                 <span class="user-crm__section-title">Dossiers conseillés</span>
@@ -126,7 +126,7 @@
     {% if user_memberships %}
         <div>
             <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
-                <span class="user-crm__section-title">{% if crm_user_is_advisor %}Autres dossiers{% else %}Dossiers{% endif %}</span>
+                <span class="user-crm__section-title">{% if user_switchtendings %}Autres dossiers{% else %}Dossiers{% endif %}</span>
             </div>
             {% for membership in user_memberships %}
                 <div class="user-crm__section-container fr-px-3w fr-py-2w">
