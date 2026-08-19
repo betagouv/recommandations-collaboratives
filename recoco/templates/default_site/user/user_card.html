@@ -11,7 +11,7 @@
 Parameter Django:
     - show_organization
 {% endcomment %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 <div x-data="User()"
      class="user-card position-relative d-flex flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">

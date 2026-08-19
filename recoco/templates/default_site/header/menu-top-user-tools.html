@@ -11,7 +11,7 @@
 <!-- User -->
 <div class="user-tools d-flex" x-data="ExpandableMenuHandler">
     {% if user.is_authenticated %}
-        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
         <!-- Notifications -->
         <div class="dropdown user-tools__notification-menu fr-p-0 h-64"
              x-data="MenuNotifications({{ unread_notifications_count }}, {% if unread_notifications|length > 0 %}{{ unread_notifications }} {% else %}[]{% endif %} )"

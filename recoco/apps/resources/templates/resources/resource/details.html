@@ -139,7 +139,7 @@
                     {% include "dsrc/core/blocks/buttons/button.html" with label="Imprimer" variant="secondary" classes="w-100 justify-content-center fr-btn--icon-left fr-icon-printer-line" onclick="window.print()" %}
                 </div>
                 <!-- Edit -->
-                {% get_obj_perms request.user for request.site as "user_site_perms" %}
+                {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
                 {% if "manage_resources" in user_site_perms %}
                     <div id="edit-resource" class="fr-mt-2w">
                         <a class="fr-btn fr-btn--secondary w-100 justify-content-center fr-btn--icon-left fr-icon-edit-line"
