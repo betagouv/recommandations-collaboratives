@@ -31,6 +31,7 @@ from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
+    BooleanField,
     Case,
     CharField,
     Count,
@@ -41,6 +42,7 @@ from django.db.models import (
     Func,
     Max,
     OuterRef,
+    Prefetch,
     Q,
     Subquery,
     Value,
@@ -75,6 +77,7 @@ from recoco.apps.projects.models import (
     Document,
     Project,
     ProjectMember,
+    ProjectSite,
     ProjectSwitchtender,
     Topic,
 )
@@ -860,6 +863,49 @@ def user_unset_advisor(request, user_id=None):
     return render(request, "crm/user_unset_advisor.html", locals())
 
 
+def rich_project_relations(relations, model, site_id):
+    relations = (
+        relations.prefetch_related(
+            Prefetch(
+                "project",
+                Project._base_manager.select_related("commune")
+                .prefetch_related(Project.prefetch_owner())
+                .annotate(
+                    is_current_site=Subquery(
+                        Exists(
+                            ProjectSite.objects.filter(
+                                project=OuterRef("pk"), site=site_id
+                            )
+                        )
+                    ),
+                ),
+            ),
+            "project__project_sites__site",
+        )
+        .annotate(
+            is_deleted=ExpressionWrapper(
+                ~Q(project__deleted=None), output_field=BooleanField()
+            ),
+            is_origin_current_site=Exists(
+                ProjectSite.objects.filter(
+                    project=OuterRef("project_id"),
+                    site=site_id,
+                    is_origin=True,
+                )
+            ),
+            is_current_site=Exists(
+                ProjectSite.objects.filter(project=OuterRef("project_id"), site=site_id)
+            ),
+        )
+        .order_by(
+            "is_deleted",
+            "-is_origin_current_site",
+            "-is_current_site",
+        )
+    )
+    return relations
+
+
 @login_required
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -876,11 +922,33 @@ def user_details(request, user_id):
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     actions = (
-        crm_user.actor_actions.exclude(
-            verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+        (
+            crm_user.actor_actions.exclude(
+                verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+            )
+            | crm_user.action_object_actions.all()
         )
-        | crm_user.action_object_actions.all()
-    ).order_by("-timestamp")[:50]
+        .order_by("-timestamp")[:50]
+        .prefetch_related(
+            GenericPrefetch(
+                "actor",
+                [
+                    User.objects.select_related(
+                        "profile__organization", "profile__organization__group"
+                    )
+                ],
+            ),
+            "action_object",
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to actually have all projects for rendering
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
+        )
+    )
 
     user_ct = ContentType.objects.get_for_model(User)
 
@@ -891,9 +959,15 @@ def user_details(request, user_id):
         action_object_content_type=user_ct, action_object_object_id=crm_user.pk
     ).mark_all_as_read()
 
-    all_notes = models.Note.on_site.filter(
-        object_id=crm_user.pk, content_type=user_ct
-    ).order_by("-updated_on")
+    all_notes = (
+        models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
+        .select_related(
+            "created_by__profile__organization",
+            "created_by__profile__organization__group",
+        )
+        .prefetch_related("tags")
+        .order_by("-updated_on")
+    )
     sticky_notes = all_notes.filter(sticky=True)
     notes = all_notes.exclude(sticky=True)
 
@@ -908,6 +982,13 @@ def user_details(request, user_id):
             .order_by("deadline")
             .first()
         )
+
+    user_memberships = rich_project_relations(
+        crm_user.projectmember_set, ProjectMember, request.site.id
+    )
+    user_switchtendings = rich_project_relations(
+        crm_user.projects_switchtended_per_site, ProjectSwitchtender, request.site.id
+    )
 
     search_form = forms.CRMSearchForm()
 
