@@ -891,7 +891,7 @@ def rich_project_relations(relations, model, site_id):
             Prefetch(
                 "project",
                 Project._base_manager.select_related("commune")
-                .prefetch_related(Project.prefetch_owner())
+                .with_perf_prefetch("origin_site", "next_reminder", "owner")
                 .annotate(
                     is_current_site=Subquery(
                         Exists(
@@ -1590,8 +1590,8 @@ def make_low_reach_project_query(
             "notes",
             "switchtenders__profile__organization",
             "crm_annotations__tags",
-            Project.prefetch_owner(),
         )
+        .with_perf_prefetch("owner")
         .order_by("-last_members_activity_at")
         .distinct()
     )
