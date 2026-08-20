@@ -978,6 +978,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-csp"
+version = "4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/52/db/23567744dff2169aadb095f726088074476b24dfff5a759ffcf6389cf401/django_csp-4.0.tar.gz", hash = "sha256:b27010bb702eb20a3dad329178df2b61a2b82d338b70fbdc13c3a3bd28712833", size = 20028, upload-time = "2025-04-02T16:41:46.721Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/a4/736ab90ee527a23e194d1ce7358c6bcced66381ced83c28268b4aea236f7/django_csp-4.0-py3-none-any.whl", hash = "sha256:d5a0a05463a6b75a4f1fc1828c58c89af8db9364d09fc6e12f122b4d7f3d00dc", size = 25689, upload-time = "2025-04-02T16:41:45.689Z" },
+]
+
+[[package]]
 name = "django-dbtemplates"
 version = "0.0.0"
 source = { git = "https://github.com/jazzband/django-dbtemplates.git?rev=master#eab2ce0a7edbbd593f37538be358e58a7b237af0" }
@@ -3553,6 +3566,7 @@ dependencies = [
     { name = "django-compressor" },
     { name = "django-cookie-consent" },
     { name = "django-crispy-forms" },
+    { name = "django-csp" },
     { name = "django-dbtemplates" },
     { name = "django-filter" },
     { name = "django-gravatar2" },
@@ -3664,6 +3678,7 @@ requires-dist = [
     { name = "django-compressor", specifier = "==4.5.1" },
     { name = "django-cookie-consent", git = "https://github.com/jazzband/django-cookie-consent?rev=1ddd4717d35dc882eed1f1b1bee6970f5755ae03" },
     { name = "django-crispy-forms", specifier = "==2.0" },
+    { name = "django-csp", specifier = ">=4.0" },
     { name = "django-dbtemplates", git = "https://github.com/jazzband/django-dbtemplates.git?rev=master" },
     { name = "django-filter", specifier = ">=24.3" },
     { name = "django-gravatar2", specifier = ">=1.4.5" },
