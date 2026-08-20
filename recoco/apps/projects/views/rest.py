@@ -193,6 +193,7 @@ class ProjectList(ListAPIView):
                 ),
                 "project_sites",
                 "tags",
+                "topics",
                 "members",
                 "project_creation_requests",
             )

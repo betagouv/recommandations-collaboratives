@@ -951,6 +951,7 @@ def user_details(request, user_id):
             | crm_user.action_object_actions.all()
         )
         .order_by("-timestamp")[:50]
+        .select_related("action_object_content_type", "target_content_type")
         .prefetch_related(
             GenericPrefetch(
                 "actor",
@@ -984,6 +985,7 @@ def user_details(request, user_id):
     all_notes = (
         models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
         .select_related(
+            "content_type",
             "created_by__profile__organization",
             "created_by__profile__organization__group",
         )
