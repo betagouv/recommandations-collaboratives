@@ -209,7 +209,7 @@ def test_non_logged_user_can_send_message_to_team(mocker, client, request):
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
         message=content,
-        from_email=site_config.sender_email,
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[site_config.contact_form_recipient],
         fail_silently=True,
     )
@@ -534,8 +534,6 @@ def test_make_new_site_fails_for_existing_domain(client):
         utils.make_new_site(
             "Example",
             "example.com",
-            "sender@example.com",
-            "Sender",
             "contact@example.com",
             "36 green street 75000 Paris",
         )
@@ -549,8 +547,6 @@ def test_make_new_site(client):
     site = utils.make_new_site(
         "New example",
         "new-example.com",
-        "sender@example.com",
-        "Sender",
         "contact@example.com",
         "36 green street 75000 Paris",
     )

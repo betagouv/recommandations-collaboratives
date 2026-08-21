@@ -19,13 +19,6 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         if app_settings.USER_MODEL_USERNAME_FIELD:
             user_username(user, email)
 
-    def get_from_email(self):
-        """
-        This is a hook that can be overridden to programatically
-        set the 'from' email address for sending emails
-        """
-        return settings.DEFAULT_FROM_EMAIL
-
     def save_user(self, request, user, form):
         saved_user = super().save_user(request, user, form)
 

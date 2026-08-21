@@ -12,7 +12,6 @@ import test  # noqa
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
-from django.conf import settings
 from django.test import override_settings
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -215,7 +214,6 @@ def test_send_brevo_email_use_default_template(mocker, request):
             "legal_address": "here",
             "legal_owner": "Doe",
             "description": "The short description",
-            "sender_email": settings.DEFAULT_FROM_EMAIL,
         },
         test=False,
     )
@@ -263,7 +261,6 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
             "legal_address": "here",
             "legal_owner": "Doe",
             "description": "The short description",
-            "sender_email": settings.DEFAULT_FROM_EMAIL,
         },
         test=False,
     )
