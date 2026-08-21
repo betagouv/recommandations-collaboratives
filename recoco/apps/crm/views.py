@@ -951,8 +951,13 @@ def user_details(request, user_id):
             GenericPrefetch(
                 "actor",
                 [
-                    User.objects.select_related(
-                        "profile__organization", "profile__organization__group"
+                    User.objects.prefetch_related(
+                        Prefetch(
+                            "profile",
+                            home_models.UserProfile.all.select_related(
+                                "organization", "organization__group"
+                            ),
+                        )
                     )
                 ],
             ),
@@ -979,12 +984,16 @@ def user_details(request, user_id):
 
     all_notes = (
         models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
-        .select_related(
-            "content_type",
-            "created_by__profile__organization",
-            "created_by__profile__organization__group",
+        .select_related("content_type", "created_by")
+        .prefetch_related(
+            Prefetch(
+                "created_by__profile",
+                queryset=home_models.UserProfile.all.select_related(
+                    "organization", "organization__group"
+                ),
+            ),
+            "tags",
         )
-        .prefetch_related("tags")
         .order_by("-updated_on")
     )
     sticky_notes = all_notes.filter(sticky=True)
