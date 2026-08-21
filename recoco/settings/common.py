@@ -128,10 +128,10 @@ MIDDLEWARE = [
     "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
     "recoco.apps.plugins.middlewares.TenantPluginSchemaMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "recoco.apps.home.middlewares.SesameWithCookieMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
@@ -323,7 +323,7 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_RATE_LIMITS = {
     "login_failed": "20/m/ip",
 }
