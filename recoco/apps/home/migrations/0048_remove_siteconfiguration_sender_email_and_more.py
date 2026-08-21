@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0046_userprofile_login_with_code"),
+        ("home", "0047_alter_userprofile_options"),
     ]
 
     operations = [
