@@ -18,6 +18,7 @@ from allauth.account.views import (
 )
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
@@ -69,7 +70,7 @@ from .forms import (
     UserPasswordFirstTimeSetupForm,
 )
 from .models import AdvisorAccessRequest
-from .utils import get_current_site_sender_email, make_new_site
+from .utils import make_new_site
 
 
 class HomePageView(TemplateView):
@@ -123,11 +124,6 @@ class SecurityPageView(TemplateView):
 
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["sender_email"] = get_current_site_sender_email()
-        return context
 
 
 class MutliAnnualSchemaPageView(TemplateView):
@@ -233,7 +229,7 @@ def send_message_to_team(request, data):
 
     # Try to get the current user email if logged in, otherwise default to current site
     # sender
-    sender_email = site_config.sender_email
+    sender_email = settings.DEFAULT_FROM_EMAIL
     if not request.user.is_anonymous and request.user.email:
         sender_email = request.user.email
 
@@ -521,8 +517,6 @@ class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
             make_new_site(
                 name=form.cleaned_data["name"],
                 domain=f"{form.cleaned_data['subdomain']}.recoconseil.fr",
-                sender_email=form.cleaned_data["sender_email"],
-                sender_name=form.cleaned_data["sender_name"],
                 contact_form_recipient=form.cleaned_data["contact_form_recipient"],
                 legal_address=form.cleaned_data["legal_address"],
                 admin_user=self.request.user,

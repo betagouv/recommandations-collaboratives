@@ -25,7 +25,6 @@ from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from recoco.apps.home import models as home_models
-from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
 from recoco.utils import assign_site_admin, login
@@ -46,35 +45,6 @@ def test_logged_in_user_can_access_home_page(client):
     with login(client):
         response = client.get(url)
         assert response.status_code == 200
-
-
-########################################################################
-# utility functions
-########################################################################
-
-
-@pytest.mark.django_db
-def test_get_current_site_sender_with_configuration(request):
-    current_site = get_current_site(request)
-
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    site_config = baker.make(
-        home_models.SiteConfiguration,
-        site=current_site,
-        onboarding=onboarding,
-    )
-
-    sender = utils.get_current_site_sender()
-
-    assert site_config.sender_email in sender
-    assert site_config.sender_name in sender
-
-
-@pytest.mark.django_db
-def test_get_current_site_sender_without_configuration(request):
-    sender = utils.get_current_site_sender()
-    assert sender == settings.DEFAULT_FROM_EMAIL
 
 
 ################################################
@@ -239,7 +209,7 @@ def test_non_logged_user_can_send_message_to_team(mocker, client, request):
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
         message=content,
-        from_email=site_config.sender_email,
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[site_config.contact_form_recipient],
         fail_silently=True,
     )
@@ -564,8 +534,6 @@ def test_make_new_site_fails_for_existing_domain(client):
         utils.make_new_site(
             "Example",
             "example.com",
-            "sender@example.com",
-            "Sender",
             "contact@example.com",
             "36 green street 75000 Paris",
         )
@@ -579,8 +547,6 @@ def test_make_new_site(client):
     site = utils.make_new_site(
         "New example",
         "new-example.com",
-        "sender@example.com",
-        "Sender",
         "contact@example.com",
         "36 green street 75000 Paris",
     )

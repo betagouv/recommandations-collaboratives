@@ -9,7 +9,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from . import utils
 from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
 from .validators import EmailValidatorForBrevo
 
@@ -25,13 +24,6 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
         if app_settings.USER_MODEL_USERNAME_FIELD:
             user_username(user, email)
-
-    def get_from_email(self):
-        """
-        This is a hook that can be overridden to programatically
-        set the 'from' email address for sending emails
-        """
-        return utils.get_current_site_sender()
 
     def save_user(self, request, user, form):
         saved_user = super().save_user(request, user, form)

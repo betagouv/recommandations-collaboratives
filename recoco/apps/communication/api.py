@@ -62,7 +62,6 @@ def get_site_params():
     params["legal_address"] = site_config.legal_address or ""
     params["legal_owner"] = site_config.legal_owner or ""
     params["description"] = site_config.description or ""
-    params["sender_email"] = site_config.sender_email or ""
 
     if site_config.email_logo:
         params["site_logo"] = build_absolute_url(site_config.email_logo.url)
