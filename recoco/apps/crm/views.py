@@ -113,8 +113,15 @@ def site_action_stream(site):
         # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
         .prefetch_related(
             GenericPrefetch("actor", [User.objects.all()]),
-            "action_object",  # todo GenericPrefetch list querysets of relevant ob
-            GenericPrefetch("target", [Project.on_site.all(), Site.objects.all()]),
+            "action_object",  # todo GenericPrefetch list querysets of relevant objects
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to not silently miss projects
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
         )
     )
 
@@ -402,13 +409,15 @@ def organization_list(request):
         projects_count=Coalesce(
             Subquery(
                 Project.on_site.filter(
-                    Q(switchtenders__profile__organization=OuterRef("pk"))
+                    Q(switchtenders__profile__organization=OuterRef("pk")),
+                    # Q(
+                    #     switchtenders__profile__sites=request.site
+                    # ),  # should I add this line to do as in details ?
                     # | Q(commune__department__organizations=OuterRef("pk"))
                 )
                 .order_by()
-                .values(
-                    "switchtenders__profile__organization"
-                )  # remove this to also count unfollowed projects
+                .values("switchtenders__profile__organization")
+                # .distinct()
                 # .annotate(v=Value(1))
                 # .values("v")
                 .annotate(count=Count("pk", distinct=True))
@@ -558,9 +567,10 @@ def organization_details(request, organization_id):
     qs = get_queryset_for_site_organizations(request.site)
     organization = get_object_or_404(qs, pk=organization_id)
 
-    participants = User.objects.filter(
-        profile__in=organization.registered_profiles.all(), profile__sites=request.site
-    )
+    participants_everywhere = User.objects.filter(
+        profile__organization=organization
+    )  # clean if we don't need to have their projects anymore
+    participants = participants_everywhere.filter(profile__sites=request.site)
 
     members_stats = participants.aggregate(
         last_activity=Max("profile__previous_activity_at"),
@@ -577,7 +587,19 @@ def organization_details(request, organization_id):
         .first()
     )
 
-    advised_projects = Project.on_site.filter(switchtenders__in=participants)
+    advised_projects = (
+        Project.on_site.filter(switchtenders__in=participants_everywhere)
+        .annotate(
+            is_current_site=Subquery(
+                Exists(
+                    ProjectSite.objects.filter(
+                        project=OuterRef("pk"), site=request.site.id
+                    )
+                )
+            )
+        )
+        .distinct()
+    )
 
     org_departments = organization.departments.all()
 
@@ -869,7 +891,7 @@ def rich_project_relations(relations, model, site_id):
             Prefetch(
                 "project",
                 Project._base_manager.select_related("commune")
-                .prefetch_related(Project.prefetch_owner())
+                .with_perf_prefetch("origin_site", "next_reminder", "owner")
                 .annotate(
                     is_current_site=Subquery(
                         Exists(
@@ -929,6 +951,7 @@ def user_details(request, user_id):
             | crm_user.action_object_actions.all()
         )
         .order_by("-timestamp")[:50]
+        .select_related("action_object_content_type", "target_content_type")
         .prefetch_related(
             GenericPrefetch(
                 "actor",
@@ -962,6 +985,7 @@ def user_details(request, user_id):
     all_notes = (
         models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
         .select_related(
+            "content_type",
             "created_by__profile__organization",
             "created_by__profile__organization__group",
         )
@@ -1568,8 +1592,8 @@ def make_low_reach_project_query(
             "notes",
             "switchtenders__profile__organization",
             "crm_annotations__tags",
-            Project.prefetch_owner(),
         )
+        .with_perf_prefetch("owner")
         .order_by("-last_members_activity_at")
         .distinct()
     )

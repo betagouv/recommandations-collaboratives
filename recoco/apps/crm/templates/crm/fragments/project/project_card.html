@@ -1,7 +1,7 @@
 {# project.is_current_site must have been annotated in backend #}
 
 <div class="crm-project-card d-flex flex-column">
-    {% with origin_site=project.project_sites.origin.site %}
+    {% with origin_site=project.origin_site %}
         <a class="crm-project-card__name fr-link d-flex align-items-center gap-2"
            {% if project.is_current_site %}href="{% url 'crm-project-details' project.pk %}"{% endif %}>
                 <span {% if project.deleted %}class="text-decoration-line-through"{% endif %}>{% if project.owner.profile.organization %}{{ project.owner.profile.organization.name }} - {% endif %}{{ project.name }}</span>
