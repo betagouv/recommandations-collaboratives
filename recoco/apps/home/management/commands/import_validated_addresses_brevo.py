@@ -24,6 +24,7 @@ class Command(BaseCommand):
     def import_from_brevo(self, path, dry_run):
         email_addresses_to_validate = []
         email_addresses_to_add = []
+        email_user_to_update = []
         address_no_user = set()
         already_valid_count = 0
         link_ignored_count = 0
@@ -49,20 +50,35 @@ class Command(BaseCommand):
                     address_no_user.add(email)
                     continue
 
-                count = EmailAddress.objects.filter(email=email).count()
-                if count == 1:
+                count_same = EmailAddress.objects.filter(email=email, user=user).count()
+                if count_same == 1:
                     email_address = EmailAddress.objects.get(email=email)
                     if email_address.verified:
                         already_valid_count += 1
                         continue
                     email_address.verified = True
                     email_addresses_to_validate.append(email_address)
-                elif count == 0:
-                    email_addresses_to_add.append(
-                        EmailAddress(
-                            email=email, verified=True, primary=True, user=user
+                elif count_same == 0:
+                    count_diff = EmailAddress.objects.filter(user=user).count()
+                    if count_diff == 0:
+                        email_addresses_to_add.append(
+                            EmailAddress(
+                                email=email, verified=True, primary=True, user=user
+                            )
                         )
-                    )
+                    else:
+                        email_address = EmailAddress.objects.get(user=user)
+                        email_user_to_update.append((email_address, user))
+
+        if email_user_to_update:
+            self.stdout.write(
+                "Addresses that should be manually updated to account for manual changes. Ignored by the script",
+            )
+            self.stdout.write("user_id, user__email, address__email, address_id")
+            for email_address, user in email_user_to_update:
+                self.stdout.write(
+                    f"{user.id}, {user.email}, {email_address.email}, {email_address.id}"
+                )
 
         if dry_run:
             self.stdout.write(
