@@ -1,8 +1,8 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 {% if project.owner %}
     <div class="d-flex align-items-start fr-mb-2v">
         <span class="fr-mr-2v d-flex align-items-center justify-content-between">

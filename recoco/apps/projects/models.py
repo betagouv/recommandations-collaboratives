@@ -233,6 +233,52 @@ class ProjectQuerySet(models.QuerySet):
             )
         )
 
+    def with_perf_prefetch(self, *args):
+        prefetch_to_do = []
+
+        if "origin_site" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "project_sites",
+                    ProjectSite.objects.filter(is_origin=True).select_related(
+                        "site", "site__configuration"
+                    ),
+                    to_attr="_origin_site",
+                )
+            )
+        if "owner" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "members",
+                    auth_models.User.objects.filter(
+                        projectmember__is_owner=True
+                    ).select_related(
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
+                    ),
+                    to_attr="_owner",
+                )
+            )
+        if "next_reminder" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "reminders",
+                    django_apps.get_model(
+                        app_label="reminders", model_name="Reminder"
+                    )  # Imported lazily to avoid a circular import in reminders.models
+                    .objects.filter(site=Site.objects.get_current(), sent_on=None)
+                    .order_by("deadline"),
+                    to_attr="_next_reminder",
+                )
+            )  # _next_reminder is looked at in getter
+
+        return self.prefetch_related(*prefetch_to_do)
+
+
+class AllProjectManager(ProjectManager.from_queryset(ProjectQuerySet)):
+    pass
+
 
 class ProjectOnSiteManagerBase(CurrentSiteManager, ProjectManager):
     pass
@@ -357,6 +403,7 @@ class Project(models.Model):
     on_site = ActiveProjectOnSiteManager()
     deleted_on_site = DeletedProjectOnSiteManager()
 
+    all = AllProjectManager()
     all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(
@@ -406,25 +453,18 @@ class Project(models.Model):
 
     @property
     def owner(self):
-        # `_owner` may be populated in bulk (use prefetch_owner below) to avoid N+1 queries
+        # `_owner` may be populated in bulk (use with_perf_prefetch from manager) to avoid N+1 queries
         # an empty list means "no owner", not "not prefetched".
         if hasattr(self, "_owner"):
             return self._owner[0] if self._owner else None
         return self.members.filter(projectmember__is_owner=True).first()
 
-    @staticmethod
-    def prefetch_owner():
-        return Prefetch(
-            "members",
-            auth_models.User.objects.filter(
-                projectmember__is_owner=True
-            ).select_related(
-                "profile",
-                "profile__organization",
-                "profile__organization__group",
-            ),
-            to_attr="_owner",
-        )  # _owner is looked at in getter
+    @property
+    def origin_site(self):
+        # use with_perf_prefetch from manager to enjoy optimization
+        if hasattr(self, "_origin_site"):
+            return self._origin_site[0].site if self._origin_site else None
+        return self.project_sites.origin().site
 
     ro_key = models.CharField(
         max_length=32,
@@ -583,6 +623,10 @@ class Project(models.Model):
 
     @property
     def next_reminder(self):
+        # `_next_reminder` may be populated in bulk (use with_perf_prefetch from manager)
+        # to avoid N+1 queries. An empty list means "no reminder", not "not prefetched".
+        if hasattr(self, "_next_reminder"):
+            return self._next_reminder[0] if self._next_reminder else None
         current_site = Site.objects.get_current()
         return (
             self.reminders.filter(site=current_site, sent_on=None)
@@ -602,6 +646,7 @@ class Project(models.Model):
     class Meta:
         verbose_name = "project"
         verbose_name_plural = "projects"
+        base_manager_name = "all"
         permissions = (
             # General
             # Builtin: ("view_project", "Can view the project"),

@@ -2,15 +2,17 @@ from collections import defaultdict
 from functools import wraps
 
 from django.conf import settings
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.core.serializers import serialize
 from django.utils.timezone import localtime
+from guardian.core import ObjectPermissionChecker
 from notifications import models as notifications_models
 
 from recoco import verbs
 from recoco.apps.plugins.manager import get_site_plugin_manager
+from recoco.apps.projects.models import Project
+from recoco.apps.projects.utils import can_administrate_project
 from recoco.utils import check_if_advisor, is_admin_for_site, is_staff_for_site
-
-from .utils import can_administrate_project
 
 
 def exclude_path(excluded_path: str):
@@ -28,12 +30,25 @@ def exclude_path(excluded_path: str):
 
 
 @exclude_path("/nimda")
+@exclude_path("/api")
 def is_switchtender_processor(request):
     return {
         "is_switchtender": check_if_advisor(request.user),
         "is_administrating_project": can_administrate_project(
             project=None, user=request.user
         ),
+    }
+
+
+@exclude_path("/nimda")
+@exclude_path("/api")
+def user_perm_checker_processor(request):
+    """
+    Limits queries since we only want to check request.user's perms
+    Works with anonymous
+    """
+    return {
+        "user_perm_checker": ObjectPermissionChecker(request.user),
     }
 
 
@@ -48,7 +63,10 @@ def unread_notifications_processor(request):
         .filter(recipient=request.user)
         .prefetch_related("actor__profile__organization")
         .prefetch_related("action_object")
-        .prefetch_related("target")
+        .prefetch_related(
+            # _base_manager since for relations we might have projects that would have been filtered otherwise
+            GenericPrefetch("target", [Project._base_manager.select_related("commune")])
+        )
         .order_by("-timestamp")[:100]
     )
 
