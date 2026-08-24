@@ -1408,6 +1408,30 @@ def test_doc_upload_does_not_accept_malicious_files_by_extension(
     assert models.Document.objects.count() == 0
 
 
+@pytest.mark.django_db
+def test_doc_upload_denied_for_anonymous_user(client, project_ready, good_file):
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+    data = {"description": "this is some content", "the_file": good_file}
+
+    response = client.post(url, data)
+
+    assert response.status_code == 403
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_denied_for_user_outside_project(client, project_ready, good_file):
+    outsider = baker.make(auth_models.User)
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+    data = {"description": "this is some content", "the_file": good_file}
+
+    with login(client, user=outsider):
+        response = client.post(url, data)
+
+    assert response.status_code == 403
+    assert models.Document.objects.count() == 0
+
+
 @pytest.fixture
 def inactive_project(request, make_project):
     yield make_project(inactive_since=datetime.today())
