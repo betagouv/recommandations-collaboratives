@@ -1432,6 +1432,67 @@ def test_doc_upload_denied_for_user_outside_project(client, project_ready, good_
     assert models.Document.objects.count() == 0
 
 
+########################################################################
+# REST API: document retrieve permissions
+########################################################################
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_denied_for_anonymous_user(request, client, project_ready):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        the_link="https://example.com/report.pdf",
+    )
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_denied_for_user_outside_project(request, client, project_ready):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        the_link="https://example.com/report.pdf",
+    )
+    outsider = baker.make(auth_models.User)
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    with login(client, user=outsider):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_allowed_for_project_reader(
+    request, client, project_ready, project_reader
+):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        description="a description",
+        the_link="https://example.com/report.pdf",
+    )
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    with login(client, user=project_reader):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == document.id
+    assert response.data["description"] == "a description"
+
+
 @pytest.fixture
 def inactive_project(request, make_project):
     yield make_project(inactive_since=datetime.today())
