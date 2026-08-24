@@ -173,6 +173,17 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request, project):
     assert response.status_code == 403
 
 
+@pytest.mark.django_db
+def test_anonymous_user_cannot_see_project_tasks(request, project, current_site):
+    baker.make(models.Task, project=project, site=current_site, public=True)
+
+    client = APIClient()
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
 #
 # create task
 
@@ -285,6 +296,20 @@ def test_cannot_create_project_task_for_site_invalid_contact_or_resource(
 
 
 @pytest.mark.django_db
+def test_project_simple_user_cannot_update_project_task(
+    api_client, project, current_site
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+    user = baker.make(auth_models.User)
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-detail", args=[project.id, task.id])
+    response = api_client.patch(url, data={"public": True})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_project_advisor_cannot_update_other_project_task_for_site(
     request, project, make_project
 ):
@@ -370,6 +395,8 @@ def test_project_advisor_can_update_project_task_for_site_no_content(request, pr
 ##################
 # mark task as visited
 ##################
+
+
 @pytest.mark.django_db
 def test_project_collaborator_can_mark_task_as_visited(request, project):
     user = baker.make(auth_models.User)
@@ -476,7 +503,7 @@ def test_non_project_user_cannot_move_project_tasks_for_site(request, project):
 
 
 @pytest.mark.django_db
-def test_project_advisor_cannot_move_unknown_tasks_for_site(request, project):
+def test_project_advisor_cannot_move_above_unknown_tasks_for_site(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     task = baker.make(models.Task, project=project, site=site, public=True)
@@ -577,6 +604,20 @@ def test_project_advisor_can_move_project_tasks_for_site(request, project):
     response = client.post(url, data={"above": tasks[1].id})
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_anonymous_user_cannot_move_project_tasks_for_site(request, project):
+    site = get_current_site(request)
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+
+    client = APIClient()
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 403
 
 
 ########################################################################
