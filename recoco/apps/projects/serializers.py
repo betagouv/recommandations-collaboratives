@@ -247,7 +247,7 @@ class NewProjectSerializer(ProjectSerializer):
         ]
 
     insee = serializers.CharField(max_length=5, write_only=True)
-    owner_email = serializers.EmailField(write_only=True)
+    owner_email = serializers.EmailField(max_length=150, write_only=True)
 
     description = serializers.CharField(required=True)
     tags = TagListSerializerField(required=False)
@@ -300,7 +300,7 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     sent, and nothing is to be accepted.
     """
 
-    email = serializers.EmailField()
+    email = serializers.EmailField(max_length=150)
     role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
 
     @property
@@ -319,8 +319,10 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
             assign_collaborator(user, self.project)
         elif role == "SWITCHTENDER":
             assign_advisor(user, self.project, site=self.current_site)
-        else:
+        elif role == "OBSERVER":
             assign_observer(user, self.project, site=self.current_site)
+        else:
+            raise ValueError(f"Unhandled invite role '{role}'")
 
         return validated_data
 
