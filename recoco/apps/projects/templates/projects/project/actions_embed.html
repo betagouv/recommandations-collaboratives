@@ -15,8 +15,8 @@
     {% vite_asset 'js/apps/actionsEmbed.js' %}
 {% endblock js %}
 {% block project_detail %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+    {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
     <div class="col-12 mx-auto">
         <div class="row">
             <div class="col">

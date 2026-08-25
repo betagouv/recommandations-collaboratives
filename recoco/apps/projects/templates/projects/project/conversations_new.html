@@ -93,7 +93,7 @@
                  {% comment %}
                  @topic-switched.window="scrollToFirstNotification($event.detail)"
                  {% endcomment %}>
-                {% get_obj_perms request.user for project as "user_project_perms" %}
+                {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
                 {% include "conversations/messages/fragments/conversations_new_feed.html" %}
                 {% if "use_public_notes" in user_project_perms %}
                     <!-- Post message -->

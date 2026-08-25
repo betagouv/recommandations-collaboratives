@@ -3,8 +3,8 @@
 {% block content %}
     <p class="fr-text--lead fr-mb-3w">
         Oups, vous n'avez pas l'autorisation d'accéder à cette page
-        {% if request.user.is_authenticated %}avec votre compte <strong>{{ request.user }}</strong>{% endif %}
-        . Si vous pensez que c'est une erreur, écrivez aux administrateurs du site !
+        {% if request.user.is_authenticated %}avec votre compte <strong>{{ request.user }}</strong>{% endif %}.
+        Si vous pensez que c'est une erreur, écrivez aux administrateurs du site !
     </p>
 {% endblock content %}
 {% block buttons %}

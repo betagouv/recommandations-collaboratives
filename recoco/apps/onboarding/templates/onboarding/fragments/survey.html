@@ -5,7 +5,7 @@
         {% if form.fields.answer.choices != None %}
             {% for error in form.answer.errors %}<p class="fr-error-text element-to-focus">{{ error }}</p>{% endfor %}
             <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
-                    id="radio-hint-legend">{{ form.question.text }} *</legend>
+                    id="radio-hint-legend">{{ form.question.text }}</legend>
         {% endif %}
         {% for choice in form.fields.answer.choices %}
             <div class="fr-fieldset__element">
@@ -48,7 +48,6 @@
                         {% else %}
                             {{ question_comment_title|default:'Commentaire' }}
                         {% endif %}
-                        *
                     </label>
                     <textarea x-data="FieldValidator(true,'{{ form.comment.value|default:'' }}', 'input', ['focusout', 'input'], submittedForm)"
                               x-effect="validateData(submittedForm)"
