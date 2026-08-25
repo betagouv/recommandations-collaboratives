@@ -11,6 +11,7 @@ from recoco.apps.crm.models import Note, ProjectAnnotations
 from recoco.apps.crm.templatetags.crm_tags import get_note_update_url
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.models import Project
+from recoco.utils import login
 
 
 @pytest.mark.django_db
@@ -42,108 +43,105 @@ class TestViewSiteConfigurationTags:
     url = reverse("crm-site-configuration-tags")
 
     def test_view_perms(self, client, current_site_with_config):
-        user = baker.make(User)
-        client.force_login(user)
-        response = client.get(self.url)
-        assert response.status_code == 403
+        with login(client):
+            response = client.get(self.url)
+            assert response.status_code == 403
 
     def test_get_context(self, client, current_site_with_config):
-        user = baker.make(User)
-        client.force_login(user)
+        with login(client) as user:
+            # Create 3 projects with tag_one, with one of them marked as deleted
+            for _ in range(3):
+                project = baker.make(Project, sites=[current_site_with_config])
+                project_annotations = baker.make(
+                    ProjectAnnotations, project=project, site=current_site_with_config
+                )
+                project_annotations.tags.add("tag_one")
+            project = Project.objects.filter(sites=current_site_with_config).first()
+            project.deleted = timezone.now()
+            project.save()
 
-        # Create 3 projects with tag_one, with one of them marked as deleted
-        for _ in range(3):
+            assign_perm("manage_configuration", user, current_site_with_config)
+
+            response = client.get(self.url)
+            assert response.status_code == 200
+            assert [tag.name for tag in response.context["tags"]] == [
+                "tag_one",
+                "tag_two",
+            ]
+            assert [tag.impacted_count for tag in response.context["tags"]] == [
+                2,
+                0,
+            ]
+            assert list(
+                current_site_with_config.configuration.crm_available_tags.names()
+            ) == [
+                "tag_one",
+                "tag_two",
+            ]
+
+    def test_post_add_tag(self, client, current_site_with_config):
+        with login(client) as user:
+            assign_perm("manage_configuration", user, current_site_with_config)
+
+            response = client.post(
+                self.url,
+                headers={"HX_REQUEST": "true"},
+                data={"action": "add", "new_tag_name": "tag_three"},
+            )
+            assert response.status_code == 200
+            assert [tag.name for tag in response.context["tags"]] == [
+                "tag_one",
+                "tag_three",
+                "tag_two",
+            ]
+
+    def test_post_remove_tag(self, client, current_site_with_config):
+        with login(client) as user:
+            assign_perm("manage_configuration", user, current_site_with_config)
+
+            project = baker.make(Project, sites=[current_site_with_config])
+            project_annotations = baker.make(
+                ProjectAnnotations, project=project, site=current_site_with_config
+            )
+            project_annotations.tags.add("tag_one", "tag_two")
+
+            response = client.post(
+                self.url,
+                headers={"HX_REQUEST": "true"},
+                data={"action": "remove", "tag_name": "tag_one"},
+            )
+            assert response.status_code == 200
+            assert [tag.name for tag in response.context["tags"]] == ["tag_two"]
+            assert list(project.crm_annotations.tags.names()) == ["tag_two"]
+            assert list(
+                current_site_with_config.configuration.crm_available_tags.names()
+            ) == ["tag_two"]
+
+    def test_post_rename_tag(self, client, current_site_with_config):
+        with login(client) as user:
+            assign_perm("manage_configuration", user, current_site_with_config)
+
             project = baker.make(Project, sites=[current_site_with_config])
             project_annotations = baker.make(
                 ProjectAnnotations, project=project, site=current_site_with_config
             )
             project_annotations.tags.add("tag_one")
-        project = Project.objects.filter(sites=current_site_with_config).first()
-        project.deleted = timezone.now()
-        project.save()
 
-        assign_perm("manage_configuration", user, current_site_with_config)
-
-        response = client.get(self.url)
-        assert response.status_code == 200
-        assert [tag.name for tag in response.context["tags"]] == [
-            "tag_one",
-            "tag_two",
-        ]
-        assert [tag.impacted_count for tag in response.context["tags"]] == [
-            2,
-            0,
-        ]
-        assert list(
-            current_site_with_config.configuration.crm_available_tags.names()
-        ) == [
-            "tag_one",
-            "tag_two",
-        ]
-
-    def test_post_add_tag(self, client, current_site_with_config):
-        user = baker.make(User)
-        assign_perm("manage_configuration", user, current_site_with_config)
-        client.force_login(user)
-
-        response = client.post(
-            self.url,
-            headers={"HX_REQUEST": "true"},
-            data={"action": "add", "new_tag_name": "tag_three"},
-        )
-        assert response.status_code == 200
-        assert [tag.name for tag in response.context["tags"]] == [
-            "tag_one",
-            "tag_three",
-            "tag_two",
-        ]
-
-    def test_post_remove_tag(self, client, current_site_with_config):
-        user = baker.make(User)
-        assign_perm("manage_configuration", user, current_site_with_config)
-        client.force_login(user)
-
-        project = baker.make(Project, sites=[current_site_with_config])
-        project_annotations = baker.make(
-            ProjectAnnotations, project=project, site=current_site_with_config
-        )
-        project_annotations.tags.add("tag_one", "tag_two")
-
-        response = client.post(
-            self.url,
-            headers={"HX_REQUEST": "true"},
-            data={"action": "remove", "tag_name": "tag_one"},
-        )
-        assert response.status_code == 200
-        assert [tag.name for tag in response.context["tags"]] == ["tag_two"]
-        assert list(project.crm_annotations.tags.names()) == ["tag_two"]
-        assert list(
-            current_site_with_config.configuration.crm_available_tags.names()
-        ) == ["tag_two"]
-
-    def test_post_rename_tag(self, client, current_site_with_config):
-        user = baker.make(User)
-        assign_perm("manage_configuration", user, current_site_with_config)
-        client.force_login(user)
-
-        project = baker.make(Project, sites=[current_site_with_config])
-        project_annotations = baker.make(
-            ProjectAnnotations, project=project, site=current_site_with_config
-        )
-        project_annotations.tags.add("tag_one")
-
-        response = client.post(
-            self.url,
-            headers={"HX_REQUEST": "true"},
-            data={
-                "action": "rename",
-                "tag_name": "tag_one",
-                "new_tag_name": "tag_azou",
-            },
-        )
-        assert response.status_code == 200
-        assert [tag.name for tag in response.context["tags"]] == ["tag_azou", "tag_two"]
-        assert list(project.crm_annotations.tags.names()) == ["tag_azou"]
-        assert list(
-            current_site_with_config.configuration.crm_available_tags.names()
-        ) == ["tag_azou", "tag_two"]
+            response = client.post(
+                self.url,
+                headers={"HX_REQUEST": "true"},
+                data={
+                    "action": "rename",
+                    "tag_name": "tag_one",
+                    "new_tag_name": "tag_azou",
+                },
+            )
+            assert response.status_code == 200
+            assert [tag.name for tag in response.context["tags"]] == [
+                "tag_azou",
+                "tag_two",
+            ]
+            assert list(project.crm_annotations.tags.names()) == ["tag_azou"]
+            assert list(
+                current_site_with_config.configuration.crm_available_tags.names()
+            ) == ["tag_azou", "tag_two"]

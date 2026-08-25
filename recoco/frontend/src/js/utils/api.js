@@ -95,6 +95,16 @@ export function userProjectStatusUrl() {
   return '/api/userprojectstatus/';
 }
 
+// ACRA
+export function askRecommendationsUrl(projectId) {
+  return `/api/projects/${projectId}/tasks/acra/ask/`;
+}
+
+export function corecommendationsUrl(projectId, params) {
+  const qs = params && params.toString() ? `?${params.toString()}` : '';
+  return `/api/projects/${projectId}/tasks/acra/co-recommendations/${qs}`;
+}
+
 // Sites :
 export function sitesConfigUrl() {
   return '/api/sites/';

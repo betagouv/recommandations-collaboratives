@@ -62,18 +62,18 @@ class OnboardingSignupForm(DsrcBaseForm):
             ],
         }
 
-    first_name = forms.CharField(label="Prénom *", initial="", required=True)
-    last_name = forms.CharField(label="Nom *", initial="", required=True)
+    first_name = forms.CharField(label="Prénom", initial="", required=True)
+    last_name = forms.CharField(label="Nom", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre organisation *",
+        label="Nom de votre organisation",
         help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
-    role = forms.CharField(label="Fonction *", initial="", required=True)
+    role = forms.CharField(label="Fonction", initial="", required=True)
 
     # TODO: add an email validation, pattern / mask
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
         disabled=True,
@@ -81,7 +81,7 @@ class OnboardingSignupForm(DsrcBaseForm):
 
     # Password input, with a password widget, show/hide control, and a help text
     password = forms.CharField(
-        label="Mot de passe *",
+        label="Mot de passe",
         required=True,
         help_text="Votre mot de passe doit contenir 10 caractères minimum et au moins 1 majuscule et 1 chiffre",
         widget=forms.PasswordInput(
@@ -92,7 +92,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     # TODO: add a phone number validation, pattern / mask
     phone = forms.CharField(
         max_length=16,
-        label="Numéro de téléphone *",
+        label="Numéro de téléphone",
         initial="",
         help_text="Votre numéro de téléphone ne sera jamais diffusé en dehors du site. Il permet aux administrateurs ou aux partenaires de votre dossier de vous joindre plus facilement. Format attendu: 0102030405.",
         required=True,
@@ -130,7 +130,7 @@ class OnboardingProject(DsrcBaseForm):
             self.fields.pop("captcha")
 
     name = forms.CharField(
-        label="Nom de votre dossier *",
+        label="Nom de votre dossier",
         initial="",
         required=True,
         help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
@@ -141,7 +141,7 @@ class OnboardingProject(DsrcBaseForm):
         required=False,
         help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
     )
-    postcode = forms.CharField(label="Code postal *", initial="", required=True)
+    postcode = forms.CharField(label="Code postal", initial="", required=True)
 
     insee = forms.CharField(
         max_length=5,
@@ -150,7 +150,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé de votre demande *",
+        label="Résumé de votre demande",
         initial="",
         required=True,
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
@@ -158,7 +158,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email",
         required=True,
         help_text="Format attendu : prenom.nom@domaine.fr",
     )

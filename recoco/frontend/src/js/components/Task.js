@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs';
 
 import { renderMarkdown } from '../utils/markdown';
-import { truncate } from '../utils/taskStatus';
+import { truncate } from '../utils/text-parsing';
 
 export default function Task(currentTask) {
   return {

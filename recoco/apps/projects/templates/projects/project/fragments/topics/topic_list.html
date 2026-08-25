@@ -5,8 +5,8 @@
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
 {% endblock js %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 <section class="project-details-section h-100">
     <header>
         <h6 class="font-small fr-mb-1v">Thématiques du dossier</h6>

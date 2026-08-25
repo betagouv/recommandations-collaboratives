@@ -18,7 +18,7 @@
     CRM
 {% endblock og_title %}
 {% block content %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% get_verbs as verbs %}
     {% if 'moderate_projects' in user_site_perms %}
@@ -35,7 +35,15 @@
                 Bienvenue sur l’Administration
             </h3>
         </div>
-        <div x-data="Crm" class="fr-px-0 d-flex">
+        <div x-data="Crm" class="fr-px-0 d-flex flex-column">
+            <div class="fr-pb-4w">
+                <h4 class="crm-home__subtitle fr-mb-1v">Activité de l'ensemble des dossiers</h4>
+                {% include "crm/timeline.html" with actions=site_action_stream|slice:":3" %}
+                <div>
+                    <a class="button filled grey small inherit fw-bold fr-mt-1w"
+                       href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
+                </div>
+            </div>
             <div class="crm-home__section d-flex flex-column justify-content-start">
                 <div class="d-flex flex-column">
                     {% if projects_to_moderate_count or advisor_access_requests_count %}
@@ -43,7 +51,7 @@
                             <h4 class="crm-home__subtitle fr-mb-1v">
                                 Alertes
                             </h4>
-                            <div class="gap-2 d-flex flex-wrap">
+                            <div class="gap-4 d-flex flex-wrap">
                                 <div class="crm-home__card-container">
                                     {% url "projects-moderation-list" as url %}
                                     {% with text="Nouveaux dossiers ou demandes d’accès conseiller à modérer" %}
@@ -57,7 +65,7 @@
                         <h4 class="crm-home__subtitle fr-mb-1v">
                             Tâches récurrentes
                         </h4>
-                        <div class="gap-2 d-flex flex-wrap">
+                        <div class="gap-4 d-flex flex-wrap">
                             <div class="crm-home__card-container">
                                 {% url 'crm-list-projects-low-reach' as url %}
                                 {% with text="Rappelez les demandeurs qui n’ont pas lu les recommandations ou donné de nouvelles" %}
@@ -76,7 +84,7 @@
                         <h4 class="crm-home__subtitle fr-mb-1v">
                             Données
                         </h4>
-                        <div class="gap-2 d-flex flex-wrap">
+                        <div class="gap-4 d-flex flex-wrap">
                             <div class="crm-home__card-container">
                                 {% url 'crm-user-list' as url %}
                                 {% with text="Gestion de vos utilisateurs, suivi de leur activité" %}
@@ -120,7 +128,7 @@
                             <h4 class="crm-home__subtitle fr-mb-1v">
                                 Configuration du portail
                             </h4>
-                            <div class="gap-2 d-flex flex-wrap">
+                            <div class="gap-4 d-flex flex-wrap">
                                 {% if "manage_configuration" in user_site_perms %}
                                     <div class="crm-home__card-container">
                                         {% url 'crm-site-configuration' as url %}
@@ -159,7 +167,7 @@
                             <h4 class="crm-home__subtitle fr-mb-1v">
                                 Sécurité de votre compte
                             </h4>
-                            <div class="gap-2 d-flex flex-wrap">
+                            <div class="gap-4 d-flex flex-wrap">
                                 <div class="crm-home__card-container">
                                     {% url 'account_email' as email_url_ %}
                                     {% with text="Confirmez que vous avez accès à votre adresse email" %}
@@ -195,16 +203,6 @@
                         -- Pas encore d'activité, revenez plus tard ! --
                     {% endfor %}
                 </ul>
-            </div>
-            <div class="crm-home__sidebar fr-px-3w fr-pt-1v crm-timeline-min-height d-flex flex-column">
-                <h3 class="crm-home__subtitle fr-mt-2w">Activité de l'ensemble des dossiers</h3>
-                <div class="crm-home__timeline">
-                    {% include "crm/timeline.html" with actions=site_action_stream %}
-                </div>
-                <div class="d-flex justify-content-center">
-                    <a class="button filled grey small inherit fw-bold fr-mt-3w fr-mb-3w"
-                        href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
-                </div>
             </div>
         </div>
     </div>

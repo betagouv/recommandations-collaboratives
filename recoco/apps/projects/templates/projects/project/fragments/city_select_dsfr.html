@@ -10,7 +10,7 @@
              data-test-id="input-group-postcode">
             <label class="fr-label" for="input-project-address">
                 Code postal
-                {% if isRequired %}*{% endif %}
+                {% if not isRequired %}<span class="fr-italic">(facultatif)</span>{% endif %}
             </label>
             <input :disabled="isLoading"
                    @change.debounce="fetchCities()"
@@ -28,7 +28,7 @@
         <div class="col-6 fr-select-group" data-test-id="select-group-city">
             <label class="fr-label" for="input-project-address">
                 Commune
-                {% if isRequired %}*{% endif %}
+                {% if not isRequired %}<span class="fr-italic">(facultatif)</span>{% endif %}
             </label>
             <select required
                     x-ref="insee"

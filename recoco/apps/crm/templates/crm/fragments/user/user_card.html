@@ -19,4 +19,5 @@
             <span class="crm-user-card__org{% if not user.is_active %}-inactive{% endif %} fr-icon-people fr-icon--sm fr-ml-1v fr-btn--icon-left">{{ project.org_name }}</span>
         {% endif %}
     </div>
+    {% include "account/fragments/unvalidated_email_indicator.html" %}
 </div>

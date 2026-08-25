@@ -263,8 +263,9 @@ def test_send_digests_for_new_sites_by_user(request, make_project):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_switchtender_by_user(request, client, make_project):
-    current_site = get_current_site(request)
+def test_send_digests_for_switchtender_by_user(
+    request, client, make_project, current_site
+):
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     advisor_group = auth.Group.objects.get(name="example_com_advisor")

@@ -11,9 +11,6 @@ from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action
-from allauth.account.internal.flows.email_verification import (
-    send_verification_email_for_user,
-)
 from allauth.account.models import EmailAddress
 from allauth.account.utils import filter_users_by_email, setup_user_email
 from django import forms as django_forms
@@ -31,6 +28,7 @@ from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
+    BooleanField,
     Case,
     CharField,
     Count,
@@ -41,12 +39,13 @@ from django.db.models import (
     Func,
     Max,
     OuterRef,
+    Prefetch,
     Q,
     Subquery,
     Value,
     When,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -69,12 +68,15 @@ from recoco.apps.conversations.models import Message, RecommendationNode
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
+from recoco.apps.home.adapters import send_confirmation_email
+from recoco.apps.home.utils import deactivate_user, reactivate_user
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.plugins.manager import get_plugin_manager, get_site_plugin_manager
 from recoco.apps.projects.models import (
     Document,
     Project,
     ProjectMember,
+    ProjectSite,
     ProjectSwitchtender,
     Topic,
 )
@@ -88,7 +90,6 @@ from recoco.utils import (
     make_group_name_for_site,
 )
 
-from ..home.utils import deactivate_user, reactivate_user
 from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
@@ -110,8 +111,15 @@ def site_action_stream(site):
         # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
         .prefetch_related(
             GenericPrefetch("actor", [User.objects.all()]),
-            "action_object",  # todo GenericPrefetch list querysets of relevant ob
-            GenericPrefetch("target", [Project.on_site.all(), Site.objects.all()]),
+            "action_object",  # todo GenericPrefetch list querysets of relevant objects
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to not silently miss projects
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
         )
     )
 
@@ -385,18 +393,36 @@ def organization_list(request):
 
     # organization from addressbook current site or w/ user on site
     qs = get_queryset_for_site_organizations(request.site).annotate(
-        members_count=Count(
-            "registered_profiles",
-            filter=Q(registered_profiles__sites=request.site),
-            distinct=True,
+        members_count=Coalesce(
+            Subquery(
+                home_models.UserProfile.objects.filter(
+                    sites=request.site, organization_id=OuterRef("pk")
+                )
+                .values("organization_id")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            ),
+            0,
         ),
-        projects_count=Subquery(
-            Project.on_site.filter(members__profile__organization=OuterRef("pk"))
-            .order_by()
-            .values("members__profile__organization")
-            .annotate(count=Count("pk", distinct=True))
-            .values("count")
-        ),
+        projects_count=Coalesce(
+            Subquery(
+                Project.on_site.filter(
+                    Q(switchtenders__profile__organization=OuterRef("pk")),
+                    # Q(
+                    #     switchtenders__profile__sites=request.site
+                    # ),  # should I add this line to do as in details ?
+                    # | Q(commune__department__organizations=OuterRef("pk"))
+                )
+                .order_by()
+                .values("switchtenders__profile__organization")
+                # .distinct()
+                # .annotate(v=Value(1))
+                # .values("v")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            ),
+            0,
+        ),  # uncomment upside to count also unfollowed projects
     )
 
     organizations = filters.OrganizationFilter(
@@ -539,17 +565,41 @@ def organization_details(request, organization_id):
     qs = get_queryset_for_site_organizations(request.site)
     organization = get_object_or_404(qs, pk=organization_id)
 
-    participants = User.objects.filter(
-        profile__in=organization.registered_profiles.all()
+    participants_everywhere = User.objects.filter(
+        profile__organization=organization
+    )  # clean if we don't need to have their projects anymore
+    participants = participants_everywhere.filter(profile__sites=request.site)
+
+    members_stats = participants.aggregate(
+        last_activity=Max("profile__previous_activity_at"),
+        last_login=Max("last_login"),
+    )
+    last_members_activity_at = members_stats["last_activity"]
+    last_members_login_at = members_stats["last_login"]
+
+    next_members_reminder = (
+        reminders_models.Reminder.on_site.filter(
+            project__projectmember__member__in=participants, sent_on=None
+        )
+        .order_by("deadline")
+        .first()
     )
 
-    advised_projects = Project.on_site.filter(switchtenders__in=participants)
+    advised_projects = (
+        Project.on_site.filter(switchtenders__in=participants_everywhere)
+        .annotate(
+            is_current_site=Subquery(
+                Exists(
+                    ProjectSite.objects.filter(
+                        project=OuterRef("pk"), site=request.site.id
+                    )
+                )
+            )
+        )
+        .distinct()
+    )
 
     org_departments = organization.departments.all()
-
-    unadvised_projects = Project.on_site.filter(
-        commune__department__in=org_departments
-    ).exclude(switchtenders__in=participants)
 
     participant_ids = list(participants.values_list("id", flat=True))
 
@@ -589,8 +639,6 @@ def organization_details(request, organization_id):
 
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
-
-    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/organization_details.html", locals())
 
@@ -736,10 +784,7 @@ def user_update(request, user_id=None):
                     )
                     if email_changed:
                         setup_user_email(request, crm_user, [])
-                        # XXX this method comes from the "internal" package of allauth
-                        # and should probably not be used directly -- fixing sec bug
-                        # when moving from 65.9 to 65.12
-                        send_verification_email_for_user(request, crm_user)
+                        send_confirmation_email(request, crm_user)
 
                     messages.success(request, success_message)
                     return redirect(reverse("crm-user-details", args=[crm_user.id]))
@@ -835,6 +880,49 @@ def user_unset_advisor(request, user_id=None):
     return render(request, "crm/user_unset_advisor.html", locals())
 
 
+def rich_project_relations(relations, model, site_id):
+    relations = (
+        relations.prefetch_related(
+            Prefetch(
+                "project",
+                Project._base_manager.select_related("commune")
+                .with_perf_prefetch("origin_site", "next_reminder", "owner")
+                .annotate(
+                    is_current_site=Subquery(
+                        Exists(
+                            ProjectSite.objects.filter(
+                                project=OuterRef("pk"), site=site_id
+                            )
+                        )
+                    ),
+                ),
+            ),
+            "project__project_sites__site",
+        )
+        .annotate(
+            is_deleted=ExpressionWrapper(
+                ~Q(project__deleted=None), output_field=BooleanField()
+            ),
+            is_origin_current_site=Exists(
+                ProjectSite.objects.filter(
+                    project=OuterRef("project_id"),
+                    site=site_id,
+                    is_origin=True,
+                )
+            ),
+            is_current_site=Exists(
+                ProjectSite.objects.filter(project=OuterRef("project_id"), site=site_id)
+            ),
+        )
+        .order_by(
+            "is_deleted",
+            "-is_origin_current_site",
+            "-is_current_site",
+        )
+    )
+    return relations
+
+
 @login_required
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -851,11 +939,39 @@ def user_details(request, user_id):
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     actions = (
-        crm_user.actor_actions.exclude(
-            verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+        (
+            crm_user.actor_actions.exclude(
+                verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+            )
+            | crm_user.action_object_actions.all()
         )
-        | crm_user.action_object_actions.all()
-    ).order_by("-timestamp")[:50]
+        .order_by("-timestamp")[:50]
+        .select_related("action_object_content_type", "target_content_type")
+        .prefetch_related(
+            GenericPrefetch(
+                "actor",
+                [
+                    User.objects.prefetch_related(
+                        Prefetch(
+                            "profile",
+                            home_models.UserProfile.all.select_related(
+                                "organization", "organization__group"
+                            ),
+                        )
+                    )
+                ],
+            ),
+            "action_object",
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to actually have all projects for rendering
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
+        )
+    )
 
     user_ct = ContentType.objects.get_for_model(User)
 
@@ -866,9 +982,20 @@ def user_details(request, user_id):
         action_object_content_type=user_ct, action_object_object_id=crm_user.pk
     ).mark_all_as_read()
 
-    all_notes = models.Note.on_site.filter(
-        object_id=crm_user.pk, content_type=user_ct
-    ).order_by("-updated_on")
+    all_notes = (
+        models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
+        .select_related("content_type", "created_by")
+        .prefetch_related(
+            Prefetch(
+                "created_by__profile",
+                queryset=home_models.UserProfile.all.select_related(
+                    "organization", "organization__group"
+                ),
+            ),
+            "tags",
+        )
+        .order_by("-updated_on")
+    )
     sticky_notes = all_notes.filter(sticky=True)
     notes = all_notes.exclude(sticky=True)
 
@@ -883,6 +1010,13 @@ def user_details(request, user_id):
             .order_by("deadline")
             .first()
         )
+
+    user_memberships = rich_project_relations(
+        crm_user.projectmember_set, ProjectMember, request.site.id
+    )
+    user_switchtendings = rich_project_relations(
+        crm_user.projects_switchtended_per_site, ProjectSwitchtender, request.site.id
+    )
 
     search_form = forms.CRMSearchForm()
 
@@ -1462,8 +1596,8 @@ def make_low_reach_project_query(
             "notes",
             "switchtenders__profile__organization",
             "crm_annotations__tags",
-            Project.prefetch_owner(),
         )
+        .with_perf_prefetch("owner")
         .order_by("-last_members_activity_at")
         .distinct()
     )
