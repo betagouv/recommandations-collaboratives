@@ -140,13 +140,13 @@ def test_crm_organization_list_annotates_member_and_project_counts(request, clie
 
     # deux projets sur le site avec un membre de `org`
     project1 = baker.make(projects_models.Project, sites=[site])
-    projects_utils.assign_collaborator(members[0], project1, is_owner=True)
+    projects_utils.assign_advisor(members[0], project1)
     project2 = baker.make(projects_models.Project, sites=[site])
-    projects_utils.assign_collaborator(members[1], project2)
+    projects_utils.assign_advisor(members[1], project2)
 
     # un projet appartenant à l'autre orga, ne doit pas compter pour `org`
     other_project = baker.make(projects_models.Project, sites=[site])
-    projects_utils.assign_collaborator(other_member, other_project, is_owner=True)
+    projects_utils.assign_advisor(other_member, other_project)
 
     url = reverse("crm-organization-list")
     with login(client) as user:

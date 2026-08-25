@@ -19,6 +19,11 @@
         line-height: 150%; /* 21px */
     }
 
+    &__portal-logo {
+        height: 18px;
+        width: auto;
+    }
+
     &__org {
         color: var(--light-text-title-grey, #161616);
         font-size: 12px;

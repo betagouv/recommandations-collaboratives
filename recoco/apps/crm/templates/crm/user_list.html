@@ -133,7 +133,9 @@
                             <td>{{ crm_user.first_name }}</td>
                             <td class="text-ellipsis" title="{{ crm_user.email }}">
                                 <a class="fr-link project-table__project-name"
-                                    href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.email }}</a>
+                                    href="{% url 'crm-user-details' crm_user.pk %}">
+                                    {% include "account/fragments/unvalidated_email_indicator.html" with user=crm_user %}
+                                    {{ crm_user.email }}</a>
                             </td>
                             <td class="text-ellipsis">
                                 {% if crm_user.profile.organization %}

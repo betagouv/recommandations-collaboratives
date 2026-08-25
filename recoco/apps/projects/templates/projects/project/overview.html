@@ -15,7 +15,7 @@
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block project_detail %}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
     <div x-data="ProjectShare" class="col-12">
         <div>
             <div class="row">

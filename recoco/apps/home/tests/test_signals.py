@@ -3,12 +3,15 @@ from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
+from django.core import mail
 from django.urls import reverse
 from model_bakery import baker
+from pytest_django.asserts import assertContains
 from sesame.utils import get_query_string
 
 from conftest import setup_sesame_cookie
-from recoco.utils import login
+from recoco.apps.home.adapters import UVAccountAdapter
+from recoco.utils import confirm_mail, login
 
 
 @pytest.mark.django_db
@@ -18,8 +21,10 @@ def test_admin_signin_should_not_be_logged(request, client):
 
 
 @pytest.mark.django_db
-def test_allauth_signin_should_be_logged(request, client):
+def test_allauth_verified_signin_should_be_logged(request, client):
     user = baker.make(auth_models.User, email="truc@truc.fr")
+    confirm_mail(user)
+
     assert user.actor_actions.count() == 0
     password = "mon mot de passe"  # nosec B105
     user.set_password(password)
@@ -32,6 +37,40 @@ def test_allauth_signin_should_be_logged(request, client):
 
     assert response.status_code == 302
     assert user.actor_actions.count() == 1
+    assert get_user(client).is_authenticated
+
+
+@pytest.mark.django_db
+def test_allauth_not_verified_signin_should_not_be_logged(request, client, mocker):
+    user = baker.make(auth_models.User, email="truc@truc.fr")
+    assert user.actor_actions.count() == 0
+    spy_adapter = mocker.spy(UVAccountAdapter, "get_email_confirmation_url")
+
+    password = "mon mot de passe"  # nosec B105
+    user.set_password(password)
+    user.save()
+
+    redirect_url = "/tata"  # intentionnally random url
+    url = reverse("account_login") + f"?next={redirect_url}"
+    response = client.post(
+        url,
+        data={"login": user.email, "password": password, "remember": False},
+        follow=True,
+    )
+
+    assert get_user(client).is_anonymous
+    assert user.actor_actions.count() == 0  # no login trace
+
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("account_email_verification_sent")
+    assertContains(response, user.email)
+    assert len(mail.outbox) == 1
+
+    confirm_email_url = spy_adapter.spy_return
+    response = client.get(confirm_email_url, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert last_url == redirect_url
 
 
 @pytest.mark.django_db

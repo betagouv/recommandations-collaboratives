@@ -21,8 +21,8 @@
     {% if challenge and not challenge.acquired_on %}
         {% challenge_acquire challenge %}
     {% endif %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+    {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
     <style type="text/css">
 	@media print
     {
