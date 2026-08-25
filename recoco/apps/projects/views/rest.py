@@ -26,7 +26,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
-from recoco.apps.plugins.manager import get_tenant_hook
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
     VectorSearchFilter,
@@ -80,22 +80,25 @@ class ProjectDetail(
     def get_object(self, pk):
         try:
             return (
-                self.filter_queryset(self.get_queryset()).prefetch_related(
-                    Prefetch(
-                        "switchtenders",
-                        User.objects.select_related(
-                            "profile",
-                            "profile__organization",
-                            "profile__organization__group",
+                (
+                    self.filter_queryset(self.get_queryset()).prefetch_related(
+                        Prefetch(
+                            "switchtenders",
+                            User.objects.select_related(
+                                "profile",
+                                "profile__organization",
+                                "profile__organization__group",
+                            ),
                         ),
-                    ),
-                    "project_sites",
-                    "tags",
-                    models.Project.prefetch_owner(),
-                    "project_creation_requests",
-                    "topics",
+                        "project_sites",
+                        "tags",
+                        "project_creation_requests",
+                        "topics",
+                    )
                 )
-            ).get(pk=pk)
+                .with_perf_prefetch("owner")
+                .get(pk=pk)
+            )
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
 
@@ -167,7 +170,7 @@ class ProjectList(ListAPIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        pm = get_tenant_hook(self.request)
+        pm = get_site_plugin_manager(self.request)
         extra_fields = []
         for fields in pm.hook.crm_project_list_extra_serializer_fields(
             request=self.request
@@ -190,17 +193,18 @@ class ProjectList(ListAPIView):
                 ),
                 "project_sites",
                 "tags",
+                "topics",
                 "members",
-                models.Project.prefetch_owner(),
                 "project_creation_requests",
             )
+            .with_perf_prefetch("owner")
             .select_related(
                 "commune__department__region",
             )
         )
 
         # Apply plugin queryset annotations (e.g. realisations_count)
-        pm = get_tenant_hook(request)
+        pm = get_site_plugin_manager(request)
         plugin_annotations = {}
         for p_annotations in pm.hook.crm_project_list_annotations(request=request):
             plugin_annotations.update(p_annotations)

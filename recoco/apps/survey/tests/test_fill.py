@@ -568,8 +568,7 @@ def test_refresh_signals_only_for_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_refresh_signals(request, client):
-    current_site = get_current_site(request)
+def test_refresh_signals(request, client, current_site):
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
     session = Recipe(
         models.Session, survey=survey, project__sites=[current_site]

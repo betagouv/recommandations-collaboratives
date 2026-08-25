@@ -10,6 +10,7 @@ from django.utils import timezone
 from sesame.middleware import AuthenticationMiddleware as SesameAuthenticationMiddleware
 from sesame.utils import get_user
 
+from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration, UserProfile
 
 
@@ -155,6 +156,7 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
             # we rely that the 403 page reminds the user of the authentication status
             return None
 
+        confirm_email(request, user)  # login by email means that email is accessible
         login(request, user)
         # specific tests below comes from sesame original code
         if (

@@ -12,11 +12,5 @@
 {% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
-    <div>
-        {% if advisor_access_request %}
-            {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller" %}
-        {% else %}
-            {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Précisions sur votre demande" title="Devenir conseiller•e" %}
-        {% endif %}
-    </div>
+    {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=3 step_number=2 current_step_title="Précisions sur votre demande" next_step_title="Confirmation de l'adresse e-mail" title="Devenir conseiller ou conseillère" %}
 {% endblock content %}

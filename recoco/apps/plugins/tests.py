@@ -2,21 +2,24 @@ from unittest.mock import Mock, patch
 
 import pluggy
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.db.models import Value
+from django.test import RequestFactory
 from django.urls import reverse
 from model_bakery import baker
 from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.projects.context_processors import unread_notifications_processor
 from recoco.utils import login
 
-from .hooks import CrmSpec, ProjectSpec
-from .manager import get_tenant_hook
+from .hooks import CrmSpec, NotificationSpec, ProjectSpec
+from .manager import get_site_plugin_manager
 from .middlewares import TenantPluginSchemaMiddleware
 from .routers import TenantPluginRouter
 
-# --- Fixtures & helpers for get_tenant_hook ---
+# --- Fixtures & helpers for get_site_plugin_manager ---
 
 
 @pytest.fixture
@@ -77,7 +80,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_a"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         names = [name for name, _ in scoped.list_name_plugin()]
         assert "plugin_a" in names
@@ -92,7 +95,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_a", "plugin_b"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         names = [name for name, _ in scoped.list_name_plugin()]
         assert "plugin_a" in names
@@ -105,7 +108,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request([])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         assert scoped.list_name_plugin() == []
 
@@ -116,7 +119,7 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_unknown"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         assert scoped.list_name_plugin() == []
 
@@ -129,11 +132,50 @@ class TestGetTenantHook:
             "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
         ):
             request = make_request(["plugin_a"])
-            scoped = get_tenant_hook(request)
+            scoped = get_site_plugin_manager(request)
 
         results = [item for sublist in scoped.hook.get_tab_views() for item in sublist]
         assert {"name": "plugin_a"} in results
         assert {"name": "plugin_b"} not in results
+
+
+@pytest.mark.django_db
+class TestGetSitePluginManager:
+    def test_returns_only_enabled_plugins(self, current_site):
+        global_pm = make_plugin_manager(
+            ("plugin_a", PluginA()), ("plugin_b", PluginB())
+        )
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=["plugin_a"])
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            scoped = get_site_plugin_manager(site=current_site)
+
+        names = [name for name, _ in scoped.list_name_plugin()]
+        assert "plugin_a" in names
+        assert "plugin_b" not in names
+
+    def test_returns_empty_manager_when_no_plugins_enabled(self, current_site):
+        global_pm = make_plugin_manager(("plugin_a", PluginA()))
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            scoped = get_site_plugin_manager(site=current_site)
+
+        assert scoped.list_name_plugin() == []
+
+    def test_returns_empty_manager_when_no_site_configuration(self, current_site):
+        global_pm = make_plugin_manager(("plugin_a", PluginA()))
+
+        with patch(
+            "recoco.apps.plugins.manager.get_plugin_manager", return_value=global_pm
+        ):
+            scoped = get_site_plugin_manager(site=current_site)
+
+        assert scoped.list_name_plugin() == []
 
 
 @pytest.mark.django_db
@@ -172,9 +214,11 @@ class TestTenantPluginSchemaMiddleware:
 
             middleware(request_mock)
 
-            cursor_instance.execute.assert_called_once_with(
+            cursor_instance.execute.assert_any_call(
                 SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
             )
+            # search_path is reset to public once the response has been generated
+            cursor_instance.execute.assert_called_with("SET search_path TO public")
 
 
 @pytest.mark.django_db
@@ -371,3 +415,63 @@ class TestCrmProjectListColumnsHook:
 
         assert response.status_code == 200
         assert response.context["plugin_columns"] == []
+
+
+# ---------------------------------------------------------------------------
+# Notification hook extension point
+# ---------------------------------------------------------------------------
+
+FAKE_NOTIFICATION_PLUGIN_NAME = "fake_notification_plugin"
+FAKE_NOTIFICATION_VERB = "plugin_fake:custom_verb"
+
+
+class FakeNotificationPlugin:
+    """Minimal plugin contributing an extra notification verb."""
+
+    @pluggy.HookimplMarker("recoco")
+    def notification_project_verbs(self):
+        return [FAKE_NOTIFICATION_VERB]
+
+
+def make_notification_plugin_manager(plugin):
+    pm = pluggy.PluginManager("recoco")
+    pm.add_hookspecs(NotificationSpec)
+    pm.register(plugin, name=FAKE_NOTIFICATION_PLUGIN_NAME)
+    return pm
+
+
+@pytest.mark.django_db
+class TestNotificationProjectVerbsHook:
+    def test_verb_added_when_plugin_enabled(self, current_site):
+        site_config = baker.make(
+            SiteConfiguration,
+            site=current_site,
+            enabled_plugins=[FAKE_NOTIFICATION_PLUGIN_NAME],
+        )
+        user = baker.make(get_user_model())
+        request = RequestFactory().get("/")
+        request.user = user
+        request.site_config = site_config
+
+        pm = make_notification_plugin_manager(FakeNotificationPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            context = unread_notifications_processor(request)
+
+        assert FAKE_NOTIFICATION_VERB in context["show_project_verb_list"]
+
+    def test_verb_absent_when_plugin_disabled(self, current_site):
+        site_config = baker.make(
+            SiteConfiguration, site=current_site, enabled_plugins=[]
+        )
+        user = baker.make(get_user_model())
+        request = RequestFactory().get("/")
+        request.user = user
+        request.site_config = site_config
+
+        pm = make_notification_plugin_manager(FakeNotificationPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            context = unread_notifications_processor(request)
+
+        assert FAKE_NOTIFICATION_VERB not in context["show_project_verb_list"]

@@ -14,8 +14,8 @@
     {% vite_asset 'js/apps/projectAdministration.js' %}
 {% endblock js %}
 {% block project_detail %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+    {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% include "projects/project/navigation.html" with administration_panel=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}

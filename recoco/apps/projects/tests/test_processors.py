@@ -8,6 +8,7 @@ created: 2023-01-31 14:24:56 CEST
 """
 
 import pytest
+from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import reverse
 from model_bakery import baker
@@ -19,6 +20,7 @@ from recoco.apps.tasks import models as task_models
 from recoco.utils import login
 
 from .. import models, utils
+from ..context_processors import unread_notifications_processor
 
 
 @pytest.mark.django_db
@@ -54,6 +56,41 @@ def test_active_project_processor(request, client):
         )
 
         assert "unread_notifications_count" in response.context
+
+
+@pytest.mark.django_db
+def test_unread_notifications_processor_includes_private_notifications(
+    rf, project_ready, current_site
+):
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    user = baker.make(auth_models.User)
+    utils.assign_collaborator(user, project_ready)
+
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb="a public notification",
+        action_object=project_ready,
+        target=project_ready,
+        public=True,
+    )
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb="a private notification",
+        action_object=project_ready,
+        target=project_ready,
+        public=False,
+    )
+
+    request = rf.get("/")
+    request.user = user
+    request.site = current_site
+
+    context = unread_notifications_processor(request)
+
+    assert context["unread_notifications_count"] == 2
 
 
 # eof

@@ -24,6 +24,7 @@ from .utils import (
 )
 
 message_posted = django.dispatch.Signal()
+message_updated = django.dispatch.Signal()
 
 
 @receiver(action_created)
@@ -140,6 +141,17 @@ def notify_message_created(sender, message, **kwargs):
     notify_advisors_of_project(project, notification, exclude=user)
     if not project.inactive_since:
         notify_members_of_project(project, notification, exclude=user)
+
+
+@receiver(message_updated)
+def notify_message_updated(sender, message, **kwargs):
+    new_annotations = gather_annotations_for_message_notification(message)
+    message_ct = ContentType.objects.get_for_model(message)
+    Notification.objects.filter(
+        action_object_object_id=message.id,
+        action_object_content_type=message_ct,
+        verb=verbs.Conversation.POST_MESSAGE,
+    ).update(data={"annotations": new_annotations})
 
 
 @receiver(message_posted)

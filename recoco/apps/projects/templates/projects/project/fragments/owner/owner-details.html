@@ -29,6 +29,7 @@
                     &nbsp;
                     {{ project.owner.email }}
                 </a>
+
                 <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
                         @click="clipboardCopy(`L'email`, '{{ project.owner.email }}')"
                         title="Copier l'email">
@@ -37,6 +38,17 @@
                     </svg>
                 </button>
             </div>
+            {% if not project.owner.profile.email_validated %}
+                <div class="fr-notice fr-notice--warning fr-mt-2v">
+                    <div class="fr-container">
+                        <div class="fr-notice__body">
+                            <p>
+                                <span class="fr-notice__title font-size-12px">Adresse email non validé, peut-être est-il en difficulté ?</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
         {% if project.owner.profile.phone_no or project.phone %}
             <span class="d-flex align-items-center a-specific-fontsize-14 specific-color-high-blue-france">
