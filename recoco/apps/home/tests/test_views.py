@@ -82,15 +82,23 @@ def test_get_current_site_sender_without_configuration(request):
 ################################################
 
 
-@pytest.mark.django_db
-def test_create_user_requires_10characters_password(client, request):
-    data = {
+def _signup_data(email="default@email.fr"):
+    return {
         "first_name": "Test",
         "last_name": "test",
         "organization": "test",
         "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
+        "email": email,
         "phone_no": "0303003033",
+        "password1": "LowerCaseButWithSpecials12%",
+        "password2": "LowerCaseButWithSpecials12%",
+    }
+
+
+@pytest.mark.django_db
+def test_create_user_requires_10characters_password(client, request):
+    data = {
+        **_signup_data(),
         "password1": "123456789",
         "password2": "123456789",
     }
@@ -103,12 +111,7 @@ def test_create_user_requires_10characters_password(client, request):
 @pytest.mark.django_db
 def test_create_user_requires_caps_in_password(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data(),
         "password1": "onlylowercase",
         "password2": "onlylowercase",
     }
@@ -121,12 +124,7 @@ def test_create_user_requires_caps_in_password(client, request):
 @pytest.mark.django_db
 def test_create_user_requires_special_chars_in_password(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data(),
         "password1": "LowerCaseButNoSpecials",
         "password2": "LowerCaseButNoSpecials",
     }
@@ -139,12 +137,7 @@ def test_create_user_requires_special_chars_in_password(client, request):
 @pytest.mark.django_db
 def test_create_user_no_similar(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "jeanmichel@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data("jeanmichel@kdkdk.fr"),
         "password1": "Jeanmichel01",
         "password2": "Jeanmichel01",
     }
@@ -156,16 +149,7 @@ def test_create_user_no_similar(client, request):
 
 @pytest.mark.django_db
 def test_create_user(client, request):
-    data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
-        "password1": "LowerCaseButNoSpecials12",
-        "password2": "LowerCaseButNoSpecials12",
-    }
+    data = _signup_data()
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
@@ -177,16 +161,7 @@ def test_create_user(client, request):
 @pytest.mark.django_db
 def test_create_user_assign_current_site_via_allauth(client, request):
     site = get_current_site(request)
-    data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
-        "password1": "6t2dCLGjNFTBuRv",
-        "password2": "6t2dCLGjNFTBuRv",
-    }
+    data = _signup_data()
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
