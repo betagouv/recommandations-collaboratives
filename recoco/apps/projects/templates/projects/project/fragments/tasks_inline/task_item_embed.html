@@ -1,8 +1,8 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 <div x-data="Task({id:{{ task.id }}, public:Boolean(`{{ task.public }}`), topic:{name :`{{ task.topic }}` == `None` ? null : `{{ task.topic }}`}, intent:`{{ task.intent }}`, resource:`{{ task.resource }}`, comments_count:Number(`{{ task.comments_count }}`), content:`{{ task.content }}`, created_by:{ email : `{{ task.created_by.email }}`, first_name: `{{ task.created_by.first_name }}`, last_name: `{{ task.created_by.last_name }}`, is_active: Boolean(`{{ task.created_by.is_active }}`), profile : {organization: { name: `{{ task.created_by.profile.organization.name }}` }}}  })"
      :class="`border${getTaskColor(currentTask)}`"
      class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item hover-shadow hover-border-blue transition-all"

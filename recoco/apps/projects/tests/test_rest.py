@@ -1536,11 +1536,12 @@ def test_doc_upload(project_ready, project_editor, client, good_file):
 
     data = {"description": "this is some content", "the_file": good_file}
 
-    client.force_login(project_editor)
-    res = client.post(url, data)
+    with login(client, user=project_editor):
+        res = client.post(url, data)
 
-    assert res.status_code == 201
-    assert res.data["id"] is not None
+        assert res.status_code == 201
+        assert res.data["id"] is not None
+
     assert Document.objects.filter(pk=res.data["id"]).exists()
     # send signal..?
 
@@ -1556,10 +1557,9 @@ def test_doc_upload_does_not_accept_malicious_files(
     )
     data = {"description": "this is some content", "the_file": my_file}
 
-    client.force_login(project_editor)
-    response = client.post(url, data=data)
-
-    assert response.status_code == 400
+    with login(client, user=project_editor):
+        response = client.post(url, data=data)
+        assert response.status_code == 400
 
     assert models.Document.objects.count() == 0
 
@@ -1575,10 +1575,9 @@ def test_doc_upload_does_not_accept_malicious_files_detects_html(
     )
     data = {"description": "this is some content", "the_file": my_file}
 
-    client.force_login(project_editor)
-    response = client.post(url, data=data)
-
-    assert response.status_code == 400
+    with login(client, user=project_editor):
+        response = client.post(url, data=data)
+        assert response.status_code == 400
 
     assert models.Document.objects.count() == 0
 
@@ -1594,10 +1593,10 @@ def test_doc_upload_does_not_accept_malicious_files_by_extension(
     )
     data = {"description": "this is some content", "the_file": my_file}
 
-    client.force_login(project_editor)
-    response = client.post(url, data=data)
+    with login(client, user=project_editor):
+        response = client.post(url, data=data)
 
-    assert response.status_code == 400
+        assert response.status_code == 400
 
     assert models.Document.objects.count() == 0
 
@@ -1618,10 +1617,10 @@ def test_doc_upload_reactivates_project(
 
     data = {"description": "this is some content", "the_file": good_file}
 
-    client.force_login(project_editor)
-    res = client.post(url, data)
+    with login(client, user=project_editor):
+        res = client.post(url, data)
+        assert res.status_code == 201
 
-    assert res.status_code == 201
     inactive_project.refresh_from_db()
     assert inactive_project.inactive_since is None
 
@@ -1637,10 +1636,10 @@ def test_doc_upload_by_advisors_lets_projects_unactivated(
 
     data = {"description": "this is some content", "the_file": good_file}
 
-    client.force_login(project_editor)
-    res = client.post(url, data)
+    with login(client, user=project_editor):
+        res = client.post(url, data)
 
-    assert res.status_code == 201
+        assert res.status_code == 201
     inactive_project.refresh_from_db()
     assert inactive_project.inactive_since is not None
 

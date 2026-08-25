@@ -82,22 +82,25 @@ class ProjectDetail(
     def get_object(self, pk):
         try:
             return (
-                self.filter_queryset(self.get_queryset()).prefetch_related(
-                    Prefetch(
-                        "switchtenders",
-                        User.objects.select_related(
-                            "profile",
-                            "profile__organization",
-                            "profile__organization__group",
+                (
+                    self.filter_queryset(self.get_queryset()).prefetch_related(
+                        Prefetch(
+                            "switchtenders",
+                            User.objects.select_related(
+                                "profile",
+                                "profile__organization",
+                                "profile__organization__group",
+                            ),
                         ),
-                    ),
-                    "project_sites",
-                    "tags",
-                    models.Project.prefetch_owner(),
-                    "project_creation_requests",
-                    "topics",
+                        "project_sites",
+                        "tags",
+                        "project_creation_requests",
+                        "topics",
+                    )
                 )
-            ).get(pk=pk)
+                .with_perf_prefetch("owner")
+                .get(pk=pk)
+            )
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
 
@@ -248,10 +251,11 @@ class ProjectList(ListAPIView):
                 ),
                 "project_sites",
                 "tags",
+                "topics",
                 "members",
-                models.Project.prefetch_owner(),
                 "project_creation_requests",
             )
+            .with_perf_prefetch("owner")
             .select_related(
                 "commune__department__region",
             )
