@@ -44,6 +44,9 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
     def is_login_by_code_required(self, request, **kwargs):
         if settings.DEBUG:
             return False
+        if not request.user or request.user.is_anonymous:
+            # fallback for cases with login started as a way to prevent enumeration by allauth
+            return False
         return request.user.profile.login_with_code
 
     def clean_email(self, email: str) -> str:
@@ -107,7 +110,8 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
             return self.respond_user_inactive(request, user)
 
     def respond_email_verification_sent(self, request, user):
-        request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
+        if user:
+            request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
         return super().respond_email_verification_sent(request, user)
 
 
