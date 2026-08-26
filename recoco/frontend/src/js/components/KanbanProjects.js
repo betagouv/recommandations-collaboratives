@@ -256,9 +256,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         return b.created_on - a.created_on;
       }
     },
-    truncate(input, size = 30) {
-      return input.length > size ? `${input.substring(0, size)}...` : input;
-    },
     formatDateDisplay(date) {
       return new Date(date).toLocaleDateString('fr-FR');
     },

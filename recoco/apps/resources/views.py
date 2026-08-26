@@ -150,7 +150,7 @@ def resource_search(request):
 
     # prefetch and select related must be after all filters, else they are useless
     resources = resources.select_related("category").prefetch_related(
-        "task_recommendations"
+        "task_recommendations", "departments"
     )
 
     return render(

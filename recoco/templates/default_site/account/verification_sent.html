@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Confirmation de l'adresse e-mail sur {{ request.site.name }}
+{% endblock title %}
+{% block og_title %}
+    Confirmation de l'adresse e-mail sur {{ request.site.name }}
+{% endblock og_title %}
+
+{% block content %}
+    {% include "account/fragments/confirm_email_form.html" with title="Connexion" title_new_line=False %}
+{% endblock content %}
