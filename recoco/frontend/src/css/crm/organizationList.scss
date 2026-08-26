@@ -1,18 +1,4 @@
-.org-list-scroll {
-  max-height: calc(100vh - 90px);
-  overflow: auto;
-
-  .table-responsive {
-    overflow: visible;
-  }
-
-  .project-table__thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #fff;
-  }
-
+.crm {
   .org-name-cell .project-table__project-name {
     min-width: 0;
   }
