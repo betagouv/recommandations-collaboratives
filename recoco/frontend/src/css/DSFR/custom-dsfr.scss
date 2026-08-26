@@ -79,6 +79,25 @@
 }
 
 /* ¯¯¯¯ *\
+  HEADER
+\* ˍˍˍˍ */
+
+.fr-header {
+  &.sticky-top {
+    position: sticky;
+    top: 0;
+  }
+  &__tools {
+    line-height: 1rem;
+  }
+  &__separator {
+    border-left: 1px solid #aaa ;
+    height: 24px;
+    padding-left: 1rem;
+  }
+}
+
+/* ¯¯¯¯ *\
   ICONS
 \* ˍˍˍˍ */
 
@@ -581,6 +600,15 @@ form > p {
   cursor: pointer;
 }
 
+/* ¯¯¯¯¯¯ *\
+  CONTAINER
+\* ˍˍˍˍˍˍ */
+
+.fr-container--small {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
 /* ¯¯¯ *\
   UTILS
 \* ˍˍˍ */
@@ -688,6 +716,11 @@ form > p {
 
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
+}
+
+.font-size-16px,
+.font-size-16px p {
+  font-size: 16px;
 }
 
 .font-size-14px,

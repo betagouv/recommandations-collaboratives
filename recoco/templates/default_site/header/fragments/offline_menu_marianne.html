@@ -1,10 +1,8 @@
-<div class="fr-header__logo">
-    <a href="{% url 'home' %}"
-       title="Accueil - Nom de l’entité (ministère, secrétariat d‘état, gouvernement)">
-        <p class="fr-logo">
-            République
-            <br>
-            Française
-        </p>
+{% load static %}
+<div class="fr-header__logo fr-pr-0">
+    {% url 'home' as default_home_url %}
+    <a href="{{ home_url|default:default_home_url }}"
+       title="Accueil - {{ request.site.name }}">
+        <img src="{% static 'svg/marianne.svg' %}" class="fr-py-3v" height="64px" width="100%"  alt="Logo Marianne">
     </a>
 </div>

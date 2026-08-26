@@ -62,19 +62,22 @@ uv sync
 ```
 
 Il faut aussi une base de données postgres. Configurez-là pour le projet:
+
 ```sh
 sudo -u postgres psql < sql/init.sql
 ```
-La base ainsi créée s'appelle `recoco` et appartient à un utilisateur nommé `recoco` avec le mot de passe `recoco`. À ne laisser tel quel que pour un environement de développement pour des raisons de sécurité.
+
+La base ainsi créée s'appelle `recoco` et appartient à un utilisateur nommé `recoco` avec le mot de passe `recoco`. À ne laisser tel quel que pour un environnement de développement pour des raisons de sécurité.
 
 Les modules suivants sont installés en production et peuvent être requis (à affiner, plusieurs ne sont plus vraiment utilisés) :
-* agestore
-* pgcrypto
-* trgm
-* postgis
-* postgis topology
-* unaccent
-* uuid-ossp
+
+- agestore
+- pgcrypto
+- trgm
+- postgis
+- postgis topology
+- unaccent
+- uuid-ossp
 
 #### Configuration de l'applicatif
 
@@ -97,6 +100,8 @@ DJANGO_VITE_TEST_SERVER_PORT=3001
 DJANGO_VITE_DEV_SERVER_PORT=3000
 GDAL_LIBRARY_PATH=
 GEOS_LIBRARY_PATH=
+ACRA_API_BASE_URL=
+ACRA_API_TOKEN=
 SKIP_TEST_METRICS_CREATE_ROLES=
 ```
 
@@ -182,7 +187,6 @@ Avec un dump de db de prod, vous pouvez restaurer ces donnés:
 psql -U recoco < [path vers le dump]
 ```
 
-
 ### Récupérer les portails existants
 
 Plusieurs portails (ie sites) ont déjà été configurés et sont disponibles sur le dépôt [recoco-portails](https://github.com/betagouv/recoco-portails). Pour y avoir accès en local, il faut cloner ce dépôt dans un dossier `multisites` à la racine du projet global.
@@ -192,6 +196,7 @@ Pour créer les bons alias dans l'interface d'administration, exécuter depuis l
 ```python
 run scripts/create_site_localhost_aliases.py
 ```
+
 Pour vérifier que ç'a bien fonctionné, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
 
 ## Environnement de développement
@@ -199,9 +204,11 @@ Pour vérifier que ç'a bien fonctionné, vérifiez que l'accès à http://sospo
 ### pre-commit
 
 Pour que des PRs soient acceptées, on requiert que pre-commit ait été passé. La configuration est en principe bonne avec les étapes précédentes, mais il faut exécuter la commande
+
 ```bash
 pre-commit install
 ```
+
 pour que cette configuration soit bien appliquée.
 
 ## Tests
@@ -228,6 +235,37 @@ Pour lancer les tests back end, vous pouvez utiliser la commande suivante :
 ```sh
 pytest --create-db
 ```
+
+## Déploiement
+
+Le déploiement se fait avec [Fabric](https://www.fabfile.org/) via le fichier
+[`fabfile.py`](./fabfile.py). Installez `fabric` (inclus dans les dépendances de dev) puis
+utilisez la commande `fab` depuis la racine du projet, en précisant l'hôte cible avec `--hosts`.
+
+### Préparer un nouveau serveur
+
+```sh
+fab setup --site={production,development} --hosts=user@serveur
+```
+
+Crée l'arborescence attendue (`recoco-{site}/dist`) et installe un virtualenv avec `uv`.
+
+### Déployer une nouvelle version
+
+```sh
+fab deploy --site={production,development} --hosts=user@serveur
+```
+
+Cette commande, exécutée depuis votre poste :
+
+1. build le front (`yarn build`) et le package python (`uv build`) en local ;
+2. envoie l'archive générée vers le serveur ;
+3. installe le package avec `uv pip install`, exécute les migrations, `compilescss` et
+   `collectstatic` sur le serveur ;
+4. copie le `manifest.json` du front dans le dossier des statics.
+
+`site` doit valoir soit `production` soit `development` : la commande détermine ainsi le
+dossier cible (`recoco-production` ou `recoco-development`) sur le serveur.
 
 ## En cas de difficultés
 

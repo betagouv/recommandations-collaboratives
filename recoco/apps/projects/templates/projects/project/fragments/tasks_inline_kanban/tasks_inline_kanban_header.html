@@ -1,3 +1,4 @@
+{% load waffle_tags %}
 <div class="w-100 fr-mb-5v">
     <div class="d-flex align-items-center justify-content-between w-100">
         <template x-if="$store.djangoData.canManageTasks">
@@ -8,9 +9,15 @@
                     </div>
                 </div>
                 {% if advising or is_staff %}
-                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                    <div class="d-flex">
+                        {% flag "ia_exploration" %}
+                            <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                            class="fr-btn fr-btn--secondary fr-mr-2v fr-icon-lightbulb-line fr-btn--icon-left">Assistant de création de recommandations</a>
+                        {% endflag %}
+                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
                         class="fr-btn fr-btn--secondary"
                         data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                    </div>
                 {% endif %}
             </div>
         </template>
@@ -23,8 +30,8 @@
                 </div>
                 {% if advising or is_staff %}
                     <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                        class="fr-btn fr-btn--secondary"
-                        data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                    class="fr-btn fr-btn--secondary"
+                    data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
                 {% endif %}
             </div>
         </template>

@@ -128,13 +128,14 @@ MIDDLEWARE = [
     "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
     "recoco.apps.plugins.middlewares.TenantPluginSchemaMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "recoco.apps.home.middlewares.SesameWithCookieMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "recoco.apps.home.middlewares.EmbedMiddleware",
     "recoco.apps.home.middlewares.SetEnableSesameCookieMiddleware",
     "recoco.apps.home.middlewares.PreviousActivityMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
@@ -157,8 +158,10 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.contrib.messages.context_processors.messages",
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
+                "recoco.apps.projects.context_processors.user_perm_checker_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
                 "recoco.apps.projects.context_processors.matomo_context_processor",
+                "recoco.apps.home.context_processors.embed",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -322,7 +325,7 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_RATE_LIMITS = {
     "login_failed": "20/m/ip",
 }
@@ -589,6 +592,10 @@ WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 # https://github.com/etianen/django-watson/wiki/language-support
 WATSON_POSTGRES_SEARCH_CONFIG = "pg_catalog.french"
+
+# ACRA (ML) proxy
+ACRA_API_BASE_URL = os.environ.get("ACRA_API_BASE_URL", "")
+ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 
 # Matomo
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
