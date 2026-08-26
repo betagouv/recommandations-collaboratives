@@ -285,10 +285,9 @@ class TestEmbedMiddlewareCSP:
 
         response = self.middleware(request)
 
-        assert (
-            response["Content-Security-Policy"]
-            == "frame-ancestors 'self' https://partner.example.fr"
-        )
+        assert response._csp_update == {
+            "frame-ancestors": ["https://partner.example.fr"]
+        }
         assert response.xframe_options_exempt is True
 
     def test_joins_multiple_allowed_origins(self):
@@ -302,9 +301,12 @@ class TestEmbedMiddlewareCSP:
 
         response = self.middleware(request)
 
-        assert response["Content-Security-Policy"] == (
-            "frame-ancestors 'self' https://partner.example.fr https://other.example.fr"
-        )
+        assert response._csp_update == {
+            "frame-ancestors": [
+                "https://partner.example.fr",
+                "https://other.example.fr",
+            ]
+        }
 
     def test_no_csp_header_when_no_allowed_origins(self):
         site_config = Mock(embed_allowed_origins=[])
@@ -312,7 +314,7 @@ class TestEmbedMiddlewareCSP:
 
         response = self.middleware(request)
 
-        assert "Content-Security-Policy" not in response
+        assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
 
     def test_no_csp_header_when_no_site_config(self):
@@ -320,7 +322,7 @@ class TestEmbedMiddlewareCSP:
 
         response = self.middleware(request)
 
-        assert "Content-Security-Policy" not in response
+        assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
 
     def test_no_csp_header_when_not_embedded(self):
@@ -329,7 +331,7 @@ class TestEmbedMiddlewareCSP:
 
         response = self.middleware(request)
 
-        assert "Content-Security-Policy" not in response
+        assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
 
 
