@@ -25,10 +25,11 @@ from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from recoco.apps.home import models as home_models
+from recoco.apps.home.config import SIGNUP_USER_ID_SESSION_KEY
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
-from recoco.utils import assign_site_admin, login
+from recoco.utils import assign_site_admin, confirm_mail, login
 
 from .. import utils
 
@@ -82,15 +83,23 @@ def test_get_current_site_sender_without_configuration(request):
 ################################################
 
 
-@pytest.mark.django_db
-def test_create_user_requires_10characters_password(client, request):
-    data = {
+def _signup_data(email="default@email.fr"):
+    return {
         "first_name": "Test",
         "last_name": "test",
         "organization": "test",
         "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
+        "email": email,
         "phone_no": "0303003033",
+        "password1": "LowerCaseButWithSpecials12%",
+        "password2": "LowerCaseButWithSpecials12%",
+    }
+
+
+@pytest.mark.django_db
+def test_create_user_requires_10characters_password(client, request):
+    data = {
+        **_signup_data(),
         "password1": "123456789",
         "password2": "123456789",
     }
@@ -103,12 +112,7 @@ def test_create_user_requires_10characters_password(client, request):
 @pytest.mark.django_db
 def test_create_user_requires_caps_in_password(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data(),
         "password1": "onlylowercase",
         "password2": "onlylowercase",
     }
@@ -121,12 +125,7 @@ def test_create_user_requires_caps_in_password(client, request):
 @pytest.mark.django_db
 def test_create_user_requires_special_chars_in_password(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data(),
         "password1": "LowerCaseButNoSpecials",
         "password2": "LowerCaseButNoSpecials",
     }
@@ -139,12 +138,7 @@ def test_create_user_requires_special_chars_in_password(client, request):
 @pytest.mark.django_db
 def test_create_user_no_similar(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "jeanmichel@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data("jeanmichel@kdkdk.fr"),
         "password1": "Jeanmichel01",
         "password2": "Jeanmichel01",
     }
@@ -156,16 +150,7 @@ def test_create_user_no_similar(client, request):
 
 @pytest.mark.django_db
 def test_create_user(client, request):
-    data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
-        "password1": "LowerCaseButNoSpecials12",
-        "password2": "LowerCaseButNoSpecials12",
-    }
+    data = _signup_data()
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
@@ -177,16 +162,7 @@ def test_create_user(client, request):
 @pytest.mark.django_db
 def test_create_user_assign_current_site_via_allauth(client, request):
     site = get_current_site(request)
-    data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
-        "password1": "6t2dCLGjNFTBuRv",
-        "password2": "6t2dCLGjNFTBuRv",
-    }
+    data = _signup_data()
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
@@ -195,6 +171,74 @@ def test_create_user_assign_current_site_via_allauth(client, request):
     assert len(user.profile.sites.all()) == 1
     assert site in user.profile.sites.all()
     assert site in user.profile.organization.sites.all()
+
+
+@pytest.mark.django_db
+def test_signup_existing_user_on_other_site_redirects_to_login(client, current_site):
+    other_site = baker.make(Site)
+    user = baker.make(auth_models.User, email="existing@example.com")
+    confirm_mail(user)
+    user.profile.sites.add(other_site)
+
+    response = client.post(reverse("account_signup"), _signup_data(user.email))
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
+    assert parse_qs(parsed.query)["next"] == [reverse("advisor-access-request")]
+
+    # no duplicate account was created, and the user isn't added to the
+    # site until their access request is accepted
+    assert auth_models.User.objects.filter(email=user.email).count() == 1
+    assert current_site not in user.profile.sites.all()
+
+
+@pytest.mark.django_db
+def test_signup_advisor_access_request_existing_user_redirect_to_step2_after_log_in(
+    client, current_site
+):
+    # test redirection after login
+    other_site = baker.make(Site)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    email = "existing@example.com"
+    signup_data = _signup_data("existing@example.com")  # nosec B105
+    user = baker.make(auth_models.User, email=email)
+    user.set_password(signup_data["password1"])
+    user.save()
+    confirm_mail(user)
+    user.profile.sites.add(other_site)
+
+    response = client.post(reverse("account_signup"), _signup_data(user.email))
+    assert response.status_code == 302
+
+    response = client.post(
+        response.url,
+        {"login": user.email, "password": signup_data["password1"]},
+        follow=True,
+    )
+
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("advisor-access-request")
+    assert client.session[SIGNUP_USER_ID_SESSION_KEY] == user.pk
+
+
+@pytest.mark.django_db
+def test_signup_existing_user_already_on_this_site_does_not_crashes(
+    client, current_site
+):
+    user = baker.make(auth_models.User, email="existing@example.com")
+    confirm_mail(user)
+    user.profile.sites.add(current_site)
+    user.profile.sites.add(baker.make(Site))
+
+    response = client.post(reverse("account_signup"), _signup_data(user.email))
+    assert response.status_code == 302
+
+    assert auth_models.User.objects.filter(email=user.email).count() == 1
+    assert not home_models.AdvisorAccessRequest.objects.filter(
+        user=user, site=current_site
+    ).exists()
 
 
 # sending message to team
