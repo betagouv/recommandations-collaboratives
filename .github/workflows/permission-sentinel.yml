@@ -1,4 +1,4 @@
-name: permission-sentinel
+name: Permission Sentinel
 
 permissions:
   contents: read
