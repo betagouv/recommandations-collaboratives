@@ -140,7 +140,7 @@ class ProjectDetail(
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectCreate(CreateAPIView):
+class ProjectCreate(ServiceAPIKeyAllowedMixin, CreateAPIView):
     """Create a project on the current site
 
     The project is submitted on behalf of its owner by the authenticated
@@ -166,7 +166,7 @@ class ProjectCreate(CreateAPIView):
     serializer_class = NewProjectSerializer
 
 
-class ProjectMembershipCreate(CreateAPIView):
+class ProjectMembershipCreate(ServiceAPIKeyAllowedMixin, CreateAPIView):
     """Attach a participant, an advisor or an observer to a project
 
     The person is given by email, in the `email` field, and its account is

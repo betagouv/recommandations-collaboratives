@@ -25,6 +25,7 @@ from notifications.signals import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
+from recoco.apps.api_keys.models import ServiceAPIKey
 from recoco.apps.conversations import models as conversations_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.tasks import models as tasks_models
@@ -799,6 +800,30 @@ def test_existing_owner_account_is_reused_by_project_create_api(api_client, api_
     assert project.owner == owner
 
 
+@pytest.mark.django_db
+def test_project_create_api_accepts_a_valid_service_api_key(
+    request, api_client, api_user
+):
+    commune = baker.make(geomatics_models.Commune, insee="62000")
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-test", user=api_user, site=get_current_site(request)
+    )
+
+    url = reverse("projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "insee": commune.insee,
+            "owner_email": "owner@example.com",
+        },
+        HTTP_AUTHORIZATION=f"Api-Key {key}",
+    )
+
+    assert response.status_code == 201
+
+
 ########################################################################
 # attach members and advisors to a project
 ########################################################################
@@ -868,6 +893,24 @@ def test_advisor_is_attached_by_project_membership_api(
     )
     assert switchtending.is_observer is is_observer
     assert advisor.has_perm("projects.view_project", project)
+
+
+@pytest.mark.django_db
+def test_project_membership_api_accepts_a_valid_service_api_key(
+    request, api_client, api_user, project
+):
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-test", user=api_user, site=get_current_site(request)
+    )
+
+    url = reverse("projects-members-create", args=[project.id])
+    response = api_client.post(
+        url,
+        data={"email": "jane@example.com", "role": "COLLABORATOR"},
+        HTTP_AUTHORIZATION=f"Api-Key {key}",
+    )
+
+    assert response.status_code == 201
 
 
 ########################################################################
