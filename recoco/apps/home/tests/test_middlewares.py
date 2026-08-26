@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth import get_user
@@ -333,6 +333,25 @@ class TestEmbedMiddlewareCSP:
 
         assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
+
+    @pytest.mark.django_db
+    def test_csp_update_is_appended_to_content_security_policy_header(self, client):
+        # Bypass the site_config/allowed_origins logic (covered by the tests
+        # above) to test how _csp_update is interpreted
+        def fake_call(self, request):
+            response = self.get_response(request)
+            response._csp_update = {"frame-ancestors": ["https://partner.example.fr"]}
+            return response
+
+        with patch.object(EmbedMiddleware, "__call__", fake_call):
+            response = client.get(reverse("home"))
+
+        assert response.status_code == 200
+        csp_header = response["Content-Security-Policy"]
+        assert (
+            "frame-ancestors 'self' https://partner.example.fr" in csp_header
+            or "frame-ancestors https://partner.example.fr 'self'" in csp_header
+        )
 
 
 class TestEmbedContextProcessor:
