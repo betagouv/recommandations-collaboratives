@@ -18,7 +18,7 @@
     {% vite_asset 'js/apps/CRM/resourceListCrm.js' %}
 {% endblock js %}
 {% block content %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% if "use_crm" in user_site_perms %}
         {% include "crm/fragments/navigation.html" with resources=True %}
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Ressources' } }"

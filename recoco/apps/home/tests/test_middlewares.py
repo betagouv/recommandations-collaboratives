@@ -13,7 +13,7 @@ from sesame.utils import get_query_string
 from conftest import setup_sesame_cookie
 from recoco.apps.home.middlewares import CurrentSiteConfigurationMiddleware
 from recoco.apps.home.models import SiteConfiguration
-from recoco.utils import login
+from recoco.utils import check_email_verified, login
 
 
 @pytest.fixture
@@ -65,6 +65,7 @@ class TestSesameWithCookie:
         authenticated_user = get_user(client)
         assert authenticated_user.is_anonymous
         assert response.status_code != 302
+        assert not check_email_verified(user)
 
     def test_login_fails_with_other_cookie(self, client):
         user = baker.make(auth_models.User)
@@ -77,6 +78,7 @@ class TestSesameWithCookie:
         authenticated_user = get_user(client)
         assert authenticated_user.is_anonymous
         assert response.status_code != 302
+        assert not check_email_verified(user)
 
     def test_succeeds_with_proper_cookie(self, client):
         user = baker.make(auth_models.User)
@@ -102,6 +104,17 @@ class TestSesameWithCookie:
             authenticated_user = get_user(client)
             assert authenticated_user.id == other_user.id
             assert response.status_code == 200
+        assert not check_email_verified(user)
+
+    def test_sesame_login_confirms_email(self, client):
+        user = baker.make(auth_models.User)
+        setup_sesame_cookie(client, user)
+        assert not check_email_verified(user)
+
+        url = reverse("home") + get_query_string(user)
+        client.get(url)
+
+        assert check_email_verified(user)
 
 
 @pytest.mark.django_db

@@ -9,8 +9,8 @@
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
     {% vite_asset 'js/store/showRole.js' %}
 {% endblock js %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 {% is_staff_for_current_site request.user as is_staff %}
 <div x-data
      class="project-navigation d-flex justify-content-between"

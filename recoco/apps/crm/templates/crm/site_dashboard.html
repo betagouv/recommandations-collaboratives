@@ -18,7 +18,7 @@
     CRM
 {% endblock og_title %}
 {% block content %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% get_verbs as verbs %}
     {% if 'moderate_projects' in user_site_perms %}
