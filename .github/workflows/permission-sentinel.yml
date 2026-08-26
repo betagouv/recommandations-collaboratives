@@ -33,4 +33,4 @@ jobs:
 
       - name: Run permission sentinel
         run: |
-          uv run python scripts/check_permissions_matrix.py
+          uv run python scripts/check_permissions_matrix.py --only-stale
