@@ -246,6 +246,7 @@ CONTENT_SECURITY_POLICY = {
             "https://api-adresse.data.gouv.fr/https://www.google.com/recaptcha",
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
+        "frame-ancestors": [SELF],
         "frame-src": ["https://www.google.com"],
         "form-action": [SELF],
         "img-src": [
