@@ -1,10 +1,16 @@
+from urllib import parse
+
 from allauth.account import adapter as allauth_adapter
 from allauth.account import app_settings
+from allauth.account.models import EmailAddress
 from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import redirect
+from django.urls import reverse
 
 from . import utils
+from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
 from .validators import EmailValidatorForBrevo
 
 
@@ -38,6 +44,9 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
     def is_login_by_code_required(self, request, **kwargs):
         if settings.DEBUG:
             return False
+        if not request.user or request.user.is_anonymous:
+            # fallback for cases with login started as a way to prevent enumeration by allauth
+            return False
         return request.user.profile.login_with_code
 
     def clean_email(self, email: str) -> str:
@@ -47,3 +56,70 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         # - Domaine valide (chaque label ≤ 63 caractères, caractères autorisés uniquement, pas d’espace, pas de <>, etc.)
         EmailValidatorForBrevo()(email)
         return email
+
+    def get_email_confirmation_url(self, request, emailconfirmation):
+        url_str = super().get_email_confirmation_url(request, emailconfirmation)
+
+        # redirect according to context
+        url_to_redirect = ""
+        match request.session.get(EMAIL_CONFIRMATION_FLOW_SESSION_KEY, None):
+            case "onboarding":
+                url_to_redirect = (
+                    reverse(
+                        "onboarding-summary",
+                        args=(request.session["project_id"],),
+                    )
+                    if "project_id" in request.session
+                    else "/"
+                )
+            case "advisor":
+                url_to_redirect = reverse("advisor-access-request-pending")
+            case _:
+                # the email confirmation was sent because an admin changed the user's email
+                if request.resolver_match.view_name == "crm-user-update":
+                    url_to_redirect = "/"
+                else:  # random login
+                    url_to_redirect = request.path
+
+        if url_to_redirect:
+            url = parse.urlsplit(url_str)
+            qs = parse.parse_qs(url.query)
+            qs["next"] = url_to_redirect
+            qs_str = parse.urlencode(qs)
+            parts = (url.scheme, url.netloc, url.path, qs_str, url.fragment)
+            url_str = parse.urlunsplit(parts)
+
+        return url_str
+
+    def pre_login(
+        self,
+        request,
+        user,
+        *,
+        email_verification,
+        signal_kwargs,
+        email,
+        signup,
+        redirect_url,
+    ):
+        # this is to easily skip to controlled second step signup form.
+        # might be cleaner through a custom login stage conditionned by signup arg
+        if redirect_url == "/advisor-access-request":
+            return redirect(redirect_url)
+        if not user.is_active:
+            return self.respond_user_inactive(request, user)
+
+    def respond_email_verification_sent(self, request, user):
+        if user:
+            request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
+        return super().respond_email_verification_sent(request, user)
+
+
+def send_confirmation_email(request, user, signup=False):
+    email_address = EmailAddress.objects.filter(user=user).first()
+    email_address.send_confirmation(request, signup)
+
+
+def confirm_email(request, user):
+    email_address, _ = EmailAddress.objects.get_or_create(user=user, email=user.email)
+    UVAccountAdapter().confirm_email(request, email_address)

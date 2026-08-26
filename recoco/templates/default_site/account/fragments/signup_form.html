@@ -13,8 +13,13 @@
                        value="{{ redirect_field_value }}" />
             {% endif %}
             <fieldset class="fr-fieldset">
-                <h4 class="fr-mb-3w d-block">S'inscrire en remplissant les champs suivants</h4>
-                <div class="fr-fieldset__content">
+                <legend class="fr-fieldset__legend fr-mb-2w" id="identity-fieldset-legend">
+                    <h2 class="fr-mb-0">S'inscrire en remplissant les champs suivants</h2>
+                </legend>
+                <div class="fr-fieldset__element fr-mb-2w fr-italic font-size-16px">
+                    <p class="fr-hint-text">Sauf mention contraire, tous les champs sont obligatoires.</p>
+                </div>
+                <div x-data="{acceptCgu: false}" class="fr-fieldset__content">
                     <p>
                         {{ form.first_name.label }}
                         {{ form.first_name.errors }}
@@ -59,8 +64,10 @@
                         {{ form.captcha }}
                         {% for error in form.captcha.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
                     </p>
-                    <div class="fr-input-group fr-mt-4v">
-                        <button class="fr-btn custom-login-button w-100" type="submit">S'inscrire</button>
+                    {% include "account/fragments/accept_cgu.html" %}
+                    <div class="fr-input-group fr-mt-4v" x-tooltip="!acceptCgu && 'Veuillez accepter les CGU pour vous inscrire'">
+                        <p x-text="acceptCgu.value"></p>
+                        <button class="fr-btn custom-login-button w-100" :disabled="!acceptCgu" type="submit">S'inscrire</button>
                     </div>
                 </div>
             </fieldset>

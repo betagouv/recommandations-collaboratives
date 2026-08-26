@@ -10,10 +10,14 @@ from allauth.mfa.models import Authenticator
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
+from django.urls import reverse
 
 from recoco.apps.geomatics.models import Department
 
+from .config import SIGNUP_USER_ID_SESSION_KEY
 from .models import SiteConfiguration
 
 
@@ -42,6 +46,26 @@ class UVSignupForm(SignupForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+
+    def custom_signup(self, request, user):
+        super().custom_signup(request, user)
+        # sets up session data to prefill advisor access request form
+        request.session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
+
+    def try_save(self, request):
+        # we finish access request for this site after user login so we need to setup session
+        if self.account_already_exists:
+            user = User.objects.get(email=self.cleaned_data.get("email"))
+            if not user.profile.sites.filter(id=request.site.id).exists():
+                next_url = reverse("advisor-access-request")
+                login = reverse("account_login")
+                url = f"{login}?next={next_url}"
+                resp = redirect(url)
+                request.session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
+                return user, resp
+            # else case handled in parent try_save
+
+        return super().try_save(request)
 
 
 class UVLoginForm(LoginForm):
