@@ -32,6 +32,13 @@
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "consent/banner.html" %}
         {% endif %}
+        {% comment %}
+            hidden_site_title is used to ensure that a page always has a h1,
+            including those that do not display one (RGAA 9.1 criterion). A page
+            that has its own visible h1 must empty this block, otherwise it ends
+            up with two competing h1s and the screen reader announces the site
+            name instead of the page title.
+        {% endcomment %}
         {% block hidden_site_title %}
             <h1 class="visually-hidden">{{ request.site.name }}</h1>
         {% endblock hidden_site_title %}
