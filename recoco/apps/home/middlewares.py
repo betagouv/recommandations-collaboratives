@@ -61,9 +61,8 @@ class EmbedMiddleware:
                 # (Django admin only) may embed it; everyone else falls
                 # back to the default SAMEORIGIN behaviour.
                 response.xframe_options_exempt = True
-                response["Content-Security-Policy"] = (
-                    "frame-ancestors 'self' " + " ".join(allowed_origins)
-                )
+                # _csp_update is used to update django-csp config
+                response._csp_update = {"frame-ancestors": [*allowed_origins]}
 
         return response
 

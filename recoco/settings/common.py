@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from csp.constants import NONE, SELF, UNSAFE_EVAL, UNSAFE_INLINE
 from multisite import SiteID
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "csp",
     "recoco.apps.feature_flag",
     "recoco.apps.hitcount",
     "recoco.apps.dsrc",
@@ -135,6 +137,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "csp.middleware.CSPMiddleware",
     "recoco.apps.home.middlewares.EmbedMiddleware",
     "recoco.apps.home.middlewares.SetEnableSesameCookieMiddleware",
     "recoco.apps.home.middlewares.PreviousActivityMiddleware",
@@ -231,6 +234,44 @@ GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
 # SESAME Configuration
 SESAME_MAX_AGE = 60 * 60 * 24 * 10
 SESAME_ONE_TIME = False
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [NONE],
+        "connect-src": [
+            SELF,
+            "https://client.crisp.chat/",
+            "wss://client.relay.crisp.chat/",
+            "https://geo.api.gouv.fr/",
+            "https://api-adresse.data.gouv.fr/https://www.google.com/recaptcha",
+        ],
+        "font-src": [SELF, "https://client.crisp.chat/"],
+        "frame-ancestors": [SELF],
+        "frame-src": ["https://www.google.com"],
+        "form-action": [SELF],
+        "img-src": [
+            SELF,
+            "data:",
+            "https://client.crisp.chat",
+            "https://image.crisp.chat",
+            "https://www.gravatar.com",
+            "https://secure.gravatar.com",
+            "https://data.geopf.fr",
+            "https://*.tile.openstreetmap.fr",
+        ],
+        "script-src": [
+            SELF,
+            "https://stats.beta.gouv.fr/",
+            "https://client.crisp.chat",
+            UNSAFE_EVAL,
+        ],  # fixme with @alpine/csp and manual checks
+        "style-src": [
+            SELF,
+            "https://client.crisp.chat",
+            UNSAFE_INLINE,
+        ],  # fixme with @alpine/csp and manual checks
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
