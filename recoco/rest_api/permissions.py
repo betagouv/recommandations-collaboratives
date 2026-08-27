@@ -1,6 +1,5 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
-from recoco.apps.api_keys.permissions import HasServiceAPIKey
 from recoco.apps.projects import models as projects_models
 from recoco.utils import has_perm, is_staff_for_site
 
@@ -22,11 +21,6 @@ class IsStaffForSiteOrIsAuthenticatedReadOnly(IsStaffForSite):
             and request.user
             and request.user.is_authenticated
         ) or super().has_permission(request, view)
-
-
-# Guards the OpenAPI schema: machines authenticate with a service API key,
-# humans with a staff session (swagger-ui / redoc).
-HasServiceAPIKeyOrIsStaffForSite = HasServiceAPIKey | IsStaffForSite
 
 
 class BaseConversationPermission(BasePermission):

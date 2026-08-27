@@ -432,13 +432,11 @@ REST_FRAMEWORK = {
 
 # https://drf-spectacular.readthedocs.io/en/latest/settings.html
 SPECTACULAR_SETTINGS = {
-    # the schema is served to machines: on top of the usual authentication
-    # classes, a service API key opens it (cf recoco.apps.api_keys)
+    # a service API key is enough to read the schema, on top of the usual
+    # authentication classes (cf recoco.apps.api_keys)
     "SERVE_AUTHENTICATION": REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
     + ["recoco.apps.api_keys.authentication.ServiceAPIKeyAuthentication"],
-    "SERVE_PERMISSIONS": [
-        "recoco.rest_api.permissions.HasServiceAPIKeyOrIsStaffForSite"
-    ],
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"],
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html

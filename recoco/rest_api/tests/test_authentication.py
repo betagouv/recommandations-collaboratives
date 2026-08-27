@@ -93,8 +93,7 @@ def test_api_key_gives_access_to_the_openapi_schema(api_client, service_account_
 
 
 @pytest.mark.django_db
-def test_openapi_schema_is_refused_to_a_regular_user(api_client):
-    user = baker.make(get_user_model())
-    api_client.force_authenticate(user=user)
+def test_openapi_schema_is_readable_by_a_logged_in_user(api_client):
+    api_client.force_authenticate(user=baker.make(get_user_model()))
 
-    assert api_client.get(reverse("schema")).status_code == 403
+    assert api_client.get(reverse("schema")).status_code == 200
