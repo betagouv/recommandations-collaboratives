@@ -158,6 +158,10 @@ class ProjectCreate(CreateAPIView):
     Both are write-only: the created project is returned with its full
     `commune` representation, and without the owner email.
 
+    The `status` of the project on the current site can be given, and defaults
+    to `TO_PROCESS`, which is the status of a project that has been validated
+    but not yet processed.
+
     The caller must be staff for the current site.
     """
 

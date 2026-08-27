@@ -237,6 +237,8 @@ class NewProjectSerializer(ProjectSerializer):
     The commune is given as an insee code rather than as a primary key: it is
     what identifies a commune unambiguously for an API client. The owner is
     given as an email, and its account is created if it does not exist yet.
+    The status of the project on the current site can be given, and defaults
+    to `TO_PROCESS`.
     """
 
     class Meta(ProjectSerializer.Meta):
@@ -251,6 +253,13 @@ class NewProjectSerializer(ProjectSerializer):
 
     description = serializers.CharField(required=True)
     tags = TagListSerializerField(required=False)
+
+    # read only on the parent serializer, since it belongs to the project site
+    status = serializers.ChoiceField(
+        choices=ProjectSite.PROJECTSITE_STATES,
+        required=False,
+        default="TO_PROCESS",
+    )
 
     def validate_owner_email(self, value):
         return value.lower()
@@ -274,6 +283,8 @@ class NewProjectSerializer(ProjectSerializer):
     def create(self, validated_data):
         validated_data.pop("insee")
         owner_email = validated_data.pop("owner_email")
+        # status is not a field of the project, but of its site
+        status = validated_data.pop("status")
 
         # the caller submits the project on behalf of its owner,
         # cf. onboarding.views.prefill_project_submit
@@ -283,7 +294,7 @@ class NewProjectSerializer(ProjectSerializer):
 
         # the project skips moderation, it is created already validated
         project.project_sites.create(
-            site=self.current_site, status="TO_PROCESS", is_origin=True
+            site=self.current_site, status=status, is_origin=True
         )
 
         owner = get_or_create_user_on_site(owner_email, self.current_site)

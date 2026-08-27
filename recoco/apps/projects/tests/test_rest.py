@@ -775,6 +775,55 @@ def test_project_is_created_already_validated_by_project_create_api(
 
 
 @pytest.mark.django_db
+def test_project_status_is_given_to_project_create_api(request, api_client, api_user):
+    site = get_current_site(request)
+    commune = baker.make(geomatics_models.Commune, insee="62000")
+
+    api_client.force_authenticate(api_user)
+
+    url = reverse("projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "insee": commune.insee,
+            "owner_email": "owner@example.com",
+            "status": "IN_PROGRESS",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.data["status"] == "IN_PROGRESS"
+
+    project = models.Project.objects.get(pk=response.data["id"])
+    assert project.project_sites.get(site=site).status == "IN_PROGRESS"
+
+
+@pytest.mark.django_db
+def test_unknown_project_status_is_rejected_by_project_create_api(api_client, api_user):
+    commune = baker.make(geomatics_models.Commune, insee="62000")
+
+    api_client.force_authenticate(api_user)
+
+    url = reverse("projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "insee": commune.insee,
+            "owner_email": "owner@example.com",
+            "status": "NOT_A_STATUS",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "status" in response.data
+    assert not models.Project.objects.exists()
+
+
+@pytest.mark.django_db
 def test_existing_owner_account_is_reused_by_project_create_api(api_client, api_user):
     commune = baker.make(geomatics_models.Commune, insee="62000")
     owner = baker.make(auth_models.User, username="owner@example.com")
