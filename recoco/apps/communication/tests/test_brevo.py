@@ -62,7 +62,7 @@ def test_brevo_send_email_uses_given_sender_name(mocker, client):
     assert send_smtp_email.sender.email == settings.DEFAULT_SENDER_EMAIL
 
 
-def test_brevo_send_email_without_sender_name_defers_to_template(mocker, client):
+def test_brevo_send_email_without_sender_name_uses_default_sender(mocker, client):
     brevo = Brevo()
 
     mocker.patch("sib_api_v3_sdk.TransactionalEmailsApi.send_transac_email")
@@ -74,7 +74,8 @@ def test_brevo_send_email_without_sender_name_defers_to_template(mocker, client)
     )
 
     send_smtp_email = brevo.api_instance.send_transac_email.call_args.args[0]
-    assert send_smtp_email.sender is None
+    assert send_smtp_email.sender.name == settings.DEFAULT_SENDER_NAME
+    assert send_smtp_email.sender.email == settings.DEFAULT_SENDER_EMAIL
 
 
 def test_brevo_send_test_email(mocker, client):

@@ -320,8 +320,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Technical sender address, shared by every site (must be a verified sender on
 # Brevo). The displayed name comes from SiteConfiguration.sender_name.
 DEFAULT_SENDER_EMAIL = "noreply@recoconseil.fr"
-# Used as is when the site has no SiteConfiguration
-DEFAULT_FROM_EMAIL = f"Recoco <{DEFAULT_SENDER_EMAIL}>"
+# Displayed name used when the site has no SiteConfiguration, or no sender_name
+DEFAULT_SENDER_NAME = "Recoco"
+DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"
 
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
