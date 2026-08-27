@@ -1,17 +1,22 @@
 from datetime import datetime, timezone
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponse
 from django.urls import reverse
 from model_bakery import baker
 from sesame.utils import get_query_string
 
 from conftest import setup_sesame_cookie
-from recoco.apps.home.middlewares import CurrentSiteConfigurationMiddleware
+from recoco.apps.home.context_processors import embed
+from recoco.apps.home.middlewares import (
+    CurrentSiteConfigurationMiddleware,
+    EmbedMiddleware,
+)
 from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import check_email_verified, login
 
@@ -211,3 +216,155 @@ def test_dont_save_previous_activity_data_if_hijacked(client, rf, current_site):
         hijacked.refresh_from_db()
         assert hijacked.profile.previous_activity_at == last_date
         assert hijacked.profile.previous_activity_site == site1
+
+
+class TestEmbedMiddleware:
+    def setup_method(self):
+        self.get_response = Mock(return_value=Mock())
+        self.middleware = EmbedMiddleware(get_response=self.get_response)
+
+    def _make_request(self, headers=None, get_params=None, session=None):
+        request = Mock()
+        request.headers = headers or {}
+        request.GET = get_params or {}
+        request.session = session if session is not None else {}
+        request.site_config = None
+        return request
+
+    def test_sets_embedded_from_sec_fetch_dest_header(self):
+        request = self._make_request(headers={"Sec-Fetch-Dest": "iframe"})
+        self.middleware(request)
+        assert request.session["is_embedded"] is True
+        assert request.is_embedded is True
+
+    def test_sets_embedded_from_query_param(self):
+        request = self._make_request(get_params={"embed": "1"})
+        self.middleware(request)
+        assert request.session["is_embedded"] is True
+        assert request.is_embedded is True
+
+    def test_not_embedded_by_default(self):
+        request = self._make_request()
+        self.middleware(request)
+        assert request.is_embedded is False
+
+    def test_not_embedded_when_embed_param_is_not_one(self):
+        request = self._make_request(get_params={"embed": "0"})
+        self.middleware(request)
+        assert request.is_embedded is False
+
+    def test_persists_embedded_state_from_session(self):
+        request = self._make_request(session={"is_embedded": True})
+        self.middleware(request)
+        assert request.is_embedded is True
+
+    def test_does_not_set_session_without_trigger(self):
+        session = {}
+        request = self._make_request(session=session)
+        self.middleware(request)
+        assert "is_embedded" not in session
+
+
+class TestEmbedMiddlewareCSP:
+    def setup_method(self):
+        self.response = HttpResponse()
+        self.get_response = Mock(return_value=self.response)
+        self.middleware = EmbedMiddleware(get_response=self.get_response)
+
+    def _make_request(self, site_config=None, embedded=True):
+        request = Mock()
+        request.headers = {}
+        request.GET = {"embed": "1"} if embedded else {}
+        request.session = {}
+        request.site_config = site_config
+        return request
+
+    def test_sets_frame_ancestors_header_when_origins_configured(self):
+        site_config = Mock(embed_allowed_origins=["https://partner.example.fr"])
+        request = self._make_request(site_config=site_config)
+
+        response = self.middleware(request)
+
+        assert response._csp_update == {
+            "frame-ancestors": ["https://partner.example.fr"]
+        }
+        assert response.xframe_options_exempt is True
+
+    def test_joins_multiple_allowed_origins(self):
+        site_config = Mock(
+            embed_allowed_origins=[
+                "https://partner.example.fr",
+                "https://other.example.fr",
+            ]
+        )
+        request = self._make_request(site_config=site_config)
+
+        response = self.middleware(request)
+
+        assert response._csp_update == {
+            "frame-ancestors": [
+                "https://partner.example.fr",
+                "https://other.example.fr",
+            ]
+        }
+
+    def test_no_csp_header_when_no_allowed_origins(self):
+        site_config = Mock(embed_allowed_origins=[])
+        request = self._make_request(site_config=site_config)
+
+        response = self.middleware(request)
+
+        assert "_csp_update" not in response
+        assert getattr(response, "xframe_options_exempt", False) is False
+
+    def test_no_csp_header_when_no_site_config(self):
+        request = self._make_request(site_config=None)
+
+        response = self.middleware(request)
+
+        assert "_csp_update" not in response
+        assert getattr(response, "xframe_options_exempt", False) is False
+
+    def test_no_csp_header_when_not_embedded(self):
+        site_config = Mock(embed_allowed_origins=["https://partner.example.fr"])
+        request = self._make_request(site_config=site_config, embedded=False)
+
+        response = self.middleware(request)
+
+        assert "_csp_update" not in response
+        assert getattr(response, "xframe_options_exempt", False) is False
+
+    @pytest.mark.django_db
+    def test_csp_update_is_appended_to_content_security_policy_header(self, client):
+        # Bypass the site_config/allowed_origins logic (covered by the tests
+        # above) to test how _csp_update is interpreted
+        def fake_call(self, request):
+            response = self.get_response(request)
+            response._csp_update = {"frame-ancestors": ["https://partner.example.fr"]}
+            return response
+
+        with patch.object(EmbedMiddleware, "__call__", fake_call):
+            response = client.get(reverse("home"))
+
+        assert response.status_code == 200
+        csp_header = response["Content-Security-Policy"]
+        assert (
+            "frame-ancestors 'self' https://partner.example.fr" in csp_header
+            or "frame-ancestors https://partner.example.fr 'self'" in csp_header
+        )
+
+
+class TestEmbedContextProcessor:
+    def test_returns_is_embedded_true(self):
+        request = Mock()
+        request.is_embedded = True
+        assert embed(request) == {"is_embedded": True}
+
+    def test_returns_is_embedded_false(self):
+        request = Mock()
+        request.is_embedded = False
+        assert embed(request) == {"is_embedded": False}
+
+    def test_defaults_to_false_when_attribute_missing(self):
+        request = Mock(spec=[])
+        assert embed(request) == {"is_embedded": False}

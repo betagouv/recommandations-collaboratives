@@ -1,0 +1,117 @@
+{% load static %}
+{% load django_vite %}
+{% load cookie_consent_tags %}
+{% load cache %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <title>
+            {% block title %}
+            {% endblock title %}
+        - {{ request.site.name }}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta property="og:title"
+              content="{% spaceless %}{% block og_title %}{% endblock og_title %}{% endspaceless %} - {{ request.site.name }}">
+        {% vite_hmr_client %}
+        {% vite_asset 'js/main.js' %}
+        {% cache 3600 crisp request.site %}
+        {% include "crisp.html" %}
+    {% endcache %}
+    {% include "seo.html" %}
+    {% include "matomo.html" %}
+    {% vite_asset 'js/styles/base.css.js' %}
+    {% vite_asset 'js/styles/markdownx.css.js' %}
+    <!-- Extra CSS -->
+    {% block css %}
+    {% endblock css %}
+    {% block favicon %}
+        {% include "favicon.html" %}
+    {% endblock favicon %}
+</head>
+{% with request.resolver_match.url_name as url_name %}
+    <body class="bg-light {% if is_embedded %}base-embed{% endif %}">
+        {% block banner %}
+            {% if url_name != "projects-project-detail-recommandations-embed" %}
+                {% include "consent/banner.html" %}
+            {% endif %}
+        {% endblock banner %}
+        <h1 class="visually-hidden">{{ request.site.name }}</h1>
+        {% include "header/skip-links.html" %}
+        {% block menu_top %}
+            {% if url_name != "projects-project-detail-recommandations-embed" %}
+                {% include "header/menu-top.html" %}
+            {% endif %}
+        {% endblock menu_top %}
+        <main class="main-content {% if not user.is_authenticated %}public-content{% endif %}">
+            <div id="notification"
+                 class="toast-notification"
+                 :class="type"
+                 x-data="Notification"
+                 x-show="isOpen">
+                <span x-text="message"></span>
+            </div>
+            <div x-data="Crisp" class="visually-hidden"></div>
+            {% if messages %}
+                <div x-data="Toast"
+                     x-init="init()"
+                     id="notification-container"
+                     class="position-fixed bottom-0 end-0 fr-p-2w z-2">
+                    {% for message in messages %}
+                        <div class="toast"
+                             role="alert"
+                             aria-live="assertive"
+                             aria-atomic="true"
+                             x-ref="toastContainer">
+                            <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-danger text-white{% endif %}">
+                                {% if "email" in message.tags %}
+                                    <strong class="fr-mr-auto">
+                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope" />
+                                        </svg>
+                                        &nbsp;
+                                        <span class="align-middle">Courriel envoyé !</span>
+                                    </strong>
+                                {% elif "auth" in message.tags %}
+                                    <strong class="fr-mr-auto">
+                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
+                                        </svg>
+                                        &nbsp;
+                                        <span class="align-middle">Gestion des droits</span>
+                                    </strong>
+                                {% else %}
+                                    <strong class="fr-mr-auto">Notification</strong>
+                                {% endif %}
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="toast"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">{{ message|capfirst }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="main-content__background-color w-100" id="content">
+                <div class="background--grey-light">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+                {% block footer %}
+                    {% if not request.user.is_authenticated %}
+                        <div class="row justify-content-center bg-white" id="footer">{% include "footer/footer.html" %}</div>
+                    {% endif %}
+                {% endblock footer %}
+            </div>
+        </main>
+        {% include "tools/on_leave_modal.html" %}
+        {% if debug is False %}
+            <script src="https://sentry.incubateur.net/js-sdk-loader/caf46e9eca66a6aee8e9dfc9434f00a8.min.js"
+                    crossorigin="anonymous"></script>
+        {% endif %}
+        {% block js %}
+        {% endblock js %}
+    </body>
+{% endwith %}
+</html>
