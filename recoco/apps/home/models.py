@@ -202,6 +202,12 @@ class SiteConfiguration(models.Model):
         blank=True,
         help_text="Question présentées lors de la saisine",
     )
+
+    sender_name = models.CharField(
+        verbose_name="Expéditeur des emails automatiques",
+        help_text="Nom du service affiché comme expéditeur des emails",
+        max_length=30,
+    )
     contact_form_recipient = models.EmailField(
         verbose_name="Adresse de contact affichée sur le site"
     )

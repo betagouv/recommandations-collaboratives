@@ -35,9 +35,24 @@ from ..crm.models import Note
 from . import models
 
 
+def get_current_site_sender():
+    """Returns the identity for current site email sender"""
+    current_site = Site.objects.get_current()
+    try:
+        site_config = current_site.configuration
+    except models.SiteConfiguration.DoesNotExist:
+        return settings.DEFAULT_FROM_EMAIL
+
+    if not site_config.sender_name:
+        return settings.DEFAULT_FROM_EMAIL
+
+    return f"{site_config.sender_name} <{settings.DEFAULT_SENDER_EMAIL}>"
+
+
 def make_new_site(
     name: str,
     domain: str,
+    sender_name: str,
     contact_form_recipient: str,
     legal_address: str,
     admin_user: Optional[User] = None,
@@ -70,6 +85,7 @@ def make_new_site(
         site_config = models.SiteConfiguration.objects.create(
             site=site,
             project_survey=survey,
+            sender_name=sender_name,
             contact_form_recipient=contact_form_recipient,
             legal_address=legal_address,
         )

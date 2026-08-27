@@ -26,7 +26,13 @@ class Brevo:
         return api_response.templates
 
     def send_email(
-        self, template_id, recipients, params=None, test=False, dry_run=False
+        self,
+        template_id,
+        recipients,
+        params=None,
+        test=False,
+        dry_run=False,
+        sender_name=None,
     ):
         if not isinstance(recipients, list):
             recipients = [recipients]
@@ -60,8 +66,21 @@ class Brevo:
                 for recipient in recipients
             ]
 
+            # when no sender is given, the one configured on the Brevo
+            # template is used
+            sender = (
+                brevo_sdk.SendSmtpEmailSender(
+                    name=sender_name, email=settings.DEFAULT_SENDER_EMAIL
+                )
+                if sender_name
+                else None
+            )
+
             send_smtp_email = brevo_sdk.SendSmtpEmail(
-                template_id=template_id, to=send_to, params=params
+                template_id=template_id,
+                to=send_to,
+                params=params,
+                sender=sender,
             )
 
             if dry_run:

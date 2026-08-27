@@ -41,6 +41,7 @@ class SiteConfigurationForm(forms.ModelForm):
         model = home_models.SiteConfiguration
 
         fields = [
+            "sender_name",
             "contact_form_recipient",
             "legal_address",
             "legal_owner",

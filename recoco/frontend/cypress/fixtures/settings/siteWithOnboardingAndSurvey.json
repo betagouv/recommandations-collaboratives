@@ -174,6 +174,7 @@
       "site": 1,
       "project_survey": 1,
       "onboarding": 1,
+      "sender_name": "Recoconseil",
       "contact_form_recipient": "noreply@nodomain.nowhere"
     }
   },
@@ -273,6 +274,7 @@
       "site": 2,
       "project_survey": 2,
       "onboarding": 2,
+      "sender_name": "Recoconseil2",
       "contact_form_recipient": "noreply2@nodomain.nowhere"
     }
   },
@@ -359,6 +361,7 @@
       "site": 3,
       "project_survey": 3,
       "onboarding": 3,
+      "sender_name": "Recoconseil3",
       "contact_form_recipient": "noreply3@nodomain.nowhere"
     }
   }

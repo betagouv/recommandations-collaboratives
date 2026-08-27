@@ -69,6 +69,15 @@ def get_site_params():
     return params
 
 
+def get_site_sender_name():
+    """Return the name displayed as email sender for the current site"""
+    current_site = Site.objects.get_current()
+    try:
+        return current_site.configuration.sender_name
+    except SiteConfiguration.DoesNotExist:
+        return None
+
+
 def brevo_email(
     template_name, recipients, params=None, test=False, related=None, dry_run=False
 ):
@@ -100,7 +109,12 @@ def brevo_email(
         all_params.update(params)
 
     response = brevo.send_email(
-        template.sib_id, recipients, all_params, test=test, dry_run=dry_run
+        template.sib_id,
+        recipients,
+        all_params,
+        test=test,
+        dry_run=dry_run,
+        sender_name=get_site_sender_name(),
     )
 
     if response and not dry_run:
