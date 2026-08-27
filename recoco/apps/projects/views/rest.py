@@ -26,6 +26,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
+from recoco.apps.api_keys.authentication import ServiceAPIKeyAllowedMixin
 from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
@@ -68,7 +69,7 @@ from ..serializers import (
 
 
 class ProjectDetail(
-    RetrieveAPIView
+    ServiceAPIKeyAllowedMixin, RetrieveAPIView
 ):  # NB : interfaces are not completely respected due to legacy, cf #2077
     """Retrieve a project"""
 
