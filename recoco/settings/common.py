@@ -243,7 +243,8 @@ CONTENT_SECURITY_POLICY = {
             "https://client.crisp.chat/",
             "wss://client.relay.crisp.chat/",
             "https://geo.api.gouv.fr/",
-            "https://api-adresse.data.gouv.fr/https://www.google.com/recaptcha",
+            "https://api-adresse.data.gouv.fr/",
+            "https://www.google.com/recaptcha",
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
@@ -264,6 +265,7 @@ CONTENT_SECURITY_POLICY = {
             "https://stats.beta.gouv.fr/",
             "https://client.crisp.chat",
             UNSAFE_EVAL,
+            UNSAFE_INLINE,
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
