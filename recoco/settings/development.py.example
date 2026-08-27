@@ -12,6 +12,7 @@ import os
 from dotenv import load_dotenv
 
 from .common import *
+from . import common
 
 load_dotenv()
 
@@ -146,5 +147,10 @@ CELERY_TASK_ALWAYS_EAGER = True
 # Démarches simplifiées
 DS_AUTOLOAD_SCHEMA = False
 DS_AUTOCREATE_FOLDER = False
+
+CONTENT_SECURITY_POLICY = {
+    key: [*policies, "http://localhost:3000", "ws://localhost:3000"]
+    for key, policies in common.CONTENT_SECURITY_POLICY.items()
+}
 
 # eof
