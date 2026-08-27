@@ -69,7 +69,9 @@ def get_site_params():
     return params
 
 
-def brevo_email(template_name, recipients, params=None, test=False, related=None):
+def brevo_email(
+    template_name, recipients, params=None, test=False, related=None, dry_run=False
+):
     """Uses Brevo service to send an email using the given template and params"""
     brevo = Brevo()
     try:
@@ -81,6 +83,11 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
             template = EmailTemplate.objects.get(site=None, name__iexact=template_name)
         except EmailTemplate.DoesNotExist:
             current_site = Site.objects.get_current()
+            if dry_run:
+                logger.warning(
+                    f"[DRY RUN] {template_name} was not found on {current_site} !"
+                )
+                return False
             mail_admins(
                 subject="Unable to send email",
                 message=f"{template_name} was not found on {current_site} !",
@@ -92,9 +99,11 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     if params:
         all_params.update(params)
 
-    response = brevo.send_email(template.sib_id, recipients, all_params, test=test)
+    response = brevo.send_email(
+        template.sib_id, recipients, all_params, test=test, dry_run=dry_run
+    )
 
-    if response:
+    if response and not dry_run:
         create_transaction(
             transaction_id=response.message_id,
             recipients=recipients,
@@ -106,7 +115,9 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     return response
 
 
-def send_debug_email(template_name, recipients, params=None, test=False, related=None):
+def send_debug_email(
+    template_name, recipients, params=None, test=False, related=None, dry_run=False
+):
     """
     As an alternative, use the default django send_mail, mostly used for debugging
     and displaying email on the terminal.
@@ -128,10 +139,18 @@ def send_debug_email(template_name, recipients, params=None, test=False, related
     if params:
         all_params.update(params)
 
+    message = (
+        f"Message utilisant le template {template_name} avec les "
+        f"paramètres : {all_params} (TEST MODE: {test})"
+    )
+
+    if dry_run:
+        logger.info(f"[DRY RUN] Would have sent to {simple_recipients}: {message}")
+        return True
+
     django_send_mail(
         "Brevo Mail",
-        f"Message utilisant le template {template_name} avec les "
-        f"paramètres : {all_params} (TEST MODE: {test})",
+        message,
         "no-reply@recoconseil.fr",
         simple_recipients,
         fail_silently=False,
@@ -160,7 +179,7 @@ def fetch_transaction_content(transaction_id):
 
 
 def send_mail_filter_recipient(
-    template_name, recipients, params=None, test=False, related=None
+    template_name, recipients, params=None, test=False, related=None, dry_run=False
 ):
     if not isinstance(recipients, list):
         recipients = [recipients]
@@ -175,14 +194,24 @@ def send_mail_filter_recipient(
 
     res_debug = (
         send_debug_email(
-            template_name, to_debug_send, params=params, test=test, related=related
+            template_name,
+            to_debug_send,
+            params=params,
+            test=test,
+            related=related,
+            dry_run=dry_run,
         )
         if len(to_debug_send) > 0
         else True
     )
     res_brevo = (
         brevo_email(
-            template_name, to_really_send, params=params, test=test, related=related
+            template_name,
+            to_really_send,
+            params=params,
+            test=test,
+            related=related,
+            dry_run=dry_run,
         )
         if len(to_really_send) > 0
         else True

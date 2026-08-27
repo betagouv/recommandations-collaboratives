@@ -101,10 +101,6 @@ def send_new_recommendations_reminders_digest_by_project(
         logger.debug("No NEW_RECO due reminder for project <{project.name}>, skipping")
         return False
 
-    if dry_run:
-        logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{due_reminder}>")
-        return True
-
     recipient = project.owner
     if not recipient:
         return False
@@ -125,7 +121,13 @@ def send_new_recommendations_reminders_digest_by_project(
         },
         params=digest,
         related=due_reminder,
+        dry_run=dry_run,
     )
+
+    if dry_run:
+        logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{due_reminder}>")
+        return True
+
     logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
 
     # Mark as dispatched
@@ -159,10 +161,6 @@ def send_whatsup_reminders_digest_by_project(
         logger.debug("No WHATSUP due reminder for <{project.name}>, skipping")
         return False
 
-    if dry_run:
-        logger.info(f"[DRY RUN] Would have sent WHATSUP reminder <{due_reminder}>")
-        return True
-
     tasks = (
         project.tasks.filter(status__in=tasks_models.Task.OPEN_STATUSES)
         .filter(site=site)
@@ -183,7 +181,13 @@ def send_whatsup_reminders_digest_by_project(
         },
         params=digest,
         related=due_reminder,
+        dry_run=dry_run,
     )
+
+    if dry_run:
+        logger.info(f"[DRY RUN] Would have sent WHATSUP reminder <{due_reminder}>")
+        return True
+
     logger.info(f"Sent WHATS_UP reminder <{due_reminder}>")
 
     # Mark as dispatched
@@ -258,14 +262,14 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
             project, project_notifications, user
         )
 
-        if not dry_run:
-            send_email(
-                communication_constants.TPL_NEW_RECOMMENDATIONS_DIGEST,
-                {"name": normalize_user_name(user), "email": user.email},
-                params=digest,
-                related=project,
-            )
-        else:
+        send_email(
+            communication_constants.TPL_NEW_RECOMMENDATIONS_DIGEST,
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
+            related=project,
+            dry_run=dry_run,
+        )
+        if dry_run:
             logger.info(
                 f"[DRY RUN] Would have sent {len(digest)} notifications for <{user}>."
             )
@@ -450,15 +454,15 @@ def send_new_site_digest_by_user(user, notifications, dry_run):
     for notification in notifications:
         digest = make_digest_for_new_site(notification, user)
         if digest:
+            send_email(
+                communication_constants.TPL_NEW_SITE_FOR_SWITCHTENDER,
+                {"name": normalize_user_name(user), "email": user.email},
+                params=digest,
+                dry_run=dry_run,
+            )
             if dry_run:
                 logger.info(
                     f"[DRY RUN] Would have sent {len(digest)} notifications for {user}."
-                )
-            else:
-                send_email(
-                    communication_constants.TPL_NEW_SITE_FOR_SWITCHTENDER,
-                    {"name": normalize_user_name(user), "email": user.email},
-                    params=digest,
                 )
 
 
@@ -519,17 +523,20 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
         # but if it does we don't want it to crash the whole command
         return 0
 
-    if not dry_run:
-        send_email(
-            communication_constants.TPL_MESSAGES_DIGEST,
-            {"name": normalize_user_name(user), "email": user.email},
-            params=digest,
-        )
-        notifications.mark_as_sent()
-    else:
+    send_email(
+        communication_constants.TPL_MESSAGES_DIGEST,
+        {"name": normalize_user_name(user), "email": user.email},
+        params=digest,
+        dry_run=dry_run,
+    )
+
+    if dry_run:
         logger.info(
             f"[DRY RUN] Would have sent one email with {len(digest)} message notifications to <{user}>."
         )
+    else:
+        notifications.mark_as_sent()
+
     return notifications.count()
 
 
@@ -799,13 +806,13 @@ def send_digest_by_user(
         digest.update(extra_context)
 
     if notification_count > 0:
-        if not dry_run:
-            send_email(
-                template_name,
-                {"name": normalize_user_name(user), "email": user.email},
-                params=digest,
-            )
-        else:
+        send_email(
+            template_name,
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
+            dry_run=dry_run,
+        )
+        if dry_run:
             logger.info(
                 f"[DRY RUN] Would have sent {len(digest)} notifications to <{user}>."
             )
