@@ -77,3 +77,24 @@ def test_api_key_is_refused_on_endpoints_without_the_mixin(
     )
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_api_key_gives_access_to_the_openapi_schema(api_client, service_account_key):
+    _, key = service_account_key
+    url = reverse("schema")
+
+    assert api_client.get(url).status_code == 403
+
+    response = api_client.get(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
+
+    assert response.status_code == 200, response.data
+    assert response["Content-Type"].startswith("application/vnd.oai.openapi")
+
+
+@pytest.mark.django_db
+def test_openapi_schema_is_refused_to_a_regular_user(api_client):
+    user = baker.make(get_user_model())
+    api_client.force_authenticate(user=user)
+
+    assert api_client.get(reverse("schema")).status_code == 403

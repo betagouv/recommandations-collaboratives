@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_api_key",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "generic_relations",
     "django_filters",
     "csvexport",
@@ -426,6 +428,17 @@ REST_FRAMEWORK = {
     ],
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
+}
+
+# https://drf-spectacular.readthedocs.io/en/latest/settings.html
+SPECTACULAR_SETTINGS = {
+    # the schema is served to machines: on top of the usual authentication
+    # classes, a service API key opens it (cf recoco.apps.api_keys)
+    "SERVE_AUTHENTICATION": REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
+    + ["recoco.apps.api_keys.authentication.ServiceAPIKeyAuthentication"],
+    "SERVE_PERMISSIONS": [
+        "recoco.rest_api.permissions.HasServiceAPIKeyOrIsStaffForSite"
+    ],
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
