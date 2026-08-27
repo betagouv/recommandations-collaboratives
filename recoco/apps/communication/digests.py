@@ -325,6 +325,7 @@ def make_site_digest(site):
     data.update(
         {
             "description": site_config.description or "",
+            "sender_name": site_config.sender_name or "",
             "legal_address": site_config.legal_address or "",
             "main_topic": site_config.main_topic or "",
             "legal_owner": site_config.legal_owner or "",
