@@ -6,6 +6,7 @@ from .models import ServiceAPIKey
 
 class ServiceAPIKeyAuthentication(authentication.BaseAuthentication):
     keyword = "Api-Key"
+    invalid_key_message = "Clé d'API invalide, expirée ou non-autorisée pour ce site."
 
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
@@ -34,13 +35,10 @@ class ServiceAPIKeyAuthentication(authentication.BaseAuthentication):
         try:
             api_key = ServiceAPIKey.objects.get_from_key(key)
         except ServiceAPIKey.DoesNotExist as exc:
-            raise exceptions.AuthenticationFailed("Clé d'API invalide.") from exc
+            raise exceptions.AuthenticationFailed(self.invalid_key_message) from exc
 
-        if api_key.has_expired:
-            raise exceptions.AuthenticationFailed("Clé d'API expirée.")
-
-        if api_key.site_id != request.site.id:
-            raise exceptions.AuthenticationFailed("Clé d'API invalide pour ce site.")
+        if api_key.has_expired or api_key.site_id != request.site.id:
+            raise exceptions.AuthenticationFailed(self.invalid_key_message)
 
         return api_key.user, api_key
 
