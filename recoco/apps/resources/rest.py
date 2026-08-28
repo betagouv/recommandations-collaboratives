@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from recoco.rest_api.filters import WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
-from recoco.utils import has_perm
+from recoco.utils import check_advises, has_perm
 
 from ..tasks.models import Task
 from .filters import ResourceCategoryFilter, ResourceStatusFilter
@@ -36,6 +36,13 @@ class IsResourceManagerOrReadOnly(permissions.BasePermission):
             return True
 
         return has_perm(request.user, "sites.manage_resources", request.site)
+
+
+class IsResourceManagerOrAdvises(IsResourceManagerOrReadOnly):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) or check_advises(
+            user=request.user, site=request.site
+        )
 
 
 class ResourceViewSet(viewsets.ModelViewSet):
@@ -96,7 +103,10 @@ class ResourceViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=["post"],
-        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+        permission_classes=[
+            permissions.IsAuthenticatedOrReadOnly,
+            IsResourceManagerOrAdvises,
+        ],
     )
     def import_from_uri(self, request):
         """Import (create) a resource from an external known site, miroring it.
