@@ -62,6 +62,8 @@ def get_site_params():
     params["legal_address"] = site_config.legal_address or ""
     params["legal_owner"] = site_config.legal_owner or ""
     params["description"] = site_config.description or ""
+    # sender_email is the key name used on Brevo's side, painful to update
+    params["sender_email"] = site_config.contact_form_recipient or ""
 
     if site_config.email_logo:
         params["site_logo"] = build_absolute_url(site_config.email_logo.url)
