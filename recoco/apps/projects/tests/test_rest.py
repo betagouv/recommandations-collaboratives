@@ -788,6 +788,27 @@ def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
 
 
 @pytest.mark.django_db
+def test_list_project_statuses_for_anonymous(
+    request, project, project_draft, api_client, current_site
+):
+    url = reverse("projects-projectsites-list")
+    response = api_client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_list_project_statuses_for_random(
+    request, project, project_draft, api_client, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-projectsites-list")
+    response = api_client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_list_project_statuses_for_non_moderator(
     request, project, project_draft, api_client
 ):
@@ -859,6 +880,85 @@ def test_project_status_is_updated_by_patch_api(request, api_client, project):
 
     project.refresh_from_db()
     assert project.project_sites.current().status == new_status
+
+
+@pytest.mark.django_db
+def test_project_status_is_not_updated_anonymous(request, api_client, project):
+    new_status = "DONE"
+
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_is_not_updated_random_user(request, api_client, project):
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_draft_not_updated_with_list_project_perm(
+    request, api_client, project_draft, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, current_site)
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project_draft.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 404
+
+    project_draft.refresh_from_db()
+    assert project_draft.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_draft_update_with_moderate_perm(
+    request, api_client, project_draft, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, current_site)
+    assign_perm("moderate_projects", user, current_site)
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project_draft.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 204
+
+    project_draft.refresh_from_db()
+    assert project_draft.project_sites.current().status == new_status
 
 
 ########################################################################
