@@ -195,6 +195,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
         legal_address="here",
         legal_owner="Doe",
         description="The short description",
+        contact_form_recipient="contact@me.fr",
     )
 
     template = baker.make(models.EmailTemplate, name=template_name, site=None)
@@ -215,6 +216,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
             "legal_address": "here",
             "legal_owner": "Doe",
             "description": "The short description",
+            "sender_email": "contact@me.fr",
         },
         test=False,
         dry_run=False,
@@ -242,6 +244,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
         legal_address="here",
         legal_owner="Doe",
         description="The short description",
+        contact_form_recipient="contact@me.fr",
     )
 
     baker.make(models.EmailTemplate, name=template_name, site=None)
@@ -265,6 +268,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
             "legal_address": "here",
             "legal_owner": "Doe",
             "description": "The short description",
+            "sender_email": "contact@me.fr",
         },
         test=False,
         dry_run=False,
