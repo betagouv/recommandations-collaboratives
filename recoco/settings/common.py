@@ -317,7 +317,12 @@ SASS_PROCESSOR_INCLUDE_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email Configuration
-EMAIL_FROM = "Recoco <no-reply@recoco.fr>"
+# Technical sender address, shared by every site (must be a verified sender on
+# Brevo). The displayed name comes from SiteConfiguration.sender_name.
+DEFAULT_SENDER_EMAIL = "noreply@recoconseil.fr"
+# Displayed name used when the site has no SiteConfiguration, or no sender_name
+DEFAULT_SENDER_NAME = "Recoco"
+DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"
 
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [

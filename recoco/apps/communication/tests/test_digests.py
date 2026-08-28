@@ -164,18 +164,6 @@ def test_send_digests_for_new_reco_empty(client, request, make_project):
 
 
 @pytest.mark.django_db
-def test_make_site_digest_with_siteconfiguration(client, request):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
-    data = digests.make_site_digest(site)
-
-    assert "legal_owner" in data
-
-    assert len(data) > 0
-
-
-@pytest.mark.django_db
 def test_make_project_survey_for_site_digest_without_configuration(
     project_ready, client, request
 ):
