@@ -262,13 +262,14 @@ def test_simple_user_cannot_create_resource_with_api(request, api_client):
 
 
 @pytest.mark.django_db
-def test_member_cannot_create_resource_with_api(request, api_client):
-    site = get_current_site(request)
-
+def test_member_cannot_create_resource_with_api(request, api_client, current_site):
     user = baker.make(auth_models.User)
-    user.profile.sites.add(site)
+    user.profile.sites.add(current_site)
     project = baker.make(project_models.Project)
-    assign_collaborator(project)
+    baker.make(
+        project_models.ProjectSite, project=project, site=current_site, status="READY"
+    )
+    assign_collaborator(user, project)
 
     url = reverse("resources-list")
     api_client.force_authenticate(user=user)
