@@ -974,7 +974,7 @@ def test_project_status_needs_authentication(request, api_client):
 
 
 @pytest.mark.django_db
-def test_user_cannot_change_some_one_else_project_status(request, project):
+def test_user_cannot_change_someone_else_project_status(request, project):
     user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
     # project and user statuses
