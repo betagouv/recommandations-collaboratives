@@ -1,17 +1,23 @@
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
+from django.db import transaction
 from notifications import models as notifications_models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
+from recoco.apps.geomatics.models import Commune
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
+from recoco.apps.invites.models import Invite
 from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
+from .utils import assign_advisor, assign_collaborator, assign_observer
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -215,6 +221,121 @@ class UserProjectSerializer(ProjectSerializer):
             "unread_private_messages": unread_private_messages.count(),
             "new_recommendations": new_recommendations.count(),
         }
+
+
+def get_or_create_user_on_site(email: str, site: Site) -> User:
+    """Return the user of given email, creating its account if needed"""
+    user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
+    user.profile.sites.add(site)
+
+    return user
+
+
+class NewProjectSerializer(ProjectSerializer):
+    """Create an already validated project, on the current site
+
+    The commune is given as an insee code rather than as a primary key: it is
+    what identifies a commune unambiguously for an API client. The owner is
+    given as an email, and its account is created if it does not exist yet.
+    The status of the project on the current site can be given, and defaults
+    to `TO_PROCESS`.
+    """
+
+    class Meta(ProjectSerializer.Meta):
+        fields = ProjectSerializer.Meta.fields + ["insee", "owner_email"]
+        read_only_fields = ProjectSerializer.Meta.read_only_fields + [
+            "created_on",
+            "updated_on",
+        ]
+
+    insee = serializers.CharField(max_length=5, write_only=True)
+    owner_email = serializers.EmailField(max_length=150, write_only=True)
+
+    description = serializers.CharField(required=True)
+    tags = TagListSerializerField(required=False)
+
+    # read only on the parent serializer, since it belongs to the project site
+    status = serializers.ChoiceField(
+        choices=ProjectSite.PROJECTSITE_STATES,
+        required=False,
+        default="TO_PROCESS",
+    )
+
+    def validate_owner_email(self, value):
+        return value.lower()
+
+    def validate(self, data):
+        insee = data["insee"]
+
+        commune = Commune.get_by_insee_code(insee)
+        if commune is None:
+            raise serializers.ValidationError(
+                {"insee": f"No commune found for insee code '{insee}'."}
+            )
+
+        # commune is read only on the parent serializer, it is only writable
+        # here, through the insee code
+        data["commune"] = commune
+
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data.pop("insee")
+        owner_email = validated_data.pop("owner_email")
+        # status is not a field of the project, but of its site
+        status = validated_data.pop("status")
+
+        # the caller submits the project on behalf of its owner,
+        # cf. onboarding.views.prefill_project_submit
+        validated_data["submitted_by"] = self.current_user
+
+        project = super().create(validated_data)
+
+        # the project skips moderation, it is created already validated
+        project.project_sites.create(
+            site=self.current_site, status=status, is_origin=True
+        )
+
+        owner = get_or_create_user_on_site(owner_email, self.current_site)
+        assign_collaborator(owner, project, is_owner=True)
+
+        return project
+
+
+class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Attach someone, given by email, to a project with the given role
+
+    The roles are the ones of an invitation, but the account is created if it
+    does not exist yet and the person is attached right away: no invitation is
+    sent, and nothing is to be accepted.
+    """
+
+    email = serializers.EmailField(max_length=150)
+    role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
+
+    @property
+    def project(self) -> Project:
+        return self.context["project"]
+
+    def validate_email(self, value):
+        return value.lower()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = get_or_create_user_on_site(validated_data["email"], self.current_site)
+        role = validated_data["role"]
+
+        if role == "COLLABORATOR":
+            assign_collaborator(user, self.project)
+        elif role == "SWITCHTENDER":
+            assign_advisor(user, self.project, site=self.current_site)
+        elif role == "OBSERVER":
+            assign_observer(user, self.project, site=self.current_site)
+        else:
+            raise ValueError(f"Unhandled invite role '{role}'")
+
+        return validated_data
 
 
 class ProjectForListSerializer(BaseSerializerMixin):
