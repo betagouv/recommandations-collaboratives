@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 from csp.constants import NONE, SELF, UNSAFE_EVAL, UNSAFE_INLINE
 from multisite import SiteID
@@ -227,6 +228,15 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+PROCONNECT_SERVER_URL = os.getenv(
+    "PROCONNECT_SERVER_URL",
+    "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
+)
+pro_connect_split_url = urlsplit(PROCONNECT_SERVER_URL)
+PROCONNECT_ORIGIN = urlunsplit(
+    (pro_connect_split_url[0], pro_connect_split_url[1], "", "", "")
+)
+
 # GUARDIAN
 GUARDIAN_USER_OBJ_PERMS_MODEL = "home.UserObjectPermissionOnSite"
 GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
@@ -249,7 +259,7 @@ CONTENT_SECURITY_POLICY = {
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
         "frame-src": ["https://www.google.com"],
-        "form-action": [SELF],
+        "form-action": [SELF, PROCONNECT_ORIGIN],
         "img-src": [
             SELF,
             "data:",
@@ -265,7 +275,7 @@ CONTENT_SECURITY_POLICY = {
             "https://stats.beta.gouv.fr/",
             "https://client.crisp.chat",
             UNSAFE_EVAL,
-            UNSAFE_INLINE,
+            UNSAFE_INLINE,  # fixme crisp uses this
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
@@ -420,10 +430,7 @@ SOCIALACCOUNT_PROVIDERS = {
                 "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
                 "secret": os.getenv("PROCONNECT_SECRET"),
                 "settings": {
-                    "server_url": os.getenv(
-                        "PROCONNECT_SERVER_URL",
-                        "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
-                    ),
+                    "server_url": PROCONNECT_SERVER_URL,
                     "token_auth_method": "client_secret_post",
                 },
             },
