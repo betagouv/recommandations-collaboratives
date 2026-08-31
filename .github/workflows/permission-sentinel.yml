@@ -1,0 +1,36 @@
+name: Permission Sentinel
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: ['main', 'develop', 'release/*', 'feature/*']
+  pull_request:
+    branches: ['main', 'develop', 'release/*']
+
+jobs:
+  check-permissions-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.1.5
+        with:
+          # the checker diffs the working tree against verified_commit in
+          # docs/api_permissions.yaml, which can be arbitrarily old
+          fetch-depth: 0
+
+      - name: Install uv and python
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install Dependencies
+        run: |
+          uv sync --no-dev
+          uv sync --only-dev
+
+      - name: Run permission sentinel
+        run: |
+          uv run python scripts/check_permissions_matrix.py --only-stale

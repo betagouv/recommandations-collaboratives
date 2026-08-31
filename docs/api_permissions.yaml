@@ -1,0 +1,744 @@
+verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+# ^ the git commit this whole matrix's code_ref/tests entries were last
+# checked against. Used by scripts/check_permissions_matrix.py to detect
+# when a referenced view or test has changed since and needs re-review.
+# Individual viewsets/actions/endpoints may override with their own
+# `verified_commit` field if they were re-checked more recently than the
+# rest of the file.
+
+# Reference matrix of REST API permissions.
+#
+# History:
+#   - First pass: transcribed as-is from the source document "permissions
+#     api.md" (Téléchargements), with reviewed/deprecated flags from the
+#     source's ☑ / strikethrough markers.
+#   - Second pass (this version): each viewset's actual permission_classes /
+#     get_permissions() / get_queryset() logic was located in the codebase
+#     (code_ref, file:line) and matching tests were identified (tests: list
+#     of file:function or file:line). `verified` records whether the actual
+#     code matches what the source doc claimed, and `discrepancy` explains
+#     any mismatch or gap found.
+#
+# Fields:
+#   name       - viewset dotted path (module.ClassName)
+#   reviewed   - true if the source doc marked this viewset with a checkmark (☑)
+#   deprecated - true if the source doc struck through the viewset name (~~...~~)
+#                NOTE: for TaskFollowupViewSet this flag is now known to be
+#                WRONG — the viewset is live, in active use, and tested. See
+#                its discrepancy note.
+#   note       - free-form remark from the source doc's "/!\" column (viewset level)
+#   code_ref   - file:line of the viewset class itself
+#   actions    - list of per verb/route entries:
+#       verb          - HTTP verb or route/action name, as given in the source doc
+#       permission    - permission expression as written in the source doc
+#       roles         - roles allowed, as written in the source doc
+#       note          - free-form remark from the source doc (action level)
+#       code_ref      - file:line of the actual permission check for this action
+#       verified      - true/false/partial — does code match the source doc's claim
+#       discrepancy   - explanation when verified is false/partial, or a gap found
+#       tests         - list of "path/to/test_file.py:function_name" (or :line)
+#                       exercising this permission
+
+# ---------------------------------------------------------------------------
+# Ground-truth role -> permission mapping, derived from code (not from the
+# source doc). Used to check the `roles` field of each action below via
+# `roles_check`. Two distinct mechanisms exist:
+#   - site:*    persistent, per-tenant (Site) Django Group, statically
+#               composing permissions (SITE_GROUP_PERMISSIONS)
+#   - project:* NOT a Group — a runtime, per-object grant assigned directly
+#               to the user via guardian's assign_perm(perm, user, project)
+#               when they become a collaborator/advisor/observer on that
+#               specific project
+roles:
+  "site:staff":
+    mechanism: "Django Group, per-Site, static membership (SITE_GROUP_PERMISSIONS)"
+    code_ref: "recoco/apps/home/models.py:42-50"
+    permissions:
+      - sites.moderate_projects
+      - sites.list_projects
+      - sites.delete_projects
+      - sites.manage_resources
+      - sites.use_crm
+      - sites.use_addressbook
+      - sites.change_addressbook
+
+  "site:admin":
+    mechanism: "Django Group, per-Site, static membership (SITE_GROUP_PERMISSIONS)"
+    code_ref: "recoco/apps/home/models.py:51-54"
+    permissions:
+      - sites.manage_surveys
+      - sites.manage_configuration
+
+  "site:advisor":
+    mechanism: "Django Group, per-Site, static membership (SITE_GROUP_PERMISSIONS)"
+    code_ref: "recoco/apps/home/models.py:55-60"
+    permissions:
+      - sites.list_projects
+      - sites.use_addressbook
+      - sites.change_addressbook
+      - sites.manage_resources
+
+  "project:member_draft":
+    mechanism: "Runtime per-object grant to user (not a Group), via assign_collaborator_permissions before project moderation"
+    code_ref: "recoco/apps/projects/models.py:52-60"
+    permissions:
+      - projects.view_public_notes
+      - projects.use_public_notes
+      - projects.view_project
+      - projects.view_tasks
+      - projects.use_surveys
+      - projects.view_surveys
+      - projects.change_location
+
+  "project:member":
+    mechanism: "Runtime per-object grant to user (not a Group), via assign_collaborator_permissions once project is accepted; superset of project:member_draft"
+    code_ref: "recoco/apps/projects/models.py:52-67"
+    permissions:
+      - projects.view_public_notes
+      - projects.use_public_notes
+      - projects.view_project
+      - projects.view_tasks
+      - projects.use_surveys
+      - projects.view_surveys
+      - projects.change_location
+      - projects.use_tasks
+      - projects.manage_documents
+      - projects.invite_collaborators
+      - projects.manage_collaborators
+
+  "project:advisor":
+    mechanism: "Runtime per-object grant to user (not a Group), via assign_advisor / ProjectSwitchtender(is_observer=False)"
+    code_ref: "recoco/apps/projects/models.py:69-89"
+    permissions: &project_advisor_perms
+      - projects.view_public_notes
+      - projects.use_advisor_note
+      - projects.use_public_notes
+      - projects.use_private_notes
+      - projects.view_project
+      - projects.view_tasks
+      - projects.manage_tasks
+      - projects.use_tasks
+      - projects.invite_advisors
+      - projects.invite_collaborators
+      - projects.manage_collaborators
+      - projects.change_topics
+      - projects.manage_documents
+      - projects.use_surveys
+      - projects.view_surveys
+      - projects.change_project
+      - projects.change_location
+      - projects.use_project_tags
+      - projects.manage_private_documents
+
+  "project:observer":
+    mechanism: "Runtime per-object grant to user (not a Group), via assign_observer / ProjectSwitchtender(is_observer=True)"
+    code_ref: "recoco/apps/projects/models.py:91"
+    note: >
+      IDENTICAL permission set to project:advisor — OBSERVER_PERMISSIONS is a
+      direct alias of ADVISOR_PERMISSIONS in code, no restriction is applied
+      despite the "observer" name implying read-only/limited access. See
+      finding in the "roles vs code" discrepancies below.
+    permissions: *project_advisor_perms
+
+viewsets:
+  # ---------------------------------------------------------------- tasks_rest
+  - name: tasks_rest.TaskFollowupViewSet
+    reviewed: false
+    deprecated: true   # source doc struck this through and asked "jette juste?"
+    note: "est-ce que je jette juste ?"
+    code_ref: "recoco/apps/tasks/views/rest.py:315-348"
+    severity: High
+    discrepancy: >
+      NOT actually deprecated/removable — the viewset is live, wired up, and
+      has an active test suite (test_rest_task_followup.py). The source
+      doc's strikethrough is stale; do not delete without further review.
+    actions:
+      - verb: safe
+        permission: "list_project(site) ou view_task(project)"
+        roles: ["site:staff", "site:advisor", "project:member_draft", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/tasks/views/rest.py:297-309 (TaskFollowupPermission)"
+        verified: true
+        roles_check: "CORRECTED — added site:advisor (also has list_projects) and project:observer (same perms as project:advisor); renamed remaining entries to site:/project: prefixes to remove ambiguity."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_list_not_allowed_to_anonymous_user (L14)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_list_not_allowed_to_user_wo_permission (L26)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_list_closed_for_dissociate_task_and_project (L40)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_list_returns_followups_to_collaborator (L61)"
+      - verb: create
+        permission: "use_tasks(projects)"
+        roles: ["project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/tasks/views/rest.py:312 (TaskFollowupPermission, unsafe -> projects.use_tasks)"
+        verified: true
+        roles_check: "CORRECTED — added project:observer; renamed to project: prefix. member_draft correctly excluded (no use_tasks at draft stage)."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_create_not_allowed_to_anonymous_user (L93)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_create_not_allowed_to_simple_auth_user (L105)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_create_not_allowed_to_external_advisor (L119)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_create_is_processed_for_auth_user (L136)"
+      - verb: edit
+        permission: "use_tasks(projects)"
+        roles: ["project:member", "project:advisor", "project:observer"]
+        note: "on peut éditer les msg des autres"
+        code_ref: "recoco/apps/tasks/views/rest.py:290-312 (TaskFollowupPermission — no author check)"
+        verified: true
+        roles_check: "CORRECTED — source doc left roles blank; derived from code (same use_tasks check as create): project:member, project:advisor, project:observer."
+        severity: Medium
+        discrepancy: >
+          Confirmed in code: unlike MessageViewSet (which has an explicit
+          author check via MessagePermission), TaskFollowupPermission has
+          no object-level author restriction, so any user with use_tasks
+          can edit followups authored by others.
+        tests:
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_update_not_allowed_to_anonymous_user (L176)"
+          - "recoco/apps/tasks/tests/test_rest_task_followup.py:test_project_task_followup_update_is_processed_for_auth_user (L191)"
+
+  - name: tasks_rest.TaskViewSet
+    reviewed: true
+    code_ref: "recoco/apps/tasks/views/rest.py:56-216"
+    actions:
+      - verb: safe
+        permission: "list_project(site) ou view_task(project)"
+        roles: ["site:staff", "site:advisor", "project:member_draft", "project:advisor", "project:observer"]
+        note: "ok -> list_projects pour ça bientôt obsolète"
+        code_ref: "recoco/apps/tasks/views/rest.py:49-51 (IsTaskViewerOrManagerToWrite)"
+        verified: true
+        roles_check: "CORRECTED — added site:advisor (also has list_projects) and project:observer (same perms as project:advisor); renamed remaining entries to site:/project: prefixes."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_collaborator_can_see_project_tasks_for_site (L37)"
+          - "recoco/apps/tasks/tests/test_rest.py (L55, 86, 105, 124, 144, 162)"
+      - verb: "create, edit"
+        permission: "use_tasks(project), manage_tasks(project)"
+        roles: ["project:advisor", "project:observer"]
+        note: "ok"
+        code_ref: "recoco/apps/tasks/views/rest.py:53 (base), 90 (perform_create), 97-99 (perform_update)"
+        verified: true
+        roles_check: "CORRECTED — added project:observer (same perms as project:advisor, both hold manage_tasks); renamed to project: prefix. Correctly excludes project:member and member_draft (neither holds manage_tasks)."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_simple_user_cannot_create_project_task (L180)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_collaborator_cannot_create_project_task_for_site (L189)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_advisor_can_create_project_task_for_site (L199, L234)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_advisor_cannot_update_other_project_task_for_site (L287)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_collaborator_cannot_update_project_task_for_site (L311)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_advisor_can_update_project_task_for_site (L330, L349)"
+      - verb: "move (unsafe)"
+        permission: use_tasks
+        roles: ["project:member", "project:advisor", "project:observer"]
+        note: "bientôt déprécié"
+        code_ref: "recoco/apps/tasks/views/rest.py:111-152 (no extra check beyond base use_tasks)"
+        verified: true
+        roles_check: "CORRECTED — added project:advisor and project:observer (both hold use_tasks, same as project:member); renamed to project: prefix."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py (L462, 478, 493, 511, 529, 547, 565)"
+      - verb: "mark_visited (unsafe)"
+        permission: use_tasks
+        roles: ["project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/tasks/views/rest.py:154-175 (explicit check L161, plus 403 if task not public L164)"
+        verified: true
+        roles_check: "CORRECTED — added project:advisor and project:observer (both hold use_tasks, same as project:member); renamed to project: prefix."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py (L373, 394, 415, 437)"
+      - verb: publish
+        permission: "manage_tasks(project)"
+        roles: ["project:advisor", "project:observer"]
+        code_ref: "recoco/apps/tasks/views/rest.py:177-216 (explicit check L184)"
+        verified: null
+        severity: Low
+        discrepancy: "Action not present in source doc at all — undocumented gap, added here from code."
+        roles_check: "CORRECTED — added project:observer (same perms as project:advisor, both hold manage_tasks); renamed to project: prefix."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_collaborator_cannot_publish_project_task_for_site (L742)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_advisor_can_publish_project_task_for_site (L762)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_user_cannot_publish_already_published_task (L791)"
+
+  - name: tasks_rest.TaskNotificationViewSet
+    reviewed: true
+    note: "TESTS"
+    code_ref: "recoco/apps/tasks/views/rest.py:224-282"
+    actions:
+      - verb: all
+        permission: "is_authenticated pour les siennes"
+        roles: []
+        code_ref: "recoco/apps/tasks/views/rest.py:282 (IsAuthenticated); own-only enforced via queryset filter L235, not a permission class"
+        verified: true
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_task_notifications_list_closed_to_anonymous_user (L590)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_task_notifications_list_returns_notifications_of_advisor (L602)"
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_task_notifications_mark_read_updates_notifications_of_advisor (L646)"
+      - verb: mark_all_as_read
+        permission: "is_authenticated pour les siennes"
+        roles: []
+        code_ref: "recoco/apps/tasks/views/rest.py:269-279 (no permission_classes override, inherits base IsAuthenticated; scoped to get_queryset())"
+        verified: null
+        severity: Low
+        discrepancy: "Action not present in source doc at all — undocumented gap, added here from code."
+        tests:
+          - "recoco/apps/tasks/tests/test_rest.py:test_project_task_notifications_mark_read_updates_notifications_of_advisor (L646)"
+
+  # -------------------------------------------------------- resources_rest
+  - name: resources_rest.ResourceViewSet
+    reviewed: true
+    code_ref: "recoco/apps/resources/rest.py:41-131"
+    actions:
+      - verb: safe
+        permission: tous
+        roles: []
+        note: "même anonyme !, pas les brouillons"
+        code_ref: "recoco/apps/resources/rest.py:29-38 (IsResourceManagerOrReadOnly); draft filter in get_queryset L57-60"
+        verified: true
+        tests:
+          - "recoco/apps/resources/tests/test_rest.py:test_anonymous_can_see_resources_list_api (L31)"
+          - "recoco/apps/resources/tests/test_rest.py:test_anonymous_cannot_see_unpublished_resource_in_list_api (L141)"
+          - "recoco/apps/resources/tests/test_rest.py:test_staff_can_see_unpublished_resource_in_list_api (L156)"
+      - verb: "create, update"
+        permission: "sites.manage_resources"
+        roles: ["site:staff", "site:advisor"]
+        code_ref: "recoco/apps/resources/rest.py:29-38 (IsResourceManagerOrReadOnly, unsafe -> has_perm sites.manage_resources)"
+        verified: true
+        roles_check: "VERIFIED — matches code exactly; renamed to site: prefix for clarity."
+        tests:
+          - "recoco/apps/resources/tests/test_rest.py:test_simple_user_cannot_create_resource_with_api (L243)"
+          - "recoco/apps/resources/tests/test_rest.py:test_staff_user_can_create_resource_with_api (L264)"
+          - "recoco/apps/resources/tests/test_rest.py:test_staff_user_can_edit_resource_with_api (L294)"
+      - verb: import
+        permission: TODO
+        roles: [staff, advisor, invited advisors]
+        note: "TODO là c'est + ouvert"
+        code_ref: "recoco/apps/resources/rest.py:96-131 (import_from_uri, permission_classes=[IsAuthenticatedOrReadOnly], FIXME docstring L104-107)"
+        verified: true
+        severity: High
+        discrepancy: >
+          Still an open TODO in code (a FIXME comment explicitly admits the
+          permission is too open and should be restricted). No test exists
+          for import_from_uri's permission at all — coverage gap.
+        tests: []
+
+  - name: resources_rest.ResourceAddonViewSet
+    reviewed: false
+    code_ref: "recoco/apps/resources/rest.py:139-150"
+    actions:
+      - verb: all
+        permission: "sites.manage_resources"
+        roles: ["site:staff", "site:advisor"]
+        note: "sert encore..? début du code des communs"
+        code_ref: "recoco/apps/resources/rest.py:134-136 (IsResourceManager, always requires sites.manage_resources)"
+        verified: true
+        roles_check: "VERIFIED — matches code exactly; renamed to site: prefix for clarity."
+        tests:
+          - "recoco/apps/resources/tests/test_rest.py:TestRessourceAddonViewSet.test_not_authenticated (L573)"
+          - "recoco/apps/resources/tests/test_rest.py:TestRessourceAddonViewSet.test_not_authorized (L578)"
+          - "recoco/apps/resources/tests/test_rest.py:TestRessourceAddonViewSet.test_list_resource_addons (L585)"
+          - "recoco/apps/resources/tests/test_rest.py:TestRessourceAddonViewSet.test_create_resource_addon (L616)"
+
+  # -------------------------------------------------------- geomatics_rest
+  - name: geomatics_rest.DepartmentViewSet
+    reviewed: true
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/geomatics/rest.py:24-56"
+    actions:
+      - verb: all
+        permission: tous
+        roles: []
+        code_ref: "recoco/apps/geomatics/rest.py (no permission_classes set -> DRF default, AllowAny; not overridden in settings)"
+        verified: true
+        severity: Low
+        discrepancy: "No tests at all for this viewset's permissions (geomatics/tests.py only covers commune-merge/import management commands)."
+        tests: []
+
+  - name: geomatics_rest.RegionViewSet
+    reviewed: true
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/geomatics/rest.py:24-56"
+    actions:
+      - verb: all
+        permission: tous
+        roles: []
+        code_ref: "recoco/apps/geomatics/rest.py (no permission_classes set -> DRF default AllowAny)"
+        verified: true
+        severity: Low
+        discrepancy: "No tests at all for this viewset's permissions."
+        tests: []
+
+  - name: geomatics_rest.CommuneViewSet
+    reviewed: true
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/geomatics/rest.py:24-56"
+    actions:
+      - verb: all
+        permission: tous
+        roles: []
+        code_ref: "recoco/apps/geomatics/rest.py (no permission_classes set -> DRF default AllowAny)"
+        verified: true
+        severity: Low
+        discrepancy: "No tests at all for this viewset's permissions."
+        tests: []
+
+  # -------------------------------------------------------- projects_rest
+  - name: projects_rest.TopicViewSet
+    reviewed: true
+    code_ref: "recoco/apps/projects/views/rest.py:549-581"
+    actions:
+      - verb: "safe only"
+        permission: authentifié
+        roles: []
+        note: "pas utilisé par les collectivités"
+        code_ref: "recoco/apps/projects/views/rest.py:553 (IsAuthenticated; ReadOnlyModelViewSet so safe-only is structural)"
+        verified: true
+        tests:
+          - "recoco/apps/projects/tests/test_rest.py:test_anonymous_cannot_use_topic_api (L1199)"
+          - "recoco/apps/projects/tests/test_rest.py:test_anonymous_cannot_search_topic_api (L1206)"
+          - "recoco/apps/projects/tests/test_rest.py:test_unused_topics_are_not_suggested_via_rest_api (L1220)"
+          - "recoco/apps/projects/tests/test_rest.py:test_topics_on_deleted_task_are_not_suggested_via_rest_api (L1238)"
+          - "recoco/apps/projects/tests/test_rest.py:test_topics_on_deleted_project_are_not_suggested_via_rest_api (L1258)"
+          - "recoco/apps/projects/tests/test_rest.py:test_topics_are_restricted_to_projects_via_rest_api (L1278)"
+          - "recoco/apps/projects/tests/test_rest.py:test_topics_are_restricted_to_recommendations_via_rest_api (L1298)"
+          - "recoco/apps/projects/tests/test_rest.py:test_topics_are_restricted_to_nonexistent_via_rest_api (L1318)"
+
+  - name: projects_rest.DocumentViewSet
+    reviewed: false
+    code_ref: "recoco/apps/projects/views/rest.py:640-668"
+    actions:
+      - verb: safe
+        permission: view_public_notes
+        roles: ["project:member_draft", "project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/projects/views/rest.py:645 (BaseConversationPermission, recoco/rest_api/permissions.py:26-31)"
+        verified: true
+        roles_check: "CORRECTED — added project:member_draft and project:observer (both hold view_public_notes); renamed to project: prefix."
+        tests: []
+        severity: Medium
+        discrepancy: >
+          No explicit 403-for-unauthorized-user test found for this specific
+          DRF viewset; only legacy-view tests exist in test_documents.py
+          (e.g. test_project_documents_not_available_for_non_switchtender
+          L30, test_upload_document_not_available_for_non_logged_users
+          L195), which likely hit the old template view, not DocumentViewSet.
+          Needs manual confirmation.
+      - verb: unsafe
+        permission: use_public_notes
+        roles: ["project:member_draft", "project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/projects/views/rest.py:645 (BaseConversationPermission)"
+        verified: true
+        verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+        roles_check: "CORRECTED — added project:member_draft and project:observer (both hold use_public_notes); renamed to project: prefix."
+        tests:
+          - "recoco/apps/projects/tests/test_rest.py:test_doc_upload (L1341)"
+          - "recoco/apps/projects/tests/test_rest.py:test_doc_upload_does_not_accept_malicious_files (L1356)"
+          - "recoco/apps/projects/tests/test_rest.py:test_doc_upload_does_not_accept_malicious_files_detects_html (L1375)"
+          - "recoco/apps/projects/tests/test_rest.py:test_doc_upload_does_not_accept_malicious_files_by_extension (L1394)"
+          - "recoco/apps/projects/tests/test_rest.py:test_doc_upload_reactivates_project (L1418)"
+          - "recoco/apps/projects/tests/test_rest.py:test_doc_upload_by_advisors_lets_projects_unactivated (L1437)"
+
+  - name: projects_rest.ProjectSiteViewSet
+    reviewed: false
+    note: "filtré par status si pas moderate_projects"
+    code_ref: "recoco/apps/projects/views/rest.py:593-632"
+    actions:
+      - verb: "list, partial_update"
+        permission: list_projects
+        roles: ["site:staff", "site:advisor"]
+        note: "rendre + robuste -> c'est ok c'est en read_only"
+        code_ref: "recoco/apps/projects/views/rest.py:610,618 (has_perm_or_403 list_projects); status filter in get_queryset L601-607 via moderate_projects"
+        verified: true
+        roles_check: "VERIFIED — matches code exactly; renamed to site: prefix for clarity."
+        tests:
+          - "recoco/apps/projects/tests/test_rest.py:test_list_project_statuses_for_non_moderator (L791)"
+          - "recoco/apps/projects/tests/test_rest.py:test_list_project_statuses_for_moderators (L821)"
+          - "recoco/apps/projects/tests/test_rest.py:test_project_status_is_updated_by_patch_api (L844)"
+
+  # -------------------------------------------------------- training_rest
+  - name: training_rest.ChallengeDefinitionViewSet
+    reviewed: false
+    code_ref: "recoco/apps/training/rest.py:22-35"
+    actions:
+      - verb: readonly
+        permission: authenticated
+        roles: []
+        code_ref: "recoco/apps/training/rest.py:22-35 (IsAuthenticated; http_method_names=['get'])"
+        verified: true
+        tests:
+          - "recoco/apps/training/tests/test_rest.py:test_anonymous_cannot_use_challenge_defintion_get_api (L27)"
+          - "recoco/apps/training/tests/test_rest.py:test_challenge_definition_get_api_fails_if_other_site (L41)"
+          - "recoco/apps/training/tests/test_rest.py:test_challenge_get_api_returns__challenge_definition_info (L56)"
+
+  # -------------------------------------------------------- conversations_rest
+  - name: conversations_rest.MessageViewSet
+    reviewed: false
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/conversations/rest.py:26-72"
+    actions:
+      - verb: safe
+        permission: view_public_notes
+        roles: ["project:member_draft", "project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/conversations/rest.py:28 (MessagePermission -> BaseConversationPermission, safe -> projects.view_public_notes)"
+        verified: true
+        roles_check: "CORRECTED — added project:member_draft and project:observer (both hold view_public_notes); renamed to project: prefix."
+        tests:
+          - "recoco/apps/conversations/tests.py:test_who_can_read_messages (L71)"
+      - verb: "create, update, delete"
+        permission: "use_public_notes & être l'auteur"
+        roles: ["project:member_draft (soi)", "project:member (soi)", "project:advisor (soi)", "project:observer (soi)"]
+        code_ref: "recoco/apps/conversations/rest.py:21-23 (MessagePermission adds object-level obj.posted_by == request.user for unsafe)"
+        verified: true
+        severity: Low
+        discrepancy: "Author check is object-level in MessagePermission, distinct from BaseConversationPermission's use_public_notes check — worth keeping as two separate layers in the matrix."
+        roles_check: "CORRECTED — added 'project:member_draft (soi)' (also has use_public_notes) and 'project:observer (soi)' (same perms as advisor); renamed to project: prefix."
+        tests:
+          - "recoco/apps/conversations/tests.py:test_who_can_send_messages (L90)"
+          - "recoco/apps/conversations/tests.py:test_who_can_edit_messages (L112)"
+          - "recoco/apps/conversations/tests.py:test_who_can_delete_messages (L135)"
+          - "recoco/apps/conversations/tests.py:test_cannot_send_empty_message (L197)"
+          - "recoco/apps/conversations/tests.py:test_cannot_edit_empty_message (L209)"
+          - "recoco/apps/conversations/tests.py:test_delete_message (L222)"
+      - verb: mark_as_read
+        permission: authenticated
+        roles: []
+        note: "exposes message ids"
+        code_ref: "recoco/apps/conversations/rest.py:55-72 (explicit permission_classes=[IsAuthenticated]; docstring flags the exposure)"
+        verified: true
+        tests:
+          - "recoco/apps/conversations/tests.py:test_mark_message_as_read (L484)"
+          - "recoco/apps/conversations/tests.py:test_mark_message_as_read_honors_current_user (L513)"
+
+  - name: conversations_rest.ActivityViewSet
+    reviewed: false
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/conversations/rest.py:75-94"
+    actions:
+      - verb: list
+        permission: view_public_notes
+        roles: ["project:member_draft", "project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/conversations/rest.py:92 (no permission_classes; has_perm_or_403 in get_queryset)"
+        verified: true
+        roles_check: "CORRECTED — added project:member_draft and project:observer (both hold view_public_notes); renamed to project: prefix."
+        tests:
+          - "recoco/apps/conversations/tests.py:test_who_can_see_activity (L156)"
+
+  - name: conversations_rest.ParticipantViewSet
+    reviewed: false
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/conversations/rest.py:97-116"
+    actions:
+      - verb: list
+        permission: view_public_notes
+        roles: ["project:member_draft", "project:member", "project:advisor", "project:observer"]
+        code_ref: "recoco/apps/conversations/rest.py:109 (no permission_classes; has_perm_or_403 in get_queryset)"
+        verified: true
+        roles_check: "CORRECTED — added project:member_draft and project:observer (both hold view_public_notes); renamed to project: prefix."
+        tests:
+          - "recoco/apps/conversations/tests.py:test_who_can_see_participants (L174)"
+
+  # -------------------------------------------------------- home_rest
+  - name: home_rest.SiteViewSet
+    reviewed: false
+    code_ref: "recoco/apps/home/rest.py:50-57"
+    actions:
+      - verb: safe
+        permission: authentifié
+        roles: []
+        code_ref: "recoco/apps/home/rest.py:57 (IsAuthenticated; ReadOnlyModelViewSet)"
+        verified: true
+        tests:
+          - "recoco/apps/home/tests/test_rest.py:test_anonymous_user_cannot_use_site_api (L93)"
+          - "recoco/apps/home/tests/test_rest.py:test_site_list_contains_sites_info (L103)"
+          - "recoco/apps/home/tests/test_rest.py:test_site_list_cant_be_modified (L116)"
+
+  # -------------------------------------------------------- addressbook_rest
+  - name: addressbook_rest.OrganizationGroupViewSet
+    reviewed: false
+    code_ref: "recoco/apps/addressbook/rest.py:29-38"
+    actions:
+      - verb: "read one"
+        permission: authenticated
+        roles: []
+        code_ref: "recoco/apps/addressbook/rest.py:15-26 (AddressbookPermissionOrRetrieveOnly: retrieve -> IsAuthenticated only, no extra perm)"
+        verified: true
+        severity: Low
+        discrepancy: "This 'retrieve is special-cased' rule is shared by all three addressbook viewsets via one common permission class — worth documenting once instead of per-viewset."
+        tests:
+          - "recoco/apps/addressbook/tests/test_rest_organization_group.py:test_anonymous_cannot_read_organizationgroup_nor_update (L34)"
+          - "recoco/apps/addressbook/tests/test_rest_organization_group.py:test_logged_in_user_can_read_organizationgroup_but_not_update (L47)"
+      - verb: list
+        permission: use_addressbook
+        roles: ["site:advisor", "site:staff"]
+        code_ref: "recoco/apps/addressbook/rest.py:15-26 (AddressbookPermissionOrRetrieveOnly, safe non-retrieve -> sites.use_addressbook)"
+        verified: true
+        roles_check: "VERIFIED — matches code exactly; renamed to site: prefix for clarity."
+        tests:
+          - "recoco/apps/addressbook/tests/test_rest_organization_group.py:test_anonymous_cannot_list_organizationgroups_nor_create (L11)"
+          - "recoco/apps/addressbook/tests/test_rest_organization_group.py:test_logged_in_user_cannot_list_organizationgroups_nor_create (L22)"
+          - "recoco/apps/addressbook/tests/test_rest_organization_group.py:test_orga_group_search (L61)"
+      - verb: "create, update"
+        permission: change_addressbook
+        roles: ["site:staff", "site:advisor"]
+        code_ref: "recoco/apps/addressbook/rest.py:15-26 (unsafe -> sites.change_addressbook)"
+        verified: true
+        roles_check: "CORRECTED — added site:advisor (also holds change_addressbook, home/models.py:55-60); was staff-only in the source doc, which understated who can create/update addressbook entries."
+        tests:
+          - "recoco/apps/addressbook/tests/test_rest_organization_group.py:test_logged_in_user_cannot_list_organizationgroups_nor_create (L22)"
+
+  - name: addressbook_rest.OrganizationViewSet
+    reviewed: false
+    same_as: addressbook_rest.OrganizationGroupViewSet
+    code_ref: "recoco/apps/addressbook/rest.py:41-78"
+    note: "il faut une route pour les anonymes dans l'onboarding"
+    roles_check: "Same roles_check corrections as OrganizationGroupViewSet apply here (shared AddressbookPermissionOrRetrieveOnly class): list -> [site:advisor, site:staff]; create/update -> [site:staff, site:advisor]."
+    severity: Medium
+    discrepancy: >
+      Still unresolved in code: `retrieve` is allowed only to authenticated
+      users (AddressbookPermissionOrRetrieveOnly requires IsAuthenticated as
+      a base), anonymous users are still blocked. The onboarding TODO from
+      the source doc has not been addressed.
+    tests:
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_anonymous_cannot_list_organizations_nor_create (L22)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_logged_in_user_cannot_list_organizations_nor_create (L33)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_anonymous_cannot_search_organizations (L45)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_logged_in_user_cannot_search_organizations (L53)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_anonymous_cannot_read_organization (L62)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_logged_in_user_can_read_organization_but_not_update (L70)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_create (L90)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_update (L106)"
+      - "recoco/apps/addressbook/tests/test_rest_organization.py:test_add_sites_to_orga_when_created_same_name (L123)"
+
+  - name: addressbook_rest.ContactViewSet
+    reviewed: false
+    same_as: addressbook_rest.OrganizationGroupViewSet
+    code_ref: "recoco/apps/addressbook/rest.py:99-130"
+    roles_check: "Same roles_check corrections as OrganizationGroupViewSet apply here (shared AddressbookPermissionOrRetrieveOnly class): list -> [site:advisor, site:staff]; create/update -> [site:staff, site:advisor]."
+    tests:
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_anonymous_can_not_reach_contact_list_endpoint (L15)"
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_logged_in_user_cannot_list_contacts_or_create (L21)"
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_logged_in_user_can_read_contact_but_not_update (L35)"
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_staff_user_can_create_contact (L57)"
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_can_not_create_contact_with_wrong_organization (L87)"
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_organization_start_with_filter (L121)"
+      - "recoco/apps/addressbook/tests/test_rest_contact.py:test_organization_department (L164)"
+
+# ---------------------------------------------------------------------------
+# Non-router endpoints: plain APIViews registered directly in
+# recoco/rest_api/urls.py (api_urls / survey_urls), NOT via router.register.
+# The original source doc only covered router-registered ViewSets, so this
+# entire group was missing until this pass. Same field meaning as `actions`
+# above; `route` replaces `verb` for these single-purpose views.
+endpoints:
+  - name: projects_rest.ProjectDetail
+    route: "GET/PATCH projects/<int:pk>/"
+    code_ref: "recoco/apps/projects/views/rest.py:70-134"
+    permission: "IsAuthenticated + manual has_perm check"
+    actions:
+      - verb: get
+        permission: "list_projects(site) ou view_project(project)"
+        code_ref: "recoco/apps/projects/views/rest.py:108-115 (L110-112)"
+        tests:
+          - "recoco/apps/projects/tests/test_rest.py:test_anonymous_cannot_use_project_detail_api (L549)"
+          - "recoco/apps/projects/tests/test_rest.py:test_simple_user_cannot_use_project_detail_api (L556)"
+      - verb: patch
+        permission: "list_projects(site) ou projects.change_location(project)"
+        code_ref: "recoco/apps/projects/views/rest.py:117-134 (L119-121)"
+        tests: []
+        severity: Medium
+        discrepancy: "No dedicated permission test found for the patch path specifically (only get is covered by name) — worth double-checking."
+
+  - name: projects_rest.ProjectList
+    route: "GET projects/"
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/projects/views/rest.py:137-166"
+    permission: "IsAuthenticated (L140); results scoped via Project.all_on_site.for_user(request.user) (L157)"
+    tests:
+      - "recoco/apps/projects/tests/test_rest.py:test_anonymous_cannot_use_project_list_api (L43)"
+
+  - name: projects_rest.UserProjectStatusDetail
+    route: "GET/PATCH userprojectstatus/<int:pk>/"
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/projects/views/rest.py:332-367"
+    permission: "IsAuthenticated (L335) + manual ownership check (raises Http404, not 403, if ups.user != request.user, L345/L353)"
+    severity: Low
+    discrepancy: "Uses 404 instead of 403 to hide the existence of other users' records — an intentional information-hiding choice, not a bug, but worth documenting explicitly."
+    tests:
+      - "recoco/apps/projects/tests/test_rest.py:test_project_status_detail_needs_authentication (L1083)"
+      - "recoco/apps/projects/tests/test_rest.py:test_cannot_access_other_user_project_status (L1102)"
+      - "recoco/apps/projects/tests/test_rest.py:test_access_my_user_project_status (L1116)"
+      - "recoco/apps/projects/tests/test_rest.py:test_project_status_patch_needs_authentication (L1138)"
+      - "recoco/apps/projects/tests/test_rest.py:test_project_status_patch_dont_update_others_object (L1146)"
+
+  - name: projects_rest.UserProjectStatusList
+    route: "GET userprojectstatus/"
+    code_ref: "recoco/apps/projects/views/rest.py:366-376"
+    permission: "IsAuthenticated (L369); results scoped to request.user via fetch_the_site_project_statuses_for_user"
+    tests:
+      - "recoco/apps/projects/tests/test_rest.py:test_project_status_needs_authentication (L870)"
+      - "recoco/apps/projects/tests/test_rest.py:test_user_project_status_contains_only_my_projects (L887)"
+      - "recoco/apps/projects/tests/test_rest.py:test_user_project_status_contains_only_my_projects_for_site (L984)"
+      - "recoco/apps/projects/tests/test_rest.py:test_user_project_status_dont_list_unmoderated_projects_for_regional_advisors (L1005)"
+
+  - name: training_rest.ChallengeView
+    route: "GET/PATCH challenges/<str:slug>/"
+    code_ref: "recoco/apps/training/rest.py:38-58+"
+    permission: "IsAuthenticated (L45); scoped implicitly via utils.get_challenge_for(request.user, ...), no separate object-level check found"
+    tests:
+      - "recoco/apps/training/tests/test_rest.py:test_anonymous_cannot_use_challenge_get_api (L84)"
+      - "recoco/apps/training/tests/test_rest.py:test_anonymous_cannot_use_challenge_patch_api (L174)"
+
+  - name: home_rest.UserNotificationsMarkOneAsRead
+    route: "POST notifications/mark-one-as-read/<int:pk>/"
+    code_ref: "recoco/apps/home/rest.py:14-31"
+    permission: "IsAuthenticated (L15); ownership via request.user.notifications.get(pk=pk) (404 if not owned)"
+    tests:
+      - "recoco/apps/home/tests/test_rest.py:test_user_notifications_try_mark_one_as_read_unauthorized (L13)"
+      - "recoco/apps/home/tests/test_rest.py:test_user_notifications_mark_one_as_read (L35)"
+
+  - name: home_rest.UserNotificationsMarkAllAsRead
+    route: "POST notifications/mark-all-as-read"
+    code_ref: "recoco/apps/home/rest.py:34-44"
+    permission: "IsAuthenticated (L35); scoped to request.user.notifications"
+    severity: Low
+    discrepancy: "No explicit anonymous/401 test found for this endpoint specifically (unlike mark-one-as-read, which has one) — coverage gap."
+    tests:
+      - "recoco/apps/home/tests/test_rest.py:test_user_notifications_mark_all_as_read (L67)"
+
+  - name: notifications_views.live_unread_notification_list
+    route: "GET notifications/unread_list"
+    code_ref: "third-party django-notifications package (recoco/rest_api/urls.py:4, not recoco code)"
+    permission: "not investigated — out of scope, belongs to django-notifications"
+    skip_check: true  # code_ref points at an import line, not a function in our code — nothing for the symbol-based checker to resolve
+    tests: []
+
+  - name: survey_rest.SessionView
+    route: "GET survey/sessions/"
+    code_ref: "recoco/apps/survey/views/rest.py:35-46"
+    permission: "IsAuthenticated (L37); scoped to projects_not_deleted_by_default(request) (user's own projects)"
+    severity: Medium
+    discrepancy: "No anonymous/403 test found for any of the three survey views in test_rest.py."
+    tests:
+      - "recoco/apps/survey/tests/test_rest.py:test_session_view (L15)"
+
+  - name: survey_rest.SessionAnswersView
+    route: "GET survey/sessions/<int:session_id>/answers/"
+    code_ref: "recoco/apps/survey/views/rest.py:49-67"
+    permission: "IsAuthenticated (L51); same project-scoping pattern as SessionView"
+    tests:
+      - "recoco/apps/survey/tests/test_rest.py:test_session_answers_view (L37)"
+      - "recoco/apps/survey/tests/test_rest.py (deleted-visibility variants, L178, L191, L204)"
+
+  - name: survey_rest.SurveyQuestionsView
+    route: "GET survey/questions/"
+    code_ref: "recoco/apps/survey/views/rest.py:70-81"
+    permission: "IsStaffForSite (L72, recoco/rest_api/permissions.py) — stricter than the other two survey views, staff-only"
+    severity: Medium
+    discrepancy: "No explicit 'non-staff gets 403' test found by name pattern for the base list — worth double-checking."
+    tests:
+      - "recoco/apps/survey/tests/test_rest.py:test_survey_questions_view (L89)"
+      - "recoco/apps/survey/tests/test_rest.py:test_session_not_staff_cant_see_deleted (L166)"
+
+  - name: "auth: TokenObtainPairView / TokenRefreshView"
+    route: "POST token/, POST token/refresh/"
+    code_ref: "rest_framework_simplejwt (third-party, recoco/rest_api/urls.py:6)"
+    permission: "standard JWT issuance/refresh, not investigated — out of scope"
+    skip_check: true  # code_ref points at an import line, not a function in our code — nothing for the symbol-based checker to resolve
+    tests: []
+
+# Extensibility blind spot: recoco/rest_api/urls.py:199-213
+# _collect_plugin_rest_urls() dynamically imports `rest_urls_module` from any
+# installed plugin that declares one, and appends its urlpatterns. As of this
+# pass, no plugin in the codebase declares rest_urls_module, so nothing is
+# hidden today -- but this mechanism means a future plugin's REST endpoints
+# will NOT show up in a static read of urls.py, and must be checked
+# separately (per-plugin) when auditing permissions again.
