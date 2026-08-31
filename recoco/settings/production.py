@@ -75,4 +75,44 @@ if SENTRY_DSN := os.environ.get("SENTRY_DSN"):
         release=f"recoco@{VERSION}",
     )
 
+# OpenID Connect
+if (
+    os.getenv("OPENID_PROVIDER_ID") is not None
+    and os.getenv("OPENID_CLIENT_ID") is not None
+    and os.getenv("OPENID_CLIENT_SECRET") is not None
+    and os.getenv("OPENID_SERVER_URL") is not None
+):
+    # mfa not working with openid
+    INSTALLED_APPS.remove("allauth.mfa")
+
+    # Auto registration without user intervention
+    SOCIALACCOUNT_AUTO_SIGNUP = os.getenv("OPENID_AUTO_SIGNUP", False)
+    SOCIALACCOUNT_STORE_TOKENS = True
+
+    if os.getenv("OPENID_SKIP_LOCAL_SIGNUP", False):
+        SOCIALACCOUNT_ONLY = True
+        # Email verification must be skipped when with social account only is true.
+        ACCOUNT_EMAIL_VERIFICATION = "none"
+
+    # Automatic redirections
+    LOGIN_REDIRECT_URL = "/"
+    ACCOUNT_SIGNUP_REDIRECT_URL = "/"
+
+    SOCIALACCOUNT_LOGIN_ON_GET = True
+    SOCIALACCOUNT_PROVIDERS = {
+        "openid_connect": {
+            "APPS": [
+                {
+                    "provider_id": os.getenv("OPENID_PROVIDER_ID"),
+                    "name": os.getenv("OPENID_NAME", "OpenID Connect"),
+                    "client_id": os.getenv("OPENID_CLIENT_ID"),
+                    "secret": os.getenv("OPENID_CLIENT_SECRET"),
+                    "settings": {
+                        "server_url": os.getenv("OPENID_SERVER_URL"),
+                    },
+                }
+            ]
+        }
+    }
+
 # eof
