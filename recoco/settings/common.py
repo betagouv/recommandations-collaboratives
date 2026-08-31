@@ -258,7 +258,7 @@ CONTENT_SECURITY_POLICY = {
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
-        "frame-src": ["https://www.google.com"],
+        "frame-src": ["https://www.google.com", "https://*.crisp.help"],
         "form-action": [SELF, PROCONNECT_ORIGIN],
         "img-src": [
             SELF,
@@ -282,6 +282,7 @@ CONTENT_SECURITY_POLICY = {
             "https://client.crisp.chat",
             UNSAFE_INLINE,
         ],  # fixme with @alpine/csp and manual checks
+        "worker-src": [SELF, "blob:", "https://*.crisp.chat"],
     },
 }
 
