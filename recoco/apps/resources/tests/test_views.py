@@ -8,6 +8,7 @@ created: 2021-06-16 17:56:10 CEST
 """
 
 from datetime import date, datetime
+from types import SimpleNamespace
 
 import pytest
 import reversion
@@ -29,6 +30,7 @@ from recoco.apps.hitcount.models import Hit, HitCount
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models
 from recoco.apps.resources import models as resources_models
+from recoco.apps.resources.rest import ResourceViewSet
 from recoco.apps.tasks.models import Task
 from recoco.utils import login
 
@@ -1250,6 +1252,217 @@ def test_embedded_resource_detail_ds_prefill_button(request, client):
         assert reverse("projects-task-ds-prefill", args=(task.id,)) in str(
             response.content
         )
+
+
+# Revisions / patches
+def make_pending_patch(resource, user, **proposed_fields):
+    """Create a pending ResourceRevisionMeta proposing `proposed_fields`.
+
+    Delegates to the production code path (ResourceViewSet._create_patch_proposal)
+    so the test data matches how patches are really built: the proposed values
+    live in a reversion revision while the live resource stays untouched.
+    """
+    request = SimpleNamespace(user=user)
+    serializer = SimpleNamespace(validated_data=proposed_fields)
+    return ResourceViewSet._create_patch_proposal(
+        ResourceViewSet(), request, resource, serializer
+    )
+
+
+@pytest.mark.django_db
+def test_try_to_update_non_pending_revision(request, client):
+    site = get_current_site(request)
+    resource = Recipe(models.Resource, sites=[site]).make()
+    patch = Recipe(
+        models.ResourceRevisionMeta,
+        resource=resource,
+        status=models.ResourceRevisionMeta.ACCEPTED,
+    ).make()
+
+    url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"action": "accept"})
+
+    assertRedirects(response, reverse("resources-patches-list"))
+
+    patch.refresh_from_db()
+    assert patch.status == models.ResourceRevisionMeta.ACCEPTED
+    assert patch.reviewed_by is None
+
+
+@pytest.mark.django_db
+def test_reject_pending_revision(request, client):
+    site = get_current_site(request)
+    resource = Recipe(models.Resource, title="ancien titre", sites=[site]).make()
+    patch = make_pending_patch(resource, baker.make(User), title="nouveau titre")
+
+    url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
+
+    with login(client, groups=["example_com_staff"]) as reviewer:
+        response = client.post(
+            url,
+            data={"action": "reject", "review_comment": "titre non pertinent"},
+        )
+
+    assertRedirects(response, reverse("resources-patches-list"))
+
+    patch.refresh_from_db()
+    resource.refresh_from_db()
+
+    assert patch.status == models.ResourceRevisionMeta.REJECTED
+    assert patch.reviewed_by == reviewer
+    assert patch.review_comment == "titre non pertinent"
+    assert resource.title == "ancien titre"
+
+    # rejecting doesn't touch the history: baseline + proposed version remain
+    versions = Version.objects.get_for_object(resource)
+    assert versions.count() == 2
+    assert versions.first().field_dict["title"] == "nouveau titre"
+
+
+@pytest.mark.django_db
+def test_resource_history_hides_patch_revisions(request, client):
+    site = get_current_site(request)
+    resource = Recipe(models.Resource, title="ancien titre", sites=[site]).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+
+    patch = make_pending_patch(resource, baker.make(User), title="nouveau titre")
+
+    url = reverse("resources-resource-history", args=[resource.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    listed = [action["version"].revision for action in response.context["action_list"]]
+    assert len(listed) > 0
+    assert patch.revision not in listed
+
+
+@pytest.mark.django_db
+def test_accept_pending_revision_existing_resource(request, client):
+    site = get_current_site(request)
+    author = baker.make(User)
+    resource = Recipe(
+        models.Resource, title="ancien titre", created_by=author, sites=[site]
+    ).make()
+    patch = make_pending_patch(resource, baker.make(User), title="nouveau titre")
+
+    url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
+
+    with login(client, groups=["example_com_staff"]) as reviewer:
+        response = client.post(
+            url,
+            data={"action": "accept", "review_comment": "ok pour moi"},
+        )
+
+    assertRedirects(response, reverse("resources-resource-detail", args=[resource.pk]))
+
+    patch.refresh_from_db()
+    resource.refresh_from_db()
+
+    assert patch.status == models.ResourceRevisionMeta.ACCEPTED
+    assert patch.reviewed_by == reviewer
+    assert patch.review_comment == "ok pour moi"
+    assert resource.title == "nouveau titre"
+    # accepting must not wipe untracked scalar fields (revert() side effect)
+    assert resource.created_by == author
+
+    # accepting applies the proposal as a new revision on top of the history
+    versions = Version.objects.get_for_object(resource)
+    assert versions.count() == 3
+    applied_version = versions.first()
+    assert applied_version.field_dict["title"] == "nouveau titre"
+    assert applied_version.revision.user == reviewer
+    assert applied_version.revision.get_comment() == f"Proposition #{patch.pk} acceptée"
+
+
+@pytest.mark.django_db
+def test_accept_pending_revision_new_resource(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        status=models.Resource.DRAFT,
+        sites=[site],
+    ).make()
+
+    # the creation proposal lives in a single reversion revision
+    with reversion.create_revision():
+        resource.save()
+    creation_version = Version.objects.get_for_object(resource).first()
+
+    patch = Recipe(
+        models.ResourceRevisionMeta,
+        resource=resource,
+        revision=creation_version.revision,
+        kind=models.ResourceRevisionMeta.CREATION,
+        status=models.ResourceRevisionMeta.PENDING,
+    ).make()
+
+    url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
+
+    with login(client, groups=["example_com_staff"]) as reviewer:
+        response = client.post(
+            url,
+            data={"action": "accept", "review_comment": "ok pour moi"},
+        )
+
+    assertRedirects(response, reverse("resources-resource-detail", args=[resource.pk]))
+
+    patch.refresh_from_db()
+    resource.refresh_from_db()
+
+    assert patch.status == models.ResourceRevisionMeta.ACCEPTED
+    assert patch.reviewed_by == reviewer
+    assert patch.review_comment == "ok pour moi"
+    assert resource.status == models.Resource.PUBLISHED
+
+
+@pytest.mark.django_db
+def test_accept_amended_revision_existing_resource(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        title="ancien titre",
+        content="ancien contenu",
+        status=models.Resource.PUBLISHED,
+        sites=[site],
+    ).make()
+    # the proposal modifies both title and content
+    patch = make_pending_patch(
+        resource,
+        baker.make(User),
+        title="titre proposé",
+        content="contenu proposé",
+    )
+
+    url = reverse("resources-patch-review", args=[resource.pk, patch.pk])
+
+    # the form is pre-filled with the proposed values; staff amends only the title
+    data = {
+        "action": "accept_amended",
+        "review_comment": "j'ajuste le titre",
+        "title": "titre amendé",
+        "content": "contenu proposé",
+        "status": models.Resource.PUBLISHED,
+    }
+
+    with login(client, groups=["example_com_staff"]) as reviewer:
+        response = client.post(url, data=data)
+
+    assertRedirects(response, reverse("resources-resource-detail", args=[resource.pk]))
+
+    patch.refresh_from_db()
+    resource.refresh_from_db()
+
+    assert patch.status == models.ResourceRevisionMeta.ACCEPTED
+    assert patch.reviewed_by == reviewer
+    # title comes from the amendment, content from the original proposal
+    assert resource.title == "titre amendé"
+    assert resource.content == "contenu proposé"
 
 
 # eof

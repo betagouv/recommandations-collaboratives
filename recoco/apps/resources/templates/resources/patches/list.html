@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Propositions de modification en attente{% endblock title %}
+{% block content %}
+    {% include "crm/fragments/navigation.html" with resources=True %}
+    <div class="fr-container fr-py-6w">
+        <h2>Propositions de modification en attente</h2>
+        {% if pending_patches %}
+            <div class="fr-table fr-table--bordered">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ressource</th>
+                            <th>Proposé par</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patch in pending_patches %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'resources-resource-detail' patch.resource.pk %}">
+                                        {{ patch.resource.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if patch.proposed_by %}
+                                        {{ patch.proposed_by.get_full_name|default:patch.proposed_by.username }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ patch.revision.date_created|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <a class="fr-btn fr-btn--sm"
+                                       href="{% url 'resources-patch-review' patch.resource.pk patch.pk %}">
+                                        Examiner
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="fr-text--lead">Aucune proposition en attente.</p>
+        {% endif %}
+    </div>
+{% endblock content %}

@@ -9,6 +9,7 @@ created : 2021-06-16 10:59:08 CEST
 
 import datetime
 
+import nh3
 import reversion
 from django import forms
 from django.contrib import messages
@@ -30,10 +31,15 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.views.generic.detail import DetailView, SingleObjectMixin, View
 from django.views.generic.edit import DeleteView
+from django.views.generic.list import ListView
+from lxml.html.diff import htmldiff
 from markdownx.fields import MarkdownxFormField
+from markdownx.utils import markdownify
 from reversion.models import Version
+from reversion_compare.mixins import CompareMixin
 from reversion_compare.views import HistoryCompareDetailView
 
 from recoco.apps.addressbook import models as addressbook_models
@@ -153,6 +159,20 @@ def resource_search(request):
         "task_recommendations", "departments"
     )
 
+    pending_patches_count = 0
+    pending_creations_count = 0
+    if has_perm(request.user, "manage_resources", request.site):
+        pending_qs = models.ResourceRevisionMeta.objects.filter(
+            status=models.ResourceRevisionMeta.PENDING,
+            resource__in=models.Resource.on_site.all(),
+        )
+        pending_patches_count = pending_qs.filter(
+            kind=models.ResourceRevisionMeta.MODIFICATION
+        ).count()
+        pending_creations_count = pending_qs.filter(
+            kind=models.ResourceRevisionMeta.CREATION
+        ).count()
+
     return render(
         request,
         "resources/resource/list.html",
@@ -163,6 +183,8 @@ def resource_search(request):
                 if request.user.is_authenticated
                 else []
             ),
+            "pending_patches_count": pending_patches_count,
+            "pending_creations_count": pending_creations_count,
             **locals(),
         },
     )
@@ -355,6 +377,11 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
                 .order_by("name")
                 .distinct()
             )
+
+        context["pending_patch"] = models.ResourceRevisionMeta.objects.filter(
+            resource=resource,
+            status=models.ResourceRevisionMeta.PENDING,
+        ).first()
 
         return context
 
@@ -611,6 +638,243 @@ class ResourceHistoryCompareView(
     def has_permission(self):
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
+
+    def _get_action_list(self):
+        """Return the resource versions, excluding the suggested patches."""
+        versions = self._order_version_queryset(
+            Version.objects.get_for_object(self.get_object())
+            .exclude(revision__resource_patch_meta__isnull=False)
+            .select_related("revision__user")
+        )
+        return [
+            {"version": version, "revision": version.revision} for version in versions
+        ]
+
+
+########################################################################
+# Resource patch moderation
+########################################################################
+
+
+class ResourcePatchListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "sites.manage_resources"
+    template_name = "resources/patches/list.html"
+    context_object_name = "pending_patches"
+
+    def has_permission(self):
+        return self.request.user.has_perm(
+            self.permission_required, get_current_site(self.request)
+        )
+
+    def get_queryset(self):
+        return (
+            models.ResourceRevisionMeta.objects.filter(
+                status=models.ResourceRevisionMeta.PENDING,
+                resource__in=models.Resource.on_site.all(),
+            )
+            .select_related("resource", "proposed_by", "revision")
+            .order_by("revision__date_created")
+        )
+
+
+class ResourcePatchReviewView(
+    LoginRequiredMixin, PermissionRequiredMixin, CompareMixin, DetailView
+):
+    """Shows the diff and (optionally) a pre-filled form to amend + accept or reject a patch."""
+
+    model = models.ResourceRevisionMeta
+    pk_url_kwarg = "patch_pk"
+    context_object_name = "patch"
+    permission_required = "sites.manage_resources"
+    template_name = "resources/patches/review.html"
+    # Restrict the diff to reversion-tracked fields. Otherwise CompareMixin walks
+    # every model field, and untracked foreign keys (created_by, ...) are wrongly
+    # reported as changed and rendered as None (reversion-compare __eq__ quirk).
+    compare_fields = models.RESOURCE_REVISION_FIELDS
+
+    def has_permission(self):
+        return self.request.user.has_perm(
+            self.permission_required, get_current_site(self.request)
+        )
+
+    def get_object(self, queryset=None):
+        resource = get_object_or_404(models.Resource, pk=self.kwargs["resource_id"])
+        return get_object_or_404(
+            models.ResourceRevisionMeta,
+            pk=self.kwargs["patch_pk"],
+            resource=resource,
+        )
+
+    def _get_versions(self, resource, patch):
+        # ordered by -pk: most recent first
+        all_versions = Version.objects.get_for_object(resource)
+        pending_version = all_versions.filter(revision=patch.revision).first()
+        if pending_version is None:
+            return None, None
+        # Compare against the baseline, not the previous version: pending proposals
+        # stack up in the history, so skip any version tied to a proposal.
+        patch_revision_ids = models.ResourceRevisionMeta.objects.filter(
+            resource=resource
+        ).values_list("revision_id", flat=True)
+        previous_version = (
+            all_versions.filter(pk__lt=pending_version.pk)
+            .exclude(revision_id__in=patch_revision_ids)
+            .first()
+        )
+        return pending_version, previous_version
+
+    def _diff_context(self, resource, pending_version, previous_version):
+        """Build compare_data using reversion-compare's own machinery.
+
+        The 'content' field diff is replaced with an lxml htmldiff on the
+        rendered Markdown so the moderator sees formatted text, not raw syntax.
+        """
+        if not pending_version or not previous_version:
+            return {}
+        compare_data, has_unfollowed_fields = self.compare(
+            resource, previous_version, pending_version
+        )
+        for entry in compare_data:
+            if entry["field"].name == "content":
+                old_html = markdownify(previous_version.field_dict.get("content", ""))
+                new_html = markdownify(pending_version.field_dict.get("content", ""))
+                entry["diff"] = mark_safe(nh3.clean(htmldiff(old_html, new_html)))  # NOQA: S308
+                break
+        return {
+            "compare_data": compare_data,
+            "has_unfollowed_fields": has_unfollowed_fields,
+            "version1": previous_version,
+            "version2": pending_version,
+        }
+
+    def _amend_form_initial(self, pending_version):
+        if not pending_version:
+            return {}
+        fd = pending_version.field_dict
+        return {
+            "title": fd.get("title", ""),
+            "subtitle": fd.get("subtitle", ""),
+            "summary": fd.get("summary", ""),
+            "content": fd.get("content", ""),
+            "category": fd.get("category_id"),
+            "expires_on": fd.get("expires_on"),
+            "contacts": fd.get("contacts", []),
+            "departments": fd.get("departments", []),
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        patch = self.object
+        resource = patch.resource
+        pending_version, previous_version = self._get_versions(resource, patch)
+        is_new_resource = previous_version is None
+        context.update(
+            {
+                "resource": resource,
+                "pending_version": pending_version,
+                "previous_version": previous_version,
+                "is_new_resource": is_new_resource,
+                "proposed_data": pending_version.field_dict if pending_version else {},
+                "amend_form": EditResourceForm(
+                    instance=resource,
+                    initial=self._amend_form_initial(pending_version),
+                ),
+            }
+        )
+        context.update(self._diff_context(resource, pending_version, previous_version))
+        return context
+
+    def post(self, request, **kwargs):
+        patch = self.get_object()
+        if patch.status != models.ResourceRevisionMeta.PENDING:
+            messages.error(request, "Cette proposition a déjà été traitée.")
+            return redirect(reverse("resources-patches-list"))
+
+        resource = patch.resource
+        action_name = request.POST.get("action")
+
+        if action_name == "reject":
+            patch.status = models.ResourceRevisionMeta.REJECTED
+            patch.reviewed_by = request.user
+            patch.reviewed_on = timezone.now()
+            patch.review_comment = request.POST.get("review_comment", "")
+            patch.save()
+            messages.success(request, "La proposition a été rejetée.")
+            return redirect(reverse("resources-patches-list"))
+
+        if action_name == "accept":
+            pending_version, previous_version = self._get_versions(resource, patch)
+            if not pending_version:
+                messages.error(request, "Version proposée introuvable.")
+                return redirect(reverse("resources-patches-list"))
+
+            # revert() rebuilds the resource from tracked fields only, resetting
+            # untracked scalar fields (created_by, created_on, site_origin, ...) to
+            # their defaults. Snapshot them so we can restore the ones the proposal
+            # must not touch.
+            tracked = set(models.RESOURCE_REVISION_FIELDS)
+            untracked_values = {
+                field.attname: getattr(resource, field.attname)
+                for field in models.Resource._meta.local_concrete_fields
+                if not field.primary_key and field.name not in tracked
+            }
+
+            with transaction.atomic():
+                with reversion.create_revision():
+                    if previous_version is None:
+                        # New resource proposal: publish it
+                        resource.status = models.Resource.PUBLISHED
+                        resource.save()
+                    else:
+                        # Existing resource patch: apply proposed version via revert()
+                        pending_version.revert()
+                        # Restore untracked scalar fields revert() reset to defaults,
+                        # without creating a new revision.
+                        models.Resource.objects.filter(pk=resource.pk).update(
+                            **untracked_values
+                        )
+                    reversion.set_user(request.user)
+                    reversion.set_comment(f"Proposition #{patch.pk} acceptée")
+                patch.status = models.ResourceRevisionMeta.ACCEPTED
+                patch.reviewed_by = request.user
+                patch.reviewed_on = timezone.now()
+                patch.review_comment = request.POST.get("review_comment", "")
+                patch.save()
+
+            messages.success(request, "La proposition a été acceptée et appliquée.")
+            return redirect(reverse("resources-resource-detail", args=[resource.pk]))
+
+        if action_name == "accept_amended":
+            # Accept with staff edits applied on top of the proposed values
+            pending_version, previous_version = self._get_versions(resource, patch)
+            form = EditResourceForm(request.POST, instance=resource)
+            if not form.is_valid():
+                context = self.get_context_data(object=patch)
+                context.update({"amend_form": form, "show_amend": True})
+                return self.render_to_response(context)
+
+            with transaction.atomic():
+                with reversion.create_revision():
+                    resource = form.save(commit=False)
+                    resource.updated_on = timezone.now()
+                    if previous_version is None:
+                        # New resource proposal: also publish it
+                        resource.status = models.Resource.PUBLISHED
+                    resource.save()
+                    form.save_m2m()
+                    reversion.set_user(request.user)
+                    reversion.set_comment(f"Proposition #{patch.pk} acceptée (amendée)")
+                patch.status = models.ResourceRevisionMeta.ACCEPTED
+                patch.reviewed_by = request.user
+                patch.reviewed_on = timezone.now()
+                patch.review_comment = request.POST.get("review_comment", "")
+                patch.save()
+
+            messages.success(request, "La proposition a été acceptée et appliquée.")
+            return redirect(reverse("resources-resource-detail", args=[resource.pk]))
+
+        messages.error(request, "Action invalide.")
+        return redirect(reverse("resources-patches-list"))
 
 
 ########################################################################
