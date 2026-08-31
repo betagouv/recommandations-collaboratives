@@ -21,6 +21,7 @@
                     <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}
                            class="fr-label">
                         {{ field.label|safe }}
+                        {% if not field.field.required %}<span class="fr-italic">(facultatif)</span>{% endif %}
                         {% if field.field.help_text %}<span class="fr-hint-text">{{ field.field.help_text }}</span>{% endif %}
                     </label>
                 {% endif %}

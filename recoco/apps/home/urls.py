@@ -89,17 +89,30 @@ urlpatterns = [
         views.setup_password,
         name="home-user-setup-password",
     ),
-    path(
+    path(  # form part 2 : profile (part 1 is signup)
         r"advisor-access-request",
         views.advisor_access_request_view,
         name="advisor-access-request",
     ),
-    path(
+    # step 3 for email confirmation is included in login stage
+    path(  # success page : request is pending
+        r"advisor-access-request/pending",
+        views.AdvisorAccessRequestPendingView.as_view(),
+        name="advisor-access-request-pending",
+    ),
+    path(  # moderation part
         r"advisor-access-request/<int:advisor_access_request_id>/",
         views.advisor_access_request_moderator_view,
         name="advisor-access-request-moderator",
     ),
     path(r"site/create", views.SiteCreateView.as_view(), name="site-create"),
+    # I use same view name to facilitate redirects
+    path(r"2fa-config", views.TwoFAConfigView.as_view(), name="mfa_index"),
+    path(
+        "confirm-email/",
+        views.EmailVerificationSentView.as_view(),
+        name="account_email_verification_sent",
+    ),
 ]
 
 if settings.ACCOUNT_LOGIN_BY_CODE_ENABLED:

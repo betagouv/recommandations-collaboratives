@@ -10,6 +10,7 @@ from django.utils import timezone
 from sesame.middleware import AuthenticationMiddleware as SesameAuthenticationMiddleware
 from sesame.utils import get_user
 
+from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration, UserProfile
 
 
@@ -34,6 +35,36 @@ class CurrentSiteConfigurationMiddleware:
         )
 
         return self.get_response(request)
+
+
+class EmbedMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        if (
+            request.headers.get("Sec-Fetch-Dest") == "iframe"
+            or request.GET.get("embed") == "1"
+        ):
+            request.session["is_embedded"] = True
+        request.is_embedded = request.session.get("is_embedded", False)
+
+        response = self.get_response(request)
+
+        site_config = getattr(request, "site_config", None)
+        if request.is_embedded and site_config is not None:
+            allowed_origins = site_config.embed_allowed_origins
+            if allowed_origins:
+                # frame-ancestors is the modern, multi-origin-capable
+                # replacement for X-Frame-Options: ALLOW-FROM (unsupported
+                # by browsers). Only the origins configured for this site
+                # (Django admin only) may embed it; everyone else falls
+                # back to the default SAMEORIGIN behaviour.
+                response.xframe_options_exempt = True
+                # _csp_update is used to update django-csp config
+                response._csp_update = {"frame-ancestors": [*allowed_origins]}
+
+        return response
 
 
 class PreviousActivityMiddleware:
@@ -79,9 +110,7 @@ class SetEnableSesameCookieMiddleware:
             request.user.is_authenticated
             and not getattr(request.user, "is_hijacked", True)
             # during hijacking request.user is the hijacked one and is_hijacked is not set
-            and get_cookie_value_from_request(
-                request, "preferences", "preferences:enable-sesame"
-            )
+            and get_cookie_value_from_request(request, "preferences", "enable-sesame:")
             and request.COOKIES.get("enable-sesame-user-id", None) != request.user.id
         ):
             current_site = Site.objects.get_current()
@@ -115,9 +144,7 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
         # on this device, to secure this type of authentication
         cookie_user_id = (
             request.COOKIES.get("enable-sesame-user-id", None)
-            if get_cookie_value_from_request(
-                request, "preferences", "preferences:enable-sesame"
-            )
+            if get_cookie_value_from_request(request, "preferences", "enable-sesame:")
             else None
         )
         if cookie_user_id is None:
@@ -128,6 +155,7 @@ class SesameWithCookieMiddleware(SesameAuthenticationMiddleware):
             # we rely that the 403 page reminds the user of the authentication status
             return None
 
+        confirm_email(request, user)  # login by email means that email is accessible
         login(request, user)
         # specific tests below comes from sesame original code
         if (

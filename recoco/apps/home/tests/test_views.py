@@ -7,25 +7,31 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-17 12:33:33 CEST
 """
 
+from unittest.mock import ANY
+from urllib.parse import parse_qs, urlparse
+
 import django.core.mail
 import pytest
+from allauth.mfa.models import Authenticator
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
+from django.utils.module_loading import import_string
 from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from recoco.apps.home import models as home_models
+from recoco.apps.home.config import SIGNUP_USER_ID_SESSION_KEY
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
-from recoco.utils import login
+from recoco.utils import assign_site_admin, confirm_mail, login
 
-from .. import models, utils
+from .. import utils
 
 
 @pytest.mark.django_db
@@ -62,8 +68,7 @@ def test_get_current_site_sender_with_configuration(request):
 
     sender = utils.get_current_site_sender()
 
-    assert site_config.sender_email in sender
-    assert site_config.sender_name in sender
+    assert sender == f"{site_config.sender_name} <{settings.DEFAULT_SENDER_EMAIL}>"
 
 
 @pytest.mark.django_db
@@ -77,15 +82,23 @@ def test_get_current_site_sender_without_configuration(request):
 ################################################
 
 
-@pytest.mark.django_db
-def test_create_user_requires_10characters_password(client, request):
-    data = {
+def _signup_data(email="default@email.fr"):
+    return {
         "first_name": "Test",
         "last_name": "test",
         "organization": "test",
         "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
+        "email": email,
         "phone_no": "0303003033",
+        "password1": "LowerCaseButWithSpecials12%",
+        "password2": "LowerCaseButWithSpecials12%",
+    }
+
+
+@pytest.mark.django_db
+def test_create_user_requires_10characters_password(client, request):
+    data = {
+        **_signup_data(),
         "password1": "123456789",
         "password2": "123456789",
     }
@@ -98,12 +111,7 @@ def test_create_user_requires_10characters_password(client, request):
 @pytest.mark.django_db
 def test_create_user_requires_caps_in_password(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data(),
         "password1": "onlylowercase",
         "password2": "onlylowercase",
     }
@@ -116,12 +124,7 @@ def test_create_user_requires_caps_in_password(client, request):
 @pytest.mark.django_db
 def test_create_user_requires_special_chars_in_password(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data(),
         "password1": "LowerCaseButNoSpecials",
         "password2": "LowerCaseButNoSpecials",
     }
@@ -134,12 +137,7 @@ def test_create_user_requires_special_chars_in_password(client, request):
 @pytest.mark.django_db
 def test_create_user_no_similar(client, request):
     data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "jeanmichel@kdkdk.fr",
-        "phone_no": "0303003033",
+        **_signup_data("jeanmichel@kdkdk.fr"),
         "password1": "Jeanmichel01",
         "password2": "Jeanmichel01",
     }
@@ -151,16 +149,7 @@ def test_create_user_no_similar(client, request):
 
 @pytest.mark.django_db
 def test_create_user(client, request):
-    data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
-        "password1": "LowerCaseButNoSpecials12",
-        "password2": "LowerCaseButNoSpecials12",
-    }
+    data = _signup_data()
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
@@ -172,16 +161,7 @@ def test_create_user(client, request):
 @pytest.mark.django_db
 def test_create_user_assign_current_site_via_allauth(client, request):
     site = get_current_site(request)
-    data = {
-        "first_name": "Test",
-        "last_name": "test",
-        "organization": "test",
-        "organization_position": "test",
-        "email": "kkkd@kdkdk.fr",
-        "phone_no": "0303003033",
-        "password1": "6t2dCLGjNFTBuRv",
-        "password2": "6t2dCLGjNFTBuRv",
-    }
+    data = _signup_data()
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
@@ -192,7 +172,75 @@ def test_create_user_assign_current_site_via_allauth(client, request):
     assert site in user.profile.organization.sites.all()
 
 
-# seding message to team
+@pytest.mark.django_db
+def test_signup_existing_user_on_other_site_redirects_to_login(client, current_site):
+    other_site = baker.make(Site)
+    user = baker.make(auth_models.User, email="existing@example.com")
+    confirm_mail(user)
+    user.profile.sites.add(other_site)
+
+    response = client.post(reverse("account_signup"), _signup_data(user.email))
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
+    assert parse_qs(parsed.query)["next"] == [reverse("advisor-access-request")]
+
+    # no duplicate account was created, and the user isn't added to the
+    # site until their access request is accepted
+    assert auth_models.User.objects.filter(email=user.email).count() == 1
+    assert current_site not in user.profile.sites.all()
+
+
+@pytest.mark.django_db
+def test_signup_advisor_access_request_existing_user_redirect_to_step2_after_log_in(
+    client, current_site
+):
+    # test redirection after login
+    other_site = baker.make(Site)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    email = "existing@example.com"
+    signup_data = _signup_data("existing@example.com")  # nosec B105
+    user = baker.make(auth_models.User, email=email)
+    user.set_password(signup_data["password1"])
+    user.save()
+    confirm_mail(user)
+    user.profile.sites.add(other_site)
+
+    response = client.post(reverse("account_signup"), _signup_data(user.email))
+    assert response.status_code == 302
+
+    response = client.post(
+        response.url,
+        {"login": user.email, "password": signup_data["password1"]},
+        follow=True,
+    )
+
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("advisor-access-request")
+    assert client.session[SIGNUP_USER_ID_SESSION_KEY] == user.pk
+
+
+@pytest.mark.django_db
+def test_signup_existing_user_already_on_this_site_does_not_crashes(
+    client, current_site
+):
+    user = baker.make(auth_models.User, email="existing@example.com")
+    confirm_mail(user)
+    user.profile.sites.add(current_site)
+    user.profile.sites.add(baker.make(Site))
+
+    response = client.post(reverse("account_signup"), _signup_data(user.email))
+    assert response.status_code == 302
+
+    assert auth_models.User.objects.filter(email=user.email).count() == 1
+    assert not home_models.AdvisorAccessRequest.objects.filter(
+        user=user, site=current_site
+    ).exists()
+
+
+# sending message to team
 
 
 @pytest.mark.django_db
@@ -234,7 +282,7 @@ def test_non_logged_user_can_send_message_to_team(mocker, client, request):
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
         message=content,
-        from_email=site_config.sender_email,
+        from_email=f"{site_config.sender_name} <{settings.DEFAULT_SENDER_EMAIL}>",
         recipient_list=[site_config.contact_form_recipient],
         fail_silently=True,
     )
@@ -553,20 +601,19 @@ def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
 
 @pytest.mark.django_db
 def test_make_new_site_fails_for_existing_domain(client):
-    before = models.SiteConfiguration.objects.count()
+    before = home_models.SiteConfiguration.objects.count()
 
     with pytest.raises(Exception) as excinfo:
         utils.make_new_site(
             "Example",
             "example.com",
-            "sender@example.com",
             "Sender",
             "contact@example.com",
             "36 green street 75000 Paris",
         )
 
     assert str(excinfo.value) == "The domain example.com already used"
-    assert models.SiteConfiguration.objects.count() == before
+    assert home_models.SiteConfiguration.objects.count() == before
 
 
 @pytest.mark.django_db
@@ -574,14 +621,13 @@ def test_make_new_site(client):
     site = utils.make_new_site(
         "New example",
         "new-example.com",
-        "sender@example.com",
         "Sender",
         "contact@example.com",
         "36 green street 75000 Paris",
     )
 
     assert site
-    assert models.SiteConfiguration.objects.filter(site=site).count() == 1
+    assert home_models.SiteConfiguration.objects.filter(site=site).count() == 1
 
     for name in (
         "new_example_com_staff",
@@ -602,6 +648,126 @@ def test_403_sesame_other_user(client, current_site, project_ready):
         assert logged_in_user.email in str(
             response.content
         )  # no assertContains because it requires a success status_code
+
+
+@pytest.mark.django_db
+def test_admin_cannot_have_code(client, mocker, current_site):
+    mocker.patch(settings.ACCOUNT_ADAPTER + ".send_mail")
+    admin = baker.make(auth_models.User, email="admin@email.fr")
+    assign_site_admin(current_site, admin)
+
+    url = reverse("account_request_login_code")
+    data = {"email": admin.email}
+    response = client.post(url, data)
+    assert response.status_code == 302
+
+    adapter = import_string(settings.ACCOUNT_ADAPTER)
+    adapter.send_mail.assert_called_with(
+        "home/email/no_login_by_code_staff", admin.email, ANY
+    )
+
+
+@pytest.mark.django_db
+def test_unkown_user_ask_code_no_fail(client, mocker):
+    mocker.patch(settings.ACCOUNT_ADAPTER + ".send_mail")
+
+    url = reverse("account_request_login_code")
+    email = "unkwnon@email.fr"
+    data = {"email": email}
+    response = client.post(url, data)
+    assert response.status_code == 302
+
+    adapter = import_string(settings.ACCOUNT_ADAPTER)
+    adapter.send_mail.assert_called_with("account/email/unknown_account", email, ANY)
+
+
+################################################################
+# 2fa config
+################################################################
+
+
+@pytest.mark.django_db
+def test_sensitive_two_fa_mode_field_cant_select_none(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = True
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    with login(client, user=user):
+        response = client.get(url)
+        choices = response.context_data.get("form").fields.get("two_fa_mode").choices
+        assert "none" not in (value for value, _ in choices)
+
+
+@pytest.mark.django_db
+def test_disabled_two_fa_mode_sensitive_default_by_code(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = True
+    user.profile.login_with_code = False
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    data = {"two_fa_mode": "none"}
+    with login(client, user=user):
+        response = client.post(url, data)
+        assert not response.context_data.get("form").is_valid()
+    user.profile.refresh_from_db()
+    assert user.profile.login_with_code
+
+
+@pytest.mark.django_db
+def test_setting_none_removes_login_with_email(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = False
+    user.profile.login_with_code = True
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    data = {"two_fa_mode": "none"}
+    with login(client, user=user):
+        response = client.post(url, data)
+        assert response.context_data.get("form").is_valid()
+    user.profile.refresh_from_db()
+    assert not user.profile.login_with_code
+
+
+@pytest.mark.django_db
+def test_setting_no_2fa_removes_totp(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = False
+    user.profile.login_with_code = False
+    user.profile.save()
+    baker.make(Authenticator, type="totp", user_id=user.id)
+
+    url = reverse("mfa_index")
+    data = {"two_fa_mode": "none"}
+    disable_totp_url = reverse("mfa_deactivate_totp")
+    with login(client, user=user):
+        response = client.post(url, data, follow=True)
+        last_url, _ = response.redirect_chain[-1]
+        parsed_url = urlparse(last_url)
+        assert parsed_url.path == reverse("account_reauthenticate")
+        next_url = parse_qs(parsed_url.query)["next"][0]
+        assert next_url == disable_totp_url
+
+
+@pytest.mark.django_db
+def test_setting_totp_activates_totp(client):
+    user = baker.make(auth_models.User)
+    user.profile.requires_2fa = False
+    user.profile.login_with_code = False
+    user.profile.save()
+
+    url = reverse("mfa_index")
+    data = {"two_fa_mode": "totp"}
+    activate_totp_url = reverse("mfa_activate_totp")
+    with login(client, user=user):
+        response = client.post(url, data, follow=True)
+        last_url, _ = response.redirect_chain[-1]
+        parsed_url = urlparse(last_url)
+        assert parsed_url.path == reverse("account_reauthenticate")
+        next_url = parse_qs(parsed_url.query)["next"][0]
+        assert next_url == activate_totp_url
 
 
 # eof

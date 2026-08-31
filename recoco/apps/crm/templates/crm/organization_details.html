@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load django_vite %}
+{% load humanize %}
 {% block title %}
     {{ organization.name }} - CRM
 {% endblock title %}
@@ -8,71 +9,112 @@
     {{ organization.name }} - CRM
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/user-crm.css.js' %}
+    {% vite_asset 'js/styles/project-card-crm.css.js' %}
+    {% vite_asset 'js/styles/card-crm.css.js' %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0">
-        {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-3w fr-py-2w fr-pt-3w {% if active_project %}mb-3{% endif %}">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h3 class="d-flex align-items-center">
-                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
-                            </svg>
-                            <span>{{ organization.name }}</span>
-                        </h3>
-                        <ul class="d-flex align-items-center list-unstyled flex-wrap organization-specific-pl-0">
-                            {% for department in org_departments %}
-                                <li class="fr-mr-2v crm-region-tag">
-                                    <span>{{ department.name }}</span>
-                                    <strong>({{ department.code }})</strong>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{% url 'crm-organization-update' organization.pk %}"
-                               class="btn btn-outline-secondary"
-                               aria-current="page">Gérer l'organisation</a>
-                        </div>
-                    </div>
-                </div>
+    <!-- CRM Navbar -->
+    {% include "crm/fragments/navigation.html" with organizations=True %}
+    <!-- Breadcrumb -->
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}, {url: '{% url 'crm-organization-list' %}', title: 'Organisations'}], current: `{{ organization.name }}` } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <div x-data="Crm" class="user-crm d-flex">
+        <!-- Left column -->
+        <div class="user-crm-left-col position-relative">
+            <div class="user-crm__actions-btn fr-p-2w d-flex align-items-center gap-1">
+                <a class="fr-btn fr-btn--tertiary fr-btn--sm user-crm__actions-btn--style fr-icon-pencil-line"
+                   href="{% url 'crm-organization-update' organization.pk %}"></a>
             </div>
-            {% if unread_notifications %}
-                <div class="fr-px-3w fr-py-3w bg-light">
-                    <h4>
-                        <svg class="align-middle bi text-warning"
-                             width="20px"
-                             height="20px"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell" />
-                        </svg>
-                        {{ unread_notifications.count }} Notification(s)
-                    </h4>
-                    <ul class="list-group">
-                        {% for notification in unread_notifications %}
-                            <li class="d-flex flex-columns list-group-item">{{ notification }}</li>
-                        {% endfor %}
-                    </ul>
+            <!-- Organization info -->
+            <div class="d-flex flex-column fr-p-5v">
+                <!-- Name -->
+                <h1 class="user-crm__user-name fr-mb-0">{{ organization.name }}</h1>
+                <!-- Departments -->
+                <span class="user-crm__user-information fr-icon-target-line fr-icon--sm fr-mb-1v d-flex align-items-center text-nowrap">Départements :
+                    {% for department in org_departments|slice:":5" %}
+                        {{ department.code }}{% if not forloop.last %},{% endif %}
+                    {% empty %}
+                        aucun département
+                    {% endfor %}
+                    {% if org_departments|length > 5 %}
+                        <span class="crm-avatar crm-avatar--overflow fr-ml-1v"
+                              title="{% for department in org_departments|slice:'5:' %}{{ department.code }}{% if not forloop.last %}, {% endif %}{% endfor %}">+{{ org_departments|length|add:"-5" }}</span>
+                    {% endif %}
+                </span>
+                <!-- Last members activity -->
+                {% if last_members_activity_at %}
+                    <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière activité il y a {{ last_members_activity_at|timesince }}</span>
+                {% endif %}
+                <!-- Last members login -->
+                {% if last_members_login_at %}
+                    <span class="user-crm__user-information fr-icon-calendar-line fr-icon--sm fr-mb-1v">dernière connexion il y a {{ last_members_login_at|timesince }}</span>
+                {% endif %}
+                <!-- Next members reminder -->
+                {% if next_members_reminder %}
+                    <span class="user-crm__user-information fr-icon-mail fr-icon--sm">prochain rappel le {{ next_members_reminder.deadline|date:"j F Y" }}</span>
+                {% endif %}
+            </div>
+            <!-- Members -->
+            <div>
+                <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="user-crm__section-title">Membres ({{ participants|length }})</span>
                 </div>
-            {% endif %}
-            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper relative">
-                <a class="btn btn-primary fr-mb-3w"
-                   href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
+                {% for participant in participants %}
+                    <div class="user-crm__section-container fr-px-3w fr-py-2w">
+                        {% include "crm/fragments/user/user_card.html" with user=participant %}
+                    </div>
+                {% empty %}
+                    <div class="fr-px-3w fr-py-2w">
+                        <span class="fr-text--sm text-muted">Aucun membre</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <!-- Advised projects -->
+            <div>
+                <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
+                    <span class="user-crm__section-title">Dossiers suivis ({{ advised_projects|length }})</span>
+                </div>
+                {% for project in advised_projects %}
+                    <div class="user-crm__section-container fr-px-3w fr-py-2w">
+                        {% include "crm/fragments/project/project_card.html" with project=project %}
+                    </div>
+                {% empty %}
+                    <div class="fr-px-3w fr-py-2w">
+                        <span class="fr-text--sm text-muted">Aucun dossier suivi</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Right column -->
+        <div class="user-crm-right-col">
+            <!-- Notes section -->
+            <section class="w-100">
+                <div class="user-crm__section-title-container no-border">
+                    <h3 class="user-crm__section-title">Notes</h3>
+                    <a class="fr-btn fr-btn--primary fr-btn--sm"
+                       href="{% url 'crm-organization-note-create' organization.pk %}">Ajouter une note</a>
+                </div>
+                <!-- Empty state -->
+                {% if not notes.all and not sticky_notes.all %}
+                    {% url 'crm-organization-note-create' organization.pk as create_note_url %}
+                    {% include "crm/fragments/notes/empty_state.html" with create_note_url=create_note_url %}
+                {% endif %}
+                <!-- Pinned notes -->
                 {% for note in sticky_notes.all %}
                     {% include "crm/note.html" with pinned=True get_user_profile=True %}
                 {% endfor %}
+                <!-- Notes list -->
                 {% for note in notes.all %}
                     {% include "crm/note.html" with get_user_profile=True %}
                 {% endfor %}
-            </div>
-            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
-                <h4>Activité</h4>
-                {% include "crm/timeline.html" %}
-            </div>
+            </section>
+            <!-- Activity timeline -->
+            <section class="w-100">
+                <h3 class="user-crm__section-title">Activité des membres de l'organisation</h3>
+                {% include "crm/timeline.html" with wrap=True %}
+            </section>
         </div>
     </div>
 {% endblock content %}

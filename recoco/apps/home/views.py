@@ -11,26 +11,39 @@ import urllib
 
 import django.core.mail
 from actstream import action
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import complete_signup, perform_login
+from allauth.account.views import (
+    EmailVerificationSentView as AllauthEmailVerificationSentView,
+)
 from allauth.account.views import RequestLoginCodeView
+from allauth.mfa.models import Authenticator
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db.models import Count, F, Prefetch, Q
-from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_403_TEMPLATE_NAME
 from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 from notifications.signals import notify
 
+from recoco import verbs
 from recoco.apps.geomatics.models import Department
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
@@ -46,16 +59,17 @@ from recoco.utils import (
     is_sensitive_account,
 )
 
-from ... import verbs
 from . import models
+from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
     SiteCreateForm,
+    TwoFaConfigForm,
     UserPasswordFirstTimeSetupForm,
 )
 from .models import AdvisorAccessRequest
-from .utils import get_current_site_sender_email, make_new_site
+from .utils import get_current_site_sender, make_new_site
 
 
 class HomePageView(TemplateView):
@@ -109,11 +123,6 @@ class SecurityPageView(TemplateView):
 
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["sender_email"] = get_current_site_sender_email()
-        return context
 
 
 class MutliAnnualSchemaPageView(TemplateView):
@@ -186,13 +195,13 @@ def contact(request):
             raise PermissionDenied(
                 "Le formulaire de contact n'est accessible qu'aux personnes authentifiées"
             )
-        form = ContactForm(request.user, request.POST)
+        form = ContactForm(request.POST, user=request.user)
         if form.is_valid():
             status = send_message_to_team(request, form.cleaned_data)
             notify_user_of_sending(request, status)
             return redirect(next_url)
     else:
-        form = ContactForm(request.user)
+        form = ContactForm(user=request.user)
     return render(request, "home/contact.html", locals())
 
 
@@ -219,7 +228,7 @@ def send_message_to_team(request, data):
 
     # Try to get the current user email if logged in, otherwise default to current site
     # sender
-    sender_email = site_config.sender_email
+    sender_email = get_current_site_sender()
     if not request.user.is_anonymous and request.user.email:
         sender_email = request.user.email
 
@@ -276,18 +285,49 @@ def setup_password(request):
     return render(request, "home/user_setup_password.html", locals())
 
 
-@login_required(login_url="/accounts/signup")
+class EmailVerificationSentView(AllauthEmailVerificationSentView):
+    def get_template_names(self):
+        match self.request.session.get(EMAIL_CONFIRMATION_FLOW_SESSION_KEY, None):
+            case "onboarding":
+                return ["onboarding/onboarding-email-confirm.html"]
+            case "advisor":
+                return ["home/advisor-access-request-confirm-email.html"]
+            case _:
+                return super().get_template_names()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_to_validate"] = User.objects.filter(
+            pk=self.request.session.get(SIGNUP_USER_ID_SESSION_KEY, None)
+        ).first()
+        return context
+
+
 def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     redirect_url = request.GET.get("next")
     site_config = request.site.configuration
     if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
         redirect_url = reverse("home")
 
-    if check_if_advisor(request.user):
+    if (
+        SIGNUP_USER_ID_SESSION_KEY not in request.session
+        and not request.user.is_authenticated
+    ):
+        return redirect(
+            f"{reverse('account_signup')}?{urlencode({'next': reverse('advisor-access-request')})}",
+        )
+
+    user = (
+        request.user
+        if request.user.is_authenticated
+        else User.objects.get(pk=request.session[SIGNUP_USER_ID_SESSION_KEY])
+    )
+
+    if check_if_advisor(user):
         return redirect(redirect_url)
 
     advisor_access_request = (
-        AdvisorAccessRequest.objects.filter(user=request.user, site=request.site)
+        AdvisorAccessRequest.objects.filter(user=user, site=request.site)
         .prefetch_related(
             Prefetch(
                 "departments",
@@ -298,7 +338,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
         .first()
     )
 
-    departments = departments = [
+    departments = [
         {"name": d.name, "code": d.code}
         for d in Department.objects.exclude(code="").order_by("code")
     ]
@@ -325,7 +365,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             new_request = not advisor_access_request
             if new_request:
                 advisor_access_request = AdvisorAccessRequest(
-                    site=request.site, user=request.user
+                    site=request.site, user=user
                 )
 
             advisor_access_request.comment = form.cleaned_data.get("comment", "")
@@ -350,6 +390,20 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
                     action_object=advisor_access_request,
                 )
 
+            request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY] = "advisor"
+            if new_request:
+                return complete_signup(
+                    request,
+                    user=user,
+                    email_verification=None,
+                    success_url=reverse("advisor-access-request-pending"),
+                )
+            return perform_login(
+                request,
+                user,
+                redirect_url=reverse("advisor-access-request-pending"),
+            )
+
     return render(
         request,
         "home/advisor_access_request.html",
@@ -361,6 +415,33 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             "selected_departments": selected_departments,
         },
     )
+
+
+class AdvisorAccessRequestPendingView(LoginRequiredMixin, TemplateView):
+    template_name = "home/advisor-access-request-pending.html"
+
+    def get(self, request, *args, **kwargs):
+        if SIGNUP_USER_ID_SESSION_KEY in self.request.session:
+            del self.request.session[SIGNUP_USER_ID_SESSION_KEY]
+        if EMAIL_CONFIRMATION_FLOW_SESSION_KEY in self.request.session:
+            del self.request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY]
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["advisor_access_request"] = get_object_or_404(
+            AdvisorAccessRequest.objects.filter(
+                user=self.request.user, site=self.request.site, status="PENDING"
+            )
+            .prefetch_related(
+                Prefetch(
+                    "departments",
+                    queryset=Department.objects.order_by("code"),
+                )
+            )
+            .select_related("user")
+        )
+        return context
 
 
 @login_required
@@ -435,7 +516,6 @@ class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
             make_new_site(
                 name=form.cleaned_data["name"],
                 domain=f"{form.cleaned_data['subdomain']}.recoconseil.fr",
-                sender_email=form.cleaned_data["sender_email"],
                 sender_name=form.cleaned_data["sender_name"],
                 contact_form_recipient=form.cleaned_data["contact_form_recipient"],
                 legal_address=form.cleaned_data["legal_address"],
@@ -476,9 +556,76 @@ def permission_denied(request, exception):
 
 class RequestLoginCodeNoStaffView(RequestLoginCodeView):
     def form_valid(self, form):
-        if is_sensitive_account(form._user, get_current_site(self.request)):
-            form._user = None
+        if form._user and is_sensitive_account(
+            form._user, get_current_site(self.request)
+        ):
+            get_adapter().send_mail(
+                "home/email/no_login_by_code_staff",
+                form._user.email,
+                {"request": self.request},
+            )
+            return HttpResponseRedirect(self.get_success_url())
         return super().form_valid(form)
+
+
+@method_decorator([login_required], name="dispatch")
+class TwoFAConfigView(FormView):
+    form_class = TwoFaConfigForm
+    template_name = "home/mfa-config.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_invalid(self, form):
+        # at least ensure that requires_2fa is respected
+        authenticator = Authenticator.objects.filter(
+            type=Authenticator.Type.TOTP, user=self.request.user
+        ).first()
+        if (
+            self.request.user.profile.requires_2fa
+            and not authenticator
+            and not self.request.user.profile.login_with_code
+        ):
+            self.request.user.profile.login_with_code = True
+            self.request.user.profile.save()
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        two_fa_mode = form.cleaned_data["two_fa_mode"]
+        if two_fa_mode == "none":
+            self.request.user.profile.login_with_code = False
+            self.request.user.profile.save()
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if authenticator:
+                url = reverse("mfa_deactivate_totp")
+                return redirect(url)
+        elif two_fa_mode == "totp":
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if not authenticator:
+                # removing email 2fa is done through a signal
+                url = reverse("mfa_activate_totp")
+                return redirect(url)
+            self.request.user.profile.login_with_code = False
+            self.request.user.profile.save()
+        else:  # 2fa is set to login with code. totp may or may not have been activated before
+            self.request.user.profile.login_with_code = True
+            self.request.user.profile.save()
+
+            authenticator = Authenticator.objects.filter(
+                type=Authenticator.Type.TOTP, user=self.request.user
+            ).first()
+            if authenticator:
+                url = reverse("mfa_deactivate_totp")
+                return redirect(url)
+
+        messages.success(self.request, "Vos paramètres ont bien été sauvegardés.")
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 # eof

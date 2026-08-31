@@ -23,16 +23,29 @@ class ProjectSpec(HookSpec):
     def project_tab_entries(self):
         """Return a tab entry to add to the project detail page navigation.
 
-        Return a 2-tuple ``(url_name, label)``:
-          url_name (str) — Django URL name, resolved with the project pk as
-                            its single argument (may include namespace, e.g.
-                            "myplugin:project-detail")
-          label (str)    — display text for the tab
+        Return a dict with keys:
+          url_name (str)          — Django URL name the tab links to, resolved
+                                    with the project pk as its single argument
+                                    (may include a namespace, e.g.
+                                    "myplugin:project-detail")
+          label (str)             — display text for the tab
+          active_url_names (list) — optional list of fully-qualified view names
+                                    (``namespace:name``) that mark the tab as
+                                    active. The tab is active when the current
+                                    request's view name is in this list.
+                                    Defaults to ``[url_name]`` when omitted.
 
         Example:
             @hookimpl
             def project_tab_entries(self):
-                return ("plugin_giphy:project-detail-giphy", "Giphyme!")
+                return {
+                    "url_name": "plugin_giphy:project-detail-giphy",
+                    "label": "Giphyme!",
+                    "active_url_names": [
+                        "plugin_giphy:project-detail-giphy",
+                        "plugin_giphy:giphy-detail",
+                    ],
+                }
         """
 
 
@@ -84,6 +97,44 @@ class ConversationSpec(HookSpec):
             @hookimpl
             def conversation_extra_html(self, request, project):
                 return mark_safe(render_to_string("plugin_giphy/conversation_extra.html"))
+        """
+
+
+class DigestSpec(HookSpec):
+    @hookspec
+    def send_digests_for_staff_users(self, site, user, dry_run):
+        """Called once per staff user before the standard digest loop.
+
+        Implementations should:
+
+        - Query ``user.notifications(manager="on_site").unsent()`` filtered to
+          the verbs they own.
+        - Build and send their email.
+        - Call ``notifications.mark_as_sent()`` to prevent double-delivery by
+          the standard digest loop that runs afterwards.
+
+        Return the count of notifications consumed (0 if nothing was sent).
+
+        Example::
+
+            @hookimpl
+            def send_digests_for_staff_users(self, site, user, dry_run):
+                from .digests import send_my_digest
+                return send_my_digest(site, user, dry_run)
+        """
+
+
+class NotificationSpec(HookSpec):
+    @hookspec
+    def notification_project_verbs(self):
+        """Return a list of notification verb strings (see ``recoco.verbs``) to add
+        to ``show_project_verb_list``, i.e. the notifications that should be shown
+        grouped under a project in the notifications UI.
+
+        Example:
+            @hookimpl
+            def notification_project_verbs(self):
+                return [PluginVerbs.GIPHY_ADDED]
         """
 
 

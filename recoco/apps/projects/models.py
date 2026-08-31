@@ -21,7 +21,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
-from django.db.models.query import QuerySet
+from django.db.models.query import Prefetch, QuerySet
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
@@ -233,6 +233,52 @@ class ProjectQuerySet(models.QuerySet):
             )
         )
 
+    def with_perf_prefetch(self, *args):
+        prefetch_to_do = []
+
+        if "origin_site" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "project_sites",
+                    ProjectSite.objects.filter(is_origin=True).select_related(
+                        "site", "site__configuration"
+                    ),
+                    to_attr="_origin_site",
+                )
+            )
+        if "owner" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "members",
+                    auth_models.User.objects.filter(
+                        projectmember__is_owner=True
+                    ).select_related(
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
+                    ),
+                    to_attr="_owner",
+                )
+            )
+        if "next_reminder" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "reminders",
+                    django_apps.get_model(
+                        app_label="reminders", model_name="Reminder"
+                    )  # Imported lazily to avoid a circular import in reminders.models
+                    .objects.filter(site=Site.objects.get_current(), sent_on=None)
+                    .order_by("deadline"),
+                    to_attr="_next_reminder",
+                )
+            )  # _next_reminder is looked at in getter
+
+        return self.prefetch_related(*prefetch_to_do)
+
+
+class AllProjectManager(ProjectManager.from_queryset(ProjectQuerySet)):
+    pass
+
 
 class ProjectOnSiteManagerBase(CurrentSiteManager, ProjectManager):
     pass
@@ -357,6 +403,7 @@ class Project(models.Model):
     on_site = ActiveProjectOnSiteManager()
     deleted_on_site = DeletedProjectOnSiteManager()
 
+    all = AllProjectManager()
     all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(
@@ -406,12 +453,18 @@ class Project(models.Model):
 
     @property
     def owner(self):
-        if hasattr(self, "_owner") and len(self._owner):
-            try:
-                return self._owner[0]
-            except IndexError:
-                return None
+        # `_owner` may be populated in bulk (use with_perf_prefetch from manager) to avoid N+1 queries
+        # an empty list means "no owner", not "not prefetched".
+        if hasattr(self, "_owner"):
+            return self._owner[0] if self._owner else None
         return self.members.filter(projectmember__is_owner=True).first()
+
+    @property
+    def origin_site(self):
+        # use with_perf_prefetch from manager to enjoy optimization
+        if hasattr(self, "_origin_site"):
+            return self._origin_site[0].site if self._origin_site else None
+        return self.project_sites.origin().site
 
     ro_key = models.CharField(
         max_length=32,
@@ -455,6 +508,12 @@ class Project(models.Model):
     inactive_since = models.DateTimeField(
         null=True, blank=True, verbose_name="Quand le dossier a été déclaré inactif"
     )
+    set_inactive_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="projects_set_inactive",
+    )
     inactive_reason = models.CharField(
         max_length=256,
         blank=True,
@@ -475,6 +534,7 @@ class Project(models.Model):
 
         self.inactive_since = None
         self.inactive_reason = None
+        self.set_inactive_by = None
         self.save()
 
     last_members_activity_at = models.DateTimeField(
@@ -563,6 +623,10 @@ class Project(models.Model):
 
     @property
     def next_reminder(self):
+        # `_next_reminder` may be populated in bulk (use with_perf_prefetch from manager)
+        # to avoid N+1 queries. An empty list means "no reminder", not "not prefetched".
+        if hasattr(self, "_next_reminder"):
+            return self._next_reminder[0] if self._next_reminder else None
         current_site = Site.objects.get_current()
         return (
             self.reminders.filter(site=current_site, sent_on=None)
@@ -582,6 +646,7 @@ class Project(models.Model):
     class Meta:
         verbose_name = "project"
         verbose_name_plural = "projects"
+        base_manager_name = "all"
         permissions = (
             # General
             # Builtin: ("view_project", "Can view the project"),
@@ -1068,17 +1133,6 @@ class ProjectSearchAdapter(watson.SearchAdapter):
     def prepare_content(self, content):
         content = super().prepare_content(content)
         return strip_accents(content)
-
-
-def truncate_string(s, max_length):
-    """Truncate given string to max_length"""
-    if len(s) <= max_length:
-        return s
-    sub = s[:max_length]
-    if s[max_length] != " ":
-        # we are truncating last word, rewind to its begining
-        sub = sub[: sub.rfind(" ")]
-    return f"{sub}…"
 
 
 # eof

@@ -1,6 +1,6 @@
 {% load humanize %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 <div class="d-flex align-items-center">
     <span class="align-middle fr-mb-0">
         {% if "manage_resources" in user_site_perms %}

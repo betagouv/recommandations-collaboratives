@@ -68,7 +68,7 @@
                 {% endif %}
                 <!-- Organization -->
                 {% if crm_user.profile.organization %}
-                    <span class="user-crm__user-information fr-icon-people fr-icon--sm {% if crm_user_is_advisor %}fr-mb-1v{% else %}fr-mb-3v{% endif %}">{{ crm_user.profile.organization.name }}</span>
+                    <a href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}" class="user-crm__user-information--link fr-icon-people fr-icon--sm {% if crm_user_is_advisor %}fr-mb-1v{% else %}fr-mb-3v{% endif %}">{{ crm_user.profile.organization.name }}</a>
                 {% endif %}
                 <!-- Departments (if advisor) -->
                 {% if crm_user_is_advisor %}
@@ -106,12 +106,12 @@
         {% endif %}
     </div>
     <!-- Dossiers conseillés -->
-    {% if crm_user_is_advisor %}
+    {% if user_switchtendings %}
         <div>
             <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
                 <span class="user-crm__section-title">Dossiers conseillés</span>
             </div>
-            {% for st in crm_user.projects_switchtended_per_site.all %}
+            {% for st in user_switchtendings %}
                 <div class="user-crm__section-container fr-px-3w fr-py-2w">
                     {% include "crm/fragments/project/project_card.html" with project=st.project %}
                 </div>
@@ -122,21 +122,19 @@
             {% endfor %}
         </div>
     {% endif %}
-    <!-- Autre dossiers -->
-    {% with crm_user.projectmember_set.all as memberships %}
-        {% if memberships %}
-            <div>
-                <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
-                    <span class="user-crm__section-title">Autre dossiers</span>
-                </div>
-                {% for membership in memberships %}
-                    <div class="user-crm__section-container fr-px-3w fr-py-2w">
-                        {% include "crm/fragments/project/project_card.html" with project=membership.project %}
-                    </div>
-                {% endfor %}
+    <!-- Autres dossiers -->
+    {% if user_memberships %}
+        <div>
+            <div class="user-crm__section-title-container fr-px-3w fr-py-2w">
+                <span class="user-crm__section-title">{% if user_switchtendings %}Autres dossiers{% else %}Dossiers{% endif %}</span>
             </div>
-        {% endif %}
-    {% endwith %}
+            {% for membership in user_memberships %}
+                <div class="user-crm__section-container fr-px-3w fr-py-2w">
+                    {% include "crm/fragments/project/project_card.html" with project=membership.project %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 <!-- Right column -->
 <div class="user-crm-right-col">
@@ -185,7 +183,7 @@
     <!-- Activity timeline -->
     <section class="w-100">
         <h3 class="user-crm__section-title">Activité de l'utilisateur</h3>
-        {% include "crm/timeline.html" %}
+        {% include "crm/timeline.html" with wrap=True %}
     </section>
 </div>
 </div>

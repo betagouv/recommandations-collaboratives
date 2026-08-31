@@ -48,6 +48,10 @@ class MessageViewSet(viewsets.ModelViewSet):
         )
         signals.message_posted.send(sender=self.perform_create, message=instance)
 
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        signals.message_updated.send(sender=self.perform_update, message=instance)
+
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def mark_as_read(self, request, project_id, pk):
         """

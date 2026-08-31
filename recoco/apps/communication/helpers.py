@@ -22,19 +22,38 @@ class NotificationFormatter:
 
     def __init__(self):
         self.dispatch_table = {
+            # custom
             verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
-            verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
-            verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
             verbs.Project.AVAILABLE: self.format_new_project_available,
             verbs.Project.SUBMITTED_BY: self.format_project_submitted,
             verbs.Project.SUBMITTED_BY_ADVISOR: self.format_project_submitted,
             verbs.Project.NEW_OWNER: self.format_new_owner,
             verbs.Recommendation.COMMENTED: self.format_action_commented,
             verbs.Recommendation.CREATED: self.format_action_recommended,
-            verbs.Document.ADDED_FILE: self.format_document_uploaded,
-            verbs.Document.ADDED_ADVISOR_FILE: self.format_document_uploaded,
-            verbs.Document.ADDED_LINK: self.format_document_uploaded,
+            # list for rich object
+            verbs.Document.ADDED_FILE: self.rich,
+            verbs.Document.ADDED_ADVISOR_FILE: self.rich,
+            verbs.Document.ADDED_LINK: self.rich,
+            # list for no object
+            verbs.Project.BECAME_ADVISOR: self.no_object,
+            verbs.Project.BECAME_OBSERVER: self.no_object,
+            verbs.Survey.STARTED: self.no_object,
         }
+
+    def no_object(self, notification):
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} {notification.verb}."
+
+        return FormattedNotification(summary=summary, excerpt=None)
+
+    def rich(self, notification):
+        """A document was uploaded by a user"""
+        subject = self._represent_user(notification.actor)
+        summary = (
+            f"{subject} {notification.verb} {notification.action_object.feed_label()}"
+        )
+
+        return FormattedNotification(summary=summary, excerpt=None)
 
     def format(self, notification):
         """
@@ -113,15 +132,6 @@ class NotificationFormatter:
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
 
-    def format_document_uploaded(self, notification):
-        """A document was uploaded by a user"""
-        subject = self._represent_user(notification.actor)
-        summary = (
-            f"{subject} {notification.verb} {notification.action_object.feed_label()}"
-        )
-
-        return FormattedNotification(summary=summary, excerpt=None)
-
     def format_action_recommended(self, notification):
         """An action was recommended by a switchtender"""
         subject = self._represent_user(notification.actor)
@@ -140,31 +150,10 @@ class NotificationFormatter:
             excerpt = ""
         else:
             complement = self._represent_recommendation(notification.action_object.task)
-            summary = f"{subject} a commenté la recommandation '{complement}'"
+            summary = f"{subject} {verbs.Recommendation.COMMENTED} '{complement}'"
             excerpt = self._represent_followup(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
-
-    def format_action_became_switchtender(self, notification):
-        """Someone joined a project as switchtender"""
-        subject = self._represent_user(notification.actor)
-        summary = f"{subject} s'est joint·e à l'équipe de conseil."
-
-        return FormattedNotification(summary=summary, excerpt=None)
-
-    def format_action_became_advisor(self, notification):
-        """Someone joined a project as advisor"""
-        subject = self._represent_user(notification.actor)
-        summary = f"{subject} {verbs.Project.BECAME_ADVISOR}."
-
-        return FormattedNotification(summary=summary, excerpt=None)
-
-    def format_action_became_observer(self, notification):
-        """Someone joined a project as observer"""
-        subject = self._represent_user(notification.actor)
-        summary = f"{subject} {verbs.Project.BECAME_OBSERVER}."
-
-        return FormattedNotification(summary=summary, excerpt=None)
 
     def format_project_submitted(self, notification):
         """A project was submitted for moderation"""

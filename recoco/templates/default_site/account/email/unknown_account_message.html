@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load waffle_tags %}
 <!DOCTYPE html>
 <html>
     {# todo refactor email styles #}
@@ -71,40 +72,20 @@
       ------------------------------------- */
       .btn-primary {
           border-radius: 1px;
-          background: var(--light-background-active-blue-france, #000091);
-          display: flex;
-          padding: 6px 8px;
-          justify-content: center;
-          align-items: flex-start;
-          gap: 10px;
-          flex: 1 0 0;
-          width: fit-content;
-          margin: auto;
-          margin-top: 10px;
-          color: white;
-          text-decoration: none;
-          font-weight: 700;
-      }
-
-      .btn-primary a {
-          color: white !important;
+          background-color: #000091;
+          color: #ffffff !important;
           text-decoration: none;
           font-weight: 700;
       }
 
       .btn-secondary {
           border-radius: 1px;
-          background: white;
-          border: 1px solid var(--light-background-action-high-blue-france, #000091);
-          display: flex;
+          background-color: #ffffff;
+          border: 1px solid #000091;
+          display: inline-block;
           padding: 6px 8px;
-          justify-content: center;
-          align-items: flex-start;
-          gap: 10px;
-          flex: 1 0 0;
-          width: fit-content;
           margin: auto;
-          color: #000091;
+          color: #000091 !important;
           text-decoration: none;
           font-weight: 700;
       }
@@ -218,15 +199,6 @@
               line-height: inherit !important;
               text-decoration: none !important;
           }
-
-          .btn-primary table td:hover {
-              background-color: #34495e !important;
-          }
-
-          .btn-primary a:hover {
-              background-color: #34495e !important;
-              border-color: #34495e !important;
-          }
       }
 
       /* use after email rework */
@@ -248,8 +220,9 @@
                      width="auto"
                      height="40px"
                      alt="" />
+            {% else %}
+                <p>{{ current_site.name }}</p>
             {% endif %}
-            <p>{{ current_site.name }}</p>
         </div>
         <table border="0" cellpadding="0" cellspacing="0" class="body">
             <tr>
@@ -266,7 +239,7 @@
                                             <td>
                                                 <p>Bonjour,</p>
                                                 <p>
-                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe
+                                                    Vous avez demandé à recevoir un lien réinitialiser votre mot de passe ou un code pour vous connecter
                                                     sur {{ current_site.name }}. Cependant, nous n'avons pas de compte utilisateur associé à votre
                                                     adresse.
                                                 </p>
@@ -294,7 +267,7 @@
                                                     sur <a href="mailto:{{ current_site.configuration.contact_form_recipient }}">{{ current_site.configuration.contact_form_recipient }}</a>.
                                                 </p>
                                                 <p>
-                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe, vous pouvez
+                                                    Si vous n'êtes pas à l'origine de cette demande de réinitialisation de mot de passe ou de connexion, vous pouvez
                                                     ignorer cet email.
                                                 </p>
                                                 <p>

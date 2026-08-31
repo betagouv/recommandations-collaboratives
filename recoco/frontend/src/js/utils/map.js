@@ -3,6 +3,9 @@ import GeocoderBAN from './geocoderBAN';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-providers';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 function mapLayerStyles(className) {
   return {
@@ -120,6 +123,17 @@ function initMapLayer(lat, lng, zoom) {
       maxZoom: 21,
       attribution:
         '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }
+  );
+}
+
+function initPlanIGNLayer() {
+  return L.tileLayer(
+    ignServiceURL('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'essentiels', 'image/png'),
+    {
+      maxZoom: 19,
+      attribution: 'IGN-F/Géoportail',
+      className: 'basemap-grayscale',
     }
   );
 }
@@ -284,6 +298,14 @@ function createMarkerIcon(className, title) {
   return L.divIcon({ className: `map-marker ${className}`, title });
 }
 
+function createMarkerClusterGroup(options = {}) {
+  return L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 50,
+    ...options,
+  });
+}
+
 function markerPopupTemplate({
   location_x,
   location_y,
@@ -339,6 +361,7 @@ function mapOptions({ interactive, zoom }) {
 export default {
   makeMap,
   initMapLayer,
+  initPlanIGNLayer,
   initSatelliteLayer,
   initMarkerLayer,
   initMapLayers,
@@ -351,5 +374,6 @@ export default {
   getDefaultLatLngForMap,
   getDefaultLatLngForLayers,
   createMarkerIcon,
+  createMarkerClusterGroup,
   markerPopupTemplate,
 };

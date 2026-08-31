@@ -1,7 +1,7 @@
 {% load gravatar %}
 {% load common_tags %}
 {% get_verbs as verbs %}
-<ul class="hide-ul-style fr-mt-1w">
+<ul class="hide-ul-style fr-mt-1w {% if not wrap %}w-100{% endif %}">
     {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
     {% for date_group in actions_by_date %}
         <li class="timeline__date">le {{ date_group.grouper }}</li>
@@ -13,9 +13,11 @@
             {% else %}
                 <li class="d-flex flex-columns list-group-item">
                     <div class="flex-row flex-grow-1">
-                        <div class="d-flex flex-grow w-100 flex-grow-1 font-size-12px no-wrap">
+                        <div class="w-100 font-size-12px">
                             {% if action.actor %}
-                                {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                                <span class="d-inline-flex align-middle">
+                                    {% include "user/user_card.html" with user=action.actor show_organization=True %}
+                                </span>
                             {% else %}
                                 <span class="actor">(compte supprimé)</span>
                             {% endif %}

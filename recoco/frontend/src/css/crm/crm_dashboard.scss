@@ -1,0 +1,60 @@
+.crm-home {
+  &__title {
+    margin-bottom: 10px;
+  }
+  &__subtitle {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 22px; /* 183.333% */
+    text-transform: uppercase;
+  }
+  &__section {
+    width: 100%;
+  }
+  &__card-container {
+    width: 32%;
+    max-width: 320px;
+  }
+  &__card {
+    border-radius: 2px;
+    border: 1px solid var(--light-border-default-grey, #E5E5E5);
+    background: var(--light-background-default-grey, #FFF);
+    box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.10);
+    display: flex;
+    padding: 14px;
+    padding-right: 40px;
+    align-items: flex-start;
+    &--icon {
+      flex-shrink: 0;
+      color: #0974F6;
+    }
+    &--title {
+        color: var(--light-text-default-grey, #3A3A3A);
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 24px; /* 171.429% */
+    }
+    &--arrow {
+        width: 20px;
+        height: 20px;
+        right: 14px;
+        top: 14px;
+    }
+    &--text {
+        display: block;
+        color: var(--light-text-mention-grey, #666);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 22px;
+    }
+  }
+}
+
+.crm-home .timeline__date {
+    color: var(--light-neutral-grey-625, #929292);
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 24px; /* 200% */
+}

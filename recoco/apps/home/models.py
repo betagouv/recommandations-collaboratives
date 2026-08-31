@@ -8,12 +8,14 @@ created: 2021-11-15 14:44:55 CET
 """
 
 from actstream.managers import ActionManager
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
@@ -79,8 +81,26 @@ class SiteActionManager(CurrentSiteManager, ActionManager):
     pass
 
 
-class UserProfileManager(models.Manager):
+class ManagerWithAddressValidationStatus(models.Manager):
+    # annotates with email validation status
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                email_validated=Exists(
+                    EmailAddress.objects.filter(
+                        user_id=OuterRef("user_id"), verified=True
+                    )
+                )
+            )
+        )
+
+
+class UserProfileManager(ManagerWithAddressValidationStatus):
     """Manager for active UserProfile"""
+
+    use_in_migrations = True
 
     def get_queryset(self):
         return (
@@ -91,13 +111,13 @@ class UserProfileManager(models.Manager):
         )
 
 
-class UserProfileOnSiteManager(CurrentSiteManager, UserProfileManager):
+class UserProfileOnSiteManager(CurrentSiteManager, ManagerWithAddressValidationStatus):
     """Manager for active UserProfile on the current site"""
 
     pass
 
 
-class DeletedUserProfileManager(models.Manager):
+class DeletedUserProfileManager(ManagerWithAddressValidationStatus):
     """Manager for deleted UserProfile"""
 
     def get_queryset(self):
@@ -107,7 +127,7 @@ class DeletedUserProfileManager(models.Manager):
 class UserProfile(models.Model):
     """Represents the profile of a user"""
 
-    all = models.Manager()
+    all = ManagerWithAddressValidationStatus()
     objects = UserProfileManager()
     on_site = UserProfileOnSiteManager()
     deleted_objects = DeletedUserProfileManager()
@@ -153,9 +173,14 @@ class UserProfile(models.Model):
 
     disabled = models.DateTimeField(null=True, blank=True)
 
+    login_with_code = models.BooleanField(default=False)
+
+    requires_2fa = models.BooleanField(default=False)
+
     class Meta:
         verbose_name = "profil utilisateur"
         verbose_name_plural = "profils utilisateurs"
+        base_manager_name = "all"  # used for related fields querysets
 
     def __str__(self):
         return f"<UserProfile: {self.user.username}>"
@@ -178,9 +203,6 @@ class SiteConfiguration(models.Model):
         help_text="Question présentées lors de la saisine",
     )
 
-    sender_email = models.EmailField(
-        verbose_name="Adresse de contact affichée dans les emails automatiques"
-    )
     sender_name = models.CharField(
         verbose_name="Expéditeur des emails automatiques",
         help_text="Nom du service affiché comme expéditeur des emails",
@@ -290,6 +312,15 @@ class SiteConfiguration(models.Model):
         default=list,
         blank=True,
         help_text="Liste des plugins activés sur ce portail",
+    )
+
+    embed_allowed_origins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Liste des origines (ex: https://exemple.gouv.fr) autorisées à "
+            "intégrer ce portail dans une iframe (embed). Admin uniquement."
+        ),
     )
 
     def save(self, *args, **kwargs):

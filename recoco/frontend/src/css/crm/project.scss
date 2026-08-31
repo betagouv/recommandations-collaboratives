@@ -106,7 +106,8 @@
     background: var(--light-text-disabled-grey, #929292);
     position: absolute;
     right: 20px;
-    top: 22px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     height: 26px;
     padding: 4px 8px;

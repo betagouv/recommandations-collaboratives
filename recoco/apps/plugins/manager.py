@@ -5,6 +5,8 @@ import importlib.metadata
 import pluggy
 import sentry_sdk
 
+from recoco.apps.home.models import SiteConfiguration
+
 from .hooks import all_specs
 
 # Global manager holding ALL discovered plugins
@@ -43,22 +45,38 @@ def _build_plugin_manager():
     return pm
 
 
-def get_tenant_hook(request):
+def get_site_configuration(site):
+    """Return the SiteConfiguration for a given Site, or None if absent."""
+    try:
+        return SiteConfiguration.objects.get(site=site)
+    except SiteConfiguration.DoesNotExist:
+        return None
+
+
+def get_site_plugin_manager(request=None, site=None):
     """
     Return a plugin manager scoped to the current tenant.
     The only enabled plugins come from the SiteConfiguration
+
+    if request is not available, try to to lookup the SiteConfiguration
+    from the Site. If neither is given, return a blank plugin manager.
     """
     pm = get_plugin_manager()
 
     recoco_pm = _new_plugin_manager()
 
+    site_config = None
+
+    if request:
+        site_config = getattr(request, "site_config", None)
+    elif site:
+        site_config = get_site_configuration(site)
+        if site_config is None:
+            return recoco_pm
+
     # Feed the scoped plugin manager with enabled plugins
-    if (
-        hasattr(request, "site_config")
-        and request.site_config
-        and request.site_config.enabled_plugins
-    ):
-        enabled = set(request.site_config.enabled_plugins)
+    if site_config and site_config.enabled_plugins:
+        enabled = set(site_config.enabled_plugins)
 
         for name, plugin in pm.list_name_plugin():
             if name in enabled:

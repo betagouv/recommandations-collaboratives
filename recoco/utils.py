@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -176,9 +177,32 @@ def get_admin_for_site(site=None):
     return auth_models.Group.objects.get(name=group_name).user_set.all()
 
 
+def truncate_string(s, max_length):
+    """Truncate given string to max_length"""
+    if len(s) <= max_length:
+        return s
+    sub = s[:max_length]
+    if s[max_length] != " ":
+        # we are truncating last word, rewind to its begining
+        sub = sub[: sub.rfind(" ")]
+    return f"{sub}…"
+
+
 ########################################################################
 # Test helpers
 ########################################################################
+
+
+def confirm_mail(user):
+    """tool for testing"""
+    EmailAddress.objects.get_or_create(
+        user=user, email=user.email, verified=True, primary=True
+    )
+
+
+def check_email_verified(user):
+    """tool for testing"""
+    return EmailAddress.objects.filter(user=user, verified=True).exists()
 
 
 @contextmanager
@@ -188,10 +212,13 @@ def login(
     user=None,
     groups=None,
     username="test",
-    email="test@example.com",
+    email=None,
+    email_verified=True,
 ):
     """Create a user and sign her into the application"""
     groups = groups or []
+    if email is None:
+        email = username + "@example.com"
     if not user:
         user = auth.User.objects.create_user(
             username=username, email=email, is_staff=is_staff
@@ -199,6 +226,8 @@ def login(
     for name in groups:
         group = auth.Group.objects.get(name=name)
         group.user_set.add(user)
+    if email_verified:
+        confirm_mail(user)
     client.force_login(user)
     yield user
 

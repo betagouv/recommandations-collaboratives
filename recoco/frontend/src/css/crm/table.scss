@@ -1,3 +1,23 @@
+.crm-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #6a6af4;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  cursor: default;
+
+  &--overflow {
+    background-color: #e3e3fd;
+    color: #3a3a3a;
+  }
+}
+
 .crm {
   .project-table,
   .resource-table {
@@ -19,14 +39,29 @@
     }
     // Largeurs des colonnes via colgroup
     col {
+      &.col--xxl {
+        width: 30%;
+      }
+      &.col--xl {
+        width: 25%;
+      }
       &.col--large {
         width: 20%;
       }
       &.col--medium {
         width: 15%;
       }
+      &.col--ms {
+        width: 13%;
+      }
       &.col--small {
         width: 10%;
+      }
+      &.col--xs {
+        width: 8%;
+      }
+      &.col--xxs {
+        width: 5%;
       }
       &.col--fixed-180 {
         min-width: 180px;
@@ -34,6 +69,12 @@
 
       &.col--fixed-160 {
         min-width: 160px;
+      }
+      &.col--fixed-140 {
+        width: 140px;
+      }
+      &.col--fixed-70 {
+        width: 70px;
       }
     }
     .fr-link {
@@ -47,6 +88,9 @@
       background: #fff;
       &:nth-child(even) {
         background-color: #f8f8f8;
+      }
+      &.is-selected {
+        border: 2px solid var(--light-background-active-blue-france, #000091);
       }
     }
     &__project-name {
