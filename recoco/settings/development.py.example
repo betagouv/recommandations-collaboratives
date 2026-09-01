@@ -116,10 +116,6 @@ VITE_DEV_SERVER_PORT = int(os.getenv("DJANGO_VITE_DEV_SERVER_PORT", 3000))
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist"
 DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": VITE_DEV_SERVER_PORT}}
 DJANGO_VITE_DEV_MODE = DEBUG
-_VITE = [
-    f"http://localhost:{VITE_DEV_SERVER_PORT}",
-    f"ws://localhost:{VITE_DEV_SERVER_PORT}",
-]
 
 # Add this if you want multisite support (make sure youclone the repository in
 # the same dir under the name "mulisites")
@@ -154,10 +150,10 @@ DS_AUTOLOAD_SCHEMA = False
 DS_AUTOCREATE_FOLDER = False
 
 CONTENT_SECURITY_POLICY = {
-    "DIRECTIVES": {
-        key: values if key == "default-src" else [*values, *_VITE]
-        for key, values in common.CONTENT_SECURITY_POLICY["DIRECTIVES"].items()
-    }
+  "DIRECTIVES": {
+    key: [*policies, f"http://localhost:{VITE_DEV_SERVER_PORT}", f"ws://localhost:{VITE_DEV_SERVER_PORT}"]
+    for key, policies in common.CONTENT_SECURITY_POLICY["DIRECTIVES"].items()
+  }
 }
 
 # eof
