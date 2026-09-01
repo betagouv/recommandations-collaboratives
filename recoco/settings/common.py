@@ -258,7 +258,7 @@ CONTENT_SECURITY_POLICY = {
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
-        "frame-src": ["https://www.google.com", "https://*.crisp.help"],
+        "frame-src": [SELF, "https://www.google.com", "https://*.crisp.help"],
         "form-action": [SELF, PROCONNECT_ORIGIN],
         "img-src": [
             SELF,
