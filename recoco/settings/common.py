@@ -255,6 +255,7 @@ CONTENT_SECURITY_POLICY = {
             "https://geo.api.gouv.fr/",
             "https://api-adresse.data.gouv.fr/",
             "https://www.google.com",
+            "https://stats.beta.gouv.fr",
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
