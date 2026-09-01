@@ -254,7 +254,7 @@ CONTENT_SECURITY_POLICY = {
             "wss://client.relay.crisp.chat/",
             "https://geo.api.gouv.fr/",
             "https://api-adresse.data.gouv.fr/",
-            "https://www.google.com/recaptcha",
+            "https://www.google.com",
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
@@ -274,6 +274,8 @@ CONTENT_SECURITY_POLICY = {
             SELF,
             "https://stats.beta.gouv.fr/",
             "https://client.crisp.chat",
+            "https://www.google.com",
+            "https://www.gstatic.com/",
             UNSAFE_EVAL,
             UNSAFE_INLINE,  # fixme crisp uses this
         ],  # fixme with @alpine/csp and manual checks
