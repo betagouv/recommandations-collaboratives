@@ -112,8 +112,9 @@ DEBUG_EMAIL_WHITELIST = []
 RECAPTCHA_REQUIRED_SCORE = 0
 
 # Vite
+VITE_DEV_SERVER_PORT = int(os.getenv("DJANGO_VITE_DEV_SERVER_PORT", 3000))
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist"
-DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3000}}
+DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": VITE_DEV_SERVER_PORT}}
 DJANGO_VITE_DEV_MODE = DEBUG
 
 # Add this if you want multisite support (make sure youclone the repository in
@@ -149,8 +150,10 @@ DS_AUTOLOAD_SCHEMA = False
 DS_AUTOCREATE_FOLDER = False
 
 CONTENT_SECURITY_POLICY = {
-    key: [*policies, "http://localhost:3000", "ws://localhost:3000"]
-    for key, policies in common.CONTENT_SECURITY_POLICY.items()
+  "DIRECTIVES": {
+    key: [*policies, f"http://localhost:{VITE_DEV_SERVER_PORT}", f"ws://localhost:{VITE_DEV_SERVER_PORT}"]
+    for key, policies in common.CONTENT_SECURITY_POLICY["DIRECTIVES"].items()
+  }
 }
 
 # eof
