@@ -25,7 +25,6 @@ INSTALLED_APPS += (
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "django_extensions",
-    "plugin_mi_depafi",
 )
 
 # Database
