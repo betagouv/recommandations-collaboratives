@@ -21,7 +21,6 @@ from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.contrib.sites.models import Site
-from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.core.exceptions import BadRequest
@@ -84,6 +83,7 @@ from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
+    AuthenticatedFeed,
     get_group_for_site,
     has_perm,
     has_perm_or_403,
@@ -2057,10 +2057,13 @@ def project_site_handover(request, project_id):
 ########################################################################
 
 
-class LatestNotesFeed(Feed):
+class LatestNotesFeed(AuthenticatedFeed):
     title = "Dernières notes de CRM"
     link = "/crm/feed"
     description = "Dernières notes"
+
+    def has_permission(self, request):
+        return has_perm(request.user, "sites.use_crm", request.site)
 
     def items(self):
         return models.Note.on_site.order_by("-updated_on", "-created_on")[:20]
