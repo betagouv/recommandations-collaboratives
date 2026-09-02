@@ -24,6 +24,82 @@
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <form method="post" enctype="multipart/form-data" class="fr-form">
                     {% csrf_token %}
+                    <h1 class="fr-h3 fr-mb-1w">Paramètres du portail</h1>
+                    <p class="fr-text--sm fr-mb-3w">
+                        Vous pouvez ici paramétrer votre portail. Pour plus d'informations,
+                        {# TODO URL doc #}<a class="fr-link" href="#">n'hésitez pas à consulter la documentation</a>.
+                        <br>
+                        Parcourez les différentes rubriques pour faire vos modifications.
+                        Une fois vos modifications faites, n'oubliez pas de les enregistrer !
+                    </p>
+                    <div class="fr-accordions-group fr-mb-3w">
+                        <section class="fr-accordion">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-description">
+                                    <span class="fr-icon-file-text-line fr-mr-1w" aria-hidden="true"></span>Description du service
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-description">
+                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                            </div>
+                        </section>
+                        <section class="fr-accordion">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-emails">
+                                    <span class="fr-icon-mail-line fr-mr-1w" aria-hidden="true"></span>Paramètres des e-mails
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-emails">
+                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                            </div>
+                        </section>
+                        <section class="fr-accordion">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-logos">
+                                    <span class="fr-icon-image-line fr-mr-1w" aria-hidden="true"></span>Logos
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-logos">
+                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                            </div>
+                        </section>
+                        <section class="fr-accordion">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-legal">
+                                    <span class="fr-icon-scales-3-line fr-mr-1w" aria-hidden="true"></span>Mentions légales et politique de confidentialité
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-legal">
+                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                            </div>
+                        </section>
+                        <section class="fr-accordion">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-config">
+                                    <span class="fr-icon-settings-5-line fr-mr-1w" aria-hidden="true"></span>Configuration
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-config">
+                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordéon</p>
+                            </div>
+                        </section>
+                    </div>
+
                     {% crispy form "dsrc_crispy_forms_no_js" %}
                     <div class="fr-mb-3w">
                         <h6 class="fr-mb-1w">Plugins activés</h6>
