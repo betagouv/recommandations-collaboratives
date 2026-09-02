@@ -7,6 +7,17 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
+const markerSettings = {
+  iconSize: [18, 22],
+  iconAnchor: [9, 22],
+  popupAnchor: [0, -22],
+};
+
+const ICONS = {
+  default: createMarkerIcon('realisation-marker', null, markerSettings),
+  focused: createMarkerIcon('realisation-marker is-focused', null, markerSettings),
+};
+
 function mapLayerStyles(className) {
   return {
     className,
@@ -294,8 +305,8 @@ function addLayerParcels(map, geoData) {
   L.control.layers(null, overlayMap).addTo(map);
 }
 
-function createMarkerIcon(className, title) {
-  return L.divIcon({ className: `map-marker ${className}`, title });
+function createMarkerIcon(className, title, options = {}) {
+  return L.divIcon({ className: `map-marker ${className}`, title, ...options });
 }
 
 function createMarkerClusterGroup(options = {}) {
@@ -346,6 +357,18 @@ function markerPopupTemplate({
 	`;
 }
 
+function setMarkerFocus(previousMarker, clickedMarker) {
+  if (previousMarker) {
+    previousMarker.setIcon(ICONS.default);
+    previousMarker.setZIndexOffset(0);
+  }
+
+  if (clickedMarker) {
+    clickedMarker.setIcon(ICONS.focused);
+    clickedMarker.setZIndexOffset(1000);
+  }
+}
+
 function mapOptions({ interactive, zoom }) {
   return {
     dragging: interactive,
@@ -376,4 +399,6 @@ export default {
   createMarkerIcon,
   createMarkerClusterGroup,
   markerPopupTemplate,
+  setMarkerFocus,
+  ICONS
 };
