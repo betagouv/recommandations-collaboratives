@@ -1252,4 +1252,37 @@ def test_embedded_resource_detail_ds_prefill_button(request, client):
         )
 
 
+@pytest.mark.django_db
+def test_staff_can_access_feed(client, current_site, staff_user):
+    public_resources = baker.make(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.PUBLISHED,
+        _fill_optional=["title"],
+        _quantity=2,
+    )
+    draft_resource = baker.make(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.DRAFT,
+        _fill_optional=["title"],
+    )
+    review_resource = baker.make(
+        models.Resource,
+        status=models.Resource.TO_REVIEW,
+        sites=[current_site],
+        _fill_optional=["title"],
+    )
+
+    client.force_login(staff_user)
+
+    response = client.get(reverse("resources-feed"))
+
+    assert response.status_code == 200
+    for resource in public_resources:
+        assert resource.title in response.text
+    assert review_resource.title not in response.text
+    assert draft_resource.title not in response.text
+
+
 # eof

@@ -624,7 +624,10 @@ class LatestResourcesFeed(Feed):
     description = "Derniers ajouts de ressources"
 
     def items(self):
-        return models.Resource.on_site.order_by("-created_on")[:5]
+        qs = models.Resource.on_site.order_by("-created_on").filter(
+            status__gt=models.Resource.TO_REVIEW
+        )
+        return qs[:5]
 
     def item_title(self, item):
         return item.title
