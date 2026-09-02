@@ -78,6 +78,7 @@ function MapDashboard(currentSiteId, regions) {
       const { map, markersLayer } = this.initMap(this.projectList);
       this.map = map;
       this.markersLayer = markersLayer;
+      this.onClickToggleGrey();
       if (this.projectList.length > 0) {
         this.zoomToCentroid(this.map, this.markersLayer);
       } else {
@@ -141,6 +142,10 @@ function MapDashboard(currentSiteId, regions) {
 
     zoomToCentroid(map, markersLayer) {
       return map.fitBounds(markersLayer.getBounds());
+    },
+
+    onClickToggleGrey() {
+      mapUtils.toggleGreyFilter(this.map);
     },
 
     // Crete layers composed with markers

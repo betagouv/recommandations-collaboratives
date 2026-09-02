@@ -144,7 +144,6 @@ function initPlanIGNLayer() {
     {
       maxZoom: 19,
       attribution: 'IGN-F/Géoportail',
-      className: 'basemap-grayscale',
     }
   );
 }
@@ -381,6 +380,10 @@ function mapOptions({ interactive, zoom }) {
   };
 }
 
+function toggleGreyFilter(map) {
+  map.getPane('tilePane').classList.toggle('basemap-grayscale');
+}
+
 export default {
   makeMap,
   initMapLayer,
@@ -400,5 +403,6 @@ export default {
   createMarkerClusterGroup,
   markerPopupTemplate,
   setMarkerFocus,
-  ICONS
+  ICONS,
+  toggleGreyFilter
 };
