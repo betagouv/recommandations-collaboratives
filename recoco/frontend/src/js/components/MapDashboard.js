@@ -37,23 +37,6 @@ function MapDashboard(currentSiteId, regions) {
     //*** options
     allProjects: [],
     async init() {
-      // this.allProjects = await this.$store.projects.getUserProjetsStatus();
-      // if (this.map) {
-      //   this.map.remove();
-      // }
-      // if (this.markersLayer) {
-      //   this.markersLayer.remove();
-      // }
-      // const { map, markersLayer } = initMap(this.allProjects);
-
-      // this.map = map;
-      // this.markersLayer = markersLayer;
-
-      // if (this.allProjects.length > 0) {
-      //   zoomToCentroid(this.map, this.markersLayer);
-      // } else {
-      //   setTimeout(() => this.map.invalidateSize(), 251);
-      // }
       await this.getDataFiltered();
     },
     get isBusy() {
