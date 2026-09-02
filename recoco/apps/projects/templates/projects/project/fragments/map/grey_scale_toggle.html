@@ -1,0 +1,14 @@
+<!-- component: Grey scale toggle for map
+    is_checked: boolean
+-->
+<div class="map-filter-toggle">
+    <div class="fr-toggle">
+        <input type="checkbox"
+                class="fr-toggle__input"
+                id="toggle_grey"
+                {% if is_checked %}checked{% endif %}
+                @click="onClickToggleGrey">
+        <label class="fr-toggle__label"
+                for="toggle_grey">Afficher en niveaux de gris</label>
+    </div>
+</div>

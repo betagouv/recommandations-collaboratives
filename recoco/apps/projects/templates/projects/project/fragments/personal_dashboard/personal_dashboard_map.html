@@ -27,15 +27,7 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#fullscreen-exit" />
         </svg>
     </div>
-    <div class="map-filter-toggle">
-        <div class="fr-toggle">
-            <input type="checkbox"
-                    class="fr-toggle__input"
-                    id="toggle_grey"
-                    checked
-                    @click="onClickToggleGrey">
-            <label class="fr-toggle__label"
-                    for="toggle_grey">Afficher en niveaux de gris</label>
-        </div>
-    </div>
+
+    {% include "projects/project/fragments/map/grey_scale_toggle.html" with is_checked=True %}
+
 </div>
