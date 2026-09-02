@@ -1,3 +1,4 @@
+import nh3
 from django.contrib.contenttypes.models import ContentType
 from notifications import models as notifications_models
 from rest_framework import serializers
@@ -150,6 +151,9 @@ class ProjectSerializer(
             if obj.owner and obj.owner.profile.organization
             else ""
         )
+
+    def validate_description(self, value):
+        return nh3.clean(value)
 
 
 class UserProjectSerializer(ProjectSerializer):

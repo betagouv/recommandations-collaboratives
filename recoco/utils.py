@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
+import nh3
 from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
@@ -311,6 +312,33 @@ class RunSQLFile(migrations.RunSQL):
             hints=hints,
             elidable=elidable,
         )
+
+
+def sanitize_text_field_historic_data(
+    model, field_name: str, db_alias: str, batch_size: int = 500
+):
+    """Retroactively run nh3.clean() over every non-empty value of
+    `field_name` on `model`, saving only the rows whose value actually
+    changes. Meant to be called from data migrations that apply, to
+    historic data, a sanitization that was added to a form/serializer
+    """
+    to_update = []
+    queryset = (
+        model.objects.using(db_alias)
+        .exclude(**{field_name: None})
+        .exclude(**{field_name: ""})
+    )
+    for obj in queryset.iterator():
+        value = getattr(obj, field_name)
+        cleaned = nh3.clean(value)
+        if cleaned != value:
+            setattr(obj, field_name, cleaned)
+            to_update.append(obj)
+        if len(to_update) >= batch_size:
+            model.objects.using(db_alias).bulk_update(to_update, [field_name])
+            to_update = []
+    if to_update:
+        model.objects.using(db_alias).bulk_update(to_update, [field_name])
 
 
 def strip_accents(input: str) -> str:
