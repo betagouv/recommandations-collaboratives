@@ -1,30 +1,39 @@
 import projects from '../../../fixtures/projects/projects.json';
-const currentProject = projects[1];
+import sharedContentsPanel from '../../../support/tools/sharedContentsPanel';
 
-// TODO Réécrire pour la nouvelle interface conversation+panneau actions
-//      (l'onglet "Recommandations" n'existe plus, /actions redirige vers /conversations#actions)
-describe.skip('I can access actions tab in a project as a member @navigation-projet @page-projet-recommandations', () => {
+const currentProject = projects[1]; // pk 2 - conseiller1 advisor, collectivité1 owner
+// pk 33 - conseiller1 advisor, published fixture reco.
+const advisorTestProject = projects.find((p) => p.pk === 33);
+
+describe('I can access the conversation tab in a project as a member @navigation-projet @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });
 
-  it('goes to the action page of my project', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+  it('goes to the conversation page of my project and opens the recommendations panel', () => {
+    cy.visit(`/project/${advisorTestProject.pk}`);
+    cy.get('[data-test-id="project-navigation-conversations-new"]').click({
+      force: true,
+    });
+    cy.url().should('include', '/conversations');
+    sharedContentsPanel.openFromTopic('recommendations');
+    sharedContentsPanel
+      .getRecommendationCards()
+      .should('contain.text', 'Reco navigation fixture');
   });
 });
 
-describe.skip('I can access actions tab in a project as an advisor @navigation-projet @page-projet-recommandations', () => {
+describe('I can access the conversation tab in a project as an advisor @navigation-projet @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });
 
-  it('goes to the action page of my project', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+  it('goes to the conversation page and opens the recommendations panel', () => {
+    cy.visit(`/project/${advisorTestProject.pk}/conversations`);
+
+    sharedContentsPanel.openFromTopic('recommendations');
+    sharedContentsPanel
+      .getRecommendationCards()
+      .should('contain.text', 'Reco navigation fixture');
   });
 });
-
-// page dossier

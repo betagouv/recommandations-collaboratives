@@ -16,20 +16,23 @@
             x-effect="recommendation = reco; element = { id: recommendation.messageId, posted_by: recommendation.messagePostedBy }">
     <!-- djlint:on -->
     <!-- Container for the draft recommendation card -->
-    <div class="shared-contents-draft-reco-card__container">
+    <div class="shared-contents-draft-reco-card__container"
+         data-test-id="draft-reco-card">
         <div class="shared-contents-draft-reco-card__header">
             <div>
                 <span class="fr-icon-draft-line fr-icon--sm" aria-hidden="true"></span>
                 <span>Brouillon</span>
             </div>
             <div>
-                <span class="fr-mr-3v">Position : <span x-text="index + 1"></span></span>
+                <span class="fr-mr-3v">Position : <span x-text="index + 1" data-test-id="draft-reco-position"></span></span>
                 <button class="fr-btn--tertiary fr-btn--tertiary-white-background"
+                        data-test-id="draft-reco-move-up"
                         @click="$store.sharedContentsPanel.moveDraftRecommendation('above', recommendation)"
                         :disabled="index == 0">
                     <span class="fr-icon-arrow-up-s-line fr-icon--sm " aria-hidden="true"></span>
                 </button>
                 <button class="fr-btn--tertiary fr-btn--tertiary-white-background"
+                        data-test-id="draft-reco-move-down"
                         @click="$store.sharedContentsPanel.moveDraftRecommendation('below', recommendation)"
                         :disabled="index == $store.sharedContentsPanel.draftRecommendations.length - 1">
                     <span class="fr-icon-arrow-down-s-line fr-icon--sm " aria-hidden="true"></span>
@@ -58,11 +61,14 @@
         <div class="shared-contents-draft-reco-card__footer fr-pt-3v fr-pl-3v">
             <div class="d-flex gap-2">
                 <a class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
+                   data-test-id="draft-reco-edit"
                    :href="editTaskUrl(recommendation.id, '{{ request.path }}')">Editer</a>
                 <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-white-background"
+                        data-test-id="draft-reco-delete"
                         @click="$dispatch('open-delete-modal', recommendation)">Supprimer</button>
             </div>
             <button class="fr-btn fr-btn--sm fr-icon-send-plane-fill fr-btn--icon-left fr-btn--primary justify-content-end"
+                    data-test-id="draft-reco-publish"
                     @click="publishDraftRecommendation(recommendation)">Publier</button>
         </div>
     </div>
