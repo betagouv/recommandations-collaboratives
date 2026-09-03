@@ -100,7 +100,28 @@
                         </section>
                     </div>
 
-                    {% crispy form "dsrc_crispy_forms_no_js" %}
+                    {% if form.non_field_errors %}
+                        <div class="fr-alert fr-alert--error fr-mb-3w">
+                            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
+                    {# TMP - replace crispy form with all its elements separately #}
+                    <fieldset class="fr-fieldset">
+                        {{ form.sender_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.description|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.logo_large|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.logo_small|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.email_logo|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.crm_available_tags|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.reminder_interval|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                        {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                    </fieldset>
+
                     <div class="fr-mb-3w">
                         <h6 class="fr-mb-1w">Plugins activés</h6>
                         {% with plugins=request.site.configuration.enabled_plugins %}
