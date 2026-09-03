@@ -43,7 +43,10 @@
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-description">
-                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.description|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
                             </div>
                         </section>
                         <section class="fr-accordion">
@@ -111,8 +114,6 @@
                         {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.description|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.logo_large|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.logo_small|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.email_logo|as_crispy_field:"dsrc_crispy_forms_no_js" }}
