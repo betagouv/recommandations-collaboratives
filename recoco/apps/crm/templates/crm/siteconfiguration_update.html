@@ -59,7 +59,15 @@
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-emails">
-                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
+                                <h3 class="fr-h6 fr-mb-1w">Informations envoyées dans les e-mails</h3>
+                                {# TODO replace text #}<p class="fr-text--sm fr-mb-2w">Texte de description additionnel</p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.sender_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.reminder_interval|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
                             </div>
                         </section>
                         <section class="fr-accordion">
@@ -110,15 +118,12 @@
                     {% endif %}
                     {# TMP - replace crispy form with all its elements separately #}
                     <fieldset class="fr-fieldset">
-                        {{ form.sender_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.logo_large|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.logo_small|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.email_logo|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.crm_available_tags|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.reminder_interval|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                     </fieldset>
