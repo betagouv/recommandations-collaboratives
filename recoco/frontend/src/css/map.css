@@ -160,25 +160,3 @@
 .map-marker.bg-dark:after {
   background-color: #212529;
 }
-
-
-.map-filter-toggle {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  z-index: 110;
-  padding: 1rem;
-
-  background-color: white;
-  box-shadow: 5px 5px 8px 0px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-
-}
-.map-filter-toggle .fr-toggle__label {
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-
-.basemap-grayscale {
-  filter: grayscale(1) contrast(0.9) brightness(1.05);
-}
