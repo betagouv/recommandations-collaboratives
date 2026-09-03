@@ -660,4 +660,7 @@ ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
 
+COOKIE_CONSENT_SAMESITE = "None"
+COOKIE_CONSENT_SECURE = True
+
 # eof
