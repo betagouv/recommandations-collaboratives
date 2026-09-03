@@ -1,0 +1,33 @@
+{% comment %}
+    upload image component (for site configuration form)
+    Parameters:
+      field : image field from the form (ex. form.logo_small)
+{% endcomment %}
+<div class="fr-upload-group">
+    <label class="fr-label" for="{{ field.id_for_label }}">
+        {{ field.label }}
+        {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
+    </label>
+    <input class="fr-upload"
+           type="file"
+           accept="image/*"
+           id="{{ field.id_for_label }}"
+           name="{{ field.html_name }}">
+    {% for error in field.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+</div>
+{% if field.value %}
+    <div class="fr-mt-2w">
+        <img class="fr-responsive-img crm-config__logo-preview"
+             src="{{ field.value.url }}"
+             alt="Aperçu : {{ field.label }}">
+        <div class="fr-checkbox-group fr-mt-1w">
+            <input type="checkbox"
+                   id="{{ field.html_name }}-clear_id"
+                   name="{{ field.html_name }}-clear">
+            <label class="fr-label" for="{{ field.html_name }}-clear_id">
+                Supprimer ce logo
+                <span class="fr-hint-text">La suppression sera effective après enregistrement.</span>
+            </label>
+        </div>
+    </div>
+{% endif %}

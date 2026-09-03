@@ -80,7 +80,30 @@
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-logos">
-                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                                <div class="fr-notice fr-notice--warning fr-mb-3w">
+                                    <div class="fr-container--fluid">
+                                        <div class="fr-notice__body">
+                                            <p class="fr-notice__title">
+                                                Pour plus d'information sur les logos et leurs formats, veuillez consulter la documentation.
+                                            </p>
+                                            {# TODO URL doc #}
+                                            <p><a class="fr-link" href="#" target="_blank" rel="noopener external">Consulter la documentation</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fr-grid-row fr-grid-row--gutters">
+                                    <div class="fr-col-12 fr-col-md-6">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_small %}
+                                    </div>
+                                    <div class="fr-col-12 fr-col-md-6">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_large %}
+                                    </div>
+                                    {# TODO add favicon part #}
+                                    <div class="fr-col-12 fr-col-md-6"></div>
+                                    <div class="fr-col-12 fr-col-md-6">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.email_logo %}
+                                    </div>
+                                </div>
                             </div>
                         </section>
                         <section class="fr-accordion">
@@ -120,9 +143,6 @@
                     <fieldset class="fr-fieldset">
                         {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.logo_large|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.logo_small|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.email_logo|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.crm_available_tags|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                         {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
