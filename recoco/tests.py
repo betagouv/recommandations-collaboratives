@@ -254,6 +254,30 @@ def test_return_admin(client, request):
     assert set(utils.get_admin_for_site(site)) == set(admin_group.user_set.all())
 
 
+def test_render_markdown_strips_embedded_script_tags():
+    rendered = utils.render_markdown("<script>alert(document.cookie)</script>")
+
+    assert "<script>" not in rendered
+    assert "alert(document.cookie)" not in rendered
+
+
+def test_render_markdown_strips_embedded_event_handlers():
+    rendered = utils.render_markdown('<img src=x onerror="alert(1)">')
+
+    assert "onerror" not in rendered
+
+
+def test_render_markdown_keeps_basic_markdown_formatting():
+    rendered = utils.render_markdown("**bold** and _italic_")
+
+    assert "<strong>bold</strong>" in rendered
+    assert "<em>italic</em>" in rendered
+
+
+def test_render_markdown_handles_none():
+    assert utils.render_markdown(None) == ""
+
+
 class CustomBaker(baker.Baker):
     def get_fields(self):
         return [

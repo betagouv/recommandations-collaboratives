@@ -18,7 +18,6 @@ from django.contrib.sites.models import Site
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django_gravatar.helpers import get_gravatar_url
-from markdownx.utils import markdownify
 
 from recoco import utils, verbs
 from recoco.apps.home.models import SiteConfiguration
@@ -603,7 +602,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     counts_less_recap = aggregated_counts.copy()
     if first_text_msg:
         counts_less_recap["message"] -= 1
-        first_text = markdownify(
+        first_text = utils.render_markdown(
             "\n\n".join(
                 node.text
                 for node in first_text_msg.nodes.filter(
