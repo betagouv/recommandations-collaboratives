@@ -275,12 +275,12 @@
                                 </span>
                                 {% if followup.comment %}
                                     <p class="fr-m-0 fr-p-0">
-                                        <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
+                                        <q>&nbsp;{{ followup.comment_rendered|safe }}&nbsp;</q>
                                     </p>
                                 {% endif %}
                             </div>
                         {% else %}
-                            {% include "projects/project/fragments/action_comment.html" with followup=followup comment=followup.comment author=followup.who date=followup.timestamp %}
+                            {% include "projects/project/fragments/action_comment.html" with followup=followup comment=followup.comment_rendered author=followup.who date=followup.timestamp %}
                         {% endif %}
                     {% endfor %}
                     {% if can_manage and task.public %}

@@ -26,7 +26,18 @@ from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.http import HttpResponse, HttpResponseBadRequest
+from markdownx.utils import markdownify
 from sesame.utils import get_parameters
+
+
+def render_markdown(text: AnyStr | None) -> str:
+    """Render markdown to HTML, stripping any embedded/unsafe HTML.
+
+    `markdownx.utils.markdownify` passes raw HTML embedded in the source
+    straight through, so its output is never safe to render with `|safe`
+    on its own -- always sanitize it here first.
+    """
+    return nh3.clean(markdownify(text or ""))
 
 
 def make_site_slug(site: Site):
