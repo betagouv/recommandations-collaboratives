@@ -10,6 +10,24 @@ from sib_api_v3_sdk.rest import ApiException
 logger = logging.getLogger("main")
 
 
+def sanitize_brevo_params(value):
+    """Neutralize Brevo's `{{ }}` template syntax in outgoing params.
+
+    User-controlled strings (note content, comments, names, etc.) can reach
+    Brevo's own template renderer verbatim. A payload like `{{7*7}}` would
+    then be evaluated by Brevo, not us (a Brevo-side SSTI). Breaking up any
+    double-brace sequence with a zero-width space keeps the text visually
+    unchanged while stopping Brevo from recognizing it as a template tag.
+    """
+    if isinstance(value, str):
+        return value.replace("{{", "{​{").replace("}}", "}​}")
+    if isinstance(value, dict):
+        return {k: sanitize_brevo_params(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [sanitize_brevo_params(v) for v in value]
+    return value
+
+
 class Brevo:
     def __init__(self):
         self.configuration = brevo_sdk.Configuration()
@@ -76,7 +94,7 @@ class Brevo:
             send_smtp_email = brevo_sdk.SendSmtpEmail(
                 template_id=template_id,
                 to=send_to,
-                params=params,
+                params=sanitize_brevo_params(params),
                 sender=sender,
             )
 
