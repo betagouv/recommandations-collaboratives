@@ -55,6 +55,7 @@ from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
     ProjectForListSerializer,
+    ProjectLocationSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
@@ -123,18 +124,30 @@ class ProjectDetail(
             request.user, "projects.change_location", p
         )  # need at least one write perm
         context = {"request": request, "view": self, "format": format}
-        serializer = UserProjectSerializer(
+
+        # Only advisors/observers hold `change_project` (and, together with
+        # it, `use_project_tags` — see `ADVISOR_PERMISSIONS`); collaborators,
+        # draft or not, only ever hold `change_location`. Restrict the
+        # writable fields to match, closing a mass-assignment gap (security
+        # audit finding #12).
+        write_serializer_class = (
+            UserProjectSerializer
+            if has_perm(request.user, "list_projects", request.site)
+            or has_perm(request.user, "projects.change_project", p)
+            else ProjectLocationSerializer
+        )
+        write_serializer = write_serializer_class(
             p, context=context, data=request.data, partial=True
         )
-        if serializer.is_valid():
+        if write_serializer.is_valid():
             # old = copy(p)
-            serializer.save()
+            write_serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
             #     )
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(UserProjectSerializer(p, context=context).data)
+        return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectList(ListAPIView):
