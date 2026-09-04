@@ -24,7 +24,7 @@ from django.contrib.syndication.views import Feed
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
@@ -223,7 +223,7 @@ class BaseResourceDetailView(DetailView):
     """Return the details of given resource"""
 
     model = models.Resource
-    queryset = models.Resource.objects.with_ds_annotations()
+    queryset = models.Resource.on_site.with_ds_annotations()
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
@@ -339,7 +339,9 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or self.request.user.is_authenticated
+        return resource.public or has_perm(
+            self.request.user, "manage_resources", self.request.site
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -364,6 +366,12 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
 class EmbededResourceDetailView(BaseResourceDetailView):
     template_name = "resources/resource/details_embeded.html"
+
+    def get_object(self, queryset=None):
+        resource = super().get_object(queryset)
+        if not resource.public:
+            raise Http404()
+        return resource
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

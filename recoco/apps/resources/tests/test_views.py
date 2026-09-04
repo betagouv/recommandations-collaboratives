@@ -463,7 +463,7 @@ def test_public_resource_detail_available_for_all_users(request, client):
 
 
 @pytest.mark.django_db
-def test_draft_resource_visible_to_any_authenticated_user(request, client):
+def test_draft_resource_not_visible_to_common_authenticated_user(request, client):
     site = get_current_site(request)
     resource = Recipe(
         models.Resource, sites=[site], status=models.Resource.DRAFT
@@ -476,7 +476,40 @@ def test_draft_resource_visible_to_any_authenticated_user(request, client):
 
     with login(client):
         response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_draft_resource_visible_to_resource_manager(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource, sites=[site], status=models.Resource.DRAFT
+    ).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_resource_detail_not_visible_across_sites(request, client):
+    other_site = Site.objects.create(domain="other.example.com", name="other")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    response = client.get(url)
+    assert response.status_code == 404
+
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -1062,13 +1095,15 @@ def test_user_bookmarks_a_resource(request, client):
 
 @pytest.mark.django_db
 def test_user_refresh_bookmark_of_a_resource(request, client):
+    site = get_current_site(request)
     with login(client) as user:
         bookmark = Recipe(
             models.Bookmark,
-            site=get_current_site(request),
+            site=site,
             created_by=user,
             deleted=datetime.now(),
             resource__status=models.Resource.PUBLISHED,
+            resource__sites=[site],
         ).make()
         url = reverse("resources-bookmark-create", args=[bookmark.resource_id])
         data = {"comments": "some nice comments"}
@@ -1085,12 +1120,14 @@ def test_user_refresh_bookmark_of_a_resource(request, client):
 
 @pytest.mark.django_db
 def test_user_deletes_a_personal_bookmark(request, client):
+    site = get_current_site(request)
     with login(client) as user:
         bookmark = Recipe(
             models.Bookmark,
-            site=get_current_site(request),
+            site=site,
             created_by=user,
             resource__status=models.Resource.PUBLISHED,
+            resource__sites=[site],
         ).make()
         url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
         response = client.post(url)
@@ -1103,10 +1140,12 @@ def test_user_deletes_a_personal_bookmark(request, client):
 
 @pytest.mark.django_db
 def test_user_cannot_delete_someone_else_bookmark(request, client):
+    site = get_current_site(request)
     bookmark = Recipe(
         models.Bookmark,
         resource__status=models.Resource.PUBLISHED,
-        site=get_current_site(request),
+        resource__sites=[site],
+        site=site,
     ).make()
     url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
 
@@ -1174,6 +1213,41 @@ def test_deleted_bookmark_honors_multisite(request):
 
 #
 # Embedded resource view
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_view_404_for_draft_resource(client, request):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    response = client.get(
+        reverse("resources-resource-detail-embeded", args=[resource.id])
+    )
+    assert response.status_code == 404
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(
+            reverse("resources-resource-detail-embeded", args=[resource.id])
+        )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_view_404_across_sites(client, request):
+    other_site = Site.objects.create(domain="other2.example.com", name="other2")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    response = client.get(
+        reverse("resources-resource-detail-embeded", args=[resource.id])
+    )
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
