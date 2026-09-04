@@ -297,6 +297,9 @@ class DuplicateResourceView(
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
 
+    def get_queryset(self):
+        return models.Resource.on_site.all()
+
     def post(self, request, *args, **kwargs):
         current_site = get_current_site(request)
         resource_to_copy = self.get_object()
@@ -397,6 +400,9 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     template_name = "resources/resource/delete.html"
     success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
+
+    def get_queryset(self):
+        return models.Resource.on_site.all()
 
     def form_valid(self, form):
         """
