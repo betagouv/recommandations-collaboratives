@@ -844,6 +844,31 @@ def test_project_draft_collaborator_can_still_update_location_via_patch_api(
     assert project_draft.location == "new address"
 
 
+@pytest.mark.django_db
+def test_project_collaborator_cannot_update_location_of_another_project_via_patch_api(
+    request, api_client, project_draft, make_project
+):
+    """`projects.change_location` is an object-level (django-guardian)
+    permission granted per project a user actually collaborates on — it
+    must not let them touch a project they aren't a member of."""
+    other_project = make_project()
+
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    original_location = other_project.location
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[other_project.id])
+    response = api_client.patch(url, data={"location": "hijacked address"})
+
+    assert response.status_code == 403
+
+    other_project.refresh_from_db()
+    assert other_project.location == original_location
+
+
 ################
 # Project Site Status
 ################
