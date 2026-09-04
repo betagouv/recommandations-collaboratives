@@ -611,6 +611,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
                 )
             )
         )
+        first_text = f"{first_text[:75]}" if len(first_text) > 75 else first_text
     else:
         first_text = None
     if first_object_node:
