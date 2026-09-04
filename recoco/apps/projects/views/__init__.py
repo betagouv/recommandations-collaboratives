@@ -403,7 +403,7 @@ def territory_filtering_queryset(user: User) -> QuerySet:
     # Provide departments/regions for filters
     department_queryset = (
         geomatics_models.Department.objects.filter(
-            code__in=(
+            pk__in=(
                 models.Project.on_site.for_user(user)
                 .order_by("-created_on", "-updated_on")
                 .prefetch_related("commune__department")

@@ -981,7 +981,7 @@ def project_list(request):
 
     department_queryset = (
         geomatics.Department.objects.filter(
-            code__in=(
+            pk__in=(
                 Project.on_site.for_user(request.user)
                 .order_by("-created_on", "-updated_on")
                 .prefetch_related("commune__department")

@@ -5,6 +5,7 @@ from markdownx.fields import MarkdownxFormField
 from taggit.forms import TagField, TagWidget
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.home import models as home_models
 
 from . import models
@@ -80,6 +81,12 @@ class CRMProfileForm(forms.ModelForm):
 class CRMOrganizationForm(forms.ModelForm):
     """Update an organization"""
 
+    departments = forms.ModelMultipleChoiceField(
+        queryset=geomatics_models.Department.objects.all(),
+        to_field_name="code",
+        required=False,
+    )
+
     class Meta:
         model = addressbook_models.Organization
         fields = ["name", "departments"]
@@ -101,6 +108,12 @@ class CRMOrganizationMergeForm(forms.Form):
 
 class CRMAdvisorForm(forms.ModelForm):
     """Update an advisor profile department list"""
+
+    departments = forms.ModelMultipleChoiceField(
+        queryset=geomatics_models.Department.objects.all(),
+        to_field_name="code",
+        required=False,
+    )
 
     class Meta:
         model = home_models.UserProfile

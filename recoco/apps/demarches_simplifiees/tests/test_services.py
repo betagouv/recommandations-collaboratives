@@ -40,21 +40,23 @@ class TestfindDSResourceForProject:
     @pytest.mark.django_db
     def test_filter_dept(self):
         resource = baker.make(Resource)
+        dept_64 = baker.make(Department, code="64")
+        dept_01 = baker.make(Department, code="01")
         ds_resource = baker.make(
             DSResource,
             resource=resource,
-            departments__code="64",
+            departments=[dept_64],
         )
         assert (
             find_ds_resource_for_project(
-                project=baker.make(Project, commune__department__code="01"),
+                project=baker.make(Project, commune__department=dept_01),
                 resource=resource,
             )
             is None
         )
         assert (
             find_ds_resource_for_project(
-                project=baker.make(Project, commune__department__code="64"),
+                project=baker.make(Project, commune__department=dept_64),
                 resource=resource,
             )
             == ds_resource

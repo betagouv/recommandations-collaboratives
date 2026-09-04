@@ -31,16 +31,15 @@ class Region(models.Model):
         "Country",
         on_delete=models.CASCADE,
         related_name="regions",
-        null=True,
-        blank=True,
     )
 
-    code = models.CharField(max_length=2, primary_key=True)
+    code = models.CharField(max_length=2)
     name = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = "région"
         verbose_name_plural = "régions"
+        unique_together = [["country", "code"]]
 
     def __str__(self):  # pragma: nocover
         return self.name
@@ -60,12 +59,13 @@ class Department(models.Model):
         "Region", on_delete=models.CASCADE, related_name="departments"
     )
 
-    code = models.CharField(max_length=3, primary_key=True)
+    code = models.CharField(max_length=3)
     name = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = "département"
         verbose_name_plural = "départements"
+        unique_together = [["region", "code"]]
 
     def __str__(self):  # pragma: nocover
         return self.name

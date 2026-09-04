@@ -280,4 +280,47 @@ def test_reactivation_by_activity_does_not_remember(project_ready):
     assert project_ready.last_manual_reactivation is None
 
 
+# ----------------------------------------------
+# in_allowed_departments
+# ----------------------------------------------
+# Regression tests for the geomatics i18n Phase 2 migration: Department's
+# primary key moved from `code` (a string) to a surrogate `id` (an integer),
+# so comparing `project.commune.department_id` against a list of `code`
+# values would always be False after the migration (right table, wrong
+# column - see GEOMATIC_I18N.md).
+@pytest.mark.django_db
+def test_in_allowed_departments_true_when_no_restriction(project):
+    user = baker.make(auth.User)
+    assert utils.in_allowed_departments(user, project) is True
+
+
+@pytest.mark.django_db
+def test_in_allowed_departments_true_when_project_department_is_allowed(
+    request, make_project
+):
+    current_site = get_current_site(request)
+    dept = baker.make(geomatics.Department, code="62")
+    user = baker.make(auth.User)
+    user.profile.departments.set([dept])
+
+    project = make_project(site=current_site, commune__department=dept)
+
+    assert utils.in_allowed_departments(user, project) is True
+
+
+@pytest.mark.django_db
+def test_in_allowed_departments_false_when_project_department_is_not_allowed(
+    request, make_project
+):
+    current_site = get_current_site(request)
+    allowed_dept = baker.make(geomatics.Department, code="62")
+    other_dept = baker.make(geomatics.Department, code="80")
+    user = baker.make(auth.User)
+    user.profile.departments.set([allowed_dept])
+
+    project = make_project(site=current_site, commune__department=other_dept)
+
+    assert not utils.in_allowed_departments(user, project)
+
+
 # eof
