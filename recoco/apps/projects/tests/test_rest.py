@@ -677,6 +677,39 @@ def check_project_content(project, data):
     }
 
 
+@pytest.mark.django_db
+def test_project_detail_get_is_not_available_across_sites(
+    request, api_client, make_project
+):
+    """A site-level list_projects permission must not leak projects from another site"""
+    other_site = baker.make(sites_models.Site, domain="other-site.example.com")
+    project = make_project(site=other_site)
+
+    url = reverse("projects-detail", args=[project.id])
+    with login(api_client, groups=["example_com_staff"]):
+        response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_project_detail_patch_is_not_available_across_sites(
+    request, api_client, make_project
+):
+    """A site-level list_projects permission must not allow patching a project
+    from another site"""
+    other_site = baker.make(sites_models.Site, domain="other-site2.example.com")
+    project = make_project(site=other_site, name="Original name")
+
+    url = reverse("projects-detail", args=[project.id])
+    with login(api_client, groups=["example_com_staff"]):
+        response = api_client.patch(url, data={"name": "Hacked name"})
+
+    assert response.status_code == 404
+    project.refresh_from_db()
+    assert project.name == "Original name"
+
+
 ########################################################################
 # patch project details
 ########################################################################
