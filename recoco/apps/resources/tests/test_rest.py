@@ -359,6 +359,51 @@ def test_advisor_or_staff_user_can_edit_resource_with_api(
     assert response.data["created_by"]["last_name"] == resource.created_by.last_name
 
 
+@pytest.mark.django_db
+def test_anonymous_cannot_import_resource_with_api(request, api_client):
+    url = reverse("resources-import-from-uri")
+    response = api_client.post(url, data={"uri": "https://example.com/somewhere"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_simple_user_cannot_import_resource_with_api(request, api_client):
+    site = get_current_site(request)
+
+    user = baker.make(auth_models.User)
+    user.profile.sites.add(site)
+
+    url = reverse("resources-import-from-uri")
+    api_client.force_authenticate(user=user)
+    response = api_client.post(url, data={"uri": "https://example.com/somewhere"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("group_name", ["example_com_advisor", "example_com_staff"])
+def test_advisor_or_staff_user_can_import_resource_with_api(
+    request, api_client, group_name
+):
+    site = get_current_site(request)
+
+    user = baker.make(auth_models.User)
+    user.profile.sites.add(site)
+    group = auth_models.Group.objects.get(name=group_name)
+    user.groups.add(group)
+
+    uri = "https://example.com/somewhere"
+    resource = baker.make(models.Resource, sites=[site], imported_from=uri)
+
+    url = reverse("resources-import-from-uri")
+    api_client.force_authenticate(user=user)
+    response = api_client.post(url, data={"uri": uri})
+
+    assert response.status_code == 200
+    assert response.data["id"] == resource.id
+
+
 ########################################################################
 # filters and search
 ########################################################################
