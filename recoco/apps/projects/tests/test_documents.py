@@ -328,6 +328,61 @@ def test_delete_document_not_available_for_others(client, request, project):
 
 
 @pytest.mark.django_db
+def test_delete_document_cross_project_is_forbidden(request, client, project):
+    """A collaborator managing documents on their own project must not be
+    able to delete a document belonging to a different, unrelated project,
+    even one they uploaded themselves."""
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+
+        document = baker.make(
+            models.Document,
+            uploaded_by=user,
+            project=other_project,
+            the_link="http://yo",
+            site=get_current_site(request),
+        )
+
+        url = reverse(
+            "projects-documents-delete-document", args=[project.id, document.id]
+        )
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    document.refresh_from_db()
+    assert document.deleted is None
+
+
+@pytest.mark.django_db
+def test_pin_document_cross_project_is_forbidden(request, client, project):
+    """A collaborator managing documents on their own project must not be
+    able to pin/unpin a document belonging to a different, unrelated
+    project."""
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    document = baker.make(
+        models.Document,
+        project=other_project,
+        the_link="http://yo",
+        site=get_current_site(request),
+        uploaded_by__username="other",
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+
+        url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    document.refresh_from_db()
+    assert document.pinned is False
+
+
+@pytest.mark.django_db
 def test_project_pin_document(request, client, project):
     with login(client) as user:
         document = baker.make(
