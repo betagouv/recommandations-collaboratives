@@ -11,7 +11,7 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-from ..brevo import Brevo
+from ..brevo import Brevo, sanitize_brevo_params
 
 
 def test_brevo_send_email_to_unique_recipient(mocker, client):
@@ -104,3 +104,40 @@ def test_brevo_send_email_checks_address_format(mocker, client):
             recipients={"name": "Bob", "email": "bob@.com"},
             params={"p1": "v1"},
         )
+
+
+def test_sanitize_brevo_params_breaks_template_syntax():
+    assert "{{" not in sanitize_brevo_params("{{7*7}}")
+    assert "}}" not in sanitize_brevo_params("{{7*7}}")
+
+
+def test_sanitize_brevo_params_recurses_into_nested_structures():
+    sanitized = sanitize_brevo_params(
+        {
+            "message": "{{7*7}}",
+            "sender": {"first_name": "{{config}}"},
+            "items": ["{{oops}}", 42, None],
+        }
+    )
+
+    assert "{{" not in sanitized["message"]
+    assert "{{" not in sanitized["sender"]["first_name"]
+    assert "{{" not in sanitized["items"][0]
+    assert sanitized["items"][1] == 42
+    assert sanitized["items"][2] is None
+
+
+def test_brevo_send_email_neutralizes_ssti_payload_in_params(mocker, client):
+    brevo = Brevo()
+
+    mocker.patch("sib_api_v3_sdk.TransactionalEmailsApi.send_transac_email")
+
+    brevo.send_email(
+        template_id=1,
+        recipients={"name": "Bob", "email": "bob@example.com"},
+        params={"message": "{{7*7}}"},
+    )
+
+    send_smtp_email = brevo.api_instance.send_transac_email.call_args.args[0]
+    assert "{{" not in send_smtp_email.params["message"]
+    assert "}}" not in send_smtp_email.params["message"]
