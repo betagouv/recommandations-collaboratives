@@ -782,6 +782,68 @@ def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
     assert project_draft.advisors_note != new_note
 
 
+@pytest.mark.django_db
+def test_project_draft_collaborator_cannot_mass_assign_privileged_fields_via_patch_api(
+    request, api_client, project_draft
+):
+    """Regression test for security audit finding #12 (mass assignment).
+
+    A draft-stage collaborator only holds `projects.change_location` (see
+    `COLLABORATOR_DRAFT_PERMISSIONS`), which is enough to pass the PATCH
+    endpoint's single permission check. The endpoint must not let that low
+    privilege also rewrite name/description/is_diagnostic_done, which the
+    classic (non-REST) views reserve for advisors via `change_project`.
+    """
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    original_name = project_draft.name
+    original_description = project_draft.description
+    assert project_draft.is_diagnostic_done is False
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(
+        url,
+        data={
+            "name": "hijacked name",
+            "description": "hijacked description",
+            "is_diagnostic_done": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.data["name"] == original_name
+    assert response.data["description"] == original_description
+    assert response.data["is_diagnostic_done"] is False
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == original_name
+    assert project_draft.description == original_description
+    assert project_draft.is_diagnostic_done is False
+
+
+@pytest.mark.django_db
+def test_project_draft_collaborator_can_still_update_location_via_patch_api(
+    request, api_client, project_draft
+):
+    """A draft-stage collaborator still has legitimate use of their
+    `change_location` permission: it must keep working on its own field."""
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(url, data={"location": "new address"})
+
+    assert response.status_code == 200
+
+    project_draft.refresh_from_db()
+    assert project_draft.location == "new address"
+
+
 ################
 # Project Site Status
 ################

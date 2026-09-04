@@ -156,6 +156,24 @@ class ProjectSerializer(
         return nh3.clean(value)
 
 
+class ProjectLocationSerializer(BaseSerializerMixin, serializers.ModelSerializer):
+    """Restricted write serializer for the Project PATCH endpoint.
+
+    Used for callers who only hold `projects.change_location` (any project
+    collaborator, draft or not — see `COLLABORATOR_DRAFT_PERMISSIONS`/
+    `COLLABORATOR_PERMISSIONS`) so that only `location` is writable.
+    `name`/`description`/`tags`/etc. stay reserved for advisors, who hold
+    `projects.change_project`/`projects.use_project_tags`, matching the
+    classic (non-REST) views. Prevents mass assignment (security audit
+    finding #12).
+    """
+
+    class Meta:
+        model = Project
+        fields = ["id", "location"]
+        read_only_fields = ["id"]
+
+
 class UserProjectSerializer(ProjectSerializer):
     class Meta(ProjectSerializer.Meta):
         fields = ProjectSerializer.Meta.fields + [
