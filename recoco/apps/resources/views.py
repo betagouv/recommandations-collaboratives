@@ -292,6 +292,9 @@ class DuplicateResourceView(
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
 
+    def get_queryset(self):
+        return models.Resource.on_site.all()
+
     def post(self, request, *args, **kwargs):
         current_site = get_current_site(request)
         resource_to_copy = self.get_object()
@@ -386,6 +389,9 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
 
+    def get_queryset(self):
+        return models.Resource.on_site.all()
+
     def form_valid(self, form):
         """
         Dereference the current site from the resource.
@@ -421,7 +427,7 @@ def resource_update(request, resource_id=None):
     """Update informations for resource"""
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
-    resource = get_object_or_404(models.Resource, pk=resource_id)
+    resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
     selected_departments = list(resource.departments.values_list("code", flat=True))
 
     categories = list(
@@ -583,7 +589,7 @@ class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, Vi
     def post(self, request, *args, **kwargs):
         resource_id = self.kwargs.get("pk")
 
-        resource = get_object_or_404(models.Resource, pk=resource_id)
+        resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
 
         rev_id = self.kwargs.get("rev_pk")
 
