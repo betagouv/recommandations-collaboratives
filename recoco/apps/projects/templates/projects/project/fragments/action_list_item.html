@@ -274,9 +274,9 @@
                                     <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
                                 </span>
                                 {% if followup.comment %}
-                                    <p class="fr-m-0 fr-p-0">
+                                    <div class="fr-m-0 fr-p-0">
                                         <q>&nbsp;{{ followup.comment_rendered|safe }}&nbsp;</q>
-                                    </p>
+                                    </div>
                                 {% endif %}
                             </div>
                         {% else %}
