@@ -224,9 +224,43 @@ class SiteConfiguration(models.Model):
         blank=True,
         max_length=100,
     )
+
+    legal_owner_name = models.CharField(
+        verbose_name="Représentant légal (prénom, nom, fonction)",
+        null=True,
+        blank=True,
+        max_length=100,
+    )
+
+    legal_phone_no = PhoneNumberField(
+        verbose_name="Numéro de téléphone de l'organisation",
+        null=True,
+        blank=True,
+    )
+
     description = models.TextField(
         verbose_name="Description du service",
         help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
+        null=True,
+        blank=True,
+    )
+
+    target_audience = models.CharField(
+        verbose_name="Bénéficiaires du service",
+        null=True,
+        blank=True,
+        max_length=150,
+    )
+
+    dpo_contact_email = models.EmailField(
+        verbose_name="Adresse du délégué à la protection des données (DPO) affichée sur le site",
+        null=True,
+        blank=True,
+    )
+
+    gdpr_purposes = models.TextField(
+        verbose_name="Finalités du traitement au sens du RGPD",
+        help_text="Description des finalités de traitement des données personnelles sur ce portail",
         null=True,
         blank=True,
     )
@@ -250,6 +284,9 @@ class SiteConfiguration(models.Model):
 
     def logo_small_upload_path(self, filename):
         return self._logo_upload_path(filename, prefix="small")
+
+    def favicon_upload_path(self, filename):
+        return self._logo_upload_path(filename, prefix="favicon")
 
     def _logo_upload_path(self, filename, prefix=None):
         if prefix:
@@ -279,6 +316,14 @@ class SiteConfiguration(models.Model):
         null=True,
         blank=True,
         upload_to=logo_email_upload_path,
+    )
+
+    favicon = models.ImageField(
+        verbose_name="Image utilisée dans l'affichage navigateur des onglets ou lors de partage du lien du site",
+        help_text="Format carré (16x16) et avec un fond transparent (PNG)",
+        null=True,
+        blank=True,
+        upload_to=favicon_upload_path,
     )
 
     crm_available_tags = TaggableManager(
