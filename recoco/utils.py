@@ -50,7 +50,7 @@ _MARKDOWN_ALLOWED_ATTRIBUTES["th"] = _MARKDOWN_ALLOWED_ATTRIBUTES["th"] | {"styl
 _MARKDOWN_ALLOWED_ATTRIBUTES["td"] = _MARKDOWN_ALLOWED_ATTRIBUTES["td"] | {"style"}
 
 
-def render_markdown(text: AnyStr | None) -> str:
+def render_markdown(text):
     """Render markdown to HTML, stripping any embedded/unsafe HTML.
 
     `markdownx.utils.markdownify` passes raw HTML embedded in the source
