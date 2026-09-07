@@ -415,6 +415,8 @@ class TestEmbedMiddlewareConsentCookie:
         request.site_config = None
         return request
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_relaxes_samesite_when_embedded(self, settings):
         settings.SESSION_COOKIE_SECURE = True
         middleware = self._make_middleware()
@@ -425,6 +427,8 @@ class TestEmbedMiddlewareConsentCookie:
         assert morsel["samesite"] == "None"
         assert morsel["secure"] is True
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_keeps_defaults_when_not_embedded(self, settings):
         settings.SESSION_COOKIE_SECURE = True
         middleware = self._make_middleware()
@@ -435,6 +439,8 @@ class TestEmbedMiddlewareConsentCookie:
         assert morsel["samesite"] == "Lax"
         assert morsel["secure"] == ""
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_keeps_defaults_when_session_cookie_is_not_secure(self, settings):
         # Without a cross-site session there is no is_embedded to read back, so
         # relaxing the consent cookie alone would buy nothing.
@@ -447,6 +453,8 @@ class TestEmbedMiddlewareConsentCookie:
         assert morsel["samesite"] == "Lax"
         assert morsel["secure"] == ""
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_no_consent_cookie_on_response(self, settings):
         settings.SESSION_COOKIE_SECURE = True
         middleware = self._make_middleware(set_cookie=False)
