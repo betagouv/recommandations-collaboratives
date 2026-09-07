@@ -22,7 +22,11 @@ from django.urls import reverse
 from django.utils.module_loading import import_string
 from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertNotContains,
+    assertRedirects,
+)
 
 from recoco.apps.home import models as home_models
 from recoco.apps.home.config import SIGNUP_USER_ID_SESSION_KEY
@@ -406,6 +410,101 @@ def test_user_can_access_followus(client):
     url = reverse("followus")
     response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_can_access_terms_of_use(client):
+    url = reverse("termsofuse")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+#######################################################################
+# Legal pages fed by the site configuration
+#######################################################################
+
+
+@pytest.mark.django_db
+def test_legals_page_uses_default_values_without_site_configuration(client):
+    url = reverse("legals")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(
+        response,
+        "Le Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et l’aménagement (CEREMA)",
+    )
+    assertContains(
+        response,
+        "Cité des mobilités – 25 avenue François Mitterrand – CS 92803 69674 Bron Cedex",
+    )
+    assertContains(response, "04 72 14 30 30")
+    assertContains(response, "Etienne Crépon, directeur général du CEREMA")
+
+
+@pytest.mark.django_db
+def test_legals_page_uses_site_configuration_values(client, current_site):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        legal_owner="Communauté de communes du Test",
+        legal_address="1 rue de la Mairie, 75000 Paris",
+        legal_owner_name="Jane Doe, directrice générale",
+        legal_phone_no="+33123456789",
+    )
+
+    url = reverse("legals")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, "Communauté de communes du Test")
+    assertContains(response, "1 rue de la Mairie, 75000 Paris")
+    assertContains(response, "Jane Doe, directrice générale")
+    assertContains(response, "+33123456789")
+    assertNotContains(response, "Etienne Crépon, directeur général du CEREMA")
+    assertNotContains(response, "04 72 14 30 30")
+
+
+@pytest.mark.django_db
+def test_privacy_page_uses_default_values_without_site_configuration(client):
+    url = reverse("privacy")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, "est un service numérique porté par CEREMA")
+    assertContains(
+        response,
+        "représentée par Etienne Crépon, directeur général du CEREMA",
+    )
+    assertContains(response, "Lutter contre l’artificialisation des sols")
+    assertNotContains(response, 'href="mailto:')
+
+
+@pytest.mark.django_db
+def test_privacy_page_uses_site_configuration_values(client, current_site):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        legal_owner="Communauté de communes du Test",
+        legal_owner_name="Jane Doe, directrice générale",
+        contact_form_recipient="contact@example.org",
+        dpo_contact_email="dpo@example.org",
+        gdpr_purposes="Suivre les demandes déposées par les collectivités",
+    )
+
+    url = reverse("privacy")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(
+        response,
+        "est un service numérique porté par Communauté de communes du Test",
+    )
+    assertContains(response, "représentée par Jane Doe, directrice générale")
+    assertContains(response, "Suivre les demandes déposées par les collectivités")
+    assertContains(response, 'href="mailto:contact@example.org"')
+    assertContains(response, 'href="mailto:dpo@example.org"')
+    assertNotContains(response, "Lutter contre l’artificialisation des sols")
 
 
 ################################################################
