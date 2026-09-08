@@ -273,6 +273,21 @@ Alpine.data(
         }
         this.$dispatch('displayed-label', this.label);
       },
+      resetSelection() {
+        debugger
+        this.open = false;
+        if (selectAll) {
+          this.handleTerritorySelectAll(true);
+        } else if (selectedDepartments) {
+          this.initSelectedDepartments();
+          const codes = this.extractDepartmentFromSelectedRegions(this.regions);
+          this.$dispatch('selected-departments', codes);
+          this.handleSelectorPlaceholder(codes);
+        } else {
+          this.handleTerritorySelectAll(false);
+        }
+        this.updateMyDepartmentsActive();
+      }
     };
   }
 );
