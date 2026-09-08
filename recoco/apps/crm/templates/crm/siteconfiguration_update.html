@@ -116,7 +116,16 @@
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-legal">
-                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordeon</p>
+                                <h3 class="fr-h6 fr-mb-1w">Mentions légales</h3>
+                                {# TODO add good text #}<p class="fr-text--sm fr-mb-2w">Texte de description additionnel</p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {# TODO add missing data (mock it) #}
+                                    {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
+                                <h3 class="fr-h6 fr-mb-1w">Politique de confidentialité</h3>
+                                {# TODO add good text #}<p class="fr-text--sm fr-mb-2w">Texte de description additionnel</p>
+                                {# TODO add missing data (mock it) #}
                             </div>
                         </section>
                         <section class="fr-accordion">
@@ -129,7 +138,48 @@
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-config">
-                                <p class="fr-text--sm fr-text--mention-grey">Contenu accordéon</p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
+                                <h3 class="fr-h6 fr-mb-1w">Tags d'impact</h3>
+                                <p class="fr-text--sm fr-mb-2w">
+                                    Les tags d'impact permettent de suivre manuellement l'avancement d'un dossier.
+                                    Ils sont uniquement disponibles pour les admins et staffs, et sont propres à votre portail.
+                                </p>
+                                {% with tags=request.site_config.crm_available_tags.all %}
+                                    {% if tags %}
+                                        <ul class="fr-tags-group fr-mb-2w">
+                                            {% for tag in tags %}<li><p class="fr-tag">{{ tag.name }}</p></li>{% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="fr-text--sm fr-text--mention-grey">Aucun tag d'impact sur ce portail.</p>
+                                    {% endif %}
+                                {% endwith %}
+                                <a class="fr-btn fr-btn--secondary fr-icon-add-line fr-btn--icon-left fr-mb-4w"
+                                   href="{% url 'crm-site-configuration-tags' %}">Ajouter un tag d'impact</a>
+                                <h3 class="fr-h6 fr-mb-1w">Plugins</h3>
+                                <p class="fr-text--sm fr-mb-2w">
+                                    Pour activer des plugins ou avoir plus d'informations, contactez l'équipe technique.
+                                </p>
+                                {% with plugins=request.site_config.enabled_plugins %}
+                                    {% if plugins %}
+                                        <ul class="fr-tags-group">
+                                            {% for plugin in plugins %}
+                                                <li>
+                                                    {% if plugin in registered_plugins %}
+                                                        <p class="fr-tag">{{ plugin }}</p>
+                                                    {% else %}
+                                                        <p class="fr-tag fr-background-flat--error fr-text-inverted--error"
+                                                           title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="fr-text--sm fr-text--mention-grey">Aucun plugin activé sur ce site.</p>
+                                    {% endif %}
+                                {% endwith %}
                             </div>
                         </section>
                     </div>
@@ -139,35 +189,6 @@
                             {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
                         </div>
                     {% endif %}
-                    {# TMP - replace crispy form with all its elements separately #}
-                    <fieldset class="fr-fieldset">
-                        {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.crm_available_tags|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                        {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                    </fieldset>
-
-                    <div class="fr-mb-3w">
-                        <h6 class="fr-mb-1w">Plugins activés</h6>
-                        {% with plugins=request.site.configuration.enabled_plugins %}
-                        {% if plugins %}
-                        <ul class="fr-tags-group">
-                            {% for plugin in plugins %}
-                            <li>
-                                {% if plugin in registered_plugins %}
-                                <p class="fr-tag">{{ plugin }}</p>
-                                {% else %}
-                                <p class="fr-tag fr-background-flat--error fr-text-inverted--error" title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p class="fr-text--sm fr-text--mention-grey">Aucun plugin activé sur ce site.</p>
-                        {% endif %}
-                        {% endwith %}
-                    </div>
                     <button class="fr-btn" type="submit">Sauvegarder</button>
                 </form>
             </div>
