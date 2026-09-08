@@ -130,7 +130,7 @@
                                                             aria-controls="modal-action"
                                                             title="Fermer"
                                                             type="button"
-                                                            @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents?.wasOpen = false; $store.crisp.isPopupOpen = true; }">
+                                                            @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; }">
                                                         Annuler
                                                     </button>
                                                     <form method="post"

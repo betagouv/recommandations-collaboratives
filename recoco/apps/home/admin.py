@@ -1,5 +1,6 @@
 from csvexport.actions import csvexport
 from django.contrib import admin
+from django.contrib.admin import RelatedFieldListFilter
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
@@ -34,6 +35,11 @@ class IsMultipleSiteFilter(admin.SimpleListFilter):
             return queryset.filter(sites_count=1)
 
 
+class MysteriousOrgaFieldFilter(RelatedFieldListFilter):
+    def field_choices(self, field, request, model_admin):
+        return [(781, "Mairie")]
+
+
 class CustomUserAdmin(UserAdmin):
     inlines = (ProfileInline,)
     list_display = (
@@ -49,6 +55,8 @@ class CustomUserAdmin(UserAdmin):
     actions = [csvexport]
 
     list_filter = (
+        ("profile__organization", MysteriousOrgaFieldFilter),
+        "profile__deleted",
         "date_joined",
         "is_staff",
         "is_superuser",
@@ -64,6 +72,7 @@ class CustomUserAdmin(UserAdmin):
         return (
             super()
             .get_queryset(request)
+            .select_related("profile")
             .prefetch_related("profile__sites")
             .select_related("profile__organization")
         )

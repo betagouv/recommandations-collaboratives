@@ -184,8 +184,7 @@
       height: 100vh;
     }
     &-feed {
-      min-height: calc(100vh - 174px);
-      //555px
+      min-height: calc(100vh - 370px);
       display: flex;
       flex-direction: column;
       justify-content: end;

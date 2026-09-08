@@ -203,9 +203,6 @@ class SiteConfiguration(models.Model):
         help_text="Question présentées lors de la saisine",
     )
 
-    sender_email = models.EmailField(
-        verbose_name="Adresse de contact affichée dans les emails automatiques"
-    )
     sender_name = models.CharField(
         verbose_name="Expéditeur des emails automatiques",
         help_text="Nom du service affiché comme expéditeur des emails",
@@ -315,6 +312,15 @@ class SiteConfiguration(models.Model):
         default=list,
         blank=True,
         help_text="Liste des plugins activés sur ce portail",
+    )
+
+    embed_allowed_origins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Liste des origines (ex: https://exemple.gouv.fr) autorisées à "
+            "intégrer ce portail dans une iframe (embed). Admin uniquement."
+        ),
     )
 
     def save(self, *args, **kwargs):

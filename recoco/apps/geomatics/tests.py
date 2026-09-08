@@ -11,8 +11,10 @@ import io
 from unittest.mock import mock_open, patch
 
 import pytest
+from django.contrib.auth import models as auth_models
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.urls import reverse
 from model_bakery import baker
 
 from recoco.apps.geomatics.management.commands.loadcommunes import (
@@ -298,6 +300,30 @@ def test_mergecommunes_command_updates_project_and_prints_summary(capsys, dept_3
     assert "Projects updated:  1" in captured.out
     assert "Communes deleted:  1" in captured.out
     assert "Warnings:          0" in captured.out
+
+
+# --- Rest routes ---
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url_name", ["regions-list", "departments-list", "communes-list"]
+)
+def test_anonymous_user_can_access_geomatics_rest_endpoint(api_client, url_name):
+    response = api_client.get(reverse(url_name))
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url_name", ["regions-list", "departments-list", "communes-list"]
+)
+def test_logged_in_user_can_access_geomatics_rest_endpoint(api_client, url_name):
+    user = baker.make(auth_models.User)
+    api_client.force_authenticate(user=user)
+
+    response = api_client.get(reverse(url_name))
+    assert response.status_code == 200
 
 
 # eof

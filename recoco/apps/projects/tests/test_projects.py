@@ -723,19 +723,6 @@ def test_notification_not_sent_when_project_is_muted(request, make_project):
     assert membership.member.notifications.unsent().count() == 0
 
 
-########################################################################
-# Project syndication feed
-########################################################################
-
-
-@pytest.mark.django_db
-def test_projects_feed_available_for_all_users(request, client, project):
-    url = reverse("projects-feed")
-    response = client.get(url)
-    detail_url = reverse("projects-project-detail", args=[project.id])
-    assertContains(response, detail_url)
-
-
 @pytest.mark.django_db
 def test_switchtender_joins_project(request, client, make_project):
     current_site = get_current_site(request)

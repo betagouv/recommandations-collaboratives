@@ -113,7 +113,7 @@ def test_site_list_contains_sites_info(request, client, make_project):
 
 
 @pytest.mark.django_db
-def test_site_list_cant_be_modified(request, client, make_project):
+def test_site_list_cannot_be_modified(request, client, make_project):
     user = baker.make(auth_models.User, email="me@example.com")
 
     client = APIClient()

@@ -1,9 +1,13 @@
+import logging
+
 import sentry_sdk
 import sib_api_v3_sdk as brevo_sdk
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from sib_api_v3_sdk.rest import ApiException
+
+logger = logging.getLogger("main")
 
 
 class Brevo:
@@ -21,7 +25,15 @@ class Brevo:
 
         return api_response.templates
 
-    def send_email(self, template_id, recipients, params=None, test=False):
+    def send_email(
+        self,
+        template_id,
+        recipients,
+        params=None,
+        test=False,
+        dry_run=False,
+        sender_name=None,
+    ):
         if not isinstance(recipients, list):
             recipients = [recipients]
 
@@ -38,6 +50,12 @@ class Brevo:
                 brevo_sdk.SendTestEmail()
             )  # XXX disabled to default to test list;
             # email_to=[recipients[0]["email"]])
+            if dry_run:
+                logger.info(
+                    f"[DRY RUN] Would have sent test template {template_id} "
+                    f"to {recipients}"
+                )
+                return None
             return self.api_instance.send_test_template(template_id, send_test_email)
         else:
             send_to = [
@@ -48,9 +66,29 @@ class Brevo:
                 for recipient in recipients
             ]
 
-            send_smtp_email = brevo_sdk.SendSmtpEmail(
-                template_id=template_id, to=send_to, params=params
+            # when the site defines no sender name, fall back on the default
+            # identity configured in the settings
+            sender = brevo_sdk.SendSmtpEmailSender(
+                name=sender_name or settings.DEFAULT_SENDER_NAME,
+                email=settings.DEFAULT_SENDER_EMAIL,
             )
+
+            send_smtp_email = brevo_sdk.SendSmtpEmail(
+                template_id=template_id,
+                to=send_to,
+                params=params,
+                sender=sender,
+            )
+
+            if dry_run:
+                # Everything up to this point (template resolution, params
+                # merging, payload construction) has run for real. Only the
+                # actual HTTP call to Brevo is skipped.
+                logger.info(
+                    "[DRY RUN] Would have called Brevo send_transac_email "
+                    f"with:\n{send_smtp_email}"
+                )
+                return None
 
             try:
                 return self.api_instance.send_transac_email(send_smtp_email)

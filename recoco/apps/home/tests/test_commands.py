@@ -108,7 +108,6 @@ def test_command_create_site_domain_already_exists(request):
     command_args = {
         "name": "New site",
         "domain": existing_site.domain,
-        "sender_email": "jdoe@example.org",
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example.org",
         "legal_address": "36 green street 75000 Paris",
@@ -127,7 +126,6 @@ def test_command_create_site_admin_user_doesnt_exists(request):
     command_args = {
         "name": "New site",
         "domain": existing_site.domain,
-        "sender_email": "jdoe@example.org",
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example.org",
         "legal_address": "36 green street 75000 Paris",
@@ -147,7 +145,6 @@ def test_command_create_site(request):
     command_args = {
         "name": "New site",
         "domain": "example2.org",
-        "sender_email": "jdoe@example2.org",
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example2.org",
         "legal_address": "36 green street 75000 Paris",
@@ -162,7 +159,6 @@ def test_command_create_site(request):
 
     new_site = Site.objects.get(domain=command_args["domain"])
     site_config = SiteConfiguration.objects.get(site=new_site)
-    assert site_config.sender_email == command_args["sender_email"]
     assert site_config.sender_name == command_args["sender_name"]
     assert site_config.contact_form_recipient == command_args["contact_form_recipient"]
     assert site_config.legal_address == command_args["legal_address"]

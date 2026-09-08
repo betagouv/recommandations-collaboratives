@@ -4,6 +4,7 @@
 {% load projects_extra %}
 {% load django_vite %}
 {% load crm_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 {% block js %}
     {% vite_asset 'js/styles/marianne.css.js' %}
     {% vite_asset 'js/apps/CRM/crmNavigation.js' %}
@@ -94,18 +95,20 @@
                     <a class="stretched-link" href="{% url 'crm-resource-list' %}">Ressources</a>
                 </label>
             </div>
-            <div class="fr-segmented__element">
-                <input value="overview"
-                       type="radio"
-                       {% if site_configuration %}checked{% endif %}
-                       aria-checked="{% if site_configuration %}true{% else %}false{% endif %}"
-                       id="segmented-control-site-configuration"
-                       name="segmented-control-site-configuration"
-                       @click="window.location='{% url 'crm-site-configuration' %}'">
-                <label class="fr-label" for="segmented-control-site-configuration">
-                    <a class="stretched-link" href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
-                </label>
-            </div>
+            {% if "manage_configuration" in user_site_perms %}
+                <div class="fr-segmented__element">
+                    <input value="overview"
+                        type="radio"
+                        {% if site_configuration %}checked{% endif %}
+                        aria-checked="{% if site_configuration %}true{% else %}false{% endif %}"
+                        id="segmented-control-site-configuration"
+                        name="segmented-control-site-configuration"
+                        @click="window.location='{% url 'crm-site-configuration' %}'">
+                    <label class="fr-label" for="segmented-control-site-configuration">
+                        <a class="stretched-link" href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
+                    </label>
+                </div>
+            {% endif %}
         </div>
     </fieldset>
     <div class="flex-grow-1">

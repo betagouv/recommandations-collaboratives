@@ -7,8 +7,9 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-from django.contrib.syndication.views import Feed
 from django.urls import reverse
+
+from recoco.utils import AuthenticatedFeed, has_perm
 
 from .. import models
 
@@ -17,10 +18,13 @@ from .. import models
 ########################################################################
 
 
-class LatestProjectsFeed(Feed):
+class LatestProjectsFeed(AuthenticatedFeed):
     title = "Derniers dossiers"
     link = "/projects/feed"
     description = "Derniers ajouts de dossiers"
+
+    def has_permission(self, request):
+        return has_perm(request.user, "sites.list_projects", request.site)
 
     def items(self):
         return models.Project.on_site.order_by("-created_on")[:5]

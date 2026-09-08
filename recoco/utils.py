@@ -14,16 +14,18 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
+import nh3
 from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
+from django.contrib.syndication.views import Feed
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from sesame.utils import get_parameters
 
 
@@ -188,6 +190,34 @@ def truncate_string(s, max_length):
     return f"{sub}…"
 
 
+class AuthenticatedFeed(Feed):
+    permission_required = None
+
+    def guard_permission_required_use(self):
+        # code from django.contrib.auth.mixins.PermissionRequiredMixin
+        if self.permission_required is not None:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} should not be defined here. "
+                "You need to define has_permission method"
+            )
+
+    def __init__(self):
+        self.guard_permission_required_use()
+        super().__init__()
+
+    def has_permission(self, request):
+        return True
+
+    def __call__(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # TODO use this if BasicAuth is ok ? https://djangosnippets.org/snippets/813/
+            return HttpResponse(status=401)
+        if not self.has_permission(request):
+            return HttpResponse(status=403)
+        else:
+            return super().__call__(request, *args, **kwargs)
+
+
 ########################################################################
 # Test helpers
 ########################################################################
@@ -282,6 +312,33 @@ class RunSQLFile(migrations.RunSQL):
             hints=hints,
             elidable=elidable,
         )
+
+
+def sanitize_text_field_historic_data(
+    model, field_name: str, db_alias: str, batch_size: int = 500
+):
+    """Retroactively run nh3.clean() over every non-empty value of
+    `field_name` on `model`, saving only the rows whose value actually
+    changes. Meant to be called from data migrations that apply, to
+    historic data, a sanitization that was added to a form/serializer
+    """
+    to_update = []
+    queryset = (
+        model.objects.using(db_alias)
+        .exclude(**{field_name: None})
+        .exclude(**{field_name: ""})
+    )
+    for obj in queryset.iterator():
+        value = getattr(obj, field_name)
+        cleaned = nh3.clean(value)
+        if cleaned != value:
+            setattr(obj, field_name, cleaned)
+            to_update.append(obj)
+        if len(to_update) >= batch_size:
+            model.objects.using(db_alias).bulk_update(to_update, [field_name])
+            to_update = []
+    if to_update:
+        model.objects.using(db_alias).bulk_update(to_update, [field_name])
 
 
 def strip_accents(input: str) -> str:

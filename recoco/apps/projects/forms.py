@@ -85,9 +85,6 @@ class PrivateNoteForm(forms.ModelForm):
 class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
-    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    insee = forms.CharField(max_length=5, required=False, label="Commune")
-
     class Meta:
         model = models.Project
         fields = [
@@ -103,9 +100,12 @@ class ProjectForm(forms.ModelForm):
             "description": "Contexte du dossier",
         }
 
-        def clean_description(self):
-            desc = self.cleaned_data["description"]
-            return nh3.clean(desc)
+    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+    insee = forms.CharField(max_length=5, required=False, label="Commune")
+
+    def clean_description(self):
+        desc = self.cleaned_data["description"]
+        return nh3.clean(desc)
 
 
 class DocumentUploadForm(forms.ModelForm):

@@ -788,6 +788,27 @@ def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
 
 
 @pytest.mark.django_db
+def test_list_project_statuses_for_anonymous(
+    request, project, project_draft, api_client, current_site
+):
+    url = reverse("projects-projectsites-list")
+    response = api_client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_list_project_statuses_for_random(
+    request, project, project_draft, api_client, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-projectsites-list")
+    response = api_client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_list_project_statuses_for_non_moderator(
     request, project, project_draft, api_client
 ):
@@ -861,6 +882,85 @@ def test_project_status_is_updated_by_patch_api(request, api_client, project):
     assert project.project_sites.current().status == new_status
 
 
+@pytest.mark.django_db
+def test_project_status_is_not_updated_anonymous(request, api_client, project):
+    new_status = "DONE"
+
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_is_not_updated_random_user(request, api_client, project):
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_draft_not_updated_with_list_project_perm(
+    request, api_client, project_draft, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, current_site)
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project_draft.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 404
+
+    project_draft.refresh_from_db()
+    assert project_draft.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_draft_update_with_moderate_perm(
+    request, api_client, project_draft, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, current_site)
+    assign_perm("moderate_projects", user, current_site)
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project_draft.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 204
+
+    project_draft.refresh_from_db()
+    assert project_draft.project_sites.current().status == new_status
+
+
 ########################################################################
 # user project status list
 ########################################################################
@@ -874,7 +974,7 @@ def test_project_status_needs_authentication(request, api_client):
 
 
 @pytest.mark.django_db
-def test_user_cannot_change_some_one_else_project_status(request, project):
+def test_user_cannot_change_someone_else_project_status(request, project):
     user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
     # project and user statuses
@@ -1406,6 +1506,91 @@ def test_doc_upload_does_not_accept_malicious_files_by_extension(
         assert response.status_code == 400
 
     assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_denied_for_anonymous_user(client, project_ready, good_file):
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+    data = {"description": "this is some content", "the_file": good_file}
+
+    response = client.post(url, data)
+
+    assert response.status_code == 403
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_denied_for_user_outside_project(client, project_ready, good_file):
+    outsider = baker.make(auth_models.User)
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+    data = {"description": "this is some content", "the_file": good_file}
+
+    with login(client, user=outsider):
+        response = client.post(url, data)
+
+    assert response.status_code == 403
+    assert models.Document.objects.count() == 0
+
+
+########################################################################
+# REST API: document retrieve permissions
+########################################################################
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_denied_for_anonymous_user(request, client, project_ready):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        the_link="https://example.com/report.pdf",
+    )
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_denied_for_user_outside_project(request, client, project_ready):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        the_link="https://example.com/report.pdf",
+    )
+    outsider = baker.make(auth_models.User)
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    with login(client, user=outsider):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_allowed_for_project_reader(
+    request, client, project_ready, project_reader
+):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        description="a description",
+        the_link="https://example.com/report.pdf",
+    )
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    with login(client, user=project_reader):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == document.id
+    assert response.data["description"] == "a description"
 
 
 @pytest.fixture

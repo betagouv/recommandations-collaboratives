@@ -606,7 +606,8 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
         qs = models.ProjectSite.objects.filter(site=self.request.site)
 
         if not has_perm(self.request.user, "moderate_projects", self.request.site):
-            qs = qs.exclude(status__in=["DRAFT", "PROPOSED"])
+            # from PROJECTSITE_STATES
+            qs = qs.exclude(status__in=["DRAFT", "PRE_DRAFT", "TO_PROCESS"])
 
         return qs
 
