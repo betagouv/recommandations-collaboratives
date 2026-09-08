@@ -274,7 +274,6 @@ Alpine.data(
         this.$dispatch('displayed-label', this.label);
       },
       resetSelection() {
-        debugger
         this.open = false;
         if (selectAll) {
           this.handleTerritorySelectAll(true);
