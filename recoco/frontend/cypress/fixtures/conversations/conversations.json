@@ -1,0 +1,194 @@
+[
+  {
+    "model": "conversations.message",
+    "pk": 1,
+    "fields": {
+      "created": "2025-06-01T10:00:00Z",
+      "modified": "2025-06-01T10:00:00Z",
+      "project": 32,
+      "posted_by": 2,
+      "in_reply_to": null,
+      "deleted": null
+    }
+  },
+  {
+    "model": "conversations.node",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": [
+        "conversations",
+        "recommendationnode"
+      ],
+      "position": 1,
+      "message": 1
+    }
+  },
+  {
+    "model": "conversations.recommendationnode",
+    "pk": 1,
+    "fields": {
+      "text": "Contenu de la reco collectivité fixture",
+      "recommendation": 101
+    }
+  },
+  {
+    "model": "conversations.message",
+    "pk": 2,
+    "fields": {
+      "created": "2025-06-01T10:00:00Z",
+      "modified": "2025-06-01T10:00:00Z",
+      "project": 33,
+      "posted_by": 2,
+      "in_reply_to": null,
+      "deleted": null
+    }
+  },
+  {
+    "model": "conversations.node",
+    "pk": 2,
+    "fields": {
+      "polymorphic_ctype": [
+        "conversations",
+        "recommendationnode"
+      ],
+      "position": 1,
+      "message": 2
+    }
+  },
+  {
+    "model": "conversations.recommendationnode",
+    "pk": 2,
+    "fields": {
+      "text": "Contenu de la reco navigation fixture",
+      "recommendation": 102
+    }
+  },
+  {
+    "model": "conversations.message",
+    "pk": 3,
+    "fields": {
+      "created": "2025-06-01T10:00:00Z",
+      "modified": "2025-06-01T10:00:00Z",
+      "project": 34,
+      "posted_by": 2,
+      "in_reply_to": null,
+      "deleted": null
+    }
+  },
+  {
+    "model": "conversations.node",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": [
+        "conversations",
+        "recommendationnode"
+      ],
+      "position": 1,
+      "message": 3
+    }
+  },
+  {
+    "model": "conversations.recommendationnode",
+    "pk": 3,
+    "fields": {
+      "text": "Contenu de la reco publiée fixture",
+      "recommendation": 103
+    }
+  },
+  {
+    "model": "conversations.message",
+    "pk": 4,
+    "fields": {
+      "created": "2025-06-01T10:00:00Z",
+      "modified": "2025-06-01T10:00:00Z",
+      "project": 35,
+      "posted_by": 2,
+      "in_reply_to": null,
+      "deleted": null
+    }
+  },
+  {
+    "model": "conversations.node",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": [
+        "conversations",
+        "recommendationnode"
+      ],
+      "position": 1,
+      "message": 4
+    }
+  },
+  {
+    "model": "conversations.recommendationnode",
+    "pk": 4,
+    "fields": {
+      "text": "Contenu de la reco à commenter fixture",
+      "recommendation": 104
+    }
+  },
+  {
+    "model": "conversations.message",
+    "pk": 5,
+    "fields": {
+      "created": "2025-06-01T10:00:00Z",
+      "modified": "2025-06-01T10:00:00Z",
+      "project": 36,
+      "posted_by": 2,
+      "in_reply_to": null,
+      "deleted": null
+    }
+  },
+  {
+    "model": "conversations.node",
+    "pk": 5,
+    "fields": {
+      "polymorphic_ctype": [
+        "conversations",
+        "recommendationnode"
+      ],
+      "position": 1,
+      "message": 5
+    }
+  },
+  {
+    "model": "conversations.recommendationnode",
+    "pk": 5,
+    "fields": {
+      "text": "Contenu de la reco à suivre fixture",
+      "recommendation": 105
+    }
+  },
+  {
+    "model": "conversations.message",
+    "pk": 6,
+    "fields": {
+      "created": "2025-06-01T10:00:00Z",
+      "modified": "2025-06-01T10:00:00Z",
+      "project": 37,
+      "posted_by": 2,
+      "in_reply_to": null,
+      "deleted": null
+    }
+  },
+  {
+    "model": "conversations.node",
+    "pk": 6,
+    "fields": {
+      "polymorphic_ctype": [
+        "conversations",
+        "recommendationnode"
+      ],
+      "position": 1,
+      "message": 6
+    }
+  },
+  {
+    "model": "conversations.recommendationnode",
+    "pk": 6,
+    "fields": {
+      "text": "Commentaire initial fixture",
+      "recommendation": 106
+    }
+  }
+]

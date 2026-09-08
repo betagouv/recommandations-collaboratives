@@ -30,6 +30,7 @@
                 <template x-if="countOf.tasks > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            data-test-id="open-shared-recommendations"
                             @click="trackClickOnRecoLink(); handleOpenPannelSharedContents('recommendations')">
                         <span class="topic-item__shared-item">
                             <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
@@ -40,6 +41,7 @@
                 <template x-if="countOf.documents > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            data-test-id="open-shared-files"
                             @click="trackClickOnFileLink(); handleOpenPannelSharedContents('files')">
                         <span class="topic-item__shared-item">
                             <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
@@ -56,6 +58,7 @@
                 <template x-if="isSwitchtender && countOf.draft_recommendations > 0">
                     <button type="button"
                             class="topic-item__message-len topic-item__message-len--button fr-mt-0"
+                            data-test-id="open-shared-drafts"
                             @click="$store.sharedContentsPanel.open('draft-recommendations')">
                         <span class="topic-item__shared-item">
                             <span class="fr-icon-draft-line fr-icon--sm" aria-hidden="true"></span>
