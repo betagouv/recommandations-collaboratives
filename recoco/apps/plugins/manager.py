@@ -35,7 +35,7 @@ def _build_plugin_manager():
 
     for dist in importlib.metadata.distributions():
         for ep in dist.entry_points:
-            if apps.is_installed(ep.name):
+            if ep.group == "recoco.plugins" and apps.is_installed(ep.name):
                 try:
                     plugin_cls = ep.load()
                     pm.register(plugin_cls(), name=ep.name)
