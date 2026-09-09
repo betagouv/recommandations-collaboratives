@@ -107,8 +107,32 @@ def test_brevo_send_email_checks_address_format(mocker, client):
 
 
 def test_sanitize_brevo_params_breaks_template_syntax():
-    assert "{{" not in sanitize_brevo_params("{{7*7}}")
-    assert "}}" not in sanitize_brevo_params("{{7*7}}")
+    sanitized = sanitize_brevo_params("{{7*7}}")
+
+    assert "{{" not in sanitized
+    assert "}}" not in sanitized
+    assert sanitized == "{ {7*7} }"
+
+
+def test_sanitize_brevo_params_breaks_overlapping_brace_runs():
+    sanitized = sanitize_brevo_params("{{{7*7}}}")
+    assert "{{" not in sanitized
+    assert "}}" not in sanitized
+
+
+def test_sanitize_brevo_params_breaks_tag_and_comment_syntax():
+    sanitized_tag = sanitize_brevo_params("{% for x in y %}")
+    assert "{%" not in sanitized_tag
+    assert "%}" not in sanitized_tag
+
+    sanitized_comment = sanitize_brevo_params("{# secret #}")
+    assert "{#" not in sanitized_comment
+    assert "#}" not in sanitized_comment
+
+
+def test_sanitize_brevo_params_sanitizes_dict_keys():
+    sanitized = sanitize_brevo_params({"{{7*7}}": "value"})
+    assert not any("{{" in key for key in sanitized)
 
 
 def test_sanitize_brevo_params_recurses_into_nested_structures():

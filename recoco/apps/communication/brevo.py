@@ -10,19 +10,48 @@ from sib_api_v3_sdk.rest import ApiException
 logger = logging.getLogger("main")
 
 
+_TEMPLATE_DELIMITERS = ("{{", "}}", "{%", "%}", "{#", "#}")
+
+# Deliberately a visible space: an invisible separator silently stops working
+# if any stage of Brevo's pipeline strips or normalizes zero-width characters.
+_DELIMITER_SEPARATOR = " "
+
+
+def _break_template_delimiters(text):
+    """Separate the two halves of every Django template delimiter.
+
+    A single non-overlapping replace pass can leave a delimiter behind on
+    overlapping/odd-length brace runs (e.g. "{{{7*7}}}" still contains "{{"
+    after one pass), so this loops until no known delimiter remains.
+    """
+    previous = None
+    while previous != text:
+        previous = text
+        for pair in _TEMPLATE_DELIMITERS:
+            text = text.replace(pair, f"{pair[0]}{_DELIMITER_SEPARATOR}{pair[1]}")
+    return text
+
+
 def sanitize_brevo_params(value):
-    """Neutralize Brevo's `{{ }}` template syntax in outgoing params.
+    """Neutralize Brevo/Django template syntax in outgoing params.
 
     User-controlled strings (note content, comments, names, etc.) can reach
-    Brevo's own template renderer verbatim. A payload like `{{7*7}}` would
-    then be evaluated by Brevo, not us (a Brevo-side SSTI). Breaking up any
-    double-brace sequence with a zero-width space keeps the text visually
-    unchanged while stopping Brevo from recognizing it as a template tag.
+    Brevo's own template renderer verbatim. Brevo's engine is Django-based,
+    so `{{ }}`, `{% %}` and `{# #}` are all live syntax; a payload like
+    `{{7*7}}` would be evaluated by Brevo, not us (a Brevo-side SSTI).
+    Inserting a space inside any such delimiter stops Brevo from
+    recognizing it as a template tag, at the cost of a visible space in the
+    rare case where a user legitimately wrote one of those sequences.
     """
     if isinstance(value, str):
-        return value.replace("{{", "{​{").replace("}}", "}​}")
+        return _break_template_delimiters(value)
     if isinstance(value, dict):
-        return {k: sanitize_brevo_params(v) for k, v in value.items()}
+        return {
+            (_break_template_delimiters(k) if isinstance(k, str) else k): (
+                sanitize_brevo_params(v)
+            )
+            for k, v in value.items()
+        }
     if isinstance(value, (list, tuple)):
         return [sanitize_brevo_params(v) for v in value]
     return value
