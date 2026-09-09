@@ -757,6 +757,20 @@ def test_project_is_updated_by_project_patch_api(request, api_client, project_dr
 
 
 @pytest.mark.django_db
+def test_project_advisor_without_assignment_cannot_patch_project_api(
+    request, api_client, project_draft
+):
+    with login(api_client, groups=["example_com_advisor"]):
+        url = reverse("projects-detail", args=[project_draft.id])
+        response = api_client.patch(url, data={"name": "Hacked name"})
+
+    assert response.status_code == 403
+
+    project_draft.refresh_from_db()
+    assert project_draft.name != "Hacked name"
+
+
+@pytest.mark.django_db
 def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
     request, api_client, project_draft
 ):
