@@ -113,20 +113,29 @@
                                         class="fr-accordion__btn"
                                         aria-expanded="false"
                                         aria-controls="accordion-legal">
-                                    <span class="fr-icon-scales-3-line fr-mr-1w" aria-hidden="true"></span>Mentions légales et politique de confidentialité
+                                    <span class="fr-icon-scales-3-line fr-mr-1w" aria-hidden="true"></span>Informations légales
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-legal">
                                 <h3 class="fr-h6 fr-mb-1w">Mentions légales</h3>
-                                {# TODO add good text #}<p class="fr-text--sm fr-mb-2w">Texte de description additionnel</p>
                                 <fieldset class="fr-fieldset">
                                     {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                                    {# TODO add missing data (mock it) #}
+                                    {{ form.legal_owner_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.legal_phone_no|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                 </fieldset>
                                 <h3 class="fr-h6 fr-mb-1w">Politique de confidentialité</h3>
-                                {# TODO add good text #}<p class="fr-text--sm fr-mb-2w">Texte de description additionnel</p>
-                                {# TODO add missing data (mock it) #}
+                                <p class="fr-text--sm fr-mb-2w">
+                                    La politique de confidentialité décrit quelles données personnelles sont collectées par le site,
+                                    à quelles fins et comment elles sont gérées. Par défaut, Recommandations-collaboratives
+                                    génère une page Confidentialité standard, à partir des informations que vous remplissez ci-dessous.
+                                    Cette page est légalement obligatoire.
+                                </p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.dpo_contact_email|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.gdpr_purposes|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.target_audience|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
                             </div>
                         </section>
                         <section class="fr-accordion">
