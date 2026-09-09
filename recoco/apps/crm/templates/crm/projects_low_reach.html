@@ -9,6 +9,8 @@
 {% block og_title %}
     Dossiers à relancer - CRM
 {% endblock og_title %}
+{# the visible h1 replaces the hidden one from base.html #}
+{% block hidden_site_title %}{% endblock hidden_site_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/apps/user.js' %}
@@ -18,7 +20,7 @@
     {% include "crm/fragments/navigation.html" with projects=True %}
     <div x-data="{ breadcrumbs: { links: [{ url: '{% url 'crm-site-dashboard' %}', title: 'Admin' }, { url: '{% url 'crm-project-list' %}', title: 'Dossiers' }], current: 'Dossiers à relancer' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div class="fr-container-fluid fr-px-5v fr-pb-5v crm">
+    <div class="fr-container-fluid fr-px-5v fr-pb-5v crm crm-list-scroll">
         <div class="d-flex justify-content-between align-items-start fr-mt-3w fr-mb-3w flex-wrap">
             <div>
                 <a href="{% url 'crm-project-list' %}"
@@ -90,12 +92,26 @@
                        @change="$el.closest('form').submit()">
                 <label class="fr-toggle__label text-nowrap project-low-reach__label" for="mine-only-toggle">Uniquement mes dossiers</label>
             </div>
+            <a href="{% url 'crm-list-projects-low-reach' %}"
+               class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"
+               title="Réinitialiser la recherche et les filtres"
+               data-test-id="reset-filters">Réinitialiser</a>
             <a href="{% url 'crm-projects-low-reach-csv' %}?days={{ days }}&status={{ status_filter }}{% if mine_only %}&mine=1{% endif %}{% if search_q %}&q={{ search_q|urlencode }}{% endif %}"
                class="fr-btn fr-btn--primary fr-btn--sm text-nowrap"
                data-test-id="low-reach-csv-export">
                 Télécharger en CSV
             </a>
         </form>
+        <span class="fr-text--sm fr-text-mention--grey d-block fr-mb-1w"
+              data-test-id="low-reach-count-label">
+            {% if total_count == 0 %}
+                Aucun résultat
+            {% elif page_obj.paginator.num_pages > 1 %}
+                {{ page_obj.object_list|length }} sur {{ total_count }} résultat{{ total_count|pluralize }}
+            {% else %}
+                {{ total_count }} résultat{{ total_count|pluralize }}
+            {% endif %}
+        </span>
         <div class="table-responsive">
             <table class="project-table w-100" data-test-id="low-reach-table">
                 <colgroup>
@@ -111,9 +127,18 @@
                     <tr>
                         <th scope="col">Dossier</th>
                         <th scope="col">Conseillers</th>
-                        <th scope="col" title="Dernière activité du demandeur">Dernière act.</th>
-                        <th scope="col" title="Date d'émission de la dernière reco">Dernière reco.</th>
-                        <th scope="col" title="Nombre de recos lues sur nombre total de recos">Recos lues</th>
+                        <th scope="col">
+                            Dernière activité
+                            {% include "crm/fragments/th_info.html" with text="Dernière activité du demandeur" %}
+                        </th>
+                        <th scope="col">
+                            Dernière recommandation
+                            {% include "crm/fragments/th_info.html" with text="Date d'émission de la dernière recommandation" %}
+                        </th>
+                        <th scope="col">
+                            Recommandations lues
+                            {% include "crm/fragments/th_info.html" with text="Nombre de recommandations lues sur le nombre total de recommandations envoyées" %}
+                        </th>
                         <th scope="col">Statut</th>
                         <th scope="col">Actions</th>
                     </tr>

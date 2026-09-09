@@ -243,7 +243,9 @@ def access_revoke_invite(request, project_id, invite_id):
     """Revoke an invitation for a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    invite = get_object_or_404(invites_models.Invite, pk=invite_id, accepted_on=None)
+    invite = get_object_or_404(
+        invites_models.Invite, pk=invite_id, project=project, accepted_on=None
+    )
 
     if invite.role == "SWITCHTENDER":
         has_perm_or_403(request.user, "manage_advisors", project)

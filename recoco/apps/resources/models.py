@@ -22,7 +22,6 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from markdownx.utils import markdownify
 from model_clone.models import CloneMixin
 from model_utils.models import TimeStampedModel
 from taggit.managers import TaggableManager
@@ -30,6 +29,7 @@ from watson import search as watson
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
+from recoco.utils import render_markdown
 
 # from recoco.apps.tasks.models import Task
 from . import apps
@@ -253,7 +253,7 @@ class Resource(CloneMixin, models.Model):
 
     def content_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.content)
+        return render_markdown(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
