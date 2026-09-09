@@ -297,9 +297,6 @@ class DuplicateResourceView(
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
 
-    def get_queryset(self):
-        return models.Resource.on_site.all()
-
     def post(self, request, *args, **kwargs):
         current_site = get_current_site(request)
         resource_to_copy = self.get_object()
