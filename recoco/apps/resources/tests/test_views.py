@@ -553,14 +553,9 @@ def test_resource_detail_visible_on_non_default_site(request, client, settings):
     ).make()
 
     url = reverse("resources-resource-detail", args=[resource.id])
-    try:
-        response = client.get(url, HTTP_HOST=other_site.domain)
+    with settings.SITE_ID.override(other_site.pk)
+        response = client.get(url)
         assert response.status_code == 200
-    finally:
-        # DynamicSiteMiddleware sets the thread-local settings.SITE_ID as a
-        # side effect of the request above : reset it so it doesn't leak into
-        # other tests sharing this worker's thread.
-        settings.SITE_ID.reset()
 
 
 @pytest.mark.django_db
