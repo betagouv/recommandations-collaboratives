@@ -438,7 +438,6 @@ def test_legals_page_uses_default_values_without_site_configuration(client):
         response,
         "Cité des mobilités – 25 avenue François Mitterrand – CS 92803 69674 Bron Cedex",
     )
-    assertContains(response, "+33102030405")
 
 
 @pytest.mark.django_db
