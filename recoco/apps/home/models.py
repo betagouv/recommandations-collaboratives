@@ -230,8 +230,8 @@ class SiteConfiguration(models.Model):
     legal_owner_name = models.CharField(
         verbose_name="Représentant ou représentante légale",
         help_text="Prénom, NOM, fonction",
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         max_length=100,
     )
 
