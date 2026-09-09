@@ -23,20 +23,22 @@
             <strong>Article 1 - Champ d’application</strong>
         </p>
         <p>
-            L'inscription est gratuite et réservée aux collectivités et porteurs de dossier en zone détendues
+            L'inscription est gratuite et réservée aux utilisateurs suivants : {{ request.site.configuration.target_audience }}.
+            {% comment %} collectivités et porteurs de dossier en zone détendues
             pour la reconversion des friches et aux conseillers publics qui font avancer les dossiers des
-            collectivités.
+            collectivités. {% endcomment %}
         </p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Article 2 – Objet</strong>
         </p>
         <p>
-            {{ request.site.name }} souhaite créer un service public gratuit d’appui aux petites collectivités pour la
+            {{ request.site.configuration.description }}
+            {% comment %} {{ request.site.name }} souhaite créer un service public gratuit d’appui aux petites collectivités pour la
             reconversion des friches, en lien avec les objectifs de sobriété foncière du gouvernement. De
             nombreuses friches restent inutilisées pendant que les sols naturels et agricoles sont
             artificialisés. Les collectivités sont bloquées dans leurs dossiers de réhabilitation donc
             {{ request.site.name }} les oriente personnellement sur leurs dossiers de réhabilitation de friche tout en
-            permettant aux conseillers publics de suivre et de faire avancer les dossiers sur les friches.
+            permettant aux conseillers publics de suivre et de faire avancer les dossiers sur les friches. {% endcomment %}
         </p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Article 3 – Définitions</strong>
