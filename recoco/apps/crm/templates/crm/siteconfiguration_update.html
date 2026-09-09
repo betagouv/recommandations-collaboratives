@@ -27,10 +27,10 @@
                     <h1 class="fr-h3 fr-mb-1w">Paramètres du portail</h1>
                     <p class="fr-text--sm fr-mb-3w">
                         Vous pouvez ici paramétrer votre portail. Pour plus d'informations,
-                        {# TODO URL doc #}<a class="fr-link" href="#">n'hésitez pas à consulter la documentation</a>.
+                        {# TODO ajout élément d'accessibilité pour le lien #}<a class="fr-link" target="_blank" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail">n'hésitez pas à consulter la documentation</a>.
                         <br>
-                        Parcourez les différentes rubriques pour faire vos modifications.
-                        Une fois vos modifications faites, n'oubliez pas de les enregistrer !
+                        Parcourez les différentes rubriques, et une fois vos modifications réalisées,
+                        pensez à les enregistrer !
                     </p>
                     <div class="fr-accordions-group fr-mb-3w">
                         <section class="fr-accordion">
@@ -63,7 +63,7 @@
                                     {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                 </fieldset>
                                 <h3 class="fr-h6 fr-mb-1w">Informations envoyées dans les e-mails</h3>
-                                {# TODO replace text #}<p class="fr-text--sm fr-mb-2w">Texte de description additionnel</p>
+                                <p class="fr-text--sm fr-mb-2w">Par exemple : Invitation sur un dossier, nouveau message, rappel de recommandations etc.</p>
                                 <fieldset class="fr-fieldset">
                                     {{ form.sender_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     {{ form.reminder_interval|as_crispy_field:"dsrc_crispy_forms_no_js" }}
@@ -84,10 +84,8 @@
                                     <div class="fr-container--fluid">
                                         <div class="fr-notice__body">
                                             <p class="fr-notice__title">
-                                                Pour plus d'information sur les logos et leurs formats, veuillez consulter la documentation.
+                                                Pour plus d'information sur les logos et leurs formats : <a class="fr-link" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail" target="_blank" rel="noopener external">consulter la documentation.</a>
                                             </p>
-                                            {# TODO URL doc #}
-                                            <p><a class="fr-link" href="#" target="_blank" rel="noopener external">Consulter la documentation</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -117,6 +115,19 @@
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-legal">
+                                <div class="fr-notice fr-notice--warning fr-mb-3w">
+                                    <div class="fr-container--fluid">
+                                        <div class="fr-notice__body flex-column">
+                                            <span>Les informations de cette section sont obligatoires pour être en conformité avec le règlement général sur la protection des données (RGPD).</span>
+                                            <p class="fr-notice__title">
+                                                Nous vous invitons compléter ces informations au plus vite ! Pour plus d'information sur le RGPD, veuillez consulter la documentation.
+                                            </p>
+                                            <p>
+                                                <a class="fr-link" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail" target="_blank" rel="noopener external">consulter la documentation.</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <h3 class="fr-h6 fr-mb-1w">Mentions légales</h3>
                                 <fieldset class="fr-fieldset">
                                     {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
