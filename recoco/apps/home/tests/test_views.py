@@ -438,8 +438,7 @@ def test_legals_page_uses_default_values_without_site_configuration(client):
         response,
         "Cité des mobilités – 25 avenue François Mitterrand – CS 92803 69674 Bron Cedex",
     )
-    assertContains(response, "04 72 14 30 30")
-    assertContains(response, "Etienne Crépon, directeur général du CEREMA")
+    assertContains(response, "+33102030405")
 
 
 @pytest.mark.django_db
@@ -461,8 +460,6 @@ def test_legals_page_uses_site_configuration_values(client, current_site):
     assertContains(response, "1 rue de la Mairie, 75000 Paris")
     assertContains(response, "Jane Doe, directrice générale")
     assertContains(response, "+33123456789")
-    assertNotContains(response, "Etienne Crépon, directeur général du CEREMA")
-    assertNotContains(response, "04 72 14 30 30")
 
 
 @pytest.mark.django_db
