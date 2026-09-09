@@ -56,4 +56,7 @@ recoco/frontend/plugin-entries.json
 recoco/frontend/src/js/plugins/
 
 # plugins
-/plugins
+./plugins
+
+# tools
+/graft/
