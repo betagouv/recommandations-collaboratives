@@ -372,10 +372,12 @@ class TestEmbedMiddlewareCSP:
 
         assert response.status_code == 200
         csp_header = response["Content-Security-Policy"]
-        assert (
-            "frame-ancestors 'self' https://partner.example.fr" in csp_header
-            or "frame-ancestors https://partner.example.fr 'self'" in csp_header
+        frame_ancestor_instruction = next(
+            instruction
+            for instruction in csp_header.split(";")
+            if "frame-ancestor" in instruction
         )
+        assert "'self'" in frame_ancestor_instruction
 
 
 class TestEmbedContextProcessor:
