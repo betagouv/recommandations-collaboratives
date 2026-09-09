@@ -145,9 +145,9 @@ def document_upload(request, project_id):
 def document_delete(request, project_id, document_id):
     """Delete a document for a project"""
     project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    document = get_object_or_404(models.Document, pk=document_id, project=project)
-
     has_perm_or_403(request.user, "manage_documents", project)
+
+    document = get_object_or_404(models.Document, pk=document_id, project=project)
 
     if request.method == "POST":
         if document.uploaded_by != request.user:
@@ -167,9 +167,9 @@ def document_delete(request, project_id, document_id):
 def document_pin_unpin(request, project_id, document_id):
     """Delete a document for a project"""
     project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    document = get_object_or_404(models.Document, pk=document_id, project=project)
-
     has_perm_or_403(request.user, "manage_documents", project)
+
+    document = get_object_or_404(models.Document, pk=document_id, project=project)
 
     if request.method == "POST":
         document.pinned = not document.pinned
