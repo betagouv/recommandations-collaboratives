@@ -443,6 +443,26 @@ def test_duplication_needs_permission(request, client, current_site):
         assert models.Resource.objects.count() == 1
 
 
+@pytest.mark.django_db
+def test_duplication_not_available_across_sites(request, client):
+    """Regression test (IDOR): DuplicateResourceView looks up the resource to
+    copy via the unscoped default manager, so a manager on site A can clone a
+    draft resource that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant6.example.com")
+    old_resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.DRAFT,
+    ).make()
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, follow=True)
+
+    assert response.status_code == 404
+    assert models.Resource.objects.count() == 1
+
+
 #
 # details
 
@@ -510,6 +530,37 @@ def test_resource_detail_not_visible_across_sites(request, client):
     with login(client):
         response = client.get(url)
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_resource_detail_visible_on_non_default_site(request, client, settings):
+    """Regression test: BaseResourceDetailView.queryset must not be a class
+    attribute. CurrentSiteManager bakes settings.SITE_ID into the SQL as
+    soon as `.filter()` runs, so a class-level `queryset = Resource.on_site...`
+    freezes at import time (SITE_ID still resolves to its `default=1` then),
+    making every non-default site 404 on its own published resources while
+    site 1's resources stay readable from any domain.
+    """
+    other_site = Site.objects.create(
+        domain="other-tenant.example.com", name="other tenant"
+    )
+    settings.ALLOWED_HOSTS = [*settings.ALLOWED_HOSTS, other_site.domain]
+
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+    try:
+        response = client.get(url, HTTP_HOST=other_site.domain)
+        assert response.status_code == 200
+    finally:
+        # DynamicSiteMiddleware sets the thread-local settings.SITE_ID as a
+        # side effect of the request above : reset it so it doesn't leak into
+        # other tests sharing this worker's thread.
+        settings.SITE_ID.reset()
 
 
 @pytest.mark.django_db
@@ -663,9 +714,31 @@ def test_update_resource_available_for_staff(request, client):
 
 @pytest.mark.resource_update
 @pytest.mark.django_db
+def test_update_resource_not_available_across_sites(request, client):
+    """Regression test (IDOR): resource_update looks up Resource via the
+    unscoped default manager, guarded only by manage_resources.
+    A manager on site A can open (and, on submit, silently
+    clone via make_clone()) a draft that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant2.example.com")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        site_origin=other_site,
+        status=models.Resource.DRAFT,
+    ).make()
+
+    url = reverse("resources-resource-update", args=[resource.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.resource_update
+@pytest.mark.django_db
 def test_update_resource_from_origin_site_and_redirect(request, client):
-    resource = baker.make(models.Resource)
     current_site = get_current_site(request)
+    resource = baker.make(models.Resource, sites=[current_site])
     resource.site_origin = current_site
     resource.save()
 
@@ -947,6 +1020,41 @@ def test_resource_history_creates_revision(request, client):
 
 
 @pytest.mark.django_db
+def test_resource_history_not_available_across_sites(request, client):
+    """Regression test (IDOR): ResourceHistoryCompareView uses the unscoped
+    default manager, so a manager on site A can view the revision history of
+    a resource that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant3.example.com")
+    resource = Recipe(models.Resource, sites=[other_site]).make()
+    url = reverse("resources-resource-history", args=[resource.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_resource_history_restore_not_available_across_sites(request, client):
+    """Regression test (IDOR): ResourceHistoryRestoreView uses the unscoped
+    default manager, so a manager on site A can restore a revision of a
+    resource that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant4.example.com")
+    resource = Recipe(models.Resource, title="first", sites=[other_site]).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+    with transaction.atomic(), reversion.create_revision():
+        resource.title = "hello"
+        resource.save()
+
+    version = Version.objects.get_for_object(resource).last()
+
+    url = reverse("resources-resource-history-restore", args=[resource.id, version.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_resource_history_reversion_available_for_authorized_user(request, client):
     resource = Recipe(
         models.Resource,
@@ -1052,6 +1160,25 @@ def test_search_resources_by_category(request):
 ########################################################################
 # Bookmarking a resource
 ########################################################################
+
+
+@pytest.mark.django_db
+def test_bookmark_create_not_available_across_sites(request, client):
+    """Regression test (IDOR): create_bookmark looks up Resource via the
+    unscoped default manager, so any authenticated user can bookmark (and
+    thus read) a resource that only belongs to another site."""
+    other_site = Site.objects.create(domain="other-tenant5.example.com")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -1228,11 +1355,31 @@ def test_embedded_resource_detail_view_404_for_draft_resource(client, request):
     )
     assert response.status_code == 404
 
-    with login(client, groups=["example_com_staff"]):
+    with login(client):
         response = client.get(
             reverse("resources-resource-detail-embeded", args=[resource.id])
         )
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_view_returns_draft_to_resource_manager(
+    client, request
+):
+    """Regression test: the "Pousse Reco" draft preview iframes the embed
+    view for any user with manage_resources (see ResourceViewSet.get_queryset
+    and resource_short_element.html). It must not blanket-404 on drafts."""
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(
+            reverse("resources-resource-detail-embeded", args=[resource.id])
+        )
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
