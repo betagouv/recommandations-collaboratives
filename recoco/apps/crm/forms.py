@@ -37,6 +37,19 @@ class SiteConfigurationForm(forms.ModelForm):
         ),
     )
 
+    required_fields = [
+        "main_topic",
+        "description",
+        "contact_form_recipient",
+        "sender_name",
+        "legal_owner",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in self.required_fields:
+            self.fields[name].required = True
+
     class Meta:
         model = home_models.SiteConfiguration
 
