@@ -666,6 +666,10 @@ class LatestResourcesFeed(Feed):
 def create_bookmark(request, resource_id=None):
     """Create bookmark for resource and and connected user"""
     resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
+    if not resource.public and not has_perm(
+        request.user, "manage_resources", request.site
+    ):
+        raise Http404()
     try:
         # look if bookmark exists and is deleted
         bookmark = models.Bookmark.deleted_on_site.get(

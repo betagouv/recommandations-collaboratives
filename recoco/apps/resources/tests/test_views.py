@@ -1177,6 +1177,42 @@ def test_bookmark_create_not_available_across_sites(request, client):
 
 
 @pytest.mark.django_db
+def test_bookmark_create_not_available_for_draft_resource(request, client):
+    """Regression test (IDOR): create_bookmark did not check the resource
+    status/permissions, so any authenticated user could bookmark (and thus
+    read the title of) a draft resource they should not be able to see."""
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_bookmark_create_available_for_draft_resource_with_manage_permission(
+    request, client
+):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client, is_staff=True, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_user_has_access_to_page_for_bookmark_with_notes(request, client):
     resource = Recipe(
         models.Resource,
