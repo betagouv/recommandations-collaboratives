@@ -26,7 +26,38 @@ from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.http import HttpResponse, HttpResponseBadRequest
+from markdownx.utils import markdownify
 from sesame.utils import get_parameters
+
+# nh3's default allowlist is narrower than what our markdown pipeline
+# legitimately emits (MARKDOWNX_MARKDOWN_EXTENSIONS in settings/common.py):
+# it drops `target`/`referrerpolicy` on links (undoing
+# markdown_link_attr_modifier's new-tab/no-referrer config), and `id`/`class`
+# (breaking footnote anchors and code-block language classes). None of these
+# are XSS vectors once tags/handlers are stripped, so widen the allowlist
+# rather than let nh3.clean() silently mangle valid output.
+_MARKDOWN_ALLOWED_ATTRIBUTES = {
+    tag: attrs | {"id", "class"} for tag, attrs in nh3.ALLOWED_ATTRIBUTES.items()
+}
+for _tag in nh3.ALLOWED_TAGS:
+    _MARKDOWN_ALLOWED_ATTRIBUTES.setdefault(_tag, {"id", "class"})
+_MARKDOWN_ALLOWED_ATTRIBUTES["a"] = _MARKDOWN_ALLOWED_ATTRIBUTES["a"] | {
+    "target",
+    "title",
+    "referrerpolicy",
+}
+_MARKDOWN_ALLOWED_ATTRIBUTES["th"] = _MARKDOWN_ALLOWED_ATTRIBUTES["th"] | {"style"}
+_MARKDOWN_ALLOWED_ATTRIBUTES["td"] = _MARKDOWN_ALLOWED_ATTRIBUTES["td"] | {"style"}
+
+
+def render_markdown(text):
+    """Render markdown to HTML, stripping any embedded/unsafe HTML.
+
+    `markdownx.utils.markdownify` passes raw HTML embedded in the source
+    straight through, so its output is never safe to render with `|safe`
+    on its own -- always sanitize it here first.
+    """
+    return nh3.clean(markdownify(text or ""), attributes=_MARKDOWN_ALLOWED_ATTRIBUTES)
 
 
 def make_site_slug(site: Site):

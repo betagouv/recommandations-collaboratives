@@ -27,7 +27,6 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
-from markdownx.utils import markdownify
 from model_utils.models import TimeStampedModel
 from notifications import models as notifications_models
 from notifications.models import Notification
@@ -40,6 +39,7 @@ from recoco.utils import (
     CastedGenericRelation,
     check_if_advisor,
     has_perm,
+    render_markdown,
     strip_accents,
 )
 
@@ -574,7 +574,7 @@ class Project(models.Model):
     @property
     def advisors_note_rendered(self):
         """Return synopsis as markdown"""
-        return markdownify(self.advisors_note)
+        return render_markdown(self.advisors_note)
 
     advisors_note_on = models.DateTimeField(
         verbose_name="Rédigé le", null=True, blank=True
@@ -611,7 +611,7 @@ class Project(models.Model):
     @property
     def impediments_rendered(self):
         """Return impediments as markdown"""
-        return markdownify(self.impediments)
+        return render_markdown(self.impediments)
 
     switchtenders = models.ManyToManyField(
         auth_models.User,
@@ -946,7 +946,7 @@ class Note(models.Model):
     @property
     def content_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.content)
+        return render_markdown(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
 

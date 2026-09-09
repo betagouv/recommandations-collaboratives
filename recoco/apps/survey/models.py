@@ -13,7 +13,6 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
-from markdownx.utils import markdownify
 from model_clone import CloneMixin
 from tagging.fields import TagField
 from tagging.models import Tag
@@ -21,6 +20,7 @@ from tagging.registry import register as tagging_register
 from taggit.managers import TaggableManager
 
 from recoco.apps.projects import models as projects_models
+from recoco.utils import render_markdown
 
 from . import apps
 from .utils import compute_qs_completion
@@ -177,14 +177,14 @@ class Question(CloneMixin, models.Model):
     @property
     def how_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.how)
+        return render_markdown(self.how)
 
     why = models.TextField(default="", blank=True, verbose_name="Pourquoi ?")
 
     @property
     def why_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.why)
+        return render_markdown(self.why)
 
     # does this question expect a multiple choice or single choice answer
     is_multiple = models.BooleanField(
