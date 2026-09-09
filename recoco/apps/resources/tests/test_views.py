@@ -463,6 +463,22 @@ def test_duplication_not_available_across_sites(request, client):
     assert models.Resource.objects.count() == 1
 
 
+@pytest.mark.django_db
+def test_duplicate_resource_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to duplicate a resource
+    that only belongs to site B into site A."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+
+    url = reverse("resources-resource-duplicate", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert models.Resource.objects.count() == 1
+
+
 #
 # details
 
@@ -732,6 +748,7 @@ def test_update_resource_from_origin_site_and_redirect(request, client):
     current_site = get_current_site(request)
     resource = baker.make(models.Resource, sites=[current_site])
     resource.site_origin = current_site
+    resource.sites.add(current_site)
     resource.save()
 
     previous_update = resource.updated_on
@@ -878,6 +895,42 @@ def test_update_resource_from_non_origin_site_and_redirect(request, client):
     assert new_resource.site_origin == current_site
 
 
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to edit a resource that
+    only belongs to site B, even though `sites.manage_resources` is granted
+    at the site level."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+    original_content = resource.content
+
+    url = reverse("resources-resource-update", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+    data = {
+        "title": "hacked title",
+        "subtitle": "a sub title",
+        "status": 0,
+        "summary": "a summary",
+        "tags": "#tag",
+        "content": "cross tenant content injection",
+        "support_orga": "Attacker Corp",
+    }
+
+    with login(client, groups=["example_com_staff"], username="test2"):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 404
+
+    resource.refresh_from_db()
+    assert resource.content == original_content
+
+
 ########################################################################
 # delete
 ########################################################################
@@ -955,6 +1008,30 @@ def test_delete_resource_non_shared_and_redirect(client, request):
     resource.refresh_from_db()
     assert resource.sites.count() == 0
     assert resource.deleted is not None
+
+
+@pytest.mark.resource_delete
+@pytest.mark.django_db
+def test_delete_resource_cross_tenant_is_forbidden(client, request):
+    """A resource manager on site A must not be able to delete a resource
+    that only belongs to site B."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+    with login(client, groups=["example_com_staff"], username="test2"):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    resource.refresh_from_db()
+    assert resource.deleted is None
+    assert other_site in resource.sites.all()
 
 
 #
@@ -1074,6 +1151,32 @@ def test_resource_history_reversion_available_for_authorized_user(request, clien
 
     assert resource.title == "first"
     assert Version.objects.get_for_object(resource).count() == 3
+
+
+@pytest.mark.django_db
+def test_resource_history_restore_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to revert a revision on
+    a resource that only belongs to site B."""
+    other_site = baker.make(Site)
+    resource = Recipe(models.Resource, title="first", sites=[other_site]).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.title = "hello"
+        resource.save()
+
+    version = Version.objects.get_for_object(resource).last()
+
+    url = reverse("resources-resource-history-restore", args=[resource.id, version.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    resource.refresh_from_db()
+    assert resource.title == "hello"
 
 
 ########################################################################

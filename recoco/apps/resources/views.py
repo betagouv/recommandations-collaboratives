@@ -398,6 +398,9 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
 
+    def get_queryset(self):
+        return models.Resource.on_site.all()
+
     def form_valid(self, form):
         """
         Dereference the current site from the resource.
