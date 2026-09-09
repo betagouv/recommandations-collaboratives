@@ -553,7 +553,7 @@ def test_resource_detail_visible_on_non_default_site(request, client, settings):
     ).make()
 
     url = reverse("resources-resource-detail", args=[resource.id])
-    with settings.SITE_ID.override(other_site.pk)
+    with settings.SITE_ID.override(other_site.pk):
         response = client.get(url)
         assert response.status_code == 200
 
