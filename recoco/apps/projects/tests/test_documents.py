@@ -383,6 +383,52 @@ def test_pin_document_cross_project_is_forbidden(request, client, project):
 
 
 @pytest.mark.django_db
+def test_delete_document_permission_checked_before_document_lookup(
+    request, client, project
+):
+    # permission check must run before the document lookup, otherwise a user
+    # with no rights on the project could tell from the status code (403 vs
+    # 404) whether a given document id belongs to another project or not
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    document = baker.make(
+        models.Document,
+        project=other_project,
+        the_link="http://yo",
+        site=get_current_site(request),
+        uploaded_by__username="other",
+    )
+
+    with login(client):
+        url = reverse(
+            "projects-documents-delete-document", args=[project.id, document.id]
+        )
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_pin_document_permission_checked_before_document_lookup(
+    request, client, project
+):
+    # same oracle check as above, for pin/unpin
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    document = baker.make(
+        models.Document,
+        project=other_project,
+        the_link="http://yo",
+        site=get_current_site(request),
+        uploaded_by__username="other",
+    )
+
+    with login(client):
+        url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_project_pin_document(request, client, project):
     with login(client) as user:
         document = baker.make(
