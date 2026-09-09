@@ -463,6 +463,22 @@ def test_duplication_not_available_across_sites(request, client):
     assert models.Resource.objects.count() == 1
 
 
+@pytest.mark.django_db
+def test_duplicate_resource_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to duplicate a resource
+    that only belongs to site B into site A."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+
+    url = reverse("resources-resource-duplicate", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert models.Resource.objects.count() == 1
+
+
 #
 # details
 
@@ -887,6 +903,7 @@ def test_update_resource_cross_tenant_is_forbidden(request, client):
     at the site level."""
     other_site = baker.make(Site)
     resource = baker.make(models.Resource, sites=[other_site])
+    original_content = resource.content
 
     url = reverse("resources-resource-update", args=[resource.id])
 
@@ -911,28 +928,7 @@ def test_update_resource_cross_tenant_is_forbidden(request, client):
     assert response.status_code == 404
 
     resource.refresh_from_db()
-    assert resource.content != data["content"]
-
-
-########################################################################
-# duplicate
-########################################################################
-
-
-@pytest.mark.django_db
-def test_duplicate_resource_cross_tenant_is_forbidden(request, client):
-    """A resource manager on site A must not be able to duplicate a resource
-    that only belongs to site B into site A."""
-    other_site = baker.make(Site)
-    resource = baker.make(models.Resource, sites=[other_site])
-
-    url = reverse("resources-resource-duplicate", args=[resource.id])
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url)
-
-    assert response.status_code == 404
-    assert models.Resource.objects.count() == 1
+    assert resource.content == original_content
 
 
 ########################################################################
