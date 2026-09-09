@@ -1,0 +1,172 @@
+[
+  {
+    "model": "account.emailaddress",
+    "pk": 1,
+    "fields": {
+      "email": "admin@admin.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 1
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 2,
+    "fields": {
+      "email": "jean@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 2
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 3,
+    "fields": {
+      "email": "jeanne@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 3
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 4,
+    "fields": {
+      "email": "jeannot@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 4
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 5,
+    "fields": {
+      "email": "bob@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 5
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 6,
+    "fields": {
+      "email": "boba@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 6
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 7,
+    "fields": {
+      "email": "bobette@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 7
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 8,
+    "fields": {
+      "email": "national@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 8
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 9,
+    "fields": {
+      "email": "nonactiveuser@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 9
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 10,
+    "fields": {
+      "email": "deleted.user@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 10
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 11,
+    "fields": {
+      "email": "new.member@@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 11
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 12,
+    "fields": {
+      "email": "conseiller-regional@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 12
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 13,
+    "fields": {
+      "email": "conseiller-regional-invited@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 13
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 14,
+    "fields": {
+      "email": "staff@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 14
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 15,
+    "fields": {
+      "email": "nationalAdvisorRequest@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 15
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 16,
+    "fields": {
+      "email": "regionalAdvisorRequest@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 16
+    }
+  },
+  {
+    "model": "account.emailaddress",
+    "pk": 17,
+    "fields": {
+      "email": "refuseAdvisorRequest@test.fr",
+      "verified": true,
+      "primary": true,
+      "user_id": 17
+    }
+  }
+]
