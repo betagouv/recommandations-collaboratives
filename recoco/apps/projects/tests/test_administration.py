@@ -786,6 +786,35 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker, proje
 
 
 @pytest.mark.django_db
+def test_revoke_invite_cross_project_is_forbidden(request, client, project):
+    """A manage_collaborators grant on one project must not let you revoke
+    (delete) an invite that belongs to a different project"""
+    other_project = Recipe(
+        projects_models.Project, sites=[get_current_site(request)]
+    ).make()
+
+    invite = baker.make(
+        invites_models.Invite,
+        site=get_current_site(request),
+        project=other_project,
+        role="COLLABORATOR",
+        email="invited@party.com",
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+
+        url = reverse(
+            "projects-project-access-revoke-invite",
+            args=[project.id, invite.pk],
+        )
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert invites_models.Invite.objects.filter(pk=invite.pk).exists()
+
+
+@pytest.mark.django_db
 def test_set_project_active_date_is_saved(client, project_ready, current_site):
     project_ready.inactive_since = timezone.make_aware(datetime(2024, 1, 1))
     project_ready.save()
