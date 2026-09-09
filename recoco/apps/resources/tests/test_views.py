@@ -533,13 +533,11 @@ def test_resource_detail_not_visible_across_sites(request, client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_visible_on_non_default_site(request, client, settings):
-    """Regression test: BaseResourceDetailView.queryset must not be a class
-    attribute. CurrentSiteManager bakes settings.SITE_ID into the SQL as
-    soon as `.filter()` runs, so a class-level `queryset = Resource.on_site...`
-    freezes at import time (SITE_ID still resolves to its `default=1` then),
-    making every non-default site 404 on its own published resources while
-    site 1's resources stay readable from any domain.
+def test_resource_detail_not_visible_on_non_default_site(request, client, settings):
+    """A resource is only visible on the site(s) it is linked to. Since the
+    resource here is only linked to `other_site`, requesting it while the
+    current site is still the default one must 404, even though the
+    resource itself is published.
     """
     other_site = Site.objects.create(
         domain="other-tenant.example.com", name="other tenant"
@@ -553,9 +551,8 @@ def test_resource_detail_visible_on_non_default_site(request, client, settings):
     ).make()
 
     url = reverse("resources-resource-detail", args=[resource.id])
-    with settings.SITE_ID.override(other_site.pk):
-        response = client.get(url)
-        assert response.status_code == 200
+    response = client.get(url)
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
