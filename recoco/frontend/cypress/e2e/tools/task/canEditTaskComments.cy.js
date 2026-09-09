@@ -1,28 +1,50 @@
 import projects from '../../../fixtures/projects/projects.json';
 
-const currentProject = projects[2];
-const message = 'Message - Test comment on task';
+// pk 38 - conseiller1 advisor, dedicated to recommendation edition. The
+const currentProject = projects.find((p) => p.pk === 38);
 
-// TODO Réécrire : edit-comment-button et list-tasks-switch-button n'existent plus
-describe.skip('As advisor, I can make a comment on a task @page-projet-recommandations-modification', () => {
-  it('adds a new comment, and stops from submitting the comment more than once', () => {
+const intent = 'Reco dont on modifie le contenu';
+const initialContent = 'Contenu initial de la recommandation';
+const updatedContent = 'Contenu modifié depuis la conversation';
+
+describe('As advisor, I can edit the content of a recommendation @page-projet-recommandations-modification', () => {
+  beforeEach(() => {
     cy.login('conseiller1');
-    cy.visit(`/project/${currentProject.pk}/actions`);
+    cy.resetProjectRecommendations(currentProject.pk);
+    cy.createTaskViaApi(currentProject.pk, {
+      intent,
+      content: initialContent,
+      draft: false,
+    });
+  });
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
-    cy.get('[data-test-id="task-initial-comment"]').should('exist');
+  it('edits a published recommendation from the conversation feed', () => {
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
-    cy.get('[data-test-id="edit-comment-button"]')
+    cy.contains(initialContent);
+
+    // Edit message with reco
+    cy.get('[data-test-id="message-edit-recommendation"]')
       .first()
       .click({ force: true });
+    cy.url().should('include', '/update/');
 
-    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').click();
-    cy.focused().type(message, {
-      force: true,
-      delay: 0,
-    });
+    cy.get('[data-cy="input-title-task"]').should('have.value', intent);
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').should(
+      'contain.text',
+      initialContent
+    );
 
-    cy.get('[data-test-id="button-submit-new"]').click({ force: true });
-    cy.get('[data-test-id="task-initial-comment"]').should('contain', message);
+    // Replace the content and submit.
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror')
+      .click()
+      .type(`{selectall}{del}${updatedContent}`, { force: true, delay: 0 });
+    cy.get('[data-cy="button-submit-task"]')
+      .should('be.enabled')
+      .click({ force: true });
+
+    cy.url().should('include', `/project/${currentProject.pk}/conversations`);
+    cy.contains(updatedContent);
+    cy.contains(initialContent).should('not.exist');
   });
 });
