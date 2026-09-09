@@ -386,9 +386,9 @@ def test_pin_document_cross_project_is_forbidden(request, client, project):
 def test_delete_document_permission_checked_before_document_lookup(
     request, client, project
 ):
-    # permission check must run before the document lookup, otherwise a user
-    # with no rights on the project could tell from the status code (403 vs
-    # 404) whether a given document id belongs to another project or not
+    """Permission check must run before the document lookup, otherwise a user
+    with no rights on the project could tell from the status code (403 vs
+    404) whether a given document id belongs to another project or not"""
     other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     document = baker.make(
         models.Document,
@@ -411,7 +411,7 @@ def test_delete_document_permission_checked_before_document_lookup(
 def test_pin_document_permission_checked_before_document_lookup(
     request, client, project
 ):
-    # same oracle check as above, for pin/unpin
+    """same oracle check as above^, for pin/unpin"""
     other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     document = baker.make(
         models.Document,

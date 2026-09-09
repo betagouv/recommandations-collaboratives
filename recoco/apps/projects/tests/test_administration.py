@@ -787,8 +787,8 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker, proje
 
 @pytest.mark.django_db
 def test_revoke_invite_cross_project_is_forbidden(request, client, project):
-    # a manage_collaborators grant on one project must not let you revoke
-    # (delete) an invite that belongs to a different project
+    """A manage_collaborators grant on one project must not let you revoke
+    (delete) an invite that belongs to a different project"""
     other_project = Recipe(
         projects_models.Project, sites=[get_current_site(request)]
     ).make()
