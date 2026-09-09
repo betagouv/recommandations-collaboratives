@@ -118,6 +118,11 @@
   margin-right: 0.2rem;
 }
 
+.fr-icon--xl::before {
+  width: 48px;
+  height: 48px;
+}
+
 p a {
   text-decoration: underline;
   color: #0000ee;

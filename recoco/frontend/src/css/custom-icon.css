@@ -197,3 +197,28 @@
 .fr-icon-check-line::before {
   mask-image: url(../assets/check-line.svg);
 }
+
+.fr-icon-file-color::after,
+.fr-icon-file-color::before {
+  mask-image: url(../assets/file-color.svg);
+}
+
+.fr-icon-mail-with-hints::after,
+.fr-icon-mail-with-hints::before {
+  mask-image: url(../assets/mail-with-hints.svg);
+}
+
+.fr-icon-mockup-with-images::after,
+.fr-icon-mockup-with-images::before {
+  mask-image: url(../assets/mockup-with-images.svg);
+}
+
+.fr-icon-justice-scale::after,
+.fr-icon-justice-scale::before {
+  mask-image: url(../assets/justice-scale.svg);
+}
+
+.fr-icon-system::after,
+.fr-icon-system::before {
+  mask-image: url(../assets/system.svg);
+}
