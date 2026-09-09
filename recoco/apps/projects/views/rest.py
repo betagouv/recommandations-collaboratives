@@ -119,9 +119,7 @@ class ProjectDetail(
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
-        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-            request.user, "projects.change_location", p
-        )  # need at least one write perm
+        has_perm_or_403(request.user, "projects.change_location", p)
         context = {"request": request, "view": self, "format": format}
         serializer = UserProjectSerializer(
             p, context=context, data=request.data, partial=True
