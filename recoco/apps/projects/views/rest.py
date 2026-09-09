@@ -120,20 +120,17 @@ class ProjectDetail(
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
-        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-            request.user, "projects.change_location", p
-        )  # need at least one write perm
+
+        # The minimal perm required to allow a PATCH
+        has_perm_or_403(request.user, "projects.change_location", p)
         context = {"request": request, "view": self, "format": format}
 
         # Only advisors/observers hold `change_project` (and, together with
-        # it, `use_project_tags` — see `ADVISOR_PERMISSIONS`); collaborators,
-        # draft or not, only ever hold `change_location`. Restrict the
-        # writable fields to match, closing a mass-assignment gap (security
-        # audit finding #12).
+        # it, `use_project_tags` -> see `ADVISOR_PERMISSIONS`).
+        # Collaborators, draft or not, only hold `change_location`.
         write_serializer_class = (
             UserProjectSerializer
-            if has_perm(request.user, "list_projects", request.site)
-            or has_perm(request.user, "projects.change_project", p)
+            if has_perm(request.user, "projects.change_project", p)
             else ProjectLocationSerializer
         )
         write_serializer = write_serializer_class(

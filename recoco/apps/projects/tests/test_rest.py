@@ -26,7 +26,7 @@ from pytest_django.asserts import assertContains
 from recoco import verbs
 from recoco.apps.conversations import models as conversations_models
 from recoco.apps.tasks import models as tasks_models
-from recoco.utils import login
+from recoco.utils import get_group_for_site, login
 
 from .. import models, utils
 from ..models import Document
@@ -754,6 +754,69 @@ def test_project_is_updated_by_project_patch_api(request, api_client, project_dr
 
     project_draft.refresh_from_db()
     assert project_draft.name == new_name
+
+
+@pytest.mark.django_db
+def test_project_advisor_without_assignment_cannot_patch_project_api(
+    request, api_client, project_draft
+):
+    """`sites.list_projects` is granted to every member of the site's
+    `advisor` group, regardless of any relation to a specific project. It
+    must not let such a user bypass the endpoint's object-level permission
+    check for a project they aren't assigned to at all.
+    """
+    with login(api_client, groups=["example_com_advisor"]):
+        url = reverse("projects-detail", args=[project_draft.id])
+        response = api_client.patch(url, data={"name": "Hacked name"})
+
+    assert response.status_code == 403
+
+    project_draft.refresh_from_db()
+    assert project_draft.name != "Hacked name"
+
+
+@pytest.mark.django_db
+def test_project_advisor_group_member_without_change_project_cannot_mass_assign_via_patch_api(
+    request, api_client, project_draft
+):
+    """
+    A user can hold object-level `projects.change_location` on a project
+    (e.g. as a collaborator) while also being a member of the site's
+    `advisor` group (`sites.list_projects`). That site-wide membership must
+    not escalate them to the full write serializer: only object-level
+    `projects.change_project` should, matching the classic (non-REST)
+    views.
+    """
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+    user.groups.add(get_group_for_site("advisor", site))
+
+    original_name = project_draft.name
+    original_description = project_draft.description
+    assert project_draft.is_diagnostic_done is False
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(
+        url,
+        data={
+            "name": "hijacked name",
+            "description": "hijacked description",
+            "is_diagnostic_done": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.data["name"] == original_name
+    assert response.data["description"] == original_description
+    assert response.data["is_diagnostic_done"] is False
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == original_name
+    assert project_draft.description == original_description
+    assert project_draft.is_diagnostic_done is False
 
 
 @pytest.mark.django_db
