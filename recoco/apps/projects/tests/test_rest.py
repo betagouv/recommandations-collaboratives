@@ -678,26 +678,32 @@ def check_project_content(project, data):
 
 
 @pytest.mark.django_db
-def test_project_detail_get_is_not_available_across_sites(
-    request, api_client, make_project
-):
-    """A site-level list_projects permission must not leak projects from another site"""
+def test_project_detail_get_is_not_available_across_sites(api_client, make_project):
+    """get_object()'s site-scoped queryset 404s for a project on another site,
+    before the list_projects permission check ever runs; the positive control
+    below confirms the 404 is site-related and not a blanket failure."""
     other_site = baker.make(sites_models.Site, domain="other-site.example.com")
-    project = make_project(site=other_site)
+    other_site_project = make_project(site=other_site)
+    same_site_project = make_project()
 
-    url = reverse("projects-detail", args=[project.id])
     with login(api_client, groups=["example_com_staff"]):
-        response = api_client.get(url)
+        response = api_client.get(
+            reverse("projects-detail", args=[other_site_project.id])
+        )
+        assert response.status_code == 404
 
-    assert response.status_code == 404
+        response = api_client.get(
+            reverse("projects-detail", args=[same_site_project.id])
+        )
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_detail_patch_is_not_available_across_sites(
-    request, api_client, make_project
-):
-    """A site-level list_projects permission must not allow patching a project
-    from another site"""
+def test_project_detail_patch_is_not_available_across_sites(api_client, make_project):
+    """get_object()'s site-scoped queryset 404s for a project on another site,
+    before the serializer (and any write) ever runs. The name assertion below
+    only confirms the 404 pre-empted the write; the write-permission path
+    itself is covered by test_project_advisor_without_assignment_cannot_patch_project_api."""
     other_site = baker.make(sites_models.Site, domain="other-site2.example.com")
     project = make_project(site=other_site, name="Original name")
 
