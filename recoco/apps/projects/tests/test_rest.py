@@ -26,7 +26,7 @@ from pytest_django.asserts import assertContains
 from recoco import verbs
 from recoco.apps.conversations import models as conversations_models
 from recoco.apps.tasks import models as tasks_models
-from recoco.utils import login
+from recoco.utils import get_group_for_site, login
 
 from .. import models, utils
 from ..models import Document
@@ -796,6 +796,69 @@ def test_project_is_updated_by_project_patch_api(request, api_client, project_dr
 
 
 @pytest.mark.django_db
+def test_project_advisor_without_assignment_cannot_patch_project_api(
+    request, api_client, project_draft
+):
+    """`sites.list_projects` is granted to every member of the site's
+    `advisor` group, regardless of any relation to a specific project. It
+    must not let such a user bypass the endpoint's object-level permission
+    check for a project they aren't assigned to at all.
+    """
+    with login(api_client, groups=["example_com_advisor"]):
+        url = reverse("projects-detail", args=[project_draft.id])
+        response = api_client.patch(url, data={"name": "Hacked name"})
+
+    assert response.status_code == 403
+
+    project_draft.refresh_from_db()
+    assert project_draft.name != "Hacked name"
+
+
+@pytest.mark.django_db
+def test_project_advisor_group_member_without_change_project_cannot_mass_assign_via_patch_api(
+    request, api_client, project_draft
+):
+    """
+    A user can hold object-level `projects.change_location` on a project
+    (e.g. as a collaborator) while also being a member of the site's
+    `advisor` group (`sites.list_projects`). That site-wide membership must
+    not escalate them to the full write serializer: only object-level
+    `projects.change_project` should, matching the classic (non-REST)
+    views.
+    """
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+    user.groups.add(get_group_for_site("advisor", site))
+
+    original_name = project_draft.name
+    original_description = project_draft.description
+    assert project_draft.is_diagnostic_done is False
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(
+        url,
+        data={
+            "name": "hijacked name",
+            "description": "hijacked description",
+            "is_diagnostic_done": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.data["name"] == original_name
+    assert response.data["description"] == original_description
+    assert response.data["is_diagnostic_done"] is False
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == original_name
+    assert project_draft.description == original_description
+    assert project_draft.is_diagnostic_done is False
+
+
+@pytest.mark.django_db
 def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
     request, api_client, project_draft
 ):
@@ -819,6 +882,93 @@ def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
     project_draft.refresh_from_db()
     assert project_draft.name == new_name
     assert project_draft.advisors_note != new_note
+
+
+@pytest.mark.django_db
+def test_project_draft_collaborator_cannot_mass_assign_privileged_fields_via_patch_api(
+    request, api_client, project_draft
+):
+    """Regression test for security audit finding #12 (mass assignment).
+
+    A draft-stage collaborator only holds `projects.change_location` (see
+    `COLLABORATOR_DRAFT_PERMISSIONS`), which is enough to pass the PATCH
+    endpoint's single permission check. The endpoint must not let that low
+    privilege also rewrite name/description/is_diagnostic_done, which the
+    classic (non-REST) views reserve for advisors via `change_project`.
+    """
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    original_name = project_draft.name
+    original_description = project_draft.description
+    assert project_draft.is_diagnostic_done is False
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(
+        url,
+        data={
+            "name": "hijacked name",
+            "description": "hijacked description",
+            "is_diagnostic_done": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.data["name"] == original_name
+    assert response.data["description"] == original_description
+    assert response.data["is_diagnostic_done"] is False
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == original_name
+    assert project_draft.description == original_description
+    assert project_draft.is_diagnostic_done is False
+
+
+@pytest.mark.django_db
+def test_project_draft_collaborator_can_still_update_location_via_patch_api(
+    request, api_client, project_draft
+):
+    """A draft-stage collaborator still has legitimate use of their
+    `change_location` permission: it must keep working on its own field."""
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(url, data={"location": "new address"})
+
+    assert response.status_code == 200
+
+    project_draft.refresh_from_db()
+    assert project_draft.location == "new address"
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_update_location_of_another_project_via_patch_api(
+    request, api_client, project_draft, make_project
+):
+    """`projects.change_location` is an object-level (django-guardian)
+    permission granted per project a user actually collaborates on — it
+    must not let them touch a project they aren't a member of."""
+    other_project = make_project()
+
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    original_location = other_project.location
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[other_project.id])
+    response = api_client.patch(url, data={"location": "hijacked address"})
+
+    assert response.status_code == 403
+
+    other_project.refresh_from_db()
+    assert other_project.location == original_location
 
 
 ################
