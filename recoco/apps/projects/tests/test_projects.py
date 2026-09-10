@@ -593,6 +593,24 @@ def test_delete_project_and_redirect(request, client):
 
 
 @pytest.mark.django_db
+def test_delete_project_forbidden_for_project_on_other_site(request, client):
+    """A moderator holding delete_projects on their own site must not be
+    able to delete a project that only exists on a different tenant
+    site."""
+    other_site = Recipe(sites.Site, domain="other.site").make()
+    project = Recipe(models.Project, sites=[other_site]).make()
+    url = reverse("projects-project-delete", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    project.refresh_from_db()
+    assert not project.deleted
+
+
+@pytest.mark.django_db
 def test_general_notifications_are_consumed_on_project_overview(request, client):
     current_site = get_current_site(request)
 
@@ -728,14 +746,6 @@ def test_switchtender_joins_project(request, client, make_project):
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
-    Recipe(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    ).make()
     project = make_project(site=current_site, commune=commune)
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
@@ -753,14 +763,6 @@ def test_switchtender_joins_project(request, client, make_project):
 @pytest.mark.django_db
 def test_switchtender_leaves_project(request, client, make_project):
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
-    Recipe(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    ).make()
     site = get_current_site(request)
     project = make_project(site=site, commune=commune)
 
@@ -780,22 +782,53 @@ def test_switchtender_leaves_project(request, client, make_project):
 
 
 @pytest.mark.django_db
+def test_switchtender_join_forbidden_for_project_on_other_site(
+    request, client, make_project
+):
+    """A national advisor authenticated on their own site must not be able
+    to join as switchtender a project that only exists on a different
+    tenant site."""
+    other_site = Recipe(sites.Site, domain="other.site").make()
+    commune = Recipe(geomatics.Commune).make()
+    project = make_project(site=other_site, commune=commune)
+
+    url = reverse("projects-project-switchtender-join", args=[project.id])
+    with login(client, groups=["example_com_advisor"]) as user:
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert project.switchtender_sites.count() == 0
+    assert user not in project.switchtenders.all()
+
+
+@pytest.mark.django_db
+def test_observer_join_forbidden_for_project_on_other_site(
+    request, client, make_project
+):
+    """A national advisor authenticated on their own site must not be able
+    to join as observer a project that only exists on a different tenant
+    site."""
+    other_site = Recipe(sites.Site, domain="other.site").make()
+    commune = Recipe(geomatics.Commune).make()
+    project = make_project(site=other_site, commune=commune)
+
+    url = reverse("projects-project-observer-join", args=[project.id])
+    with login(client, groups=["example_com_advisor"]) as user:
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert project.switchtender_sites.count() == 0
+    assert user not in project.switchtenders.all()
+
+
+@pytest.mark.django_db
 def test_advisor_joins_trigger_notification_to_all(request, client, make_project):
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
 
     collaborator = baker.make(auth.User)
     advisor = baker.make(auth.User)
-
-    baker.make(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    )
 
     project = make_project(site=current_site, status="READY", commune=commune)
 
@@ -818,17 +851,9 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
 
     membership = baker.make(models.ProjectMember, is_owner=True)
 
-    Recipe(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    ).make()
     project = make_project(
         status="BLAH",
         projectmember_set=[membership],
