@@ -746,14 +746,6 @@ def test_switchtender_joins_project(request, client, make_project):
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
-    Recipe(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    ).make()
     project = make_project(site=current_site, commune=commune)
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
@@ -771,14 +763,6 @@ def test_switchtender_joins_project(request, client, make_project):
 @pytest.mark.django_db
 def test_switchtender_leaves_project(request, client, make_project):
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
-    Recipe(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    ).make()
     site = get_current_site(request)
     project = make_project(site=site, commune=commune)
 
@@ -842,18 +826,9 @@ def test_advisor_joins_trigger_notification_to_all(request, client, make_project
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
 
     collaborator = baker.make(auth.User)
     advisor = baker.make(auth.User)
-
-    baker.make(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    )
 
     project = make_project(site=current_site, status="READY", commune=commune)
 
@@ -876,17 +851,9 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
 
     membership = baker.make(models.ProjectMember, is_owner=True)
 
-    Recipe(
-        task_models.TaskRecommendation,
-        condition="",
-        departments=[
-            dept,
-        ],
-    ).make()
     project = make_project(
         status="BLAH",
         projectmember_set=[membership],
