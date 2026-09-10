@@ -460,7 +460,7 @@ class Answer(models.Model):
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
     attachment = models.FileField(
-        blank=True, null=True, upload_to=survey_private_file_path
+        blank=True, null=True, upload_to=survey_private_file_path, max_length=255
     )
 
     @property

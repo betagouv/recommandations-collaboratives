@@ -1070,6 +1070,7 @@ class Document(models.Model):
         blank=True,
         upload_to=upload_path,
         validators=[mimetype_validator, filextension_validator],
+        max_length=255,
     )
     the_link = models.URLField(max_length=500, null=True, blank=True)
 
