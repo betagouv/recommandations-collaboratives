@@ -1063,7 +1063,7 @@ class Document(models.Model):
     private = models.BooleanField(default=True)  # for advisors only
 
     def upload_path(self, filename):
-        return "projects/%d/%s" % (self.project.pk, filename)
+        return "projects/%d/%s/%s" % (self.project.pk, uuid.uuid4().hex, filename)
 
     the_file = models.FileField(
         null=True,

@@ -1,5 +1,6 @@
 import math
 import statistics
+import uuid
 from datetime import timedelta
 from enum import Enum
 
@@ -414,7 +415,9 @@ def empty_answer():
 
 
 def survey_private_file_path(instance, filename):
-    return "survey/session/{0}/{1}".format(instance.session.id, filename)
+    return "survey/session/{0}/{1}/{2}".format(
+        instance.session.id, uuid.uuid4().hex, filename
+    )
 
 
 class Answer(models.Model):
