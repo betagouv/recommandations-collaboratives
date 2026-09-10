@@ -13,24 +13,23 @@
 {% endblock js %}
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
-        <h2>Mentions légales de la plateforme {{ request.site.name }}</h2>
+        <h1>Mentions légales de la plateforme {{ request.site.name }}</h1>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Éditeur de la Plateforme</strong>
         </p>
         <p>
             La Plateforme « {{ request.site.name }} » est éditée par :
-            Le Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et
-            l’aménagement (CEREMA) :
+            {{ request.site.configuration.legal_owner|default:"Le Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et l’aménagement (CEREMA)" }}
             <br />
-            Cité des mobilités – 25 avenue François Mitterrand – CS 92803
-            69674 Bron Cedex
+            {{ request.site.configuration.legal_address|default:"Cité des mobilités – 25 avenue François Mitterrand – CS 92803 69674 Bron Cedex" }}
             <br />
-            04 72 14 30 30
+            {{ request.site.configuration.legal_phone_no }}
+
         </p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Directeur de la publication</strong>
         </p>
-        <p>Le directeur de la publication est Pascal Berteaud, directeur général du CEREMA.</p>
+        <p>Le directeur de la publication est {{ request.site.configuration.legal_owner|default:"CEREMA" }} représenté par {{ request.site.configuration.legal_owner_name }}.</p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Hébergement de la Plateforme</strong>
         </p>

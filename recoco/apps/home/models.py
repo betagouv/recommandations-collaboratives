@@ -204,36 +204,85 @@ class SiteConfiguration(models.Model):
     )
 
     sender_name = models.CharField(
-        verbose_name="Expéditeur des emails automatiques",
-        help_text="Nom du service affiché comme expéditeur des emails",
+        verbose_name="Nom de l'expéditeur des e-mails automatiques",
+        help_text="Nom du service affiché comme expéditeur des e-mails",
         max_length=30,
     )
     contact_form_recipient = models.EmailField(
-        verbose_name="Adresse de contact affichée sur le site"
+        verbose_name="E-mail de contact affiché sur le site et dans les e-mails automatiques",
+        help_text="Format attendu : nom@domaine.fr",
     )
     legal_address = models.CharField(
-        verbose_name="Adresse postale",
-        help_text="L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales.",
+        verbose_name="Adresse postale complète",
+        help_text="L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales. Format attendu : numéro et libellé de rue, code postal et commune",
         null=True,
         blank=True,
         max_length=100,
     )
     legal_owner = models.CharField(
-        verbose_name="Entité responsable légalement du service",
+        verbose_name="Entité légalement responsable du service",
+        help_text="Par exemple : Cerema",
         null=True,
         blank=True,
         max_length=100,
     )
-    description = models.TextField(
-        verbose_name="Description du service",
-        help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
+
+    legal_owner_name = models.CharField(
+        verbose_name="Représentant ou représentante légale",
+        help_text="Prénom, NOM, fonction",
+        null=False,
+        blank=False,
+        max_length=100,
+    )
+
+    legal_phone_no = PhoneNumberField(
+        verbose_name="Numéro de téléphone de l'organisation",
+        help_text="Format attendu : +33102030405",
         null=True,
         blank=True,
     )
 
+    # FIXME: CMS should manage this field
+    description = models.TextField(
+        verbose_name="Description du service",
+        help_text="Description de 1 à 3 phrases.\n"
+        "Par exemple : UrbanVitaliz est un service gratuit du Cerema et du Ministère de la Transition Écologique. Il oriente les collectivités dans leurs projets de réhabilitation de fonciers à l’abandon (friches industrielles, ferroviaires, d'activité, d'habitation etc), en associant les acteurs publics locaux.",
+        null=True,
+        blank=True,
+    )
+
+    # FIXME: CMS should manage this field
+    target_audience = models.CharField(
+        verbose_name="Bénéficiaires du service",
+        help_text="Exemple : agents et élus de collectivités, d'association ou d'entreprises porteuses d'une projet de réhabilitation de friche, agents de l'Etat et autres établissements publics",
+        null=True,
+        blank=True,
+        max_length=150,
+    )
+
+    dpo_contact_email = models.EmailField(
+        verbose_name="Adresse e-mail du DPO",
+        help_text="Format attendu : nom@domaine.fr",
+        null=True,
+        blank=True,
+    )
+
+    # FIXME: CMS should manage this field
+    gdpr_purposes = models.TextField(
+        verbose_name="Finalités du traitement des données",
+        help_text="Par exemple :\n"
+        "- principalement, le suivi et l’accompagnement des demandeurs (essentiellement collectivités mais aussi associations, entreprises ou particuliers) dans leurs projets de réhabilitation de friche ;\n"
+        "- l’orientation de ces demandeurs vers les bons dispositifs, interlocuteurs et financements en fonction de leur situation ;\n"
+        "- la réalisation d’études quantitatives et d’analyses sur les demandes déposées et les recommandations émises, permettant d’évaluer les besoins des demandeurs, et d’améliorer les accompagnements dispensés.",
+        null=True,
+        blank=True,
+    )
+
+    # FIXME: CMS should manage this field
     main_topic = models.CharField(
         verbose_name="Thématique principale",
-        help_text="Décrivez le plus brièvement possible la thématique de ce portail",
+        help_text="Décrivez le plus brièvement possible la thématique de ce portail. \n"
+        "Par exemple: Revitalisation des friches",
         null=True,
         blank=True,
     )
@@ -251,6 +300,9 @@ class SiteConfiguration(models.Model):
     def logo_small_upload_path(self, filename):
         return self._logo_upload_path(filename, prefix="small")
 
+    def favicon_upload_path(self, filename):
+        return self._logo_upload_path(filename, prefix="favicon")
+
     def _logo_upload_path(self, filename, prefix=None):
         if prefix:
             prefix = f"{prefix}-"
@@ -259,7 +311,7 @@ class SiteConfiguration(models.Model):
 
     logo_large = models.ImageField(
         verbose_name="Logo complet",
-        help_text="Utilisé par exemple pour la barre de navigation. Format rectangulaire recommandé, avec un fond transparent (png)",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : rectangulaire horizontal.",
         null=True,
         blank=True,
         upload_to=logo_large_upload_path,
@@ -267,18 +319,26 @@ class SiteConfiguration(models.Model):
 
     logo_small = models.ImageField(
         verbose_name="Logo réduit",
-        help_text="Utilisé en cas de manque d'espace. Format carré recommandé, avec un fond transparent (png)",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : carré, sans texte.",
         null=True,
         blank=True,
         upload_to=logo_small_upload_path,
     )
 
     email_logo = models.ImageField(
-        verbose_name="Logo utilisé pour les emails automatiques",
-        help_text="Format rectangulaire recommandé, avec un fond transparent (png)",
+        verbose_name="Logo dans les e-mails automatiques",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : rectangulaire horizontal.",
         null=True,
         blank=True,
         upload_to=logo_email_upload_path,
+    )
+
+    favicon = models.ImageField(
+        verbose_name="Favicon",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : carré, sans texte. Taille maximum : 192 * 192 px.",
+        null=True,
+        blank=True,
+        upload_to=favicon_upload_path,
     )
 
     crm_available_tags = TaggableManager(
@@ -293,7 +353,7 @@ class SiteConfiguration(models.Model):
     reminder_interval = models.IntegerField(
         default=6 * 7,
         verbose_name="Fréquence des emails de rappel",
-        help_text="en jours",
+        help_text="En jours",
     )
 
     accept_handover = models.BooleanField(

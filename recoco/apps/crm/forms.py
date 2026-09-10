@@ -37,6 +37,19 @@ class SiteConfigurationForm(forms.ModelForm):
         ),
     )
 
+    required_fields = [
+        "main_topic",
+        "description",
+        "contact_form_recipient",
+        "sender_name",
+        "legal_owner",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in self.required_fields:
+            self.fields[name].required = True
+
     class Meta:
         model = home_models.SiteConfiguration
 
@@ -45,11 +58,17 @@ class SiteConfigurationForm(forms.ModelForm):
             "contact_form_recipient",
             "legal_address",
             "legal_owner",
+            "legal_owner_name",
+            "legal_phone_no",
             "description",
+            "target_audience",
+            "dpo_contact_email",
+            "gdpr_purposes",
             "main_topic",
             "logo_large",
             "logo_small",
             "email_logo",
+            "favicon",
             "crm_available_tags",
             "reminder_interval",
             "accept_handover",
