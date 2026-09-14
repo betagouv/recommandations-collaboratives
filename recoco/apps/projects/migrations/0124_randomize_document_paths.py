@@ -3,7 +3,7 @@ import uuid
 import django.core.validators
 import recoco.apps.projects.models
 import recoco.apps.home.validators
-from django.db import migrations, models
+from django.db import migrations, models, transaction
 from django.core.files.storage import default_storage
 
 
@@ -31,11 +31,12 @@ def randomize_document_paths(apps, schema_editor):
         )
 
         try:
-            with default_storage.open(old_name) as old_file:
-                default_storage.save(new_name, old_file)
+            with transaction.atomic():
+                with default_storage.open(old_name) as old_file:
+                    default_storage.save(new_name, old_file)
+                document.the_file.name = new_name
+                document.save(update_fields=["the_file"])
             default_storage.delete(old_name)
-            document.the_file.name = new_name
-            document.save(update_fields=["the_file"])
             success_files += 1
         except Exception as e:
             errors.append(e)

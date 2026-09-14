@@ -2,7 +2,7 @@ import uuid
 
 import django
 from django.core.files.storage import default_storage
-from django.db import migrations, models
+from django.db import migrations, models, transaction
 
 import recoco
 
@@ -31,11 +31,12 @@ def randomize_attachment_paths(apps, schema_editor):
         )
 
         try:
-            with default_storage.open(old_name) as old_file:
-                default_storage.save(new_name, old_file)
+            with transaction.atomic():
+                with default_storage.open(old_name) as old_file:
+                    default_storage.save(new_name, old_file)
+                answer.attachment.name = new_name
+                answer.save(update_fields=["attachment"])
             default_storage.delete(old_name)
-            answer.attachment.name = new_name
-            answer.save(update_fields=["attachment"])
             success_files += 1
         except Exception as e:
             errors.append(e)
