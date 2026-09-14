@@ -74,6 +74,7 @@ dependencies = [
     "wagtail==7.0.9",
     "libsass>=0.23.0",
     "django-csp>=4.0",
+    "djangorestframework-api-key>=3.1.0",
 ]
 
 [project.urls]
