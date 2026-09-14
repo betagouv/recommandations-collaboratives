@@ -13,12 +13,16 @@ def randomize_attachment_paths(apps, schema_editor):
     sequential session id alone.
     """
     Answer = apps.get_model("survey", "Answer")
+    errors = []
+    count_missing_files = 0
+    success_files = 0
 
     for answer in Answer.objects.exclude(attachment="").exclude(
         attachment__isnull=True
     ):
         old_name = answer.attachment.name
         if not old_name or not default_storage.exists(old_name):
+            count_missing_files += 1
             continue
 
         filename = old_name.rsplit("/", 1)[-1]
@@ -26,13 +30,18 @@ def randomize_attachment_paths(apps, schema_editor):
             answer.session_id, uuid.uuid4().hex, filename
         )
 
-        # todo only delete if save was successful, else report
-        with default_storage.open(old_name) as old_file:
-            default_storage.save(new_name, old_file)
-        default_storage.delete(old_name)
-
-        answer.attachment.name = new_name
-        answer.save(update_fields=["attachment"])
+        try:
+            with default_storage.open(old_name) as old_file:
+                default_storage.save(new_name, old_file)
+            default_storage.delete(old_name)
+            answer.attachment.name = new_name
+            answer.save(update_fields=["attachment"])
+            success_files += 1
+        except Exception as e:
+            errors.append(e)
+    print(f"\nmissing files: {count_missing_files}")
+    print(f"successfully moves files: {success_files}")
+    print(errors)
 
 
 class Migration(migrations.Migration):

@@ -13,12 +13,16 @@ def randomize_document_paths(apps, schema_editor):
     sequential project id alone.
     """
     Document = apps.get_model("projects", "Document")
+    errors = []
+    count_missing_files = 0
+    success_files = 0
 
     for document in Document.objects.exclude(the_file="").exclude(
         the_file__isnull=True
     ):
         old_name = document.the_file.name
         if not old_name or not default_storage.exists(old_name):
+            count_missing_files += 1
             continue
 
         filename = old_name.rsplit("/", 1)[-1]
@@ -26,13 +30,18 @@ def randomize_document_paths(apps, schema_editor):
             document.project_id, uuid.uuid4().hex, filename
         )
 
-        # todo only delete if save was successful, else report
-        with default_storage.open(old_name) as old_file:
-            default_storage.save(new_name, old_file)
-        default_storage.delete(old_name)
-
-        document.the_file.name = new_name
-        document.save(update_fields=["the_file"])
+        try:
+            with default_storage.open(old_name) as old_file:
+                default_storage.save(new_name, old_file)
+            default_storage.delete(old_name)
+            document.the_file.name = new_name
+            document.save(update_fields=["the_file"])
+            success_files += 1
+        except Exception as e:
+            errors.append(e)
+    print(f"\nmissing files: {count_missing_files}")
+    print(f"successfully moves files: {success_files}")
+    print(errors)
 
 
 class Migration(migrations.Migration):
