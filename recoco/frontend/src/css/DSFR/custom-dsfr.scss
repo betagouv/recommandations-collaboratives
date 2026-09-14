@@ -67,6 +67,14 @@
   text-transform: uppercase;
 }
 
+.fr-hint-text-blue {
+  color: var(--light-text-default-info, #0063cb);
+}
+
+.fr-hint-text::before {
+  margin-right: 0.25rem;
+}
+
 /* ¯¯¯¯ *\
   INPUTS
 \* ˍˍˍˍ */

@@ -45,7 +45,9 @@
                             <div class="fr-collapse" id="accordion-description">
                                 <fieldset class="fr-fieldset">
                                     {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Cette thématique permet de compléter des phrases, sur la plateforme ou les emails, qui évoquent le portail et son usage.</span>
                                     {{ form.description|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w">Cette description sera notamment utilisée dans les e-mails d'invitation sur la plateforme.</span>
                                 </fieldset>
                             </div>
                         </section>
@@ -63,10 +65,12 @@
                                     {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                 </fieldset>
                                 <h3 class="fr-h6 fr-mb-1w">Informations envoyées dans les e-mails</h3>
-                                <p class="fr-text--sm fr-mb-2w">Par exemple : Invitation sur un dossier, nouveau message, rappel de recommandations etc.</p>
+                                <p class="fr-hint-text fr-mb-2w">Par exemple : Invitation sur un dossier, nouveau message, rappel de recommandations etc.</p>
                                 <fieldset class="fr-fieldset">
                                     {{ form.sender_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Il s'agit du nom du service affiché comme expéditeur des e-mails automatiques générés par le portail.</span>
                                     {{ form.reminder_interval|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w">Il s’agit de l’email de rappel “C”, qui demande des nouvelles du dossier et des recommandations, à la fréquence définie ci-dessus, jusqu’à ce que le dossier soit mis en pause ou toutes les recommandations traitées. Pour plus d'informations, <a class="text-underline" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail" target="_blank" rel="noopener external">consulter la documentation.</a></span>
                                 </fieldset>
                             </div>
                         </section>
@@ -92,15 +96,19 @@
                                 <div class="fr-grid-row fr-grid-row--gutters">
                                     <div class="fr-col-12 fr-col-md-6">
                                         {% include "crm/fragments/config/upload_field.html" with field=form.logo_small %}
+                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Utilisé sur toutes les pages, en haut à gauche, quand l’utilisateur est connecté.</span>
                                     </div>
                                     <div class="fr-col-12 fr-col-md-6">
                                         {% include "crm/fragments/config/upload_field.html" with field=form.logo_large %}
+                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Utilisé pour la page d’accueil, et la barre de navigation du site, quand l’utilisateur n’est pas connecté.</span>
                                     </div>
                                     <div class="fr-col-12 fr-col-md-6">
                                         {% include "crm/fragments/config/upload_field.html" with field=form.favicon %}
+                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Icône utilisée sur l’onglet du navigateur</span>
                                     </div>
                                     <div class="fr-col-12 fr-col-md-6">
                                         {% include "crm/fragments/config/upload_field.html" with field=form.email_logo %}
+                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Utilisé dans l’en-tête des e-mails automatiques envoyés par le portail. IMPORTANT : fond transparent.</span>
                                     </div>
                                 </div>
                             </div>
@@ -133,6 +141,7 @@
                                     {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     {{ form.legal_owner_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales.</span>
                                     {{ form.legal_phone_no|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                 </fieldset>
                                 <h3 class="fr-h6 fr-mb-1w">Politique de confidentialité</h3>
@@ -144,7 +153,9 @@
                                 </p>
                                 <fieldset class="fr-fieldset">
                                     {{ form.dpo_contact_email|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Texte à remplir</span>
                                     {{ form.gdpr_purposes|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Indiquez ici, sous forme de liste à puces, à quoi les données personnelles vont vous servir, pourquoi vous en avez besoin.</span>
                                     {{ form.target_audience|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                 </fieldset>
                             </div>
@@ -161,7 +172,9 @@
                             <div class="fr-collapse" id="accordion-config">
                                 <fieldset class="fr-fieldset">
                                     {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Un autre portail Recommandations-collaboratives peut vous proposer d’intervenir sur un dossier déposé chez lui. Vous devrez accepter ou refuser ce dossier, et il apparaîtra dans votre liste de dossiers si vous l’acceptez.</span>
                                     {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Crisp est un outil de chat qui vous permet de répondre en direct aux questions de vos visiteurs. L’équipe Reco-co peut soit répondre à vos visiteurs (sur des questions d’utilisation de la plateforme), soit vous indiquer comment mettre en place votre propre chat pour répondre vous-même.</span>
                                 </fieldset>
                                 <h3 class="fr-h6 fr-mb-1w">Tags d'impact</h3>
                                 <p class="fr-text--sm fr-mb-2w">
