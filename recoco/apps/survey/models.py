@@ -23,6 +23,7 @@ from taggit.managers import TaggableManager
 
 from recoco.apps.projects import models as projects_models
 
+from ..home.validators import file_validators
 from . import apps
 from .utils import compute_qs_completion
 
@@ -460,7 +461,11 @@ class Answer(models.Model):
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
     attachment = models.FileField(
-        blank=True, null=True, upload_to=survey_private_file_path, max_length=255
+        blank=True,
+        null=True,
+        upload_to=survey_private_file_path,
+        max_length=255,
+        validators=file_validators,
     )
 
     @property

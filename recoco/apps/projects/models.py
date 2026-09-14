@@ -17,7 +17,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
-from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
@@ -43,9 +42,9 @@ from recoco.utils import (
     strip_accents,
 )
 
+from ..home.validators import file_validators
 from . import apps
 from .utils import generate_ro_key
-from .validators import MimetypeValidator
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -985,50 +984,6 @@ class DeletedDocumentManager(models.Manager):
 class Document(models.Model):
     """Représente un document associé à un project"""
 
-    mimetype_validator = MimetypeValidator(
-        allows=[
-            "text/plain",
-            "image/png",
-            "image/jpg",
-            "image/gif",
-            "image/jpeg",
-            "image/pjpeg",
-            "application/pdf",
-            "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.oasis.opendocument.text",
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.oasis.opendocument.spreadsheet",
-            "application/vnd.ms-powerpoint",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/vnd.oasis.opendocument.presentation",
-            "application/x-zip-compressed",
-            "application/zip",
-        ],
-    )
-
-    filextension_validator = FileExtensionValidator(
-        [
-            "txt",
-            "md",
-            "png",
-            "jpg",
-            "jpeg",
-            "pdf",
-            "doc",
-            "docx",
-            "odt",
-            "xls",
-            "xlsx",
-            "odc",
-            "ppt",
-            "pptx",
-            "odp",
-            "zip",
-        ]
-    )
-
     objects = DocumentManager()
     on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
@@ -1069,7 +1024,7 @@ class Document(models.Model):
         null=True,
         blank=True,
         upload_to=upload_path,
-        validators=[mimetype_validator, filextension_validator],
+        validators=file_validators,
         max_length=255,
     )
     the_link = models.URLField(max_length=500, null=True, blank=True)

@@ -2,7 +2,7 @@ import uuid
 
 import django.core.validators
 import recoco.apps.projects.models
-import recoco.apps.projects.validators
+import recoco.apps.home.validators
 from django.db import migrations, models
 from django.core.files.storage import default_storage
 
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 null=True,
                 upload_to=recoco.apps.projects.models.Document.upload_path,
                 validators=[
-                    recoco.apps.projects.validators.MimetypeValidator(
+                    recoco.apps.home.validators.MimetypeValidator(
                         allows=[
                             "text/plain",
                             "image/png",
