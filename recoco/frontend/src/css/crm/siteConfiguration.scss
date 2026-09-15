@@ -1,0 +1,20 @@
+.crm-config {
+
+    .fr-accordion__btn {
+        display: flex;
+        align-items: center;
+    }
+
+    &__logo-preview-wrapper {
+        display: flex;
+    }
+
+    &__logo-preview {
+        max-width: 12rem;
+        max-height: 6rem;
+        width: auto;
+        object-fit: contain;
+        padding: 0.5rem;
+        border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    }
+}

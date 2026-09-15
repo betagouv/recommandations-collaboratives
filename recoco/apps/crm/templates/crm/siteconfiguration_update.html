@@ -14,15 +14,18 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/styles/site-configuration.css.js' %}
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with site_configuration=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Paramètres du site' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div x-data="Crm" class="d-flex fr-px-0">
+    <div x-data="Crm" class="crm-config d-flex fr-px-0">
         <div class="w-100 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
-                <form method="post" enctype="multipart/form-data" class="fr-form">
+                <form method="post"
+                      enctype="multipart/form-data"
+                      class="fr-form crm-config__form">
                     {% csrf_token %}
                     <h1 class="fr-h3 fr-mb-1w">Paramètres du portail</h1>
                     <p class="fr-text--sm fr-mb-3w">
