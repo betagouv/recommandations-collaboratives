@@ -1,3 +1,4 @@
+import re
 import uuid
 
 import django.core.validators
@@ -15,33 +16,38 @@ def randomize_document_paths(apps, schema_editor):
     Document = apps.get_model("projects", "Document")
     errors = []
     count_missing_files = 0
-    success_files = 0
+    count_success_files = 0
+    count_already_moved = 0
 
     for document in Document.objects.exclude(the_file="").exclude(
         the_file__isnull=True
     ):
-        old_name = document.the_file.name
-        if not old_name or not default_storage.exists(old_name):
+        old_path = document.the_file.name
+        if not old_path or not default_storage.exists(old_path):
             count_missing_files += 1
             continue
 
-        filename = old_name.rsplit("/", 1)[-1]
-        new_name = "projects/{0}/{1}/{2}".format(
+        filename = old_path.rsplit("/", 1)[-1]
+        new_path = "projects/{0}/{1}/{2}".format(
             document.project_id, uuid.uuid4().hex, filename
         )
+        if re.search(r"projects/\d+/[^/]+/[^/]+", old_path):
+            count_already_moved += 1
+            continue
 
         try:
             with transaction.atomic():
-                with default_storage.open(old_name) as old_file:
-                    default_storage.save(new_name, old_file)
-                document.the_file.name = new_name
+                with default_storage.open(old_path) as old_file:
+                    default_storage.save(new_path, old_file)
+                document.the_file.name = new_path
                 document.save(update_fields=["the_file"])
-            default_storage.delete(old_name)
-            success_files += 1
+            default_storage.delete(old_path)
+            count_success_files += 1
         except Exception as e:
             errors.append(e)
     print(f"\nmissing files: {count_missing_files}")
-    print(f"successfully moves files: {success_files}")
+    print(f"already moved files: {count_already_moved}")
+    print(f"successfully moves files: {count_success_files}")
     print(errors)
 
 
