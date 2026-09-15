@@ -19,7 +19,7 @@
                     {% endif %}
                     <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}
                            class="fr-label">
-                        {{ field.label|safe }}
+                        {{ field.label|safe }} {{ field.field.required|yesno:"*," }}
                         {% if field.field.help_text %}<span class="fr-hint-text">{{ field.field.help_text }}</span>{% endif %}
                     </label>
                 {% endif %}
