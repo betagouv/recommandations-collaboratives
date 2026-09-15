@@ -2,6 +2,7 @@
     upload image component (for site configuration form)
     Parameters:
       field : image field from the form (ex. form.logo_small)
+      blue_hint_text : optional, if true, the help text will be displayed in blue color
 {% endcomment %}
 <div class="fr-upload-group">
     <label class="fr-label" for="{{ field.id_for_label }}">
@@ -15,6 +16,9 @@
            name="{{ field.html_name }}">
     {% for error in field.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
 </div>
+{% if blue_hint_text %}
+    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w">{{ blue_hint_text }}</span>
+{% endif %}
 {% if field.value %}
     <div class="fr-mt-2w crm-config__logo-preview-wrapper">
         <img class="fr-responsive-img crm-config__logo-preview"

@@ -98,20 +98,16 @@
                                 </div>
                                 <div class="fr-grid-row fr-grid-row--gutters">
                                     <div class="fr-col-12 fr-col-md-6">
-                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_small %}
-                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Utilisé sur toutes les pages, en haut à gauche, quand l’utilisateur est connecté.</span>
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_small blue_hint_text="Utilisé sur toutes les pages, en haut à gauche, quand l’utilisateur est connecté." %}
                                     </div>
                                     <div class="fr-col-12 fr-col-md-6">
-                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_large %}
-                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Utilisé pour la page d’accueil, et la barre de navigation du site, quand l’utilisateur n’est pas connecté.</span>
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_large blue_hint_text="Utilisé pour la page d’accueil, et la barre de navigation du site, quand l’utilisateur n’est pas connecté." %}
                                     </div>
                                     <div class="fr-col-12 fr-col-md-6">
-                                        {% include "crm/fragments/config/upload_field.html" with field=form.favicon %}
-                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Icône utilisée sur l’onglet du navigateur</span>
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.favicon blue_hint_text="Icône utilisée sur l’onglet du navigateur" %}
                                     </div>
                                     <div class="fr-col-12 fr-col-md-6">
-                                        {% include "crm/fragments/config/upload_field.html" with field=form.email_logo %}
-                                        <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Utilisé dans l’en-tête des e-mails automatiques envoyés par le portail. IMPORTANT : fond transparent.</span>
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.email_logo blue_hint_text="Utilisé dans l’en-tête des e-mails automatiques envoyés par le portail. IMPORTANT : fond transparent." %}
                                     </div>
                                 </div>
                             </div>
