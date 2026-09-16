@@ -69,6 +69,7 @@ def test_crm_site_configuration(request, client):
     )
 
     logo = SimpleUploadedFile("file.png", logo_content, content_type="image/png")
+    favicon = SimpleUploadedFile("favicon.png", logo_content, content_type="image/png")
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(
@@ -78,6 +79,7 @@ def test_crm_site_configuration(request, client):
                 "contact_form_recipient": "othr@yo.com",
                 "reminder_interval": 42,
                 "logo_small": logo,
+                "favicon": favicon,
             },
         )
 

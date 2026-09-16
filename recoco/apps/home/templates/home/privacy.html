@@ -1,8 +1,6 @@
 {% extends "base.html" %}
-{% load gravatar %}
 {% load django_vite %}
 {% load cookie_consent_tags %}
-{% load static %}
 {% block title %}
     Politique de confidentialité
 {% endblock title %}
@@ -15,27 +13,21 @@
 {% endblock js %}
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
-        <h2>Politique de confidentialité de {{ request.site.name }}</h2>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Qui est responsable de {{ request.site.name }} ?</strong>
-        </p>
+        <h1>Politique de confidentialité de {{ request.site.name }}</h1>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">1 - Responsable de traitement</h2>
         <p>
-            {{ request.site.name }} est développé au sein du Centre d’études et d’expertise sur les risques,
-            l’environnement, la mobilité et l’aménagement (CEREMA). {{ request.site.name }} est une plateforme
-            permettant de guider les porteurs de dossier en répondant à leurs questions et à leurs blocages dans la
-            réhabilitation des friches.
-            {% comment %} add var description for the portal ? {% endcomment %}
-            <br />
-            <br />
-            Le responsable de l’utilisation des données est le CEREMA représenté par Pascal Berteaud,
-            directeur général du CEREMA.
+            {{ request.site.name }} est un service numérique porté par {{ request.site.configuration.legal_owner|default:"CEREMA" }} et développé grâce au service Recommandations-collaboratives du Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et l’aménagement (CEREMA).
+            <br>
+            Les co-responsables de traitement des données à caractère personnel sont le CEREMA représenté par son directeur général, Monsieur Etienne Crépon, et {{ request.site.configuration.legal_owner|default:"CEREMA" }} représentée par {{ request.site.configuration.legal_owner_name|default:"Etienne Crépon, directeur général du CEREMA" }}.
         </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Pourquoi manipulons-nous ces données ?</strong>
-        </p>
-        <p>{{ request.site.name }} manipule des données à caractère personnelles pour les raisons suivantes :</p>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">2 - Finalités</h2>
         <p>
-            <ul>
+            La plateforme {{ request.site.name }} est un service numérique porté par {{ request.site.configuration.legal_owner|default:"CEREMA" }}, qui manipule des données à caractère personnel pour les raisons suivantes :
+        </p>
+        <ul>
+            {% if request.site.configuration.gdpr_purposes %}
+                {{ request.site.configuration.gdpr_purposes }}
+            {% else %}
                 <li>Lutter contre l’artificialisation des sols</li>
                 <li>
                     Enclencher la revitalisation des friches en fournissant les outils, les acteurs à contacter
@@ -45,75 +37,73 @@
                     Suivre les dossiers de réhabilitation de friches dans la durée grâce aux acteurs publics
                     locaux
                 </li>
-                {% comment %} create new var for privacy policy descr problems solved by the portal ? {% endcomment %}
-            </ul>
-        </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Quelles sont les données que nous manipulons ?</strong>
-        </p>
-        <p>{{ request.site.name }} manipule les données personnelles suivantes :</p>
+            {% endif %}
+            <li>la réalisation d’études quantitatives et d’analyses sur les demandes déposées et les recommandations émises, permettant d’évaluer les besoins des demandeurs, et d’améliorer les accompagnements dispensés</li>
+        </ul>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">3 - Catégorie de données à caractère personnel traitées</h2>
+        <ul>
+            <li>
+                <span class="fw-700">Données de contact relatives aux comptes utilisateurs :</span> prénom, nom, e-mail, numéro de téléphone, fonction, organisation
+            </li>
+            <li>
+                <span class="fw-700">Données de connexion :</span> adresse IP, date et heure de connexion, lieu de connexion des demandeurs ou des conseillers mentionnés dans les finalités du traitement.
+            </li>
+        </ul>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">4 - Base légale</h2>
         <p>
-            <ul>
-                <li>Prénom</li>
-                <li>Nom</li>
-                <li>Adresse e-mail</li>
-                <li>Numéro de téléphone</li>
-            </ul>
+            La plateforme {{ request.site.name }} manipule des données personnelles en se basant sur l’exécution d’une mission d’intérêt public ou relevant de l’exercice de l’autorité publique dont est investi le responsable de traitement au sens de l’article 6-e du RGPD.
         </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Qu’est-ce qui nous autorise à manipuler ces données ?</strong>
-        </p>
-        <p>{{ request.site.name }} manipule des données personnelles en se basant sur :</p>
-        <p>
-            <ul>
-                <li>
-                    L’exécution d’une mission d’intérêt public ou relevant de l’exercice de l’autorité
-                    publique dont est investi le responsable de traitement au sens de l’article 6-e du
-                    RPGD.
-                </li>
-                <li>
-                    Le décret du 25 octobre 2019 relatif au système d’information et de communication de
-                    l’Etat et à la direction interministérielle du numérique (DINUM) qui porte l’équipe
-                    {{ request.site.name }}.
-                </li>
-            </ul>
-        </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Pendant combien de temps conservons-nous ces données ?</strong>
-        </p>
-        <div class="d-flex justify-content-between border fr-p-2v">
-            <p class=" w-50">
-                <strong>Données de contact :</strong>
-                <br />
-                prénom, nom, adresse e-mail, numéro de téléphone.
-            </p>
-            <p class="w-50">
-                <strong>Durée de la conservation</strong>
-                <br />
-                2 ans à compter de la fin du dossier de réhabilitation de la friche.
-                {% comment %} another var to create for each portal in site config ? {% endcomment %}
-            </p>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">5 - Durée de conservation</h2>
+        <div class="fr-table">
+            <div class="fr-table__wrapper">
+                <div class="fr-table__container">
+                    <div class="fr-table__content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Catégories de données
+                                    </th>
+                                    <th scope="col">
+                                        Durée de conservation
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-700">
+                                        Données de contact
+                                    </td>
+                                    <td>
+                                        2 ans à compter de la dernière utilisation du compte de l’utilisateur
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-700">
+                                        Données de connexion
+                                    </td>
+                                    <td>
+                                        1 an
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Quels droits avez-vous ?</strong>
-        </p>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">6 - Vos droits</h2>
+        <p>Vous disposez des droits suivants concernant vos données à caractère personnel :</p>
+        <ul>
+            <li>D’un droit d’information et d’un droit d’accès à vos données ;</li>
+            <li>D’un droit de rectification, et le cas échéant de suppression des données;</li>
+            <li>D’un droit à la limitation des données traitées ;</li>
+            <li>D’un droit d’opposition.</li>
+            <li>D'un droit à la portabilité, vous permettant de recevoir, dans un format structuré,
+                les données personnelles vous concernant que vous nous avez fournies.</li>
+        </ul>
         <p>
-            <ul>
-                <li>D’un droit d’information et d’un droit d’accès à vos données ;</li>
-                <li>D’un droit de rectification, et le cas échéant de suppression des données ;</li>
-                <li>D’un droit d’opposition ;</li>
-                <li>D’un droit à la portabilité de vos données.</li>
-            </ul>
-        </p>
-        <p>
-            Pour les exercer, contactez-nous à : <a class="text-decoration-underline" href="mailto:friches@beta.gouv.fr">friches@beta.gouv.fr</a>
-            {% comment %} change by mail from the portal var ? {% endcomment %}
-        </p>
-        <p>
-            Ou grâce au formulaire de contact du site {{ request.site.name }} :<a class="text-decoration-underline"
-   href="https://{{ request.site }}/contact/">https://{{ request.site }}/contact/</a>
-            <br />
-            <br />
+            Pour les exercer, contactez-nous à : {% if request.site.configuration.contact_form_recipient %}<a class="text-decoration-underline" href="mailto:{{ request.site.configuration.contact_form_recipient }}">{{ request.site.configuration.contact_form_recipient }}</a>{% endif %}
         </p>
         <p>
             Puisque ce sont des droits personnels, nous ne traiterons votre demande que si nous sommes
@@ -122,153 +112,163 @@
             <br />
             <br />
             Pour vous aider dans votre démarche, vous trouverez un modèle de courrier élaboré par la
-            CNIL <a class="text-decoration-underline"
-                    href="https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces"
-                    target="_blank">
-                    ici
-                    <span class="visually-hidden">Nouvelle fenêtre</span>
-                </a> :
-            <br />
-            <br />
-            Nous nous engageons à vous répondre dans un délai raisonnable qui ne saurait dépasser 1
-            mois à compter de la réception de votre demande.
+            CNIL <a class="text-decoration-underline" href="https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces">ici</a>.
+            Nous nous engageons à vous répondre dans un délai raisonnable qui ne saurait dépasser 1 mois à compter de la réception de votre demande.
+            Vous pouvez également contacter le délégué à la protection des données (DPO) de {{ request.site.name }} à l’adresse : {% if request.site.configuration.dpo_contact_email %}<a class="text-decoration-underline" href="mailto:{{ request.site.configuration.dpo_contact_email }}">{{ request.site.configuration.dpo_contact_email }}</a>{% endif %}
         </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Qui va avoir accès à ces données ?</strong>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">7 - Destinataires</h2>
+        <p>
+            Les accès aux données sont strictement encadrés et juridiquement justifiés.
+            Sont destinataires de tout ou partie des données, les personnes habilitées suivantes :
+        </p>
+        <ul>
+            <li>agents habilités et membres de l’équipe produit de Recommandations-collaboratives ;</li>
+            <li>
+                agents habilités et membres de l’équipe qui gère {{ request.site.name }} au sein de {{ request.site.configuration.legal_owner|default:"CEREMA" }} ;
+            </li>
+            <li>
+                conseillers inscrits sur la plateforme avec un accès local ou national, ou autres membres invités à participer sur le dossier.
+            </li>
+        </ul>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">8 - Sous-traitants</h2>
+        <p>
+            Certaines des données sont envoyées à d’autres acteurs, appelés « sous-traitants de données »,
+            pour qu’ils nous aident à les manipuler. Nous nous assurons qu’ils respectent strictement le RGPD
+            et qu’ils apportent des garanties suffisantes en matière de sécurité.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">
+                        Partenaire
+                    </th>
+                    <th scope="col">
+                        Traitement réalisé
+                    </th>
+                    <th scope="col">
+                        Pays destinataire
+                    </th>
+                    <th scope="col">
+                        Garanties
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">AlwaysData</th>
+                    <td>Hébergement des données</td>
+                    <td>France</td>
+                    <td>
+                        <a class="text-decoration-underline"
+                        href="https://www.alwaysdata.com/en/contract/16/">https://www.alwaysdata.com/en/contract/16/</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Matomo</th>
+                    <td>Mesure de l’audience</td>
+                    <td>France</td>
+                    <td>
+                        <a class="text-decoration-underline"
+                        href="https://fr.matomo.org/gdpr-analytics/">https://fr.matomo.org/gdpr-analytics/</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Brevo</th>
+                    <td>Emails automatiques et newsletters</td>
+                    <td>Variable</td>
+                    <td>
+                        <a class="text-decoration-underline"
+                        href="https://www.brevo.com/fr/rgpd/">https://www.brevo.com/fr/rgpd/</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h2 class="fr-mt-3w fr-mb-2v fw-700">9 - Cookies</h2>
+        <p>
+            Un cookie est un fichier déposé sur votre terminal lors de la visite d’un site.
+            Il a pour but de collecter des informations relatives à votre navigation
+            et de vous adresser des services adaptés à votre terminal (ordinateur, mobile ou tablette).
         </p>
         <p>
-            Les accès aux données sont strictement encadrés et juridiquement justifiés. Les personnes
-            suivantes vont avoir accès aux données :
-            <br />
-            <br />
-            <ul>
-                <li>
-                    Les membres de {{ request.site.name }} qui ont besoin des données dans leurs missions ou qui y
-                    ont accès de fait (développeur, etc.)
-                </li>
-                <li>Les conseillers publics (DDT, DREAL, EPF) ?</li>
-            </ul>
+            En application de l’article 5(3) de la directive 2002/58/CE modifiée
+            concernant le traitement des données à caractère personnel
+            et la protection de la vie privée dans le secteur des communications électroniques,
+            transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978 relative à l’informatique,
+            aux fichiers et aux libertés, les traceurs ou cookies suivent deux régimes distincts :
         </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
-        </p>
+        <ol>
+            <li>
+                Les cookies strictement nécessaires au service ou ayant
+                pour finalité exclusive de faciliter la communication
+                par voie électronique sont dispensés de consentement préalable
+                au titre de l’article 82 de la loi n°78-17 du 6 janvier 1978.
+            </li>
+            <li>
+                Les cookies n’étant pas strictement nécessaires au service
+                ou n’ayant pas pour finalité exclusive de faciliter la communication
+                par voie électronique doivent être consenti par l’utilisateur.
+            </li>
+        </ol>
         <p>
-            Nous mettons en place plusieurs mesures pour sécuriser les données :
-            <br />
-            <br />
-            <ul>
-                <li>Anonymisation</li>
-                <li>Stockage des données en base de données</li>
-                <li>Cloisonnement des données</li>
-                <li>Mesures de traçabilité</li>
-                <li>Surveillance</li>
-                <li>Protection contre les virus, malwares et logiciels espions</li>
-                <li>Protection des réseaux</li>
-                <li>Sauvegarde</li>
-                <li>Mesures restrictives limitant l’accès physiques aux données à caractère personnel</li>
-            </ul>
-        </p>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Qui nous aide à manipuler les données ?</strong>
-        </p>
-        <p>
-            Certaines des données sont envoyées à d’autres acteurs, appelés “sous-traitants de données”,
-            pour qu’ils nous aident à les manipuler. Nous nous assurons qu’ils respectent strictement le
-            RGPD et qu’ils apportent des garanties suffisantes en matière de sécurité.
-        </p>
-        <div class="d-flex border fr-mt-3w">
-            <div class="d-flex flex-column privacy-div">
-                <p class="fr-p-2v p-in-dev-1">Sous-traitant</p>
-                <p class="fr-p-2v p-in-dev-2">[Nom]</p>
-                <p class="fr-p-2v ">AlwaysData</p>
-            </div>
-            <div class="d-flex flex-column privacy-div">
-                <p class="fr-p-2v p-in-dev-1">Pays destinataire</p>
-                <p class="fr-p-2v p-in-dev-2">[Lieu de manipulation des données]</p>
-                <p class="fr-p-2v">France</p>
-            </div>
-            <div class="d-flex flex-column privacy-div">
-                <p class="fr-p-2v p-in-dev-1">Traitement réalisé</p>
-                <p class="fr-p-2v p-in-dev-2">
-                    [Mission du sous-traitant : hébergement , envoi d'emails, création de formulaire, cookies…]
-                </p>
-                <p class="fr-p-2v">Hébergement des données</p>
-            </div>
-            <div class="d-flex flex-column privacy-div">
-                <p class="fr-p-2v p-in-dev-1">Garanties</p>
-                <p class="fr-p-2v p-in-dev-2">
-                    [Lien vers la politique de confidentialité du sous-traitant, vers un contrat, ou vers toute mesure qui prouve sa conformité au RGPD]
-                </p>
-                <p class="fr-p-2v">https://www.alwaysdata.com/en/contract/16/</p>
-            </div>
-        </div>
-        <p class="fr-mt-3w fr-mb-2v">
-            <strong>Cookies</strong>
-        </p>
-        <p>
-            En application de l’article 5(3) de la directive 2002/58/CE modifiée concernant le traitement
-            des données à caractère personnel et la protection de la vie privée dans le secteur des
-            communications électroniques, transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978
-            relative à l’informatique, aux fichiers et aux libertés, les traceurs ou cookies suivent deux
-            régimes distincts.
-            <br />
-            <br />
-            Les cookies strictement nécessaires au service ou ayant pour finalité exclusive de faciliter la
-            communication par voie électronique sont dispensés de consentement préalable au titre de
-            l’article 82 de la loi n°78-17 du 6 janvier 1978.
-            <br />
-            <br />
-            Les cookies n’étant pas strictement nécessaires au service ou n’ayant pas pour finalité
-            exclusive de faciliter la communication par voie électronique doivent être consenti par
-            l’utilisateur.
-            <br />
-            <br />
-            Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques
-            constitue une base légale au sens du RGPD et doit être entendu au sens de l'article 6-a du
-            Règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 relatif à la
-            protection des personnes physiques à l'égard du traitement des données à caractère personnel
-            et à la libre circulation de ces données.
-            <br />
-            <br />
-            Un cookie est un fichier déposé sur votre terminal lors de la visite d’un site. Il a pour but de
-            collecter des informations relatives à votre navigation et de vous adresser des services adaptés
-            à votre terminal (ordinateur, mobile ou tablette).
-            <br />
-            <br />
             Des cookies relatifs aux statistiques publiques et anonymes sont également déposés.
-            Cookies recensés sur le site {{ request.site.name }}:
             <br />
-            <br />
+            Cookies recensés sur la plateforme {{ request.site.name }} :
         </p>
-        <div class="d-flex border fr-mt-3w">
-            <div class="d-flex flex-column w-25 privacy-div">
-                <p class="fr-p-2v bg-light text-break p-in-dev-1">Nom du cookie</p>
-                <p class="fr-p-2v text-break p-in-dev-3">SessionId</p>
-                <p class="fr-p-2v text-break p-in-dev-3">Csrftoken</p>
-                <p class="fr-p-2v text-break p-in-dev-3">www.youtube.com</p>
-                <p class="fr-p-2v text-break p-in-dev-3">www.dailymotion.com</p>
-            </div>
-            <div class="d-flex flex-column w-25 privacy-div">
-                <p class="fr-p-2v bg-light text-break p-in-dev-1">Finalités</p>
-                <p class="fr-p-2v text-break p-in-dev-3">Identifiant de session</p>
-                <p class="fr-p-2v text-break p-in-dev-3">Cross Site Request Forgery cookie</p>
-                <p class="fr-p-2v text-break p-in-dev-3">tracking de média</p>
-                <p class="fr-p-2v text-break p-in-dev-3">tracking de média</p>
-            </div>
-            <div class="d-flex flex-column w-25 privacy-div">
-                <p class="fr-p-2v bg-light text-break p-in-dev-1">Hébergement</p>
-                <p class="fr-p-2v text-break p-in-dev-3">{{ request.site.name }}</p>
-                <p class="fr-p-2v text-break p-in-dev-3">{{ request.site.name }}</p>
-                <p class="fr-p-2v text-break p-in-dev-3">USA</p>
-                <p class="fr-p-2v text-break p-in-dev-3">France</p>
-            </div>
-            <div class="d-flex flex-column w-25 privacy-div">
-                <p class="fr-p-2v bg-light p-in-dev-1 text-break">Garanties</p>
-                <p class="fr-p-2v p-in-dev-3 text-break">{{ request.site.name }}</p>
-                <p class="fr-p-2v p-in-dev-3 text-break">{{ request.site.name }}</p>
-                <p class="fr-p-2v p-in-dev-3 text-break">https://policies.google.com/privacy</p>
-                <p class="fr-p-2v p-in-dev-3 text-break">https://legal.dailymotion.com/en/privacy-policy/</p>
-            </div>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Nom du cookie</th>
+                    <th scope="col">Finalités</th>
+                    <th scope="col">Durées de conservation du cookie</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td scope="row">SessionId</td>
+                    <td>Identifiant de session</td>
+                    <td>Session</td>
+                </tr>
+                <tr>
+                    <td scope="row">Csrftoken</td>
+                    <td>Sécurité de l’application</td>
+                    <td>Session</td>
+                </tr>
+                <tr>
+                    <td scope="row">Matomo</td>
+                    <td>Mesure de l’audience</td>
+                    <td>13 mois</td>
+                </tr>
+                <tr>
+                    <td scope="row">Dailymotion</td>
+                    <td>Affichage vidéo</td>
+                    <td>13 mois</td>
+                </tr>
+                <tr>
+                    <td scope="row">Crisp</td>
+                    <td>Chat entre les utilisateurs et les admins</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            À tout moment, vous pouvez refuser l’utilisation des cookies
+            et désactiver le dépôt sur votre ordinateur en utilisant
+            la fonction dédiée de votre navigateur (fonction disponible
+            notamment sur Microsoft Internet Explorer 11, Google Chrome, Mozilla Firefox, Apple Safari et Opera).
+            <br />
+            <br />
+            Pour aller plus loin, vous pouvez consulter les ﬁches proposées
+            par la Commission Nationale de l'Informatique et des Libertés (CNIL) :
+        </p>
+        <ul>
+            <li>
+                <a class="text-decoration-underline"
+                href="https://www.cnil.fr/fr/cookies-traceurs-que-dit-la-loi">Cookies et traceurs : que dit la loi ?</a>
+            </li>
+            <li>
+                <a class="text-decoration-underline"
+                href="https://www.cnil.fr/fr/cookies-les-outils-pour-les-maitriser">Cookies : les outils pour les maîtriser</a>
+            </li>
+        </ul>
     </div>
 {% endblock content %}
