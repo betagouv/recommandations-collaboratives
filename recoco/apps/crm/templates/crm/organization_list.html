@@ -77,7 +77,7 @@
                             {% endwith %}
                         </caption>
                         <colgroup>
-                            <col class="col--medium">
+                            <col class="col--xl">
                             <col class="col--xxl">
                             <col class="col--xxs">
                             <col class="col--xxs">
@@ -101,7 +101,7 @@
                                                    type="checkbox"
                                                    value="{{ organization.pk }}"
                                                    x-model="selected">
-                                            <a class="fr-link project-table__project-name text-ellipsis"
+                                            <a class="fr-link project-table__project-name"
                                                href="{% url 'crm-organization-details' organization.pk %}">{{ organization.name }}</a>
                                         </div>
                                     </td>

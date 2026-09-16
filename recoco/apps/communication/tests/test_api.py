@@ -218,6 +218,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
             "sender_email": "doe@example.org",
         },
         test=False,
+        dry_run=False,
     )
 
 
@@ -267,6 +268,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
             "sender_email": "doe@example.org",
         },
         test=False,
+        dry_run=False,
     )
 
 
@@ -286,11 +288,14 @@ def test_use_debug_filter(mocker):
     random_recipient = "randomuser@recoco.fr"
     send_email(*args, [white_listed_recipient, random_recipient], **kwargs)
     # the assertion depends on giving args as args or kwargs, and it shouldn't need to be
-    brevo_mock.assert_called_with(*args, [white_listed_recipient], **kwargs)
+    brevo_mock.assert_called_with(
+        *args, [white_listed_recipient], **kwargs, dry_run=False
+    )
     debug_mock.assert_called_with(
         *args,
         [random_recipient],
         **kwargs,
+        dry_run=False,
     )
 
 
@@ -309,5 +314,7 @@ def test_use_debug_filter_single_recipient(mocker):
     white_listed_recipient = {"name": "admin", "email": "superadmin@recoco.fr"}
     send_email(*args, white_listed_recipient, **kwargs)
     # the assertion depends on giving args as args or kwargs, and it shouldn't need to be
-    brevo_mock.assert_called_with(*args, [white_listed_recipient], **kwargs)
+    brevo_mock.assert_called_with(
+        *args, [white_listed_recipient], **kwargs, dry_run=False
+    )
     debug_mock.assert_not_called()

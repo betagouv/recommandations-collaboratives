@@ -1,4 +1,4 @@
-verified_commit: 0d538ef9ce027143390ebd6d04e3d13a6fc6e2b6
+verified_commit: dda7d6474dce9e85d108860480743e843560dc74
 # ^ the git commit this whole matrix's code_ref/tests entries were last
 # checked against. Used by scripts/check_permissions_matrix.py to detect
 # when a referenced view or test has changed since and needs re-review.
@@ -332,6 +332,7 @@ viewsets:
   # -------------------------------------------------------- geomatics_rest
   - name: geomatics_rest.DepartmentViewSet
     reviewed: true
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/geomatics/rest.py:24-56"
     actions:
       - verb: all
@@ -345,6 +346,7 @@ viewsets:
 
   - name: geomatics_rest.RegionViewSet
     reviewed: true
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/geomatics/rest.py:24-56"
     actions:
       - verb: all
@@ -358,6 +360,7 @@ viewsets:
 
   - name: geomatics_rest.CommuneViewSet
     reviewed: true
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/geomatics/rest.py:24-56"
     actions:
       - verb: all
@@ -414,6 +417,7 @@ viewsets:
         roles: ["project:member_draft", "project:member", "project:advisor", "project:observer"]
         code_ref: "recoco/apps/projects/views/rest.py:645 (BaseConversationPermission)"
         verified: true
+        verified_commit: dda7d6474dce9e85d108860480743e843560dc74
         roles_check: "CORRECTED — added project:member_draft and project:observer (both hold use_public_notes); renamed to project: prefix."
         tests:
           - "recoco/apps/projects/tests/test_rest.py:test_doc_upload (L1341)"
@@ -458,6 +462,7 @@ viewsets:
   # -------------------------------------------------------- conversations_rest
   - name: conversations_rest.MessageViewSet
     reviewed: false
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/conversations/rest.py:26-72"
     actions:
       - verb: safe
@@ -495,6 +500,7 @@ viewsets:
 
   - name: conversations_rest.ActivityViewSet
     reviewed: false
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/conversations/rest.py:75-94"
     actions:
       - verb: list
@@ -508,6 +514,7 @@ viewsets:
 
   - name: conversations_rest.ParticipantViewSet
     reviewed: false
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/conversations/rest.py:97-116"
     actions:
       - verb: list
@@ -632,6 +639,7 @@ endpoints:
 
   - name: projects_rest.ProjectList
     route: "GET projects/"
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
     code_ref: "recoco/apps/projects/views/rest.py:137-166"
     permission: "IsAuthenticated (L140); results scoped via Project.all_on_site.for_user(request.user) (L157)"
     tests:
@@ -639,8 +647,9 @@ endpoints:
 
   - name: projects_rest.UserProjectStatusDetail
     route: "GET/PATCH userprojectstatus/<int:pk>/"
-    code_ref: "recoco/apps/projects/views/rest.py:328-363"
-    permission: "IsAuthenticated (L331) + manual ownership check (raises Http404, not 403, if ups.user != request.user, L341/L349)"
+    verified_commit: dda7d6474dce9e85d108860480743e843560dc74
+    code_ref: "recoco/apps/projects/views/rest.py:332-367"
+    permission: "IsAuthenticated (L335) + manual ownership check (raises Http404, not 403, if ups.user != request.user, L345/L353)"
     severity: Low
     discrepancy: "Uses 404 instead of 403 to hide the existence of other users' records — an intentional information-hiding choice, not a bug, but worth documenting explicitly."
     tests:

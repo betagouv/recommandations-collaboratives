@@ -37,6 +37,37 @@ class CurrentSiteConfigurationMiddleware:
         return self.get_response(request)
 
 
+class EmbedMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        if (
+            request.headers.get("Sec-Fetch-Dest") == "iframe"
+            or request.GET.get("embed") == "1"
+        ):
+            request.session["is_embedded"] = True
+        request.is_embedded = request.session.get("is_embedded", False)
+
+        response = self.get_response(request)
+
+        site_config = getattr(request, "site_config", None)
+        if request.is_embedded and site_config is not None:
+            allowed_origins = site_config.embed_allowed_origins
+            if allowed_origins:
+                # frame-ancestors is the modern, multi-origin-capable
+                # replacement for X-Frame-Options: ALLOW-FROM (unsupported
+                # by browsers). Only the origins configured for this site
+                # (Django admin only) may embed it; everyone else falls
+                # back to the default SAMEORIGIN behaviour.
+                response.xframe_options_exempt = True
+                response["Content-Security-Policy"] = (
+                    "frame-ancestors 'self' " + " ".join(allowed_origins)
+                )
+
+        return response
+
+
 class PreviousActivityMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response

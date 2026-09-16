@@ -79,6 +79,25 @@
 }
 
 /* ¯¯¯¯ *\
+  HEADER
+\* ˍˍˍˍ */
+
+.fr-header {
+  &.sticky-top {
+    position: sticky;
+    top: 0;
+  }
+  &__tools {
+    line-height: 1rem;
+  }
+  &__separator {
+    border-left: 1px solid #aaa ;
+    height: 24px;
+    padding-left: 1rem;
+  }
+}
+
+/* ¯¯¯¯ *\
   ICONS
 \* ˍˍˍˍ */
 
@@ -579,6 +598,15 @@ form > p {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   cursor: pointer;
+}
+
+/* ¯¯¯¯¯¯ *\
+  CONTAINER
+\* ˍˍˍˍˍˍ */
+
+.fr-container--small {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 /* ¯¯¯ *\
