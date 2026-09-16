@@ -1,5 +1,6 @@
 import math
 import statistics
+import uuid
 from datetime import timedelta
 from enum import Enum
 
@@ -22,6 +23,7 @@ from taggit.managers import TaggableManager
 from recoco.apps.projects import models as projects_models
 from recoco.utils import render_markdown
 
+from ..home.validators import file_validators
 from . import apps
 from .utils import compute_qs_completion
 
@@ -414,7 +416,9 @@ def empty_answer():
 
 
 def survey_private_file_path(instance, filename):
-    return "survey/session/{0}/{1}".format(instance.session.id, filename)
+    return "survey/session/{0}/{1}/{2}".format(
+        instance.session.id, uuid.uuid4().hex, filename
+    )
 
 
 class Answer(models.Model):
@@ -457,7 +461,11 @@ class Answer(models.Model):
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
     attachment = models.FileField(
-        blank=True, null=True, upload_to=survey_private_file_path
+        blank=True,
+        null=True,
+        upload_to=survey_private_file_path,
+        max_length=255,
+        validators=file_validators,
     )
 
     @property
