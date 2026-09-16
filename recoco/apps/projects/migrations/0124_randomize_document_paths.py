@@ -2,6 +2,8 @@ import re
 import uuid
 
 import django.core.validators
+from tqdm import tqdm
+
 import recoco.apps.projects.models
 import recoco.apps.home.validators
 from django.db import migrations, models, transaction
@@ -19,8 +21,8 @@ def randomize_document_paths(apps, schema_editor):
     count_success_files = 0
     count_already_moved = 0
 
-    for document in Document.objects.exclude(the_file="").exclude(
-        the_file__isnull=True
+    for document in tqdm(
+        Document.objects.exclude(the_file="").exclude(the_file__isnull=True)
     ):
         old_path = document.the_file.name
         if not old_path or not default_storage.exists(old_path):

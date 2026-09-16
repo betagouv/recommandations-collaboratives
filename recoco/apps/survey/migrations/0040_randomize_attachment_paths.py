@@ -4,6 +4,7 @@ import uuid
 import django
 from django.core.files.storage import default_storage
 from django.db import migrations, models, transaction
+from tqdm import tqdm
 
 import recoco
 
@@ -19,8 +20,8 @@ def randomize_attachment_paths(apps, schema_editor):
     count_success_files = 0
     count_already_moved = 0
 
-    for answer in Answer.objects.exclude(attachment="").exclude(
-        attachment__isnull=True
+    for answer in tqdm(
+        Answer.objects.exclude(attachment="").exclude(attachment__isnull=True)
     ):
         old_path = answer.attachment.name
         if not old_path or not default_storage.exists(old_path):
