@@ -16,7 +16,7 @@ from recoco.rest_api.permissions import IsStaffForSite
 
 
 # todo all_on_site and function should not be necessary after #2122
-def projects_not_deleted_by_default(request):
+def my_projects_not_deleted_by_default(request):
     queryset = Project.all_on_site.for_user(request.user)
     if request_hide_deleted_projects(request):
         queryset = queryset.filter(deleted=None)
@@ -25,7 +25,7 @@ def projects_not_deleted_by_default(request):
 
 class SessionFilterSet(filters_drf.FilterSet):
     # todo projects_not_deleted_by_default should not be necessary after #2122
-    project_id = ModelChoiceFilter(queryset=projects_not_deleted_by_default)
+    project_id = ModelChoiceFilter(queryset=my_projects_not_deleted_by_default)
 
     class Meta:
         model = Session
@@ -40,7 +40,7 @@ class SessionView(ListAPIView):
 
     def get_queryset(self):
         # todo projects_not_deleted_by_default should not be necessary after #2122
-        project_ids = projects_not_deleted_by_default(self.request).values_list(
+        project_ids = my_projects_not_deleted_by_default(self.request).values_list(
             "id", flat=True
         )
         return Session.objects.filter(project__in=project_ids)
@@ -53,7 +53,7 @@ class SessionAnswersView(ListAPIView):
 
     def get_queryset(self):
         # todo projects_not_deleted_by_default should not be necessary after #2122
-        project_ids = projects_not_deleted_by_default(self.request).values_list(
+        project_ids = my_projects_not_deleted_by_default(self.request).values_list(
             "id", flat=True
         )
         try:
