@@ -18,6 +18,7 @@ from allauth.account.views import (
 )
 from allauth.account.views import RequestLoginCodeView
 from allauth.mfa.models import Authenticator
+from csp.decorators import csp_update
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth.decorators import login_required
@@ -102,6 +103,10 @@ class RegionalActorsPageView(TemplateView):
 
 
 class MethodologyPageView(TemplateView):
+    @csp_update({"frame-src": ["https://view.genial.ly", "https://view.genially.com"]})
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     template_name = "home/methodology.html"
 
 
