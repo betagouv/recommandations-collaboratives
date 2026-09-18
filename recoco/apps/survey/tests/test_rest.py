@@ -18,10 +18,10 @@ def test_session_view(request, api_client, project):
 
     session = baker.make(Session, project=project)
 
-    api_client.force_authenticate(user=user)
-    response = api_client.get(
-        path=reverse("api-survey-sessions"),
-    )
+    with login(api_client, user=user):
+        response = api_client.get(
+            path=reverse("api-survey-sessions"),
+        )
     assert response.status_code == 200
     json_response = response.json()
 
@@ -163,7 +163,7 @@ def test_session_not_staff_cant_see_deleted(
     request, api_client, current_site, session_project_deleted
 ):
     url = reverse("api-survey-sessions")
-    with login(api_client):
+    with login(api_client, user=session_project_deleted.project.owner):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )
@@ -201,7 +201,7 @@ def test_session_answers_not_staff_cant_see_deleted(
     request, api_client, current_site, session_project_deleted, answers_project_deleted
 ):
     url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client):
+    with login(api_client, user=session_project_deleted.project.owner):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )
