@@ -61,6 +61,11 @@ SITE_GROUP_PERMISSIONS = {
         "sites.change_addressbook",
         "sites.manage_resources",
     ),
+    "sync": (
+        "sites.list_projects",
+        "sites.moderate_projects",
+        "sites.see_deleted_projects",
+    ),
 }
 
 
