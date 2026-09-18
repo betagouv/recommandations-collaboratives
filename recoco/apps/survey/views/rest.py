@@ -12,7 +12,6 @@ from recoco.apps.survey.serializers import (
     QuestionSerializer,
     SessionSerializer,
 )
-from recoco.rest_api.permissions import IsStaffForSite
 
 
 # todo all_on_site and function should not be necessary after #2122
@@ -69,7 +68,7 @@ class SessionAnswersView(ListAPIView):
 
 class SurveyQuestionsView(ListAPIView):
     serializer_class = QuestionSerializer
-    permission_classes = [IsStaffForSite]
+    permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):

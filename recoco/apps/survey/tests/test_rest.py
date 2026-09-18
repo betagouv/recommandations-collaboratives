@@ -1,4 +1,4 @@
-from unittest.mock import ANY, Mock, patch
+from unittest.mock import ANY
 
 import pytest
 from django.contrib.auth.models import User
@@ -87,21 +87,17 @@ def test_session_answers_view(request, api_client, project):
 
 @pytest.mark.django_db
 def test_survey_questions_view(api_client, current_site):
-    user = baker.make(User)
-
     survey = baker.make(Survey, site=current_site)
     question_set = baker.make(QuestionSet, survey=survey)
     question = baker.make(Question, question_set=question_set)
 
-    api_client.force_authenticate(user=user)
     url = reverse("api-survey-questions")
 
-    response = api_client.get(path=url)
-    assert response.status_code == 403
+    with login(api_client):
+        response = api_client.get(path=url)
+        assert response.status_code == 200
 
-    with patch(
-        "recoco.rest_api.permissions.is_staff_for_site", Mock(return_value=True)
-    ):
+    with login(api_client, groups=["example_com_staff"], username="staff"):
         response = api_client.get(path=url)
         assert response.status_code == 200
 
