@@ -45,6 +45,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.moderate_projects",
         "sites.list_projects",
         "sites.delete_projects",
+        "sites.see_deleted_projects",
         "sites.manage_resources",
         "sites.use_crm",
         "sites.use_addressbook",
