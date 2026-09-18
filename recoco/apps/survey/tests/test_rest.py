@@ -134,11 +134,12 @@ def answers_project_deleted(session_project_deleted):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("group_name", ["example_com_staff", "example_com_sync"])
 def test_session_staff_can_see_deleted_if_asked(
-    request, api_client, current_site, session_project_deleted
+    request, api_client, current_site, session_project_deleted, group_name
 ):
     url = reverse("api-survey-sessions")
-    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+    with login(api_client, is_staff=True, groups=[group_name]):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )
@@ -171,11 +172,17 @@ def test_session_not_staff_cant_see_deleted(
 
 
 @pytest.mark.django_db
-def test_session_answers_staff_can_see_deleted_if_asked(
-    request, api_client, current_site, session_project_deleted, answers_project_deleted
+@pytest.mark.parametrize("group_name", ["example_com_staff", "example_com_sync"])
+def test_session_answers_staff_sync_can_see_deleted_if_asked(
+    request,
+    api_client,
+    current_site,
+    session_project_deleted,
+    answers_project_deleted,
+    group_name,
 ):
     url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+    with login(api_client, is_staff=True, groups=[group_name]):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )
@@ -184,11 +191,17 @@ def test_session_answers_staff_can_see_deleted_if_asked(
 
 
 @pytest.mark.django_db
-def test_session_answer_staff_dont_see_deleted_if_not_asked(
-    request, api_client, current_site, session_project_deleted, answers_project_deleted
+@pytest.mark.parametrize("group_name", ["example_com_staff", "example_com_sync"])
+def test_session_answer_staff_sync_dont_see_deleted_if_not_asked(
+    request,
+    api_client,
+    current_site,
+    session_project_deleted,
+    answers_project_deleted,
+    group_name,
 ):
     url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client, is_staff=True, groups=["example_com_staff"]):
+    with login(api_client, is_staff=True, groups=[group_name]):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}"
         )
