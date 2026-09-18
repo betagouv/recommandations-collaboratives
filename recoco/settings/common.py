@@ -388,9 +388,6 @@ ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_RATE_LIMITS = {
-    "login_failed": "20/m/ip",
-}
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -400,6 +397,7 @@ LOGIN_REDIRECT_URL = "login-redirect"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 60 * 60  # 1 hour in seconds
 ACCOUNT_LOGIN_TIMEOUT = 60 * 60
+ALLAUTH_TRUSTED_CLIENT_IP_HEADER = "X-Real-IP"
 
 # Common signup form shared by account and socialaccount
 ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"
@@ -485,6 +483,11 @@ REST_FRAMEWORK = {
     ],
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
