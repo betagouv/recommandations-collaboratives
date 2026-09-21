@@ -49,7 +49,38 @@ def crm_plugin_tabs(context, min_index, max_index):
     request = context.get("request")
     if request is None:
         return []
-    tabs = []
+    tabs = [
+        {
+            "label": "Accueil",
+            "url": reverse("crm-site-dashboard"),
+            "tab_key": "dashboard",
+            "index": 0,
+        },
+        {
+            "label": "Dossiers",
+            "url": reverse("crm-project-list"),
+            "tab_key": "projects",
+            "index": 10,
+        },
+        {
+            "label": "Utilisateurs",
+            "url": reverse("crm-user-list"),
+            "tab_key": "users",
+            "index": 20,
+        },
+        {
+            "label": "Organisations",
+            "url": reverse("crm-organization-list"),
+            "tab_key": "organizations",
+            "index": 30,
+        },
+        {
+            "label": "Ressources",
+            "url": reverse("crm-resource-list"),
+            "tab_key": "resources",
+            "index": 40,
+        },
+    ]
     for tab in get_site_plugin_manager(request).hook.crm_navigation_tabs(
         request=request
     ):
