@@ -258,7 +258,8 @@ Alpine.data(
           if (checkedDepartments.length === 0) {
             this.label = 'Aucun département sélectionné';
           } else if (checkedDepartments.length === 1) {
-            this.label = `${checkedDepartments[0]}`;
+            const departmentName = this.allDepartments.find(x => x.code === checkedDepartments[0]).name;
+            this.label = `${checkedDepartments[0]} - ${departmentName}`;
           } else if (checkedDepartments.length === this.allDepartments.length) {
             this.label = 'Tous les départements';
           } else if (checkedDepartments.length > 1) {
@@ -270,8 +271,22 @@ Alpine.data(
         else {
           this.label = 'Tous les départements';
         }
-
+        this.$dispatch('displayed-label', this.label);
       },
+      resetSelection() {
+        this.open = false;
+        if (selectAll) {
+          this.handleTerritorySelectAll(true);
+        } else if (selectedDepartments) {
+          this.initSelectedDepartments();
+          const codes = this.extractDepartmentFromSelectedRegions(this.regions);
+          this.$dispatch('selected-departments', codes);
+          this.handleSelectorPlaceholder(codes);
+        } else {
+          this.handleTerritorySelectAll(false);
+        }
+        this.updateMyDepartmentsActive();
+      }
     };
   }
 );
