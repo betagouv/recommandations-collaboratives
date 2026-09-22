@@ -9,6 +9,7 @@ resolution-markers = [
 
 [manifest]
 constraints = [
+    { name = "anyio", specifier = ">=4.14.2" },
     { name = "bleach", specifier = ">=6.4.0" },
     { name = "click", specifier = ">=8.3.3" },
     { name = "cryptography", specifier = "==50.0.0" },
