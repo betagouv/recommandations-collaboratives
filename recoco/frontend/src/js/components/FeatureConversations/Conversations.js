@@ -32,7 +32,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   sharedContentsLoaded: false,
   showMessages: false,
   sendingMessage: false,
-  tasks: [],
   messagesParticipants: [],
   documents: [],
   contacts: [],
@@ -59,17 +58,22 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   isSwitchtender: JSON.parse(
     document.getElementById('isSwitchtender').textContent
   ),
+  get tasks() {
+    return Alpine.store('tasksData').tasks;
+  },
+
   async init() {
-    this.getMessagesParticipants();
-    await this.getActivities();
-    await this.getMessages();
+    await Promise.all([
+      this.getMessagesParticipants(),
+      await this.getActivities(),
+      await this.getMessages(),
+      Alpine.store('tasksData').loadTasks()
+    ]);
     this.createFullFeed();
     this.messagesLoaded = true;
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    await Alpine.store('tasksData').loadTasks();
-    this.tasks = Alpine.store('tasksData').tasks;
     await this.extractSharedContents()
     this.loadExternalFiles();
     this.loadPrivateFiles();

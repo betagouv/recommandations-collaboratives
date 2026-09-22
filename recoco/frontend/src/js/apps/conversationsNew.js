@@ -17,6 +17,7 @@ import '../components/NotificationEater.js';
 import '../components/FeatureConversations/Conversations.js';
 import '../components/SharedContentsFileCard.js';
 import '../components/User.js';
+import '../components/FeatureConversations/TaskCardPanel.js'
 
 window.stringToColor = stringToColor;
 window.gravatar_url = gravatar_url;
