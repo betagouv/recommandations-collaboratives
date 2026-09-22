@@ -29,6 +29,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   currentUserId,
   feed: {},
   messagesLoaded: false,
+  sharedContentsLoaded: false,
   showMessages: false,
   sendingMessage: false,
   tasks: [],
@@ -67,16 +68,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    Alpine.store('tasksData')._subscribe(async () => {
-      this.tasks = Alpine.store('tasksData').tasks;
-    });
-    Alpine.store('tasksData')._notify();
+    await Alpine.store('tasksData').loadTasks();
+    this.tasks = Alpine.store('tasksData').tasks;
+    await this.extractSharedContents()
+    this.loadExternalFiles();
+    this.loadPrivateFiles();
+    this.sharedContentsLoaded = true;
+    await this.detectOpenActionsFromHash();
+
     this.countElementsInDiscussion();
-    this.extractSharedContents().then(async () => {
-      this.loadExternalFiles();
-      this.loadPrivateFiles();
-      await this.detectOpenActionsFromHash();
-    });
     window.addEventListener('hashchange', async () => {
       await this.detectOpenActionsFromHash();
     });
