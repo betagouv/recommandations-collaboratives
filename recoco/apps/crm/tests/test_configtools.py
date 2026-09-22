@@ -77,6 +77,9 @@ def test_crm_site_configuration(request, client):
             data={
                 "sender_name": "Yoo",
                 "contact_form_recipient": "othr@yo.com",
+                "legal_ower": "Yoyo factory",
+                "description": "Yoyo artisant",
+                "main_topic": "Fabrication",
                 "reminder_interval": 42,
                 "logo_small": logo,
                 "favicon": favicon,
