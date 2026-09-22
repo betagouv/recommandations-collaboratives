@@ -9,6 +9,23 @@
         margin-left: 0;
     }
 
+    &__notice {
+        display: flex;
+        align-items: flex-start;
+        align-self: stretch;
+        gap: 16px;
+        padding: 12px 24px;
+        background: var(--yellow-tournesol-950-100, #feecc2);
+        color: var(--yellow-tournesol-sun-407-moon-922, #716043);
+        font-size: 0.875rem;
+        line-height: 1.5rem;
+
+        a {
+            color: inherit;
+            font-weight: 400;
+        }
+    }
+
     &__accordion-badge {
         flex: 0 0 auto;
         margin-left: auto;
