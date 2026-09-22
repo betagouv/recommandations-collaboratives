@@ -5,6 +5,16 @@
         align-items: center;
     }
 
+    .fr-accordion__btn::after {
+        margin-left: 0;
+    }
+
+    &__accordion-badge {
+        flex: 0 0 auto;
+        margin-left: auto;
+        margin-right: 0.5rem;
+    }
+
     &__logo-preview-wrapper {
         display: flex;
     }

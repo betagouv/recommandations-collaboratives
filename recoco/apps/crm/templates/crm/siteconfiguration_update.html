@@ -25,6 +25,7 @@
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <form method="post"
                       enctype="multipart/form-data"
+                      novalidate
                       class="fr-form crm-config__form">
                     {% csrf_token %}
                     <h1 class="fr-h3 fr-mb-1w">Paramètres du portail</h1>
@@ -35,14 +36,15 @@
                         Parcourez les différentes rubriques, et une fois vos modifications réalisées,
                         pensez à les enregistrer !
                     </p>
-                    <div class="fr-accordions-group fr-mb-3w">
-                        <section class="fr-accordion">
+                    <div class="fr-mb-3w">
+                        <section class="fr-accordion" x-data="AccordionStatus">
                             <h2 class="fr-accordion__title">
                                 <button type="button"
                                         class="fr-accordion__btn"
                                         aria-expanded="false"
                                         aria-controls="accordion-description">
                                     <span class="fr-icon-file-color fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Description du service
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-description">
@@ -54,13 +56,14 @@
                                 </fieldset>
                             </div>
                         </section>
-                        <section class="fr-accordion">
+                        <section class="fr-accordion" x-data="AccordionStatus">
                             <h2 class="fr-accordion__title">
                                 <button type="button"
                                         class="fr-accordion__btn"
                                         aria-expanded="false"
                                         aria-controls="accordion-emails">
                                     <span class="fr-icon-mail-with-hints fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Paramètres des e-mails
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-emails">
@@ -77,13 +80,14 @@
                                 </fieldset>
                             </div>
                         </section>
-                        <section class="fr-accordion">
+                        <section class="fr-accordion" x-data="AccordionStatus">
                             <h2 class="fr-accordion__title">
                                 <button type="button"
                                         class="fr-accordion__btn"
                                         aria-expanded="false"
                                         aria-controls="accordion-logos">
                                     <span class="fr-icon-mockup-with-images fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Logos
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-logos">
@@ -112,13 +116,14 @@
                                 </div>
                             </div>
                         </section>
-                        <section class="fr-accordion">
+                        <section class="fr-accordion" x-data="AccordionStatus">
                             <h2 class="fr-accordion__title">
                                 <button type="button"
                                         class="fr-accordion__btn"
                                         aria-expanded="false"
                                         aria-controls="accordion-legal">
                                     <span class="fr-icon-justice-scale fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Informations légales
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-legal">
@@ -152,20 +157,21 @@
                                 </p>
                                 <fieldset class="fr-fieldset">
                                     {{ form.dpo_contact_email|as_crispy_field:"dsrc_crispy_forms_no_js" }}
-                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Texte à remplir</span>
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Le ou la  déléguée à la protection des données est la personne référente dans votre organisation sur les questions de données, notamment personnelles. Son adresse email sera indiquée dans la Politique de confidentialité.</span>
                                     {{ form.gdpr_purposes|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Indiquez ici, sous forme de liste à puces, à quoi les données personnelles vont vous servir, pourquoi vous en avez besoin.</span>
                                     {{ form.target_audience|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                 </fieldset>
                             </div>
                         </section>
-                        <section class="fr-accordion">
+                        <section class="fr-accordion" x-data="AccordionStatus">
                             <h2 class="fr-accordion__title">
                                 <button type="button"
                                         class="fr-accordion__btn"
                                         aria-expanded="false"
                                         aria-controls="accordion-config">
                                     <span class="fr-icon-system fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Configuration
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
                                 </button>
                             </h2>
                             <div class="fr-collapse" id="accordion-config">
