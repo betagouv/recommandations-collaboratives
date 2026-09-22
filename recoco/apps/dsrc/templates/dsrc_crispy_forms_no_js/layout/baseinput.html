@@ -6,6 +6,8 @@
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "email" %}
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
+{% elif field.field.widget.input_type == "tel" %}
+    {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "file" %}
     {{ field }}
 {% elif field.field.widget.input_type == "number" %}
