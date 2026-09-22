@@ -63,7 +63,18 @@ class EmbedMiddleware:
                 # back to the default SAMEORIGIN behaviour.
                 response.xframe_options_exempt = True
                 # _csp_update is used to update django-csp config
-                response._csp_update = {"frame-ancestors": [*allowed_origins]}
+                old_csp_update = (
+                    response._csp_update if hasattr(response, "_csp_update") else {}
+                )
+                old_frame_ancestors = (
+                    old_csp_update.pop("frame-ancestors")
+                    if "frame-ancestors" in old_csp_update
+                    else []
+                )
+                response._csp_update = {
+                    **old_csp_update,
+                    "frame-ancestors": [*old_frame_ancestors, *allowed_origins],
+                }
 
         return response
 

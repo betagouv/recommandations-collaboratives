@@ -1,26 +1,23 @@
-let currentProjectId;
-// TODO Réécrire : #unpublish-task-button et list-tasks-switch-button n'existent plus
-describe.skip('I can go tasks tab @page-projet-recommandations @page-projet-recommandations-brouillon', () => {
+import projects from '../../../fixtures/projects/projects.json';
+
+// pk 34 - conseiller1 advisor, published fixture reco "Reco publiée fixture".
+const currentProject = projects.find((p) => p.pk === 34);
+
+describe('I cannot unpublish a recommendation anymore @page-projet-recommandations @page-projet-recommandations-brouillon', () => {
   beforeEach(() => {
     cy.login('conseiller1');
-    cy.createProject('unpublish task').then((projectId) => {
-      currentProjectId = projectId;
-    });
   });
 
-  it('unpublishes a task', () => {
-    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
+  it('cannot turn a published recommendation back into a draft', () => {
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
-    cy.visit(`/project/${currentProjectId}/actions`);
+    // Open the edit page of the published fixture recommendation.
+    cy.get('[data-test-id="message-edit-recommendation"]').first().click({
+      force: true,
+    });
+    cy.url().should('include', '/update');
 
-    cy.createTask('unpublish task');
-
-    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
-
-    cy.get('#unpublish-task-button').click({ force: true });
-
-    cy.contains('brouillon');
+    // A published recommendation can no longer be saved as a draft.
+    cy.get('[data-test-id="publish-draft-task-button"]').should('not.exist');
   });
 });
-
-// page recommandations

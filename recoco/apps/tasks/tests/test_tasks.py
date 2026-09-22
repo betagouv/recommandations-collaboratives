@@ -34,6 +34,39 @@ from recoco.utils import login
 from .. import models
 
 ########################################################################
+# Content sanitization
+########################################################################
+
+
+@pytest.mark.django_db
+def test_task_content_rendered_strips_embedded_script_tags(current_site, project):
+    task = baker.make(
+        models.Task,
+        project=project,
+        site=current_site,
+        content="<script>alert(document.cookie)</script>",
+    )
+
+    assert "<script>" not in task.content_rendered
+    assert "alert(document.cookie)" not in task.content_rendered
+
+
+@pytest.mark.django_db
+def test_task_followup_comment_rendered_strips_embedded_script_tags(
+    current_site, project
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    followup = baker.make(
+        models.TaskFollowup,
+        task=task,
+        comment="<script>alert(document.cookie)</script>",
+    )
+
+    assert "<script>" not in followup.comment_rendered
+    assert "alert(document.cookie)" not in followup.comment_rendered
+
+
+########################################################################
 # Task Recommendation
 ########################################################################
 

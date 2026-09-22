@@ -1,37 +1,20 @@
 import projects from '../../../fixtures/projects/projects.json';
+import sharedContentsPanel from '../../../support/tools/sharedContentsPanel';
 
-const currentProject = projects[1];
+const currentProject = projects.find((p) => p.pk === 32);
 
-// TODO Réécrire : badge-new-task, close-modal-task, banner-new-tasks ont été supprimés avec la preview modal
-describe.skip('I can access the recommandations @page-projet-recommandations', () => {
-  it('goes to recommandations tab and see new recommandations', () => {
-    cy.login('conseiller1');
-    cy.visit(`/project/${currentProject.pk}/actions`);
-    cy.createTask('Notif test');
-    cy.logout();
-
+describe('I can access the recommandations @page-projet-recommandations', () => {
+  it('sees the recommendations shared by the advisor in the conversation', () => {
+    // Owner (collectivity) can read the recommendation
+    // published by the advisor, but cannot create one.
     cy.login('collectivité1');
-    cy.visit(`/project/${currentProject.pk}/actions`);
-    cy.get('Ajouter une recommandation').should('not.exist');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
-    // TODO : using intercept and dynamic wait
-    // cy.intercept(
-    //   'POST',
-    //   /\/api\/projects\/\d+\/tasks\/\d+\/notifications\/mark_all_as_read\/$/,
-    //   'success'
-    // ).as('markVisited');
+    sharedContentsPanel.openFromTopic('recommendations');
+    sharedContentsPanel
+      .getRecommendationCards()
+      .should('contain.text', 'Reco collectivité fixture');
 
-    cy.get('[data-test-id="badge-new-task"]')
-      .should('exist')
-      .first()
-      .click({ force: true });
-    // TODO : using intercept and dynamic wait
-    // cy.wait('@markVisited');
-    cy.wait(500);
-    cy.get('[data-test-id="close-modal-task"]')
-      .should('exist')
-      .click({ force: true });
-    cy.get('[data-test-id="banner-new-tasks"]').should('not.exist');
-    cy.get('[data-test-id="badge-new-task"]').should('not.be.visible');
+    cy.get('[data-test-id="create-task-button"]').should('not.exist');
   });
 });

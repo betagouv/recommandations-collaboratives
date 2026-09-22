@@ -338,5 +338,75 @@
       "project_id": 31,
       "site_id": 1
     }
+  },
+  {
+    "pk": 35,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 32,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 36,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 33,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 37,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 34,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 38,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 35,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 39,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 36,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 40,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 37,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 41,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 38,
+      "site_id": 1
+    }
   }
 ]

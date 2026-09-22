@@ -24,7 +24,7 @@ from django.contrib.syndication.views import Feed
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
@@ -223,9 +223,11 @@ class BaseResourceDetailView(DetailView):
     """Return the details of given resource"""
 
     model = models.Resource
-    queryset = models.Resource.objects.with_ds_annotations()
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
+
+    def get_queryset(self):
+        return models.Resource.on_site.with_ds_annotations()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -288,6 +290,9 @@ class DuplicateResourceView(
     http_method_names = ["post"]
     pk_url_kwarg = "resource_id"
 
+    def get_queryset(self):
+        return models.Resource.on_site.all()
+
     def has_permission(self):
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
@@ -339,7 +344,9 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or self.request.user.is_authenticated
+        return resource.public or has_perm(
+            self.request.user, "manage_resources", self.request.site
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -358,12 +365,17 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
         return context
 
-    def get_queryset(self) -> QuerySet[models.Resource]:
-        return super().get_queryset().with_ds_annotations()
-
 
 class EmbededResourceDetailView(BaseResourceDetailView):
     template_name = "resources/resource/details_embeded.html"
+
+    def get_object(self, queryset=None):
+        resource = super().get_object(queryset)
+        if not resource.public and not has_perm(
+            self.request.user, "sites.manage_resources", self.request.site
+        ):
+            raise Http404()
+        return resource
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -385,6 +397,9 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     template_name = "resources/resource/delete.html"
     success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
+
+    def get_queryset(self):
+        return models.Resource.on_site.all()
 
     def form_valid(self, form):
         """
@@ -421,7 +436,7 @@ def resource_update(request, resource_id=None):
     """Update informations for resource"""
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
-    resource = get_object_or_404(models.Resource, pk=resource_id)
+    resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
     selected_departments = list(resource.departments.values_list("code", flat=True))
 
     categories = list(
@@ -583,7 +598,7 @@ class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, Vi
     def post(self, request, *args, **kwargs):
         resource_id = self.kwargs.get("pk")
 
-        resource = get_object_or_404(models.Resource, pk=resource_id)
+        resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
 
         rev_id = self.kwargs.get("rev_pk")
 
@@ -607,6 +622,9 @@ class ResourceHistoryCompareView(
     model = models.Resource
     permission_required = "sites.manage_resources"
     template_name = "resources/resource/history.html"
+
+    def get_queryset(self) -> QuerySet[models.Resource]:
+        return models.Resource.on_site.all()
 
     def has_permission(self):
         site = get_current_site(self.request)
@@ -650,7 +668,11 @@ class LatestResourcesFeed(Feed):
 @login_required
 def create_bookmark(request, resource_id=None):
     """Create bookmark for resource and and connected user"""
-    resource = get_object_or_404(models.Resource, pk=resource_id)
+    resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
+    if not resource.public and not has_perm(
+        request.user, "manage_resources", request.site
+    ):
+        raise Http404()
     try:
         # look if bookmark exists and is deleted
         bookmark = models.Bookmark.deleted_on_site.get(

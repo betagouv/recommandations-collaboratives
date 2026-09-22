@@ -286,6 +286,123 @@ Cypress.Commands.add('becomeObserver', (projectId) => {
 });
 
 /**
+ * Removes every recommendation (published or draft) of a project through the
+ * REST API, so a shared fixture project starts from a clean slate.
+ *
+ * Recommendation specs reuse existing fixture projects (see the
+ * `currentProject` constant in each spec) and the e2e database is not reset
+ * between test attempts. With Cypress `retries` enabled, or when several specs
+ * reuse the same project, recommendations would otherwise pile up and break
+ * count/order assertions or `.first()` lookups. Call this at the start of a
+ * recommendation test to guarantee it works on an empty conversation.
+ *
+ * Conversation messages are removed first: soft-deleting a message deletes its
+ * nodes, and deleting a RecommendationNode soft-deletes the linked task
+ * (see conversations/signals.py). Deleting tasks first would instead leave
+ * orphan empty messages in the feed. Remaining tasks (drafts have no message)
+ * are then removed through the tasks API.
+ *
+ * The current user must be logged in and hold `projects.manage_tasks` on the
+ * project, i.e. be an advisor of it (fixture switchtender or cy.becomeAdvisor).
+ * Messages posted by other users cannot be deleted (403) and are skipped.
+ *
+ * @function resetProjectRecommendations
+ * @memberof Cypress.Commands
+ * @param {number|string} projectId - The project whose tasks must be removed.
+ */
+Cypress.Commands.add('resetProjectRecommendations', (projectId) => {
+  cy.getCookie('csrftoken').then((csrfToken) => {
+    const headers = { 'X-CSRFToken': csrfToken.value };
+    cy.request(`/api/projects/${projectId}/conversations/messages/`).then(
+      (response) => {
+        response.body
+          .filter((message) => !message.deleted)
+          .forEach((message) => {
+            cy.request({
+              method: 'DELETE',
+              url: `/api/projects/${projectId}/conversations/messages/${message.id}/`,
+              headers,
+              failOnStatusCode: false,
+            });
+          });
+      }
+    );
+    cy.request(`/api/projects/${projectId}/tasks/`).then((response) => {
+      response.body.forEach((task) => {
+        cy.request({
+          method: 'DELETE',
+          url: `/api/projects/${projectId}/tasks/${task.id}/`,
+          headers,
+        });
+      });
+    });
+  });
+});
+
+/**
+ * Creates a recommendation through the REST API, without going through the UI.
+ *
+ * Use this to seed the data a test is about to mutate (delete, publish,
+ * reorder...): combined with cy.resetProjectRecommendations in a beforeEach,
+ * each attempt (Cypress retries included) starts from a deterministic state,
+ * much faster than creating the recommendation through the action pusher page.
+ *
+ * A draft is a bare task (no conversation message). For a published
+ * recommendation the task is created as draft then published through the
+ * dedicated endpoint, because only the publish transition emits the
+ * `action_created` signal that creates the conversation message and its
+ * RecommendationNode (see tasks/views/rest.py).
+ *
+ * The current user must be logged in and hold `projects.manage_tasks` on the
+ * project. Yields the created (and possibly published) task.
+ *
+ * @function createTaskViaApi
+ * @memberof Cypress.Commands
+ * @param {number|string} projectId - The project to create the task in.
+ * @param {Object} options
+ * @param {string} options.intent - The task title.
+ * @param {string} [options.content=''] - The task markdown content.
+ * @param {boolean} [options.draft=true] - Keep the task as a draft.
+ * @param {number} [options.resourceId=null] - Optional resource to attach.
+ * @param {number} [options.order=0] - Position of the task (field is required
+ *   by the serializer; pass increasing values when seeding several drafts).
+ */
+Cypress.Commands.add(
+  'createTaskViaApi',
+  (
+    projectId,
+    { intent, content = '', draft = true, resourceId = null, order = 0 }
+  ) => {
+    return cy.getCookie('csrftoken').then((csrfToken) => {
+      const headers = { 'X-CSRFToken': csrfToken.value };
+      const body = { intent, content, public: false, order };
+      if (resourceId) {
+        body.resource_id = resourceId;
+      }
+      return cy
+        .request({
+          method: 'POST',
+          url: `/api/projects/${projectId}/tasks/`,
+          headers,
+          body,
+        })
+        .then((response) => {
+          if (draft) {
+            return cy.wrap(response.body);
+          }
+          return cy
+            .request({
+              method: 'POST',
+              url: `/api/projects/${projectId}/tasks/${response.body.id}/publish/`,
+              headers,
+            })
+            .then((publishResponse) => cy.wrap(publishResponse.body));
+        });
+    });
+  }
+);
+
+/**
  * Creates a new task with the given label, topic, and options.
  *
  * @function createTask
@@ -491,8 +608,10 @@ Cypress.Commands.add('shareContact', (name) => {
   });
   //search for a contact
   cy.get('#search-contact-input').type(name, { force: true });
-  //select a contact
-  cy.get('[data-test-id="contact-card"]').first().click({ force: true });
+  //select a contact among the search results (never target the generic
+  //contact-card test id here: the conversation feed may already contain
+  //contact cards from previous runs, and they would be matched first)
+  cy.get('[data-test-id="contact-to-select"]').first().click({ force: true });
   //send contact to tiptap editor
   cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
     force: true,

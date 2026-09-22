@@ -1,0 +1,17 @@
+{% comment %}
+
+Icône d'information à placer dans un en-tête de tableau (<th>),
+affichant un texte explicatif au survol et au focus clavier (tooltip Bootstrap,
+initialisée globalement via main.js).
+
+variables to pass :
+- text : le texte explicatif affiché dans la tooltip
+
+{% endcomment %}
+<span class="fr-icon-information-line fr-icon--sm fr-text-mention--grey"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      data-bs-title="{{ text }}"
+      tabindex="0"
+      role="img"
+      aria-label="{{ text }}"></span>

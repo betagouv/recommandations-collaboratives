@@ -5,10 +5,11 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
 from django.urls import reverse
 from django.utils.http import urlencode
-from markdownx.utils import markdownify
 from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
+
+from recoco.utils import render_markdown
 
 
 class MessageNotDeletedManager(models.Manager):
@@ -97,14 +98,14 @@ class RecommendationNode(Node, MarkdownTextMixin):
 
         if self.recommendation.resource is None:
             res = res | {
-                "text": markdownify(self.text),
+                "text": render_markdown(self.text),
                 "title": self.recommendation.intent,
             }
         else:
             res = res | {
                 "title": self.recommendation.resource.title,
                 "subtitle": self.recommendation.resource.subtitle,
-                "text": markdownify(self.text),
+                "text": render_markdown(self.text),
             }
         return res
 
