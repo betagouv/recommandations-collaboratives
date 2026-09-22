@@ -49,6 +49,12 @@
 
     &__logo-preview-wrapper {
         display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    &__logo-remove {
+        flex: 0 0 auto;
     }
 
     &__logo-preview {
@@ -58,5 +64,10 @@
         object-fit: contain;
         padding: 0.5rem;
         border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    }
+
+    &__logo-cell--separated > * {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-default-grey, #ddd);
     }
 }
