@@ -24,6 +24,21 @@
             color: inherit;
             font-weight: 400;
         }
+
+        .fr-btn--close {
+            justify-content: center;
+            min-width: 1.5rem;
+            min-height: 1.5rem;
+            max-height: 1.5rem;
+            padding: 0;
+            color: inherit;
+            background-color: transparent;
+
+            &:hover,
+            &:active {
+                background-color: rgb(0 0 0 / 8%);
+            }
+        }
     }
 
     &__accordion-badge {
