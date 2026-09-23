@@ -162,6 +162,9 @@
                                 {% endif %}
                             </div>
                         </div>
+                        {% for block in project_overview_sidebar_blocks %}
+                            {{ block }}
+                        {% endfor %}
                         {% include "projects/project/fragments/site_origin/show_file_origin.html" %}
                         <div class="fr-mb-2w">
                             <div class="d-flex flex-column">

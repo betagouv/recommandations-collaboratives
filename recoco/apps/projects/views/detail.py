@@ -23,6 +23,7 @@ from django.views.generic import DetailView
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.survey import models as survey_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
@@ -142,6 +143,16 @@ class ProjectOverviewView(ProjectDetailBaseView):
     """Display main info of projects (first tab in nav)"""
 
     template_name = "projects/project/overview.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pm = get_site_plugin_manager(self.request)
+        context["project_overview_sidebar_blocks"] = (
+            pm.hook.project_overview_sidebar_blocks(
+                project=self.object, request=self.request
+            )
+        )
+        return context
 
 
 class ProjectKnowledgeView(ProjectDetailBaseView):

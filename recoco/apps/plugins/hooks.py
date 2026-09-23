@@ -48,6 +48,28 @@ class ProjectSpec(HookSpec):
                 }
         """
 
+    @hookspec
+    def project_overview_sidebar_blocks(self, project, request):
+        """Return an HTML block to inject into the project overview page's right
+        sidebar, right below the project info block (name, organization, commune,
+        tags).
+
+        Every enabled plugin may contribute one block; blocks are rendered in
+        plugin registration order.
+
+        The returned string MUST be wrapped with ``mark_safe()``; the framework
+        renders it without an additional ``|safe`` filter.
+
+        Example:
+            @hookimpl
+            def project_overview_sidebar_blocks(self, project, request):
+                return mark_safe(render_to_string(
+                    "plugin_giphy/project_overview_sidebar_block.html",
+                    {"project": project},
+                    request=request,
+                ))
+        """
+
 
 class ResourceSpec(HookSpec):
     @hookspec
