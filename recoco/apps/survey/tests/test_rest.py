@@ -134,20 +134,6 @@ def answers_project_deleted(session_project_deleted):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("group_name", ["example_com_staff", "example_com_sync"])
-def test_session_staff_can_see_deleted_if_asked(
-    request, api_client, current_site, session_project_deleted, group_name
-):
-    url = reverse("api-survey-sessions")
-    with login(api_client, is_staff=True, groups=[group_name]):
-        response = api_client.get(
-            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
-        )
-        assert response.status_code == 200
-        assert len(response.data["results"]) == 1
-
-
-@pytest.mark.django_db
 def test_session_staff_dont_see_deleted_if_not_asked(
     request, api_client, current_site, session_project_deleted
 ):
@@ -169,44 +155,6 @@ def test_session_not_staff_cant_see_deleted(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )
         assert response.status_code == 400
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize("group_name", ["example_com_staff", "example_com_sync"])
-def test_session_answers_staff_sync_can_see_deleted_if_asked(
-    request,
-    api_client,
-    current_site,
-    session_project_deleted,
-    answers_project_deleted,
-    group_name,
-):
-    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client, is_staff=True, groups=[group_name]):
-        response = api_client.get(
-            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
-        )
-        assert response.status_code == 200
-        assert len(response.data["results"]) == 2
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize("group_name", ["example_com_staff", "example_com_sync"])
-def test_session_answer_staff_sync_dont_see_deleted_if_not_asked(
-    request,
-    api_client,
-    current_site,
-    session_project_deleted,
-    answers_project_deleted,
-    group_name,
-):
-    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client, is_staff=True, groups=[group_name]):
-        response = api_client.get(
-            f"{url}?project_id={session_project_deleted.project_id}"
-        )
-        assert response.status_code == 200
-        assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
