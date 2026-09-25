@@ -54,9 +54,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
-from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
-from notifications import notify
 from watson import search as watson
 
 from recoco import verbs
@@ -1370,7 +1368,6 @@ def create_note_for_organization(request, organization_id):
 
 def notify_note_creation(request, note, target):
     """Notify crm users of new note creation"""
-    # TODO only create action stream not emails
     action.send(
         request.user,
         verb=verbs.CRM.NOTE_CREATED,
@@ -1378,18 +1375,6 @@ def notify_note_creation(request, note, target):
         target=target,
     )
     return
-    crm_users = get_users_with_perms(
-        request.site, only_with_perms_in=["use_crm"]
-    ).exclude(pk=request.user.pk)
-
-    notify.send(
-        sender=request.user,
-        recipient=crm_users,
-        verb=verbs.CRM.NOTE_CREATED,
-        action_object=note,
-        target=target,
-        public=False,
-    )
 
 
 def update_note_for_object(request, note, return_view_name):
