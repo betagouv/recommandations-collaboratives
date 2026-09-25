@@ -66,7 +66,11 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.home.adapters import send_confirmation_email
-from recoco.apps.home.utils import deactivate_user, reactivate_user
+from recoco.apps.home.utils import (
+    MAX_ACTIVITY_DISPLAY,
+    deactivate_user,
+    reactivate_user,
+)
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.plugins.manager import get_plugin_manager, get_site_plugin_manager
 from recoco.apps.projects.models import (
@@ -137,7 +141,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        context["site_action_stream"] = site_action_stream(self.request.site)[:100]
+        context["site_action_stream"] = site_action_stream(self.request.site)[:3]
 
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
@@ -610,7 +614,7 @@ def organization_details(request, organization_id):
             actor_object_id__in=participant_ids,
         )
         .prefetch_related("actor", "action_object", "target")
-        .order_by("-timestamp")
+        .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
@@ -935,7 +939,7 @@ def user_details(request, user_id):
             )
             | crm_user.action_object_actions.all()
         )
-        .order_by("-timestamp")[:50]
+        .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
         .select_related("action_object_content_type", "target_content_type")
         .prefetch_related(
             GenericPrefetch(
@@ -1150,7 +1154,7 @@ def project_details(request, project_id):
 
     actions = Action.objects.filter(
         site=request.site, target_content_type=project_ct, target_object_id=project.pk
-    )
+    )[:MAX_ACTIVITY_DISPLAY]
 
     conversation_stats = {
         "messages_count": Message.not_deleted.filter(project=project).count(),
@@ -1973,6 +1977,7 @@ def projects_activity_feed(request):
 
     ctype = ContentType.objects.get_for_model(Project)
 
+    # arbitrary enough
     actions = site_action_stream(request.site)[:500]
 
     search_form = forms.CRMSearchForm()
