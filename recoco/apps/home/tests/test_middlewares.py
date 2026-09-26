@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
@@ -221,7 +222,7 @@ def test_dont_save_previous_activity_data_if_hijacked(client, rf, current_site):
 
 class TestEmbedMiddleware:
     def setup_method(self):
-        self.get_response = Mock(return_value=Mock())
+        self.get_response = Mock(return_value=HttpResponse())
         self.middleware = EmbedMiddleware(get_response=self.get_response)
 
     def _make_request(self, headers=None, get_params=None, session=None):
@@ -392,3 +393,72 @@ class TestEmbedContextProcessor:
     def test_defaults_to_false_when_attribute_missing(self):
         request = Mock(spec=[])
         assert embed(request) == {"is_embedded": False}
+
+
+class TestEmbedMiddlewareConsentCookie:
+    def _make_middleware(self, set_cookie=True):
+        response = HttpResponse()
+        if set_cookie:
+            response.set_cookie(
+                settings.COOKIE_CONSENT_NAME,
+                "preferences=2999-01-01T00:00:00",
+                samesite=settings.COOKIE_CONSENT_SAMESITE,
+                secure=settings.COOKIE_CONSENT_SECURE or None,
+            )
+        return EmbedMiddleware(get_response=Mock(return_value=response))
+
+    def _make_request(self, embedded=True):
+        request = Mock()
+        request.headers = {}
+        request.GET = {"embed": "1"} if embedded else {}
+        request.session = {}
+        request.site_config = None
+        return request
+
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
+    def test_relaxes_samesite_when_embedded(self, settings):
+        settings.SESSION_COOKIE_SECURE = True
+        middleware = self._make_middleware()
+
+        response = middleware(self._make_request())
+
+        morsel = response.cookies[settings.COOKIE_CONSENT_NAME]
+        assert morsel["samesite"] == "None"
+        assert morsel["secure"] is True
+
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
+    def test_keeps_defaults_when_not_embedded(self, settings):
+        settings.SESSION_COOKIE_SECURE = True
+        middleware = self._make_middleware()
+
+        response = middleware(self._make_request(embedded=False))
+
+        morsel = response.cookies[settings.COOKIE_CONSENT_NAME]
+        assert morsel["samesite"] == "Lax"
+        assert morsel["secure"] == ""
+
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
+    def test_keeps_defaults_when_session_cookie_is_not_secure(self, settings):
+        # Without a cross-site session there is no is_embedded to read back, so
+        # relaxing the consent cookie alone would buy nothing.
+        settings.SESSION_COOKIE_SECURE = False
+        middleware = self._make_middleware()
+
+        response = middleware(self._make_request())
+
+        morsel = response.cookies[settings.COOKIE_CONSENT_NAME]
+        assert morsel["samesite"] == "Lax"
+        assert morsel["secure"] == ""
+
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
+    def test_no_consent_cookie_on_response(self, settings):
+        settings.SESSION_COOKIE_SECURE = True
+        middleware = self._make_middleware(set_cookie=False)
+
+        response = middleware(self._make_request())
+
+        assert settings.COOKIE_CONSENT_NAME not in response.cookies
