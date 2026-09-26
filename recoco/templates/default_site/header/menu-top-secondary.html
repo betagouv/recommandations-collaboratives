@@ -3,6 +3,7 @@
 {% load gravatar %}
 {% load django_vite %}
 {% load projects_extra %}
+{% load plugins_extra %}
 {% load invites_tags %}
 {% load waffle_tags %}
 {% block js %}
@@ -157,6 +158,17 @@
                 </a>
             </li>
         {% endif %}
+        {% main_menu_plugin_link as plugin_links %}
+        {% for link in plugin_links %}
+            <li class="navigation__item responsive-header__element-not-mobile"
+                style="{% if link.active %}activated{% endif %}">
+                <a href="{{ link.url }}"
+                class="fr-link {% if link.active %}active{% endif %}"
+                {% if link.active %}aria-current="page"{% endif %}>
+                    <span class="fr-mx-1v align-middle">{{ link.label }}</span>
+                </a>
+            </li>
+        {% endfor %}
         {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
         {% comment %} {% include "header/menu-top-secondary-right.html" %} {% endcomment %}
     </ul>
