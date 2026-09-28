@@ -208,7 +208,7 @@ class CrmSpec(HookSpec):
 
 class HeaderSpec(HookSpec):
     @hookspec
-    def header_menu_entries(self, request):
+    def main_navigation_tabs(self, request):
         """Return a tab definition dict to inject into the main navigation.
 
         Keys:
