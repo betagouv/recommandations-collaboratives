@@ -214,4 +214,5 @@ class HeaderSpec(HookSpec):
         Keys:
           label (str)             — display text
           url_name (str)          — Django URL name (may include namespace, e.g. "myplugin:crm-foo")
+          index (int)             — insertion order; builtin tabs use multiples of 10
         """

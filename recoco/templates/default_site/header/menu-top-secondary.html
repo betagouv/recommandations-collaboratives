@@ -158,14 +158,14 @@
                 </a>
             </li>
         {% endif %}
-        {% main_menu_plugin_link as plugin_links %}
-        {% for link in plugin_links %}
+        {% plugin_tabs "header_menu_entries" 40 50 as tabs %}
+        {% for tab in tabs %}
             <li class="navigation__item responsive-header__element-not-mobile"
-                style="{% if link.active %}activated{% endif %}">
-                <a href="{{ link.url }}"
-                class="fr-link {% if link.active %}active{% endif %}"
-                {% if link.active %}aria-current="page"{% endif %}>
-                    <span class="fr-mx-1v align-middle">{{ link.label }}</span>
+                style="{% if tab.active %}activated{% endif %}">
+                <a href="{{ tab.url }}"
+                class="fr-link {% if tab.active %}active{% endif %}"
+                {% if tab.active %}aria-current="page"{% endif %}>
+                    <span class="fr-mx-1v align-middle">{{ tab.label }}</span>
                 </a>
             </li>
         {% endfor %}
