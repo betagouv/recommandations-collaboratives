@@ -96,7 +96,7 @@ from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
 
-def site_action_stream(site):
+def site_projects_action_stream(site):
     ctype = ContentType.objects.get_for_model(Project)
 
     return (
@@ -141,8 +141,15 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        context["site_action_stream"] = site_action_stream(self.request.site)[:3]
-
+        context["site_action_stream"] = site_projects_action_stream(
+            self.request.site
+        ).exclude(verb=verbs.User.LOGIN)[:3]
+        context["login_stream"] = (
+            Action.objects.filter(site=self.request.site, verb=verbs.User.LOGIN)
+            .order_by("-timestamp")
+            .prefetch_related(GenericPrefetch("actor", [User.objects.all()]))
+            .filter()[:50]
+        )
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
             .filter(site=self.request.site)
@@ -1978,7 +1985,7 @@ def projects_activity_feed(request):
     ctype = ContentType.objects.get_for_model(Project)
 
     # arbitrary enough
-    actions = site_action_stream(request.site)[:500]
+    actions = site_projects_action_stream(request.site)[:500]
 
     search_form = forms.CRMSearchForm()
 
