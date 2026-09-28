@@ -14,37 +14,234 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/styles/site-configuration.css.js' %}
 {% endblock js %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with site_configuration=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Paramètres du site' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    <div x-data="Crm" class="d-flex fr-px-0">
+    <div x-data="Crm" class="crm-config d-flex fr-px-0">
         <div class="w-100 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
-                <form method="post" enctype="multipart/form-data" class="fr-form">
+                <form method="post"
+                      enctype="multipart/form-data"
+                      novalidate
+                      class="fr-form crm-config__form">
                     {% csrf_token %}
-                    {% crispy form "dsrc_crispy_forms_no_js" %}
+                    <h1 class="fr-h3 fr-mb-1w">Paramètres du portail</h1>
+                    <p class="fr-text--sm fr-mb-3w">
+                        Vous pouvez ici paramétrer votre portail. Pour plus d'informations,
+                        {# TODO ajout élément d'accessibilité pour le lien #}<a class="fr-link" target="_blank" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail">n'hésitez pas à consulter la documentation</a>.
+                        <br>
+                        Parcourez les différentes rubriques, et une fois vos modifications réalisées,
+                        pensez à les enregistrer !
+                    </p>
                     <div class="fr-mb-3w">
-                        <h6 class="fr-mb-1w">Plugins activés</h6>
-                        {% with plugins=request.site.configuration.enabled_plugins %}
-                        {% if plugins %}
-                        <ul class="fr-tags-group">
-                            {% for plugin in plugins %}
-                            <li>
-                                {% if plugin in registered_plugins %}
-                                <p class="fr-tag">{{ plugin }}</p>
-                                {% else %}
-                                <p class="fr-tag fr-background-flat--error fr-text-inverted--error" title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
+                        <section class="fr-accordion" x-data="AccordionStatus">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-description">
+                                    <span class="fr-icon-file-color fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Description du service
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-description">
+                                <fieldset class="fr-fieldset">
+                                    {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Cette thématique permet de compléter des phrases, sur la plateforme ou les emails, qui évoquent le portail et son usage.</span>
+                                    {{ form.description|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w">Cette description sera notamment utilisée dans les e-mails d'invitation sur la plateforme.</span>
+                                </fieldset>
+                            </div>
+                        </section>
+                        <section class="fr-accordion" x-data="AccordionStatus">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-emails">
+                                    <span class="fr-icon-mail-with-hints fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Paramètres des e-mails
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-emails">
+                                <fieldset class="fr-fieldset">
+                                    {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
+                                <h3 class="fr-h6 fr-mb-1w">Informations envoyées dans les e-mails</h3>
+                                <p class="fr-hint-text fr-mb-2w">Par exemple : Invitation sur un dossier, nouveau message, rappel de recommandations etc.</p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.sender_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Il s'agit du nom du service affiché comme expéditeur des e-mails automatiques générés par le portail.</span>
+                                    {{ form.reminder_interval|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w">Il s’agit de l’email de rappel “C”, qui demande des nouvelles du dossier et des recommandations, à la fréquence définie ci-dessus, jusqu’à ce que le dossier soit mis en pause ou toutes les recommandations traitées. Pour plus d'informations, <a class="text-underline" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail" target="_blank" rel="noopener external">consulter la documentation.</a></span>
+                                </fieldset>
+                            </div>
+                        </section>
+                        <section class="fr-accordion" x-data="AccordionStatus">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-logos">
+                                    <span class="fr-icon-mockup-with-images fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Logos
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-logos">
+                                <div class="crm-config__notice fr-mb-3w gap-2"
+                                     x-data="DismissibleNotice('site-config.logos')"
+                                     x-show="visible"
+                                     x-cloak>
+                                    <span class="fr-icon-info-fill fr-icon--sm" aria-hidden="true"></span>
+                                    <p class="fr-mb-0 fr-text--bold">
+                                        Pour plus d'information sur les logos et leurs formats : <a class="fr-link" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail" target="_blank" rel="noopener external">consulter la documentation.</a>
+                                    </p>
+                                    <button type="button"
+                                            class="fr-btn--close fr-btn"
+                                            title="Masquer le message"
+                                            @click="dismiss()"></button>
+                                </div>
+                                <div class="fr-grid-row fr-grid-row--gutters">
+                                    <div class="fr-col-12 fr-col-md-6 crm-config__logo-cell--separated">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_small blue_hint_text="Utilisé sur toutes les pages, en haut à gauche, quand l’utilisateur est connecté." %}
+                                    </div>
+                                    <div class="fr-col-12 fr-col-md-6 crm-config__logo-cell--separated">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.logo_large blue_hint_text="Utilisé pour la page d’accueil, et la barre de navigation du site, quand l’utilisateur n’est pas connecté." %}
+                                    </div>
+                                    <div class="fr-col-12 fr-col-md-6">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.favicon blue_hint_text="Icône utilisée sur l’onglet du navigateur" %}
+                                    </div>
+                                    <div class="fr-col-12 fr-col-md-6">
+                                        {% include "crm/fragments/config/upload_field.html" with field=form.email_logo blue_hint_text="Utilisé dans l’en-tête des e-mails automatiques envoyés par le portail. IMPORTANT : fond transparent." %}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="fr-accordion" x-data="AccordionStatus">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-legal">
+                                    <span class="fr-icon-justice-scale fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Informations légales
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-legal">
+                                {% if not request.site_config.legal_owner or not request.site_config.legal_owner_name or not request.site_config.legal_address or not request.site_config.legal_phone_no or not request.site_config.dpo_contact_email or not request.site_config.gdpr_purposes or not request.site_config.target_audience %}
+                                <div class="crm-config__notice fr-mb-3w gap-2"
+                                     x-data="DismissibleNotice('site-config.rgpd', 'session')"
+                                     x-show="visible"
+                                     x-cloak>
+                                    <span class="fr-icon-info-fill fr-icon--sm" aria-hidden="true"></span>
+                                    <div>
+                                        <p class="fr-text--bold fr-mb-0">
+                                            Les informations de cette section sont obligatoires pour être en conformité avec le règlement général sur la protection des données (RGPD).
+                                        </p>
+                                        <p class="fr-mb-0">
+                                            Nous vous invitons compléter ces informations au plus vite ! Pour plus d'information sur le RGPD, veuillez consulter la documentation.
+                                        </p>
+                                        <p class="fr-mb-0">
+                                            <a class="fr-link" href="https://reco-co.gitbook.io/reco-co/parametrer-mon-portail" target="_blank" rel="noopener external">Consulter la documentation</a>
+                                        </p>
+                                    </div>
+                                    <button type="button"
+                                            class="fr-btn--close fr-btn"
+                                            title="Masquer le message"
+                                            @click="dismiss()"></button>
+                                </div>
                                 {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p class="fr-text--sm fr-text--mention-grey">Aucun plugin activé sur ce site.</p>
-                        {% endif %}
-                        {% endwith %}
+                                <h3 class="fr-h6 fr-mb-1w">Mentions légales</h3>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.legal_owner|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.legal_owner_name|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    {{ form.legal_address|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales.</span>
+                                    {{ form.legal_phone_no|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
+                                <h3 class="fr-h6 fr-mb-1w">Politique de confidentialité</h3>
+                                <p class="fr-text--sm fr-mb-2w">
+                                    La politique de confidentialité décrit quelles données personnelles sont collectées par le site,
+                                    à quelles fins et comment elles sont gérées. Par défaut, Recommandations-collaboratives
+                                    génère une page Confidentialité standard, à partir des informations que vous remplissez ci-dessous.
+                                    Cette page est légalement obligatoire.
+                                </p>
+                                <fieldset class="fr-fieldset">
+                                    {{ form.dpo_contact_email|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Le ou la  déléguée à la protection des données est la personne référente dans votre organisation sur les questions de données, notamment personnelles. Son adresse email sera indiquée dans la Politique de confidentialité.</span>
+                                    {{ form.gdpr_purposes|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Indiquez ici, sous forme de liste à puces, à quoi les données personnelles vont vous servir, pourquoi vous en avez besoin.</span>
+                                    {{ form.target_audience|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                </fieldset>
+                            </div>
+                        </section>
+                        <section class="fr-accordion" x-data="AccordionStatus">
+                            <h2 class="fr-accordion__title">
+                                <button type="button"
+                                        class="fr-accordion__btn"
+                                        aria-expanded="false"
+                                        aria-controls="accordion-config">
+                                    <span class="fr-icon-system fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Configuration
+                                    {% include "crm/fragments/config/accordion_badge.html" %}
+                                </button>
+                            </h2>
+                            <div class="fr-collapse" id="accordion-config">
+                                <fieldset class="fr-fieldset">
+                                    {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Un autre portail Recommandations-collaboratives peut vous proposer d’intervenir sur un dossier déposé chez lui. Vous devrez accepter ou refuser ce dossier, et il apparaîtra dans votre liste de dossiers si vous l’acceptez.</span>
+                                    {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Crisp est un outil de chat qui vous permet de répondre en direct aux questions de vos visiteurs. L’équipe Reco-co peut soit répondre à vos visiteurs (sur des questions d’utilisation de la plateforme), soit vous indiquer comment mettre en place votre propre chat pour répondre vous-même.</span>
+                                </fieldset>
+                                <h3 class="fr-h6 fr-mb-1w">Tags d'impact</h3>
+                                <p class="fr-text--sm fr-mb-2w">
+                                    Les tags d'impact permettent de suivre manuellement l'avancement d'un dossier.
+                                    Ils sont uniquement disponibles pour les admins et staffs, et sont propres à votre portail.
+                                </p>
+                                {% with tags=request.site_config.crm_available_tags.all %}
+                                    {% if tags %}
+                                        <ul class="fr-tags-group fr-mb-2w">
+                                            {% for tag in tags %}<li><p class="fr-tag">{{ tag.name }}</p></li>{% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="fr-text--sm fr-text--mention-grey">Aucun tag d'impact sur ce portail.</p>
+                                    {% endif %}
+                                {% endwith %}
+                                <a class="fr-btn fr-btn--secondary fr-icon-add-line fr-btn--icon-left fr-mb-4w"
+                                   href="{% url 'crm-site-configuration-tags' %}">Ajouter un tag d'impact</a>
+                                <h3 class="fr-h6 fr-mb-1w">Plugins</h3>
+                                <p class="fr-text--sm fr-mb-2w">
+                                    Pour activer des plugins ou avoir plus d'informations, contactez l'équipe technique.
+                                </p>
+                                {% with plugins=request.site_config.enabled_plugins %}
+                                    {% if plugins %}
+                                        <ul class="fr-tags-group">
+                                            {% for plugin in plugins %}
+                                                <li>
+                                                    {% if plugin in registered_plugins %}
+                                                        <p class="fr-tag">{{ plugin }}</p>
+                                                    {% else %}
+                                                        <p class="fr-tag fr-background-flat--error fr-text-inverted--error"
+                                                           title="Plugin introuvable dans l'environnement">{{ plugin }}</p>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="fr-text--sm fr-text--mention-grey">Aucun plugin activé sur ce site.</p>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </section>
                     </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="fr-alert fr-alert--error fr-mb-3w">
+                            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                        </div>
+                    {% endif %}
                     <button class="fr-btn" type="submit">Sauvegarder</button>
                 </form>
             </div>
