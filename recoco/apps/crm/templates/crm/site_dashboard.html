@@ -187,18 +187,15 @@
                 <h3 class="fr-mt-2w">
                     <span class="align-middle">Connexions</span>
                 </h3>
-                {% activity_stream "model_actions" user_model %}
                 <ul class="list-group">
-                    {% for action in stream|slice:":200" %}
-                        {% if action.verb == verbs.User.LOGIN %}
-                            <li class="list-group-item">
-                                <span class="text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
-                                <a class="font-small"
-                                href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
-                                {{ action.actor.last_name|default:"" }}</a>
-                                <span class="font-small">{{ action.verb }}</span>
-                            </li>
-                        {% endif %}
+                    {% for action in login_stream %}
+                        <li class="list-group-item">
+                            <span class="text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
+                            <a class="font-small"
+                            href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
+                            {{ action.actor.last_name|default:"" }}</a>
+                            <span class="font-small">{{ action.verb }}</span>
+                        </li>
                     {% empty %}
                         -- Pas encore d'activité, revenez plus tard ! --
                     {% endfor %}
