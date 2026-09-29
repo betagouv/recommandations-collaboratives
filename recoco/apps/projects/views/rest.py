@@ -36,7 +36,7 @@ from recoco.rest_api.pagination import (
     LargeResultsSetPagination,
     StandardResultsSetPagination,
 )
-from recoco.rest_api.permissions import BaseConversationPermission, IsStaffForSite
+from recoco.rest_api.permissions import BaseConversationPermission
 from recoco.utils import (
     get_group_for_site,
     has_perm,
@@ -68,6 +68,13 @@ from ..serializers import (
 ########################################################################
 # Project API
 ########################################################################
+
+
+class CanModerateProjectsOnSite(permissions.BasePermission):
+    """Allow users who can moderate projects on the current site"""
+
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.moderate_projects", request.site)
 
 
 class ProjectDetail(
@@ -175,7 +182,7 @@ class ProjectCreate(CreateAPIView):
     The caller must be staff for the current site.
     """
 
-    permission_classes = [IsStaffForSite]
+    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
     serializer_class = NewProjectSerializer
 
 
@@ -198,7 +205,7 @@ class ProjectMembershipCreate(CreateAPIView):
     staff for that site.
     """
 
-    permission_classes = [IsStaffForSite]
+    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
     serializer_class = ProjectMembershipSerializer
 
     def get_serializer_context(self):
