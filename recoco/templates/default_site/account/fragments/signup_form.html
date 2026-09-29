@@ -48,8 +48,8 @@
                         {{ form.phone_no.errors }}
                         {{ form.phone_no }}
                     </p>
-                    <p>{{ form.password1|as_crispy_field }}</p>
-                    <p>{{ form.password2|as_crispy_field }}</p>
+                    <p>{{ form.password1|as_crispy_field:"dsrc_crispy_forms_no_js"  }}</p>
+                    <p>{{ form.password2|as_crispy_field:"dsrc_crispy_forms_no_js"  }}</p>
                     {% for error in form.password1.errors %}
                         <div class="fr-alert fr-alert--error">
                             <p>{{ error }}</p>
