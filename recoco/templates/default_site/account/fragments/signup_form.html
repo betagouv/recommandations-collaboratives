@@ -5,7 +5,7 @@
         <form class="signup fr-form-group"
               id="signup_form"
               method="post"
-              action="{% url 'account_signup' %}">
+              action="{% url 'account_signup' %}?next={% url 'advisor-access-request' %}">
             {% csrf_token %}
             {% if redirect_field_value %}
                 <input type="hidden"
