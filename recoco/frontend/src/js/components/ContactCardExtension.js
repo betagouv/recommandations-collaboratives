@@ -217,8 +217,10 @@ export const ContactCardExtension = Node.create({
           event.stopPropagation();
 
           // Remove the contact card from the editor
-          if (getPos !== undefined) {
-            const pos = getPos();
+          // getPos() peut renvoyer undefined depuis tiptap v3 (noeud détaché)
+          const pos = getPos();
+
+          if (pos !== undefined) {
             const nodeSize = node.nodeSize;
 
             // Delete the entire node

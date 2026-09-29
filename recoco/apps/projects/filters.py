@@ -73,7 +73,7 @@ def request_hide_deleted_projects(request):
     # TODO should not be necessary after #2122
     return not (
         request.GET.get("with-deleted", None)
-        and has_perm(request.user, "delete_projects", request.site)
+        and has_perm(request.user, "see_deleted_projects", request.site)
     )
 
 

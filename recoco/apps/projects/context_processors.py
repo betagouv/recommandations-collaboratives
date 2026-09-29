@@ -58,9 +58,16 @@ def unread_notifications_processor(request):
     if not request.user.is_authenticated:
         return {}
 
+    excluded_verbs = [
+        verbs.Project.SUBMITTED,  # legacy verb
+        verbs.Project.SUBMITTED_BY,
+        verbs.User.ADVISOR_REQUEST,
+    ]
+
     unread_notifications = (
         notifications_models.Notification.on_site.unread()
         .filter(recipient=request.user)
+        .exclude(verb__in=excluded_verbs)
         .prefetch_related("actor__profile__organization")
         .prefetch_related("action_object")
         .prefetch_related(

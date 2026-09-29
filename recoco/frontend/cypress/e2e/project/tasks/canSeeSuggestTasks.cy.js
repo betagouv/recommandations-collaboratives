@@ -1,25 +1,17 @@
 import projects from '../../../fixtures/projects/projects.json';
-const currentProject = projects[1];
 
-// TODO Réécrire : la redirection /actions → /conversations#actions ne contient plus le bouton see-suggest-task-button
-describe.skip('I can see suggest task @page-projet-recommandations', () => {
-  it('as advisor I can see ', () => {
+const currentProject = projects[1]; // pk 2 - conseiller1 advisor
+
+describe('I can see suggest task @page-projet-recommandations', () => {
+  it('as advisor I can access the suggested resources page', () => {
     cy.login('conseiller1');
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du dossier
-    cy.visit(`/project/${currentProject.pk}/actions`);
-    cy.get('[data-test-id="see-suggest-task-button"]').click();
+    cy.visit(`/project/${currentProject.pk}/suggestions/`);
     cy.url().should('include', '/suggestions');
   });
 
-  it('as staff I can see ', () => {
-    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du dossier
-    cy.visit(`/project/${currentProject.pk}/actions`);
-    cy.get('[data-test-id="see-suggest-task-button"]').click();
+  it('as staff I can access the suggested resources page', () => {
+    cy.login('staff');
+    cy.visit(`/project/${currentProject.pk}/suggestions/`);
     cy.url().should('include', '/suggestions');
   });
 });
-
-// page recommandations

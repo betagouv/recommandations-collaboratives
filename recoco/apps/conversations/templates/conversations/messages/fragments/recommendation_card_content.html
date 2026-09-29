@@ -17,6 +17,7 @@
     <h4>
         <button type="button"
                 class="fr-link"
+                data-test-id="recommendation-card-title"
                 x-text="recommendation.intent"
                 @click="await openResourcePreviewPanel(recommendation, element)"></button>
     </h4>
@@ -78,6 +79,7 @@
                 </template>
             </div>
             <button class="fr-btn fr-btn--sm fr-btn--primary"
+                    data-test-id="recommendation-card-consult"
                     @click.prevent="await openResourcePreviewPanel(recommendation, element)">Consulter</button>
         </div>
     {% endif %}

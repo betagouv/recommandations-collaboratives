@@ -1,0 +1,11 @@
+<div class="fr-header__logo">
+    {% url 'home' as default_home_url %}
+    <a href="{{ home_url|default:default_home_url }}"
+       title="Accueil - {{ request.site.name }}">
+        <p class="fr-logo">
+            République
+            <br>
+            Française
+        </p>
+    </a>
+</div>

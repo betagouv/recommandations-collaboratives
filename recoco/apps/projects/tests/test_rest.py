@@ -26,7 +26,7 @@ from pytest_django.asserts import assertContains
 from recoco import verbs
 from recoco.apps.conversations import models as conversations_models
 from recoco.apps.tasks import models as tasks_models
-from recoco.utils import login
+from recoco.utils import get_group_for_site, login
 
 from .. import models, utils
 from ..models import Document
@@ -677,6 +677,45 @@ def check_project_content(project, data):
     }
 
 
+@pytest.mark.django_db
+def test_project_detail_get_is_not_available_across_sites(api_client, make_project):
+    """get_object()'s site-scoped queryset 404s for a project on another site,
+    before the list_projects permission check ever runs; the positive control
+    below confirms the 404 is site-related and not a blanket failure."""
+    other_site = baker.make(sites_models.Site, domain="other-site.example.com")
+    other_site_project = make_project(site=other_site)
+    same_site_project = make_project()
+
+    with login(api_client, groups=["example_com_staff"]):
+        response = api_client.get(
+            reverse("projects-detail", args=[other_site_project.id])
+        )
+        assert response.status_code == 404
+
+        response = api_client.get(
+            reverse("projects-detail", args=[same_site_project.id])
+        )
+        assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_detail_patch_is_not_available_across_sites(api_client, make_project):
+    """get_object()'s site-scoped queryset 404s for a project on another site,
+    before the serializer (and any write) ever runs. The name assertion below
+    only confirms the 404 pre-empted the write; the write-permission path
+    itself is covered by test_project_advisor_without_assignment_cannot_patch_project_api."""
+    other_site = baker.make(sites_models.Site, domain="other-site2.example.com")
+    project = make_project(site=other_site, name="Original name")
+
+    url = reverse("projects-detail", args=[project.id])
+    with login(api_client, groups=["example_com_staff"]):
+        response = api_client.patch(url, data={"name": "Hacked name"})
+
+    assert response.status_code == 404
+    project.refresh_from_db()
+    assert project.name == "Original name"
+
+
 ########################################################################
 # patch project details
 ########################################################################
@@ -757,6 +796,69 @@ def test_project_is_updated_by_project_patch_api(request, api_client, project_dr
 
 
 @pytest.mark.django_db
+def test_project_advisor_without_assignment_cannot_patch_project_api(
+    request, api_client, project_draft
+):
+    """`sites.list_projects` is granted to every member of the site's
+    `advisor` group, regardless of any relation to a specific project. It
+    must not let such a user bypass the endpoint's object-level permission
+    check for a project they aren't assigned to at all.
+    """
+    with login(api_client, groups=["example_com_advisor"]):
+        url = reverse("projects-detail", args=[project_draft.id])
+        response = api_client.patch(url, data={"name": "Hacked name"})
+
+    assert response.status_code == 403
+
+    project_draft.refresh_from_db()
+    assert project_draft.name != "Hacked name"
+
+
+@pytest.mark.django_db
+def test_project_advisor_group_member_without_change_project_cannot_mass_assign_via_patch_api(
+    request, api_client, project_draft
+):
+    """
+    A user can hold object-level `projects.change_location` on a project
+    (e.g. as a collaborator) while also being a member of the site's
+    `advisor` group (`sites.list_projects`). That site-wide membership must
+    not escalate them to the full write serializer: only object-level
+    `projects.change_project` should, matching the classic (non-REST)
+    views.
+    """
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+    user.groups.add(get_group_for_site("advisor", site))
+
+    original_name = project_draft.name
+    original_description = project_draft.description
+    assert project_draft.is_diagnostic_done is False
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(
+        url,
+        data={
+            "name": "hijacked name",
+            "description": "hijacked description",
+            "is_diagnostic_done": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.data["name"] == original_name
+    assert response.data["description"] == original_description
+    assert response.data["is_diagnostic_done"] is False
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == original_name
+    assert project_draft.description == original_description
+    assert project_draft.is_diagnostic_done is False
+
+
+@pytest.mark.django_db
 def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
     request, api_client, project_draft
 ):
@@ -782,9 +884,117 @@ def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
     assert project_draft.advisors_note != new_note
 
 
+@pytest.mark.django_db
+def test_project_draft_collaborator_cannot_mass_assign_privileged_fields_via_patch_api(
+    request, api_client, project_draft
+):
+    """Regression test for security audit finding #12 (mass assignment).
+
+    A draft-stage collaborator only holds `projects.change_location` (see
+    `COLLABORATOR_DRAFT_PERMISSIONS`), which is enough to pass the PATCH
+    endpoint's single permission check. The endpoint must not let that low
+    privilege also rewrite name/description/is_diagnostic_done, which the
+    classic (non-REST) views reserve for advisors via `change_project`.
+    """
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    original_name = project_draft.name
+    original_description = project_draft.description
+    assert project_draft.is_diagnostic_done is False
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(
+        url,
+        data={
+            "name": "hijacked name",
+            "description": "hijacked description",
+            "is_diagnostic_done": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.data["name"] == original_name
+    assert response.data["description"] == original_description
+    assert response.data["is_diagnostic_done"] is False
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == original_name
+    assert project_draft.description == original_description
+    assert project_draft.is_diagnostic_done is False
+
+
+@pytest.mark.django_db
+def test_project_draft_collaborator_can_still_update_location_via_patch_api(
+    request, api_client, project_draft
+):
+    """A draft-stage collaborator still has legitimate use of their
+    `change_location` permission: it must keep working on its own field."""
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(url, data={"location": "new address"})
+
+    assert response.status_code == 200
+
+    project_draft.refresh_from_db()
+    assert project_draft.location == "new address"
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_update_location_of_another_project_via_patch_api(
+    request, api_client, project_draft, make_project
+):
+    """`projects.change_location` is an object-level (django-guardian)
+    permission granted per project a user actually collaborates on — it
+    must not let them touch a project they aren't a member of."""
+    other_project = make_project()
+
+    user = baker.make(auth_models.User, email="collaborator@example.com")
+    utils.assign_collaborator(user, project_draft)
+
+    original_location = other_project.location
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[other_project.id])
+    response = api_client.patch(url, data={"location": "hijacked address"})
+
+    assert response.status_code == 403
+
+    other_project.refresh_from_db()
+    assert other_project.location == original_location
+
+
 ################
 # Project Site Status
 ################
+
+
+@pytest.mark.django_db
+def test_list_project_statuses_for_anonymous(
+    request, project, project_draft, api_client, current_site
+):
+    url = reverse("projects-projectsites-list")
+    response = api_client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_list_project_statuses_for_random(
+    request, project, project_draft, api_client, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-projectsites-list")
+    response = api_client.get(url)
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -861,6 +1071,85 @@ def test_project_status_is_updated_by_patch_api(request, api_client, project):
     assert project.project_sites.current().status == new_status
 
 
+@pytest.mark.django_db
+def test_project_status_is_not_updated_anonymous(request, api_client, project):
+    new_status = "DONE"
+
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_is_not_updated_random_user(request, api_client, project):
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_draft_not_updated_with_list_project_perm(
+    request, api_client, project_draft, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, current_site)
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project_draft.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 404
+
+    project_draft.refresh_from_db()
+    assert project_draft.project_sites.current().status != new_status
+
+
+@pytest.mark.django_db
+def test_project_status_draft_update_with_moderate_perm(
+    request, api_client, project_draft, current_site
+):
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, current_site)
+    assign_perm("moderate_projects", user, current_site)
+
+    new_status = "DONE"
+
+    api_client.force_authenticate(user)
+
+    ps = project_draft.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
+    response = api_client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 204
+
+    project_draft.refresh_from_db()
+    assert project_draft.project_sites.current().status == new_status
+
+
 ########################################################################
 # user project status list
 ########################################################################
@@ -874,7 +1163,7 @@ def test_project_status_needs_authentication(request, api_client):
 
 
 @pytest.mark.django_db
-def test_user_cannot_change_some_one_else_project_status(request, project):
+def test_user_cannot_change_someone_else_project_status(request, project):
     user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
     # project and user statuses
@@ -1406,6 +1695,91 @@ def test_doc_upload_does_not_accept_malicious_files_by_extension(
         assert response.status_code == 400
 
     assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_denied_for_anonymous_user(client, project_ready, good_file):
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+    data = {"description": "this is some content", "the_file": good_file}
+
+    response = client.post(url, data)
+
+    assert response.status_code == 403
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_denied_for_user_outside_project(client, project_ready, good_file):
+    outsider = baker.make(auth_models.User)
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+    data = {"description": "this is some content", "the_file": good_file}
+
+    with login(client, user=outsider):
+        response = client.post(url, data)
+
+    assert response.status_code == 403
+    assert models.Document.objects.count() == 0
+
+
+########################################################################
+# REST API: document retrieve permissions
+########################################################################
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_denied_for_anonymous_user(request, client, project_ready):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        the_link="https://example.com/report.pdf",
+    )
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_denied_for_user_outside_project(request, client, project_ready):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        the_link="https://example.com/report.pdf",
+    )
+    outsider = baker.make(auth_models.User)
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    with login(client, user=outsider):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_doc_retrieve_allowed_for_project_reader(
+    request, client, project_ready, project_reader
+):
+    current_site = get_current_site(request)
+    document = baker.make(
+        models.Document,
+        project=project_ready,
+        site=current_site,
+        description="a description",
+        the_link="https://example.com/report.pdf",
+    )
+
+    url = reverse("projects-documents-detail", args=[project_ready.pk, document.pk])
+    with login(client, user=project_reader):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == document.id
+    assert response.data["description"] == "a description"
 
 
 @pytest.fixture

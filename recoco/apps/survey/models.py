@@ -1,5 +1,6 @@
 import math
 import statistics
+import uuid
 from datetime import timedelta
 from enum import Enum
 
@@ -13,7 +14,6 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
-from markdownx.utils import markdownify
 from model_clone import CloneMixin
 from tagging.fields import TagField
 from tagging.models import Tag
@@ -21,7 +21,9 @@ from tagging.registry import register as tagging_register
 from taggit.managers import TaggableManager
 
 from recoco.apps.projects import models as projects_models
+from recoco.utils import render_markdown
 
+from ..home.validators import file_validators
 from . import apps
 from .utils import compute_qs_completion
 
@@ -177,14 +179,14 @@ class Question(CloneMixin, models.Model):
     @property
     def how_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.how)
+        return render_markdown(self.how)
 
     why = models.TextField(default="", blank=True, verbose_name="Pourquoi ?")
 
     @property
     def why_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.why)
+        return render_markdown(self.why)
 
     # does this question expect a multiple choice or single choice answer
     is_multiple = models.BooleanField(
@@ -414,7 +416,9 @@ def empty_answer():
 
 
 def survey_private_file_path(instance, filename):
-    return "survey/session/{0}/{1}".format(instance.session.id, filename)
+    return "survey/session/{0}/{1}/{2}".format(
+        instance.session.id, uuid.uuid4().hex, filename
+    )
 
 
 class Answer(models.Model):
@@ -457,7 +461,11 @@ class Answer(models.Model):
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
     attachment = models.FileField(
-        blank=True, null=True, upload_to=survey_private_file_path
+        blank=True,
+        null=True,
+        upload_to=survey_private_file_path,
+        max_length=255,
+        validators=file_validators,
     )
 
     @property

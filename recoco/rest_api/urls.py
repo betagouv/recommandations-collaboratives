@@ -178,7 +178,7 @@ auth_urls = [
     ),
 ]
 
-tasks_urls = [
+acra_tasks_urls = [
     path(
         "projects/<int:project_id>/tasks/acra/ask/",
         tasks_acra_proxy.AcraAskView.as_view(),
@@ -231,7 +231,7 @@ urlpatterns = (
     router.urls
     + api_urls
     + auth_urls
-    + tasks_urls
+    + acra_tasks_urls
     + survey_urls
     + _collect_plugin_rest_urls()
 )

@@ -9,6 +9,7 @@ from django.http import HttpRequest
 from django.utils import timezone
 from sesame.middleware import AuthenticationMiddleware as SesameAuthenticationMiddleware
 from sesame.utils import get_user
+from waffle.templatetags import waffle_tags
 
 from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration, UserProfile
@@ -35,6 +36,47 @@ class CurrentSiteConfigurationMiddleware:
         )
 
         return self.get_response(request)
+
+
+class EmbedMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        if (
+            request.headers.get("Sec-Fetch-Dest") == "iframe"
+            or request.GET.get("embed") == "1"
+        ) and waffle_tags.flag_is_active(request, "embeddable"):
+            request.session["is_embedded"] = True
+        request.is_embedded = request.session.get("is_embedded", False)
+
+        response = self.get_response(request)
+
+        site_config = getattr(request, "site_config", None)
+        if request.is_embedded and site_config is not None:
+            allowed_origins = site_config.embed_allowed_origins
+            if allowed_origins:
+                # frame-ancestors is the modern, multi-origin-capable
+                # replacement for X-Frame-Options: ALLOW-FROM (unsupported
+                # by browsers). Only the origins configured for this site
+                # (Django admin only) may embed it; everyone else falls
+                # back to the default SAMEORIGIN behaviour.
+                response.xframe_options_exempt = True
+                # _csp_update is used to update django-csp config
+                old_csp_update = (
+                    response._csp_update if hasattr(response, "_csp_update") else {}
+                )
+                old_frame_ancestors = (
+                    old_csp_update.pop("frame-ancestors")
+                    if "frame-ancestors" in old_csp_update
+                    else []
+                )
+                response._csp_update = {
+                    **old_csp_update,
+                    "frame-ancestors": [*old_frame_ancestors, *allowed_origins],
+                }
+
+        return response
 
 
 class PreviousActivityMiddleware:
