@@ -15,7 +15,7 @@
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
         <h1>Conditions générales d'utilisation {{ request.site.name }}</h1>
         <p class="fr-mt-3w">
-            Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique
+            Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique
             de “{{ request.site.name }}” et définissent les conditions d’accès et d’utilisation des services par
             l’Utilisateur.
         </p>
@@ -23,22 +23,17 @@
             <strong>Article 1 - Champ d’application</strong>
         </p>
         <p>
-            L'inscription est gratuite et réservée aux utilisateurs suivants : {{ request.site.configuration.target_audience }}.
-            {% comment %} collectivités et porteurs de dossier en zone détendues
-            pour la reconversion des friches et aux conseillers publics qui font avancer les dossiers des
-            collectivités. {% endcomment %}
+            L'inscription est gratuite{% if request.site.configuration.target_audience %} et réservée aux utilisateurs suivants : {{ request.site.configuration.target_audience }}{% endif %}.
         </p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Article 2 – Objet</strong>
         </p>
         <p>
-            {{ request.site.configuration.description }}
-            {% comment %} {{ request.site.name }} souhaite créer un service public gratuit d’appui aux petites collectivités pour la
-            reconversion des friches, en lien avec les objectifs de sobriété foncière du gouvernement. De
-            nombreuses friches restent inutilisées pendant que les sols naturels et agricoles sont
-            artificialisés. Les collectivités sont bloquées dans leurs dossiers de réhabilitation donc
-            {{ request.site.name }} les oriente personnellement sur leurs dossiers de réhabilitation de friche tout en
-            permettant aux conseillers publics de suivre et de faire avancer les dossiers sur les friches. {% endcomment %}
+            {% if request.site.configuration.description %}
+                {{ request.site.configuration.description }}
+            {% else %}
+                {{ request.site.name }} est un service numérique d'accompagnement de projets.
+            {% endif %}
         </p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Article 3 – Définitions</strong>
@@ -52,7 +47,7 @@
             le demandeur dans la réhabilitation des friches.
             <br />
             <br />
-            « L’Administration » vient désigner toute administration française ;
+            « L’Administration » vient désigner toute administration française ;
             <br />
             <br />
             Les « Services » sont les fonctionnalités offertes par la plateforme pour répondre à ses
@@ -68,8 +63,8 @@
             <strong>4.1.1. Avec mot de passe</strong>
         </p>
         <p>
-            Chaque utilisateur peut créer un compte {{ request.site.name }} « avec mot de passe » en fournissant les
-            informations suivantes :
+            Chaque utilisateur peut créer un compte {{ request.site.name }} « avec mot de passe » en fournissant les
+            informations suivantes :
             <br />
             <br />
             <ul>
@@ -86,7 +81,7 @@
             <strong>4.1.2. Avec adresse e-mail</strong>
         </p>
         <p>
-            Chaque utilisateur peut créer un compte {{ request.site.name }} « avec adresse e-mail » grâce à un lien
+            Chaque utilisateur peut créer un compte {{ request.site.name }} « avec adresse e-mail » grâce à un lien
             de connexion qui lui sera envoyé sur l’adresse e-mail communiquée.
         </p>
         <p class="fr-mt-3w fr-mb-2v">
@@ -101,7 +96,7 @@
         </p>
         <p>
             Chaque utilisateur peut solliciter l’équipe {{ request.site.name }} lorsqu’il souhaite déposer un dossier.
-            L’utilisateur remplit les informations suivantes :
+            L’utilisateur remplit les informations suivantes :
             <br />
             <br />
             <ul>
@@ -136,7 +131,7 @@
             <strong>Article 5 - Responsabilités</strong>
         </p>
         <p class="fr-mb-1v">
-            <strong>5.1 L’éditeur de « {{ request.site.name }} »</strong>
+            <strong>5.1 L’éditeur de « {{ request.site.name }} »</strong>
         </p>
         <p>
             Les sources des informations diffusées sur le site sont réputées fiables mais le site ne garantit
