@@ -24,7 +24,8 @@ Alpine.data('DismissibleNotice', (key, scope = 'local') => {
       this.visible = false;
       try {
         this.storage()?.setItem(key, 'true');
-      } catch {
+      } catch (error) {
+        console.warn(`Unable to remember notice dismissal (${key}) : `, error);
       }
     },
 
@@ -33,7 +34,8 @@ Alpine.data('DismissibleNotice', (key, scope = 'local') => {
         return scope === 'session'
           ? window.sessionStorage
           : window.localStorage;
-      } catch {
+      } catch (error) {
+        console.warn(`Unable to access ${scope} storage : `, error);
         return null;
       }
     },
