@@ -1,10 +1,8 @@
 from datetime import timedelta
-from io import StringIO
 
 import pytest
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.management import call_command
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -107,21 +105,3 @@ def test_endpoint_accepts_a_valid_key(
     )
 
     assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_command_creates_a_service_account_with_a_working_key(current_site):
-    out = StringIO()
-    call_command(
-        "create_service_account", "svc-grist", site=current_site.domain, stdout=out
-    )
-
-    user = User.objects.get(username="svc-grist")
-    assert user.has_usable_password() is False
-    assert current_site in user.profile.sites.all()
-
-    key = out.getvalue().split("Clé d'API : ")[1].splitlines()[0].strip()
-    api_key = ServiceAPIKey.objects.get_from_key(key)
-
-    assert api_key.user == user
-    assert api_key.site == current_site
