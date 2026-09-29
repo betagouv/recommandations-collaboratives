@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { isPlural } from '../utils/isPlural';
 
 const FIELD_SELECTOR = 'input, select, textarea';
 const MAX_EXPAND_ATTEMPTS = 20;
@@ -61,10 +62,6 @@ Alpine.data('AccordionStatus', () => {
       return element.value.trim() === '';
     },
 
-    pluralize(count, singular, plural) {
-      return `${count} ${count > 1 ? plural : singular}`;
-    },
-
     refresh() {
       let missing = 0;
       let modified = 0;
@@ -100,7 +97,7 @@ Alpine.data('AccordionStatus', () => {
         return {
           modifier: 'fr-badge--error',
           icon: 'fr-icon-error-fill',
-          label: this.pluralize(this.errorCount, 'erreur', 'erreurs'),
+          label: `${this.errorCount} ${isPlural('erreur', 'erreurs', this.errorCount)}`,
         };
       }
 
@@ -108,11 +105,11 @@ Alpine.data('AccordionStatus', () => {
         return {
           modifier: 'fr-badge--yellow-tournesol',
           icon: 'fr-icon-warning-fill',
-          label: this.pluralize(
-            this.missingCount,
+          label: `${this.missingCount} ${isPlural(
             'information manquante',
-            'informations manquantes'
-          ),
+            'informations manquantes',
+            this.missingCount
+          )}`,
         };
       }
 
@@ -120,11 +117,11 @@ Alpine.data('AccordionStatus', () => {
         return {
           modifier: 'fr-badge--success',
           icon: 'fr-icon-check-line',
-          label: this.pluralize(
-            this.modifiedCount,
+          label: `${this.modifiedCount} ${isPlural(
             'modification à enregistrer',
-            'modifications à enregistrer'
-          ),
+            'modifications à enregistrer',
+            this.modifiedCount
+          )}`,
         };
       }
 
