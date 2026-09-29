@@ -2,7 +2,6 @@ import Alpine from 'alpinejs';
 import { isPlural } from '../utils/isPlural';
 
 const FIELD_SELECTOR = 'input, select, textarea';
-const MAX_EXPAND_ATTEMPTS = 20;
 
 /**
   Accordion Status Component
@@ -35,7 +34,13 @@ Alpine.data('AccordionStatus', () => {
       this.$el.addEventListener('input', () => this.refresh());
       this.$el.addEventListener('change', () => this.refresh());
 
-      if (this.errorCount > 0) this.expand();
+      // DSFR reads aria-expanded when it initializes the accordion (after Alpine),
+      // so the section with errors is opened by the DSFR itself
+      if (this.errorCount > 0) {
+        this.$el
+          .querySelector('.fr-accordion__btn')
+          ?.setAttribute('aria-expanded', 'true');
+      }
     },
 
     fields() {
@@ -75,21 +80,6 @@ Alpine.data('AccordionStatus', () => {
 
       this.missingCount = missing;
       this.modifiedCount = modified;
-    },
-
-    expand(attempt = 0) {
-      const collapse = this.$el.querySelector('.fr-collapse');
-      if (!collapse) return;
-
-      if (collapse.dataset.frJsCollapse) {
-        window.dsfr(collapse).collapse.disclose();
-        return;
-      }
-      // we try again on the next frame,
-      // because the DSFR component may not have been initialized yet
-      if (attempt < MAX_EXPAND_ATTEMPTS) {
-        requestAnimationFrame(() => this.expand(attempt + 1));
-      }
     },
 
     get badge() {
