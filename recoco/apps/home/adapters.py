@@ -7,7 +7,7 @@ from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from . import utils
 from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
@@ -104,7 +104,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
     ):
         # this is to easily skip to controlled second step signup form.
         # might be cleaner through a custom login stage conditionned by signup arg
-        if redirect_url == "/advisor-access-request":
+        if redirect_url == reverse_lazy("advisor-access-request"):
             return redirect(redirect_url)
         if not user.is_active:
             return self.respond_user_inactive(request, user)
