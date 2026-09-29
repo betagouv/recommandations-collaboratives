@@ -15,7 +15,8 @@ Soit en texte, soit en images ou les deux.
 - [ ] L'accessibilité a été prise en compte
 - [ ] Pre-commit est configuré et a été lancé
 - [ ] Des tests couvrant le code changé ont été ajoutés/modifiés
-- [ ] L'ensemble des tests front et back sont au vert
+- [ ] L'ensemble des tests back sont au vert
+- [ ] L'ensemble des tests front sont au vert
 
 ## Demandes
 - [ ] Je souhaite un déploiement en préproduction

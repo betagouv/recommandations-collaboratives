@@ -17,7 +17,6 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-from markdownx.utils import markdownify
 from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
 from tagging.models import TaggedItem  # remains necessary for survey-related code
@@ -28,7 +27,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources
-from recoco.utils import truncate_string
+from recoco.utils import render_markdown, truncate_string
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -192,7 +191,7 @@ class Task(OrderedModel):
     @property
     def content_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.content)
+        return render_markdown(self.content)
 
     deadline = models.DateField(null=True, blank=True)
 
@@ -294,7 +293,7 @@ class TaskFollowup(models.Model):
     @property
     def comment_rendered(self):
         """Return comment as markdown"""
-        return markdownify(self.comment)
+        return render_markdown(self.comment)
 
     def __str__(self):  # pragma: nocover
         return f"TaskFollowup{self.id}"

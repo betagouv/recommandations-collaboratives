@@ -1,17 +1,11 @@
 import Alpine from 'alpinejs';
 import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import HardBreak from '@tiptap/extension-hard-break';
-import { createMarkdownEditor } from 'tiptap-markdown';
+import { Placeholder } from '@tiptap/extensions';
+import { Markdown } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
-import Placeholder from '@tiptap/extension-placeholder';
-import { ContactCardExtension } from './ContactCardExtension';
-import { FileCardExtension } from './FileCardExtension';
+import { getTiptapSchemaExtensions } from '../utils/tiptapExtensions';
 import { ToastType } from '../models/toastType';
-
-const MarkdownEditor = createMarkdownEditor(Editor);
 
 Alpine.data(
   'editor',
@@ -32,37 +26,28 @@ Alpine.data(
       init() {
         const _this = this;
 
-        editor = new MarkdownEditor({
+        editor = new Editor({
           element: this.$refs.element,
           extensions: [
-            StarterKit,
-            Link,
+            ...getTiptapSchemaExtensions(),
+            Markdown.configure({
+              html: true,
+              tightLists: true,
+              tightListClass: 'tight',
+              bulletListMarker: '-',
+              linkify: false,
+              breaks: false,
+              transformPastedText: false,
+              transformCopiedText: false,
+            }),
             Placeholder.configure({
               placeholder: placeholder || 'Ecrivez votre message ici…',
             }),
-            HardBreak.extend({
-              addKeyboardShortcuts() {
-                const handleEnter = () =>
-                  this.editor.commands.first(({ commands }) => [
-                    () => commands.newlineInCode(),
-                    () => commands.createParagraphNear(),
-                    () => commands.liftEmptyBlock(),
-                    () => commands.splitBlock(),
-                  ]);
-
-                return {
-                  'Shift-Enter': handleEnter,
-                  'Control-Enter': handleEnter,
-                  'Cmd-Enter': handleEnter,
-                };
-              },
-            }),
-            ContactCardExtension,
-            FileCardExtension,
           ],
           content: content,
           onCreate({ editor }) {
-            _this.$store.editor.currentMessage = editor.getMarkdown();
+            _this.$store.editor.currentMessage =
+              editor.storage.markdown.getMarkdown();
             _this.$store.editor.currentMessageJSON = editor.getJSON();
             if (isActionPusher) {
               const jsonContent = editor.getJSON();
@@ -109,8 +94,10 @@ Alpine.data(
             _this.renderMarkdown();
             _this.$store.editor.setIsSubmitted(false);
 
-            _this.$store.editor.isEditing = editor.getMarkdown() != '';
-            _this.$store.editor.currentMessage = editor.getMarkdown();
+            _this.$store.editor.isEditing =
+              editor.storage.markdown.getMarkdown() != '';
+            _this.$store.editor.currentMessage =
+              editor.storage.markdown.getMarkdown();
             _this.$store.editor.currentMessageJSON = editor.getJSON();
 
             _this.isEditorEmpty = editor.isEmpty;
@@ -207,7 +194,9 @@ Alpine.data(
         }
       },
       renderMarkdown() {
-        this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+        this.markdownContent = editor.storage.markdown
+          .getMarkdown()
+          .replaceAll('\\', '');
       },
       /****************
        * Plugin contact

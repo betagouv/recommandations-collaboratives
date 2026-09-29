@@ -18,7 +18,6 @@ from django.contrib.sites.models import Site
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django_gravatar.helpers import get_gravatar_url
-from markdownx.utils import markdownify
 
 from recoco import utils, verbs
 from recoco.apps.home.models import SiteConfiguration
@@ -313,32 +312,6 @@ def make_recommendations_digest(recommendations, user):
     return recommendation_digest
 
 
-def make_site_digest(site):
-    """Return site informations as a dict"""
-
-    data = {
-        "name": site.name,
-    }
-
-    site_config = SiteConfiguration.objects.get(site=site)
-
-    data.update(
-        {
-            "description": site_config.description or "",
-            "sender_name": site_config.sender_name or "",
-            "sender_email": site_config.sender_email or "",
-            "legal_address": site_config.legal_address or "",
-            "main_topic": site_config.main_topic or "",
-            "legal_owner": site_config.legal_owner or "",
-        }
-    )
-
-    if site_config.email_logo:
-        data["site_logo"] = utils.build_absolute_url(site_config.email_logo.url)
-
-    return data
-
-
 def make_project_survey_digest_for_site(user, project, site):
     """Return survey information as a dict for a given project on a given site"""
 
@@ -629,7 +602,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     counts_less_recap = aggregated_counts.copy()
     if first_text_msg:
         counts_less_recap["message"] -= 1
-        first_text = markdownify(
+        first_text = utils.render_markdown(
             "\n\n".join(
                 node.text
                 for node in first_text_msg.nodes.filter(
@@ -637,6 +610,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
                 )
             )
         )
+        first_text = f"{first_text[:75]}" if len(first_text) > 75 else first_text
     else:
         first_text = None
     if first_object_node:

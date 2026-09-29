@@ -238,11 +238,14 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
    * Display functions
    ********************/
   projectsCountLabel() {
-    if (this.projectsTotal > 0) {
-      return `${this.projectsTotal} résultat${this.projectsTotal > 1 ? 's' : ''}`;
-    } else {
+    if (this.projectsTotal === 0) {
       return 'Aucun résultat';
     }
+    const plural = this.projectsTotal > 1 ? 's' : '';
+    if (this.projectsTotal > this.pagination.limit) {
+      return `${this.projectsToDisplay.length} sur ${this.projectsTotal} résultat${plural}`;
+    }
+    return `${this.projectsTotal} résultat${plural}`;
   },
   projectTooltip(project) {
     return this.options.find((option) => option.value === project.status)

@@ -78,6 +78,19 @@
   opacity: 1;
 }
 
+.search-bar {
+  position: relative;
+  span {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    color: var(--light-text-mention-grey, #666);
+  }
+  input {
+    padding-left: 2rem;
+  }
+}
+
 /* ¯¯¯¯ *\
   HEADER
 \* ˍˍˍˍ */

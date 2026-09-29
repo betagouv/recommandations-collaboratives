@@ -56,6 +56,7 @@ from ..serializers import (
     NewDocumentSerializer,
     NewProjectSerializer,
     ProjectForListSerializer,
+    ProjectLocationSerializer,
     ProjectMembershipSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -121,22 +122,31 @@ class ProjectDetail(
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
-        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-            request.user, "projects.change_location", p
-        )  # need at least one write perm
+
+        # The minimal perm required to allow a PATCH
+        has_perm_or_403(request.user, "projects.change_location", p)
         context = {"request": request, "view": self, "format": format}
-        serializer = UserProjectSerializer(
+
+        # Only advisors/observers hold `change_project` (and, together with
+        # it, `use_project_tags` -> see `ADVISOR_PERMISSIONS`).
+        # Collaborators, draft or not, only hold `change_location`.
+        write_serializer_class = (
+            UserProjectSerializer
+            if has_perm(request.user, "projects.change_project", p)
+            else ProjectLocationSerializer
+        )
+        write_serializer = write_serializer_class(
             p, context=context, data=request.data, partial=True
         )
-        if serializer.is_valid():
+        if write_serializer.is_valid():
             # old = copy(p)
-            serializer.save()
+            write_serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
             #     )
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(UserProjectSerializer(p, context=context).data)
+        return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectCreate(CreateAPIView):
@@ -668,7 +678,8 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
         qs = models.ProjectSite.objects.filter(site=self.request.site)
 
         if not has_perm(self.request.user, "moderate_projects", self.request.site):
-            qs = qs.exclude(status__in=["DRAFT", "PROPOSED"])
+            # from PROJECTSITE_STATES
+            qs = qs.exclude(status__in=["DRAFT", "PRE_DRAFT", "TO_PROCESS"])
 
         return qs
 

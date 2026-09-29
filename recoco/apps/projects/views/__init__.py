@@ -29,7 +29,7 @@ from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import RegionSerializer
-from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
 from recoco.apps.projects.models import ProjectCreationRequest
 from recoco.utils import (
     check_if_advisor,
@@ -157,6 +157,20 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
     return redirect(reverse("projects-moderation-list"))
 
 
+def make_site_digest(site):
+    """Return site informations as a dict"""
+    # only used for emails that specifically comment on site
+    # for site params sent in all emails, look at recoco.apps.communication.api.get_site_params
+
+    site_config = SiteConfiguration.objects.get(site=site)
+    data = {
+        "name": site.name,
+        "main_topic": site_config.main_topic or "",
+        "legal_owner": site_config.legal_owner or "",
+    }
+    return data
+
+
 @login_required
 def project_moderation_project_accept(request: HttpRequest, project_id: int):
     is_project_moderator_or_403(request.user, request.site)
@@ -218,10 +232,8 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
 
                 params = {
                     "project": digests.make_project_digest(project, owner),
-                    "site": digests.make_site_digest(
-                        project.project_sites.origin().site
-                    ),
-                    "survey_site": digests.make_site_digest(request.site),
+                    "site": make_site_digest(project.project_sites.origin().site),
+                    "survey_site": make_site_digest(request.site),
                     "survey": digests.make_project_survey_digest_for_site(
                         owner,
                         project,
@@ -476,7 +488,7 @@ def project_maplist(request):
 def project_switchtender_join(request, project_id=None):
     """Join as switchtender"""
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
 
     if not can_administrate_project(project, request.user):
         is_regional_actor_for_project_or_403(
@@ -507,7 +519,7 @@ def project_switchtender_join(request, project_id=None):
 @login_required
 def project_observer_join(request, project_id=None):
     """Join as observer"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
 
     if not can_administrate_project(project, request.user):
         is_regional_actor_for_project_or_403(
@@ -568,7 +580,7 @@ def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
     has_perm_or_403(request.user, "sites.delete_projects", request.site)
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()
         project.save()

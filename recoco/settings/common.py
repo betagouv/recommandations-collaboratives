@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 from csp.constants import NONE, SELF, UNSAFE_EVAL, UNSAFE_INLINE
 from multisite import SiteID
@@ -227,6 +228,15 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+PROCONNECT_SERVER_URL = os.getenv(
+    "PROCONNECT_SERVER_URL",
+    "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
+)
+pro_connect_split_url = urlsplit(PROCONNECT_SERVER_URL)
+PROCONNECT_ORIGIN = urlunsplit(
+    (pro_connect_split_url[0], pro_connect_split_url[1], "", "", "")
+)
+
 # GUARDIAN
 GUARDIAN_USER_OBJ_PERMS_MODEL = "home.UserObjectPermissionOnSite"
 GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
@@ -243,12 +253,14 @@ CONTENT_SECURITY_POLICY = {
             "https://client.crisp.chat/",
             "wss://client.relay.crisp.chat/",
             "https://geo.api.gouv.fr/",
-            "https://api-adresse.data.gouv.fr/https://www.google.com/recaptcha",
+            "https://api-adresse.data.gouv.fr/",
+            "https://www.google.com",
+            "https://stats.beta.gouv.fr",
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
-        "frame-src": ["https://www.google.com"],
-        "form-action": [SELF],
+        "frame-src": [SELF, "https://www.google.com", "https://*.crisp.help"],
+        "form-action": [SELF, PROCONNECT_ORIGIN],
         "img-src": [
             SELF,
             "data:",
@@ -263,13 +275,17 @@ CONTENT_SECURITY_POLICY = {
             SELF,
             "https://stats.beta.gouv.fr/",
             "https://client.crisp.chat",
+            "https://www.google.com",
+            "https://www.gstatic.com/",
             UNSAFE_EVAL,
+            UNSAFE_INLINE,  # fixme crisp uses this
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
             "https://client.crisp.chat",
             UNSAFE_INLINE,
         ],  # fixme with @alpine/csp and manual checks
+        "worker-src": [SELF, "blob:", "https://*.crisp.chat"],
     },
 }
 
@@ -317,7 +333,12 @@ SASS_PROCESSOR_INCLUDE_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email Configuration
-EMAIL_FROM = "Recoco <no-reply@recoco.fr>"
+# Technical sender address, shared by every site (must be a verified sender on
+# Brevo). The displayed name comes from SiteConfiguration.sender_name.
+DEFAULT_SENDER_EMAIL = "noreply@recoconseil.fr"
+# Displayed name used when the site has no SiteConfiguration, or no sender_name
+DEFAULT_SENDER_NAME = "Recoco"
+DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"
 
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
@@ -367,9 +388,6 @@ ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_RATE_LIMITS = {
-    "login_failed": "20/m/ip",
-}
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -379,6 +397,7 @@ LOGIN_REDIRECT_URL = "login-redirect"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 60 * 60  # 1 hour in seconds
 ACCOUNT_LOGIN_TIMEOUT = 60 * 60
+ALLAUTH_TRUSTED_CLIENT_IP_HEADER = "X-Real-IP"
 
 # Common signup form shared by account and socialaccount
 ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"
@@ -418,10 +437,7 @@ SOCIALACCOUNT_PROVIDERS = {
                 "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
                 "secret": os.getenv("PROCONNECT_SECRET"),
                 "settings": {
-                    "server_url": os.getenv(
-                        "PROCONNECT_SERVER_URL",
-                        "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
-                    ),
+                    "server_url": PROCONNECT_SERVER_URL,
                     "token_auth_method": "client_secret_post",
                 },
             },
@@ -449,6 +465,7 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 # Hijack
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 
+THROTTLE_RATES = {"anon": "100/day", "user": "10000/day"}
 # Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -467,6 +484,11 @@ REST_FRAMEWORK = {
     ],
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": THROTTLE_RATES,
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html

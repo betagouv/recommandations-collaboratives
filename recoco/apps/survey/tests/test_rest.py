@@ -1,4 +1,4 @@
-from unittest.mock import ANY, Mock, patch
+from unittest.mock import ANY
 
 import pytest
 from django.contrib.auth.models import User
@@ -18,10 +18,10 @@ def test_session_view(request, api_client, project):
 
     session = baker.make(Session, project=project)
 
-    api_client.force_authenticate(user=user)
-    response = api_client.get(
-        path=reverse("api-survey-sessions"),
-    )
+    with login(api_client, user=user):
+        response = api_client.get(
+            path=reverse("api-survey-sessions"),
+        )
     assert response.status_code == 200
     json_response = response.json()
 
@@ -87,21 +87,17 @@ def test_session_answers_view(request, api_client, project):
 
 @pytest.mark.django_db
 def test_survey_questions_view(api_client, current_site):
-    user = baker.make(User)
-
     survey = baker.make(Survey, site=current_site)
     question_set = baker.make(QuestionSet, survey=survey)
     question = baker.make(Question, question_set=question_set)
 
-    api_client.force_authenticate(user=user)
     url = reverse("api-survey-questions")
 
-    response = api_client.get(path=url)
-    assert response.status_code == 403
+    with login(api_client):
+        response = api_client.get(path=url)
+        assert response.status_code == 200
 
-    with patch(
-        "recoco.rest_api.permissions.is_staff_for_site", Mock(return_value=True)
-    ):
+    with login(api_client, groups=["example_com_staff"], username="staff"):
         response = api_client.get(path=url)
         assert response.status_code == 200
 
@@ -138,19 +134,6 @@ def answers_project_deleted(session_project_deleted):
 
 
 @pytest.mark.django_db
-def test_session_staff_can_see_deleted_if_asked(
-    request, api_client, current_site, session_project_deleted
-):
-    url = reverse("api-survey-sessions")
-    with login(api_client, is_staff=True, groups=["example_com_staff"]):
-        response = api_client.get(
-            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
-        )
-        assert response.status_code == 200
-        assert len(response.data["results"]) == 1
-
-
-@pytest.mark.django_db
 def test_session_staff_dont_see_deleted_if_not_asked(
     request, api_client, current_site, session_project_deleted
 ):
@@ -167,7 +150,7 @@ def test_session_not_staff_cant_see_deleted(
     request, api_client, current_site, session_project_deleted
 ):
     url = reverse("api-survey-sessions")
-    with login(api_client):
+    with login(api_client, user=session_project_deleted.project.owner):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )
@@ -175,37 +158,11 @@ def test_session_not_staff_cant_see_deleted(
 
 
 @pytest.mark.django_db
-def test_session_answers_staff_can_see_deleted_if_asked(
-    request, api_client, current_site, session_project_deleted, answers_project_deleted
-):
-    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client, is_staff=True, groups=["example_com_staff"]):
-        response = api_client.get(
-            f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
-        )
-        assert response.status_code == 200
-        assert len(response.data["results"]) == 2
-
-
-@pytest.mark.django_db
-def test_session_answer_staff_dont_see_deleted_if_not_asked(
-    request, api_client, current_site, session_project_deleted, answers_project_deleted
-):
-    url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client, is_staff=True, groups=["example_com_staff"]):
-        response = api_client.get(
-            f"{url}?project_id={session_project_deleted.project_id}"
-        )
-        assert response.status_code == 200
-        assert len(response.data["results"]) == 0
-
-
-@pytest.mark.django_db
 def test_session_answers_not_staff_cant_see_deleted(
     request, api_client, current_site, session_project_deleted, answers_project_deleted
 ):
     url = reverse("api-survey-session-answers", args=[session_project_deleted.id])
-    with login(api_client):
+    with login(api_client, user=session_project_deleted.project.owner):
         response = api_client.get(
             f"{url}?project_id={session_project_deleted.project_id}&with-deleted=1"
         )

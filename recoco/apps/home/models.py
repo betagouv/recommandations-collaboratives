@@ -45,6 +45,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.moderate_projects",
         "sites.list_projects",
         "sites.delete_projects",
+        "sites.see_deleted_projects",
         "sites.manage_resources",
         "sites.use_crm",
         "sites.use_addressbook",
@@ -203,9 +204,6 @@ class SiteConfiguration(models.Model):
         help_text="Question présentées lors de la saisine",
     )
 
-    sender_email = models.EmailField(
-        verbose_name="Adresse de contact affichée dans les emails automatiques"
-    )
     sender_name = models.CharField(
         verbose_name="Expéditeur des emails automatiques",
         help_text="Nom du service affiché comme expéditeur des emails",

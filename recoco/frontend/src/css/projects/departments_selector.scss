@@ -56,3 +56,12 @@
   color: #666666;
   flex-shrink: 0;
 }
+
+.departments-selector{
+  &__container {
+    min-width: 300px;
+  }
+  &__button {
+    text-align: left;
+  }
+}

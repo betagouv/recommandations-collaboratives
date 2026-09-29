@@ -191,7 +191,6 @@ class SiteCreateForm(forms.ModelForm):
         fields = [
             "name",
             "subdomain",
-            "sender_email",
             "sender_name",
             "contact_form_recipient",
             "legal_address",

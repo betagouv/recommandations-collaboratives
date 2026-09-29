@@ -54,13 +54,16 @@
                                 aria-controls="modal"
                                 type="button"
                                 class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1v"
+                                data-test-id="message-delete-button"
                                 @click="setElementToDelete(element)">Supprimer</button>
                         <template x-if="element.nodes.some(x => x.type == 'RecommendationNode')">
                             <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1v"
+                               data-test-id="message-edit-recommendation"
                                :href="editTaskUrl(element.nodes.find(x => x.type == 'RecommendationNode').recommendation_id, '{{ request.path }}')">Modifier</a>
                         </template>
                         <template x-if="!element.nodes.some(x => x.type == 'RecommendationNode')">
                             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1v"
+                                    data-test-id="message-edit-button"
                                     @click="onClickHandleEdit(element)">Modifier</button>
                         </template>
                     </div>
@@ -70,6 +73,7 @@
                     <div class="action-button">
                         <div class="d-flex justify-content-end">
                             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background"
+                                    data-test-id="message-reply-button"
                                     @click="onClickHandleReply(element.id);trackReplyToMessage();">
                                 <span class="fr-icon-answer-arrow-line fr-icon--sm fr-mr-1v"
                                       aria-hidden="true"></span>

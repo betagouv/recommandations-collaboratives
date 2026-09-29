@@ -3,7 +3,7 @@
 from django.contrib.sites import models as sites_models
 from django.http import Http404
 from notifications import models as notifications_models
-from rest_framework import status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -47,7 +47,7 @@ class UserNotificationsMarkAllAsRead(APIView):
 # ----
 # Site
 # ----
-class SiteViewSet(viewsets.ReadOnlyModelViewSet):
+class SiteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     API endpoint for Sites
     """

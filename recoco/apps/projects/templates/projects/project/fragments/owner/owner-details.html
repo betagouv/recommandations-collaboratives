@@ -39,11 +39,11 @@
                 </button>
             </div>
             {% if not project.owner.profile.email_validated %}
-                <div class="fr-notice fr-notice--warning fr-mt-2v">
+                <div class="fr-notice fr-notice--warning fr-mt-2v" x-tooltip="`Nous lui avons envoyé un email pour confirmer son adresse, sans retour de sa part. Il est possible qu'elle ne reçoive pas nos emails.`">
                     <div class="fr-container">
                         <div class="fr-notice__body">
                             <p>
-                                <span class="fr-notice__title font-size-12px">Adresse email non validé, peut-être est-il en difficulté ?</span>
+                                <span class="fr-notice__title font-size-12px">Cette personne n'a pas encore vérifié son adresse email.</span>
                             </p>
                         </div>
                     </div>

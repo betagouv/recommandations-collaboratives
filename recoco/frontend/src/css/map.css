@@ -72,6 +72,16 @@
   border: solid 2px #222;
 }
 
+.map-marker.realisation-marker {
+  background-image: url(../assets/map/marker.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.map-marker.realisation-marker.is-focused {
+  background-image: url(../assets/map/marker-focused.svg);
+}
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-content-wrapper  {
   padding: 0;
@@ -149,8 +159,4 @@
 
 .map-marker.bg-dark:after {
   background-color: #212529;
-}
-
-.basemap-grayscale {
-  filter: grayscale(1) contrast(0.9) brightness(1.05);
 }
