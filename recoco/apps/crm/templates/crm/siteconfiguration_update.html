@@ -26,7 +26,10 @@
                 <form method="post"
                       enctype="multipart/form-data"
                       novalidate
-                      class="fr-form crm-config__form">
+                      class="fr-form crm-config__form"
+                      x-data="{ formChanged: {{ form.errors|yesno:'true,false' }} }"
+                      @input="formChanged = true"
+                      @change="formChanged = true">
                     {% csrf_token %}
                     <h1 class="fr-h3 fr-mb-1w">Paramètres du portail</h1>
                     <p class="fr-text--sm fr-mb-3w">
@@ -210,7 +213,8 @@
                                     {% endif %}
                                 {% endwith %}
                                 <a class="fr-btn fr-btn--secondary fr-icon-add-line fr-btn--icon-left fr-mb-4w"
-                                   href="{% url 'crm-site-configuration-tags' %}">Ajouter un tag d'impact</a>
+                                   href="{% url 'crm-site-configuration-tags' %}"
+                                   @click="if (formChanged) { $event.preventDefault(); $store.onLeaveAlert.isOpen = true; }">Ajouter un tag d'impact</a>
                                 <h3 class="fr-h6 fr-mb-1w">Plugins</h3>
                                 <p class="fr-text--sm fr-mb-2w">
                                     Pour activer des plugins ou avoir plus d'informations, contactez l'équipe technique.

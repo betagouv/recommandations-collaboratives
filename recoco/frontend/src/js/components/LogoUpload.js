@@ -14,6 +14,7 @@ Alpine.data('LogoUpload', () => {
     remove() {
       this.removed = true;
       this.replaced = false;
+      this.$dispatch('input');
     },
 
     onSelect(event) {
