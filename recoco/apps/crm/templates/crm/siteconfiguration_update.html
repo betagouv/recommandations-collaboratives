@@ -41,15 +41,7 @@
                     </p>
                     <div class="fr-mb-3w">
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            <h2 class="fr-accordion__title">
-                                <button type="button"
-                                        class="fr-accordion__btn"
-                                        aria-expanded="false"
-                                        aria-controls="accordion-description">
-                                    <span class="fr-icon-file-color fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Description du service
-                                    {% include "crm/fragments/config/accordion_badge.html" %}
-                                </button>
-                            </h2>
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-description" icon="fr-icon-file-color" label="Description du service" %}
                             <div class="fr-collapse" id="accordion-description">
                                 <fieldset class="fr-fieldset">
                                     {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
@@ -60,15 +52,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            <h2 class="fr-accordion__title">
-                                <button type="button"
-                                        class="fr-accordion__btn"
-                                        aria-expanded="false"
-                                        aria-controls="accordion-emails">
-                                    <span class="fr-icon-mail-with-hints fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Paramètres des e-mails
-                                    {% include "crm/fragments/config/accordion_badge.html" %}
-                                </button>
-                            </h2>
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-emails" icon="fr-icon-mail-with-hints" label="Paramètres des e-mails" %}
                             <div class="fr-collapse" id="accordion-emails">
                                 <fieldset class="fr-fieldset">
                                     {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
@@ -84,15 +68,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            <h2 class="fr-accordion__title">
-                                <button type="button"
-                                        class="fr-accordion__btn"
-                                        aria-expanded="false"
-                                        aria-controls="accordion-logos">
-                                    <span class="fr-icon-mockup-with-images fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Logos
-                                    {% include "crm/fragments/config/accordion_badge.html" %}
-                                </button>
-                            </h2>
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-logos" icon="fr-icon-mockup-with-images" label="Logos" %}
                             <div class="fr-collapse" id="accordion-logos">
                                 <div class="crm-config__notice fr-mb-3w gap-2"
                                      x-data="DismissibleNotice('site-config.logos')"
@@ -124,15 +100,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            <h2 class="fr-accordion__title">
-                                <button type="button"
-                                        class="fr-accordion__btn"
-                                        aria-expanded="false"
-                                        aria-controls="accordion-legal">
-                                    <span class="fr-icon-justice-scale fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Informations légales
-                                    {% include "crm/fragments/config/accordion_badge.html" %}
-                                </button>
-                            </h2>
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-legal" icon="fr-icon-justice-scale" label="Informations légales" %}
                             <div class="fr-collapse" id="accordion-legal">
                                 {% if not request.site_config.legal_owner or not request.site_config.legal_owner_name or not request.site_config.legal_address or not request.site_config.legal_phone_no or not request.site_config.dpo_contact_email or not request.site_config.gdpr_purposes or not request.site_config.target_audience %}
                                 <div class="crm-config__notice fr-mb-3w gap-2"
@@ -182,15 +150,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            <h2 class="fr-accordion__title">
-                                <button type="button"
-                                        class="fr-accordion__btn"
-                                        aria-expanded="false"
-                                        aria-controls="accordion-config">
-                                    <span class="fr-icon-system fr-icon--xl fr-mr-1w" aria-hidden="true"></span>Configuration
-                                    {% include "crm/fragments/config/accordion_badge.html" %}
-                                </button>
-                            </h2>
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-config" icon="fr-icon-system" label="Configuration" %}
                             <div class="fr-collapse" id="accordion-config">
                                 <fieldset class="fr-fieldset">
                                     {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
