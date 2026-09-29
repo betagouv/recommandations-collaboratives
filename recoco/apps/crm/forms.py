@@ -40,8 +40,6 @@ class SiteConfigurationForm(forms.ModelForm):
     required_fields = [
         "main_topic",
         "description",
-        "contact_form_recipient",
-        "sender_name",
         "legal_owner",
     ]
 
