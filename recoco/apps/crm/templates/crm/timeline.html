@@ -58,7 +58,8 @@
             {% endif %}
         {% endfor %}
     {% endfor %}
-{% if not no_explain_trunc %}
-ℹ️ Il est possible que des activités plus anciennes ne soient pas affichées ici.
-{% endif %}
 </ul>
+
+{% if not no_explain_trunc %}
+  <span class="fr-icon-information-fill" aria-hidden="true"></span> Il est possible que des activités plus anciennes ne soient pas affichées ici.
+{% endif %}
