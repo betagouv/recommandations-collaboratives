@@ -111,12 +111,36 @@
                 <div class="{% flag "login_with_credentials" %}w-50 fr-ml-5v {% else %}w-100 {% endflag %} login-page__proconnect">
                     <h3 class="fr-mb-2w d-block login-page__title">Pro Connect</h3>
                     <div class="fr-connect-group text-align-center fr-m-auto">
-                        <form action="{% provider_login_url 'proconnect' process='process' %}">
-                            <button class="fr-connect">
+                        {% if is_embedded %}
+                            {% url 'login-redirect' as login_redirect_url %}
+                            <button type="button"
+                                    class="fr-connect"
+                                    data-popup-url="{% url 'openid_connect_silent_login' provider_id='proconnect' %}?mode=popup"
+                                    data-status-url="{% url 'openid_connect_status' provider_id='proconnect' %}"
+                                    data-next-url="{{ redirect_field_value|default:login_redirect_url }}"
+                                    x-on:click="proconnectPopup($el)">
                                 <span class="fr-connect__login">Se connecter avec</span>
                                 <span class="fr-connect__brand">ProConnect</span>
                             </button>
-                        </form>
+                            <div x-show="proconnectPending" x-cloak class="fr-mt-2w">
+                                <p class="font-size-14px fr-mb-1w">
+                                    Connectez-vous dans la fenêtre ProConnect qui vient de s’ouvrir. Cette page se mettra à jour automatiquement.
+                                </p>
+                                <button type="button"
+                                        class="fr-btn fr-btn--secondary fr-btn--sm"
+                                        data-next-url="{{ redirect_field_value|default:login_redirect_url }}"
+                                        x-on:click="proconnectContinue($el)">
+                                    Je suis connecté·e, continuer
+                                </button>
+                            </div>
+                        {% else %}
+                            <form action="{% provider_login_url 'proconnect' process='process' %}">
+                                <button class="fr-connect">
+                                    <span class="fr-connect__login">Se connecter avec</span>
+                                    <span class="fr-connect__brand">ProConnect</span>
+                                </button>
+                            </form>
+                        {% endif %}
                         <p>
                             <a href="https://proconnect.gouv.fr/"
                                target="_blank"
