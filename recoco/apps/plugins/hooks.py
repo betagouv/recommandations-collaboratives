@@ -60,6 +60,11 @@ class ProjectSpec(HookSpec):
         The returned string MUST be wrapped with ``mark_safe()``; the framework
         renders it without an additional ``|safe`` filter.
 
+        The overview page is visible to anyone allowed to view the project
+        (including the project owner and their collaborators), not only staff
+        or advisors: check ``request.user`` permissions before exposing any
+        sensitive data, and return ``None`` to render nothing.
+
         Example:
             @hookimpl
             def project_overview_sidebar_blocks(self, project, request):

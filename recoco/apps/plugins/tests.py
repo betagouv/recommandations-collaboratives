@@ -7,6 +7,7 @@ from django.core.management import call_command
 from django.db.models import Value
 from django.test import RequestFactory
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from model_bakery import baker
 from psycopg.sql import SQL, Identifier
 
@@ -453,7 +454,7 @@ class FakeProjectOverviewPlugin:
 
     @hookimpl
     def project_overview_sidebar_blocks(self, project, request):
-        return "<div class='plugin-block-sentinel'>sentinel block</div>"
+        return mark_safe("<div class='plugin-block-sentinel'>sentinel block</div>")
 
 
 @pytest.fixture
@@ -463,8 +464,8 @@ def site_with_fake_project_plugin(site_with_enabled_plugins):
 
 @pytest.mark.django_db
 class TestProjectOverviewSidebarBlocksHook:
-    def test_block_in_view_context(
-        self, request, client, project, site_with_fake_project_plugin
+    def test_block_rendered_in_sidebar(
+        self, client, project, site_with_fake_project_plugin
     ):
         pm = make_project_plugin_manager(FakeProjectOverviewPlugin())
 
@@ -478,10 +479,9 @@ class TestProjectOverviewSidebarBlocksHook:
         blocks = response.context["project_overview_sidebar_blocks"]
         assert len(blocks) == 1
         assert "plugin-block-sentinel" in blocks[0]
+        assert b"<div class='plugin-block-sentinel'>" in response.content
 
-    def test_no_block_when_plugin_disabled(
-        self, request, client, project, site_without_plugins
-    ):
+    def test_no_block_when_plugin_disabled(self, client, project, site_without_plugins):
         pm = make_project_plugin_manager(FakeProjectOverviewPlugin())
 
         with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
@@ -492,6 +492,7 @@ class TestProjectOverviewSidebarBlocksHook:
 
         assert response.status_code == 200
         assert response.context["project_overview_sidebar_blocks"] == []
+        assert b"plugin-block-sentinel" not in response.content
 
 
 # ---------------------------------------------------------------------------
@@ -533,11 +534,10 @@ class TestNotificationProjectVerbsHook:
         assert FAKE_NOTIFICATION_VERB in context["show_project_verb_list"]
 
     def test_verb_absent_when_plugin_disabled(self, site_without_plugins):
-        site_config = site_without_plugins
         user = baker.make(get_user_model())
         request = RequestFactory().get("/")
         request.user = user
-        request.site_config = site_config
+        request.site_config = site_without_plugins
 
         pm = make_notification_plugin_manager(FakeNotificationPlugin())
 
