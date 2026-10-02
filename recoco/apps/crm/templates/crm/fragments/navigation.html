@@ -2,6 +2,7 @@
 {% load guardian_tags %}
 {% load waffle_tags %}
 {% load projects_extra %}
+{% load plugins_extra %}
 {% load django_vite %}
 {% load crm_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
@@ -39,7 +40,7 @@
                     <a class="stretched-link" href="{% url 'crm-project-list' %}">Dossiers</a>
                 </label>
             </div>
-            {% crm_plugin_tabs 10 20 as plugin_tabs_after_dossiers %}
+            {% plugin_tabs "crm_navigation_tabs" 10 20 as plugin_tabs_after_dossiers %}
             {% for tab in plugin_tabs_after_dossiers %}
                 <div class="fr-segmented__element">
                     <input value="{{ tab.tab_key }}"

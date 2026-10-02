@@ -204,3 +204,15 @@ class CrmSpec(HookSpec):
                     "col_class": "col--small",
                 }
         """
+
+
+class HeaderSpec(HookSpec):
+    @hookspec
+    def main_navigation_tabs(self, request):
+        """Return a tab definition dict to inject into the main navigation.
+
+        Keys:
+          label (str)             — display text
+          url_name (str)          — Django URL name (may include namespace, e.g. "myplugin:crm-foo")
+          index (int)             — insertion order; builtin tabs use multiples of 10
+        """
