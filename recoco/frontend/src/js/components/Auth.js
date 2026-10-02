@@ -31,32 +31,34 @@ function Auth() {
     },
     /**
      * Embedded mode: ProConnect cannot run inside an iframe, so the login
-     * happens in a top-level popup. The iframe then polls the session status
-     * and reloads once logged in. Storage Access API lets the iframe see the
-     * first-party session cookie on browsers partitioning third-party cookies.
+     * happens in a top-level popup.
+     *
+     * Browsers partitioning third-party cookies (Firefox, Safari, Chrome
+     * soon) keep the iframe session apart from the popup one: the iframe only
+     * sees it once the Storage Access API grants access, which needs a user
+     * gesture after Recoco has been visited top-level, i.e. after the popup.
+     * Hence the "continue" button. Elsewhere, polling the session status is
+     * enough to reload the iframe once logged in.
      */
     proconnectPopup(el) {
       const { popupUrl, statusUrl, nextUrl } = el.dataset;
 
-      // open the popup first, synchronously within the user gesture
+      // no storage access request here: window.open consumes the user
+      // activation it would need, and Recoco has not been visited top-level yet
       window.open(popupUrl, 'proconnect', 'popup,width=600,height=750');
-      this.requestStorageAccess();
 
       this.proconnectPending = true;
       this.pollProconnectStatus(statusUrl, nextUrl, Date.now());
     },
     async requestStorageAccess() {
-      if (!document.hasStorageAccess || !document.requestStorageAccess) {
-        return true;
-      }
+      if (!document.requestStorageAccess) return;
       try {
-        if (await document.hasStorageAccess()) return true;
+        // called first thing in the click handler to keep the user
+        // activation; resolves right away when access is already granted
         await document.requestStorageAccess();
-        return true;
       } catch {
-        // Safari refuses until Recoco has been visited top-level: the popup
-        // does that, the user will be asked to click again afterwards
-        return false;
+        // denied by the user or the browser: reloading will show the login
+        // page again
       }
     },
     async pollProconnectStatus(statusUrl, nextUrl, startedAt) {
@@ -77,8 +79,8 @@ function Auth() {
         PROCONNECT_POLL_INTERVAL_MS
       );
     },
-    // when polling cannot see the session (e.g. Safari without storage access
-    // granted yet), a new user gesture lets us ask for it again
+    // once logged in through the popup, this click is the user gesture the
+    // Storage Access API needs to share the session with the iframe
     async proconnectContinue(el) {
       await this.requestStorageAccess();
       window.location.href = el.dataset.nextUrl || window.location.href;
