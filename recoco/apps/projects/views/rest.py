@@ -10,17 +10,26 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
+from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.db import transaction
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+)
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -57,12 +66,15 @@ from ..serializers import (
     NewProjectSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
+    ProjectMembershipRoleSerializer,
     ProjectMembershipSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
+    get_project_memberships,
+    unassign_roles,
 )
 
 ########################################################################
@@ -186,12 +198,32 @@ class ProjectCreate(CreateAPIView):
     serializer_class = NewProjectSerializer
 
 
-class ProjectMembershipCreate(CreateAPIView):
-    """Attach a participant, an advisor or an observer to a project
+class ProjectMembershipMixin:
+    """Give the project of the url to the membership views and serializers"""
 
-    The person is given by email, in the `email` field, and its account is
-    created if it does not exist yet. The `role` field says how it is attached
-    to the project:
+    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
+
+    @cached_property
+    def project(self) -> models.Project:
+        return get_object_or_404(models.Project.on_site, pk=self.kwargs["pk"])
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["project"] = self.project
+        return context
+
+
+class ProjectMembershipList(ProjectMembershipMixin, ListCreateAPIView):
+    """List or attach the participants, advisors and observers of a project
+
+    `GET` lists the members of the project: each one has an `email`, a
+    `first_name`, a `last_name`, a `role` and an `is_owner` flag, only set for
+    the owner of the project. Someone who is both participant and advisor is
+    listed once for each role. Only the advisors of the current site are listed.
+
+    `POST` attaches someone to the project. The person is given by email, in
+    the `email` field, and its account is created if it does not exist yet.
+    The `role` field says how it is attached to the project:
 
     - `COLLABORATOR`: a participant, member of the project team;
     - `SWITCHTENDER`: an advisor, who follows the project for the site;
@@ -205,15 +237,75 @@ class ProjectMembershipCreate(CreateAPIView):
     staff for that site.
     """
 
-    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
     serializer_class = ProjectMembershipSerializer
+    pagination_class = None
+    filter_backends = []
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["project"] = get_object_or_404(
-            models.Project.on_site, pk=self.kwargs["pk"]
+    def get_queryset(self):
+        return get_project_memberships(self.project, self.request.site)
+
+
+class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
+    """Change the role of a member of a project, or remove it from the project
+
+    The member is given by email, in the url.
+
+    `PATCH` changes its role, given in the `role` field, with the same values
+    as for attaching someone to the project. The member only keeps the given
+    role: someone both participant and advisor is no longer the other one.
+
+    `DELETE` removes the member from the project, whatever its roles, and
+    deletes its notifications about the project.
+
+    In both cases, a `404` is answered if the person is not a member of the
+    project, and a `400` if it is the owner of the project, who cannot be
+    changed nor removed.
+
+    The project has to be one of the current site, and the caller must be
+    staff for that site.
+    """
+
+    serializer_class = ProjectMembershipRoleSerializer
+
+    def get_object(self) -> dict:
+        user = get_object_or_404(User, username=self.kwargs["email"].lower())
+
+        memberships = get_project_memberships(
+            self.project, self.request.site, user=user
         )
-        return context
+        if not memberships:
+            raise Http404
+
+        if any(membership["is_owner"] for membership in memberships):
+            raise ValidationError(
+                {"email": "The owner of a project cannot be changed nor removed."}
+            )
+
+        return memberships[0]
+
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object(), data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @transaction.atomic
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()["user"]
+
+        unassign_roles(user, self.project, request.site)
+
+        # same cleanup as when removing a member from the project admin
+        notifications_models.Notification.on_site.filter(
+            recipient=user,
+            target_content_type=ContentType.objects.get_for_model(models.Project),
+            target_object_id=self.project.pk,
+        ).delete()
+        models.UserProjectStatus.objects.filter(
+            site=request.site, user=user, project=self.project
+        ).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectList(ListAPIView):

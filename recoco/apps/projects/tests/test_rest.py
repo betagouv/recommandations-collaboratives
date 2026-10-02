@@ -894,7 +894,7 @@ def test_existing_owner_account_is_reused_by_project_create_api(api_client, api_
 
 @pytest.mark.django_db
 def test_non_staff_cannot_use_project_membership_api(api_client, project):
-    url = reverse("projects-members-create", args=[project.id])
+    url = reverse("projects-members-list", args=[project.id])
     data = {"email": "jane@example.com", "role": "COLLABORATOR"}
 
     # anonymous
@@ -915,7 +915,7 @@ def test_collaborator_is_attached_by_project_membership_api(
 
     api_client.force_authenticate(api_user)
 
-    url = reverse("projects-members-create", args=[project.id])
+    url = reverse("projects-members-list", args=[project.id])
     response = api_client.post(
         url, data={"email": "JANE@example.com", "role": "COLLABORATOR"}
     )
@@ -946,7 +946,7 @@ def test_advisor_is_attached_by_project_membership_api(
 
     api_client.force_authenticate(api_user)
 
-    url = reverse("projects-members-create", args=[project.id])
+    url = reverse("projects-members-list", args=[project.id])
     response = api_client.post(url, data={"email": "john@example.com", "role": role})
 
     assert response.status_code == 201
@@ -956,6 +956,182 @@ def test_advisor_is_attached_by_project_membership_api(
     )
     assert switchtending.is_observer is is_observer
     assert advisor.has_perm("projects.view_project", project)
+
+
+########################################################################
+# list, change and remove the members of a project
+########################################################################
+
+
+@pytest.fixture
+def project_members(request, project):
+    """Return an owner, a participant, an advisor and an observer of project"""
+    site = get_current_site(request)
+
+    owner = baker.make(
+        auth_models.User, username="owner@example.com", email="owner@example.com"
+    )
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    collaborator = baker.make(
+        auth_models.User, username="jane@example.com", email="jane@example.com"
+    )
+    utils.assign_collaborator(collaborator, project)
+
+    advisor = baker.make(
+        auth_models.User, username="john@example.com", email="john@example.com"
+    )
+    utils.assign_advisor(advisor, project, site=site)
+
+    observer = baker.make(
+        auth_models.User, username="jim@example.com", email="jim@example.com"
+    )
+    utils.assign_observer(observer, project, site=site)
+
+    return {
+        "owner": owner,
+        "collaborator": collaborator,
+        "advisor": advisor,
+        "observer": observer,
+    }
+
+
+@pytest.mark.django_db
+def test_project_members_are_listed_by_project_membership_api(
+    api_client, api_user, project, project_members
+):
+    # an advisor on another site is not listed
+    other_site = baker.make(sites_models.Site)
+    utils.assign_advisor(baker.make(auth_models.User), project, site=other_site)
+
+    api_client.force_authenticate(api_user)
+
+    response = api_client.get(reverse("projects-members-list", args=[project.id]))
+
+    assert response.status_code == 200
+    assert sorted(
+        (m["email"], m["role"], m["is_owner"]) for m in response.data
+    ) == sorted(
+        [
+            (project_members["owner"].email, "COLLABORATOR", True),
+            (project_members["collaborator"].email, "COLLABORATOR", False),
+            (project_members["advisor"].email, "SWITCHTENDER", False),
+            (project_members["observer"].email, "OBSERVER", False),
+        ]
+    )
+
+
+@pytest.mark.django_db
+def test_collaborator_is_made_advisor_by_project_member_detail_api(
+    request, api_client, api_user, project, project_members
+):
+    site = get_current_site(request)
+    collaborator = project_members["collaborator"]
+
+    api_client.force_authenticate(api_user)
+
+    # the email of the url is case insensitive
+    url = reverse("projects-members-detail", args=[project.id, "JANE@example.com"])
+    response = api_client.patch(url, data={"role": "SWITCHTENDER"})
+
+    assert response.status_code == 200
+    assert response.data["role"] == "SWITCHTENDER"
+
+    assert not models.ProjectMember.objects.filter(
+        project=project, member=collaborator
+    ).exists()
+    switchtending = models.ProjectSwitchtender.objects.get(
+        project=project, switchtender=collaborator, site=site
+    )
+    assert switchtending.is_observer is False
+    # a permission shared by both roles is kept
+    assert collaborator.has_perm("projects.manage_collaborators", project)
+
+
+@pytest.mark.django_db
+def test_member_is_removed_by_project_member_detail_api(
+    request, api_client, api_user, project, project_members
+):
+    site = get_current_site(request)
+    user = project_members["collaborator"]
+
+    # to check they are cleaned up when the member is removed
+    notify.send(sender=api_user, recipient=user, verb="a verb", target=project)
+    baker.make(models.UserProjectStatus, site=site, user=user, project=project)
+
+    api_client.force_authenticate(api_user)
+
+    url = reverse("projects-members-detail", args=[project.id, user.username])
+    response = api_client.delete(url)
+
+    assert response.status_code == 204
+
+    assert not models.ProjectMember.objects.filter(
+        project=project, member=user
+    ).exists()
+    assert not models.ProjectSwitchtender.objects.filter(
+        project=project, switchtender=user
+    ).exists()
+    assert not user.has_perm("projects.view_project", project)
+    assert not notifications_models.Notification.objects.filter(recipient=user).exists()
+    assert not models.UserProjectStatus.objects.filter(
+        user=user, project=project
+    ).exists()
+
+    # the other members are kept
+    assert models.ProjectMember.objects.filter(
+        project=project, member=project_members["owner"]
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_remove_member_by_project_member_detail_api(
+    api_client, project, project_members
+):
+    url = reverse("projects-members-detail", args=[project.id, "jane@example.com"])
+
+    # anonymous
+    assert api_client.delete(url).status_code == 403
+
+    # authenticated, but not staff for the current site
+    api_client.force_authenticate(baker.make(auth_models.User))
+    assert api_client.delete(url).status_code == 403
+
+    assert models.ProjectMember.objects.filter(
+        project=project, member=project_members["collaborator"]
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_unknown_email_is_reported_by_project_member_detail_api(
+    api_client, api_user, project, project_members
+):
+    api_client.force_authenticate(api_user)
+
+    url = reverse("projects-members-detail", args=[project.id, "unknown@example.com"])
+
+    assert api_client.delete(url).status_code == 404
+
+    # nobody else is removed instead
+    assert models.ProjectMember.objects.filter(project=project).count() == 2
+    assert models.ProjectSwitchtender.objects.filter(project=project).count() == 2
+
+
+@pytest.mark.django_db
+def test_owner_is_neither_changed_nor_removed_by_project_member_detail_api(
+    api_client, api_user, project, project_members
+):
+    api_client.force_authenticate(api_user)
+
+    url = reverse("projects-members-detail", args=[project.id, "owner@example.com"])
+
+    assert api_client.patch(url, data={"role": "OBSERVER"}).status_code == 400
+    assert api_client.delete(url).status_code == 400
+
+    assert project.owner == project_members["owner"]
+    assert not models.ProjectSwitchtender.objects.filter(
+        project=project, switchtender=project_members["owner"]
+    ).exists()
 
 
 ########################################################################
