@@ -69,6 +69,7 @@ def test_crm_site_configuration(request, client):
     )
 
     logo = SimpleUploadedFile("file.png", logo_content, content_type="image/png")
+    favicon = SimpleUploadedFile("favicon.png", logo_content, content_type="image/png")
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(
@@ -76,8 +77,12 @@ def test_crm_site_configuration(request, client):
             data={
                 "sender_name": "Yoo",
                 "contact_form_recipient": "othr@yo.com",
+                "legal_owner": "Yoyo factory",
+                "description": "Yoyo artisant",
+                "main_topic": "Fabrication",
                 "reminder_interval": 42,
                 "logo_small": logo,
+                "favicon": favicon,
             },
         )
 
@@ -93,6 +98,9 @@ def test_crm_site_configuration_crisp_integration(request, client, settings):
         home_models.SiteConfiguration,
         site=site,
         sender_name="Yoo",
+        legal_owner="Yoyo factory",
+        description="Yoyo artisant",
+        main_topic="Fabrication",
         contact_form_recipient="othr@yo.com",
         crisp_token=None,
     )
@@ -111,6 +119,9 @@ def test_crm_site_configuration_crisp_integration(request, client, settings):
             data={
                 "sender_name": "Yoo",
                 "contact_form_recipient": "othr@yo.com",
+                "legal_owner": "Yoyo factory",
+                "description": "Yoyo artisant",
+                "main_topic": "Fabrication",
                 "reminder_interval": 42,
                 "crisp_token": crisp_token,
             },
