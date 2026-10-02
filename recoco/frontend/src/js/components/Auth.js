@@ -7,6 +7,7 @@ const PROCONNECT_POLL_TIMEOUT_MS = 5 * 60 * 1000;
 function Auth() {
   return {
     proconnectPending: false,
+    proconnectNextUrl: null,
     initLogin() {
       const loginInput = document.getElementById('id_login');
       if (!loginInput) return;
@@ -47,6 +48,7 @@ function Auth() {
       // activation it would need, and Recoco has not been visited top-level yet
       window.open(popupUrl, 'proconnect', 'popup,width=600,height=750');
 
+      this.proconnectNextUrl = nextUrl;
       this.proconnectPending = true;
       this.pollProconnectStatus(statusUrl, nextUrl, Date.now());
     },
@@ -81,9 +83,9 @@ function Auth() {
     },
     // once logged in through the popup, this click is the user gesture the
     // Storage Access API needs to share the session with the iframe
-    async proconnectContinue(el) {
+    async proconnectContinue() {
       await this.requestStorageAccess();
-      window.location.href = el.dataset.nextUrl || window.location.href;
+      window.location.href = this.proconnectNextUrl || window.location.href;
     },
     initProconnectPopupDone() {
       // may be ignored by the browser: the page also asks to close it manually
