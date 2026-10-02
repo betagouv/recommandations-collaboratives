@@ -7,6 +7,8 @@ from allauth.socialaccount.providers.openid_connect.views import (
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
+from recoco.apps.home.adapters import confirm_email
+
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def generate_state_param(self, state: dict) -> str:
@@ -24,10 +26,12 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 
         user = sociallogin.user
         if user.id:
+            confirm_email(request, user)
             return
 
         try:
             user = User.objects.get(username=user.email)
+            confirm_email(request, user)
             sociallogin.connect(request, user)
         except User.DoesNotExist:
             pass
