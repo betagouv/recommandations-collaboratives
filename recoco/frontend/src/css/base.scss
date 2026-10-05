@@ -190,6 +190,9 @@ p {
   .fr-header__body-row {
     height: 4em;
   }
+  .project-navigation.no-header {
+    top: 0;
+  }
 }
 
 // Prevent Crisp from causing horizontal scroll on mobile
