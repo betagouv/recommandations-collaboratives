@@ -120,7 +120,9 @@
             Pour vous aider dans votre démarche, vous trouverez un modèle de courrier élaboré par la
             CNIL <a class="text-decoration-underline" href="https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces">ici</a>.
             Nous nous engageons à vous répondre dans un délai raisonnable qui ne saurait dépasser 1 mois à compter de la réception de votre demande.
-            Vous pouvez également contacter le délégué à la protection des données (DPO) de {{ request.site.name }} à l’adresse : {% if request.site.configuration.dpo_contact_email %}<a class="text-decoration-underline" href="mailto:{{ request.site.configuration.dpo_contact_email }}">{{ request.site.configuration.dpo_contact_email }}</a>{% endif %}
+            {% if request.site.configuration.dpo_contact_email %}
+                Vous pouvez également contacter le délégué à la protection des données (DPO) de {{ request.site.name }} à l’adresse : <a class="text-decoration-underline" href="mailto:{{ request.site.configuration.dpo_contact_email }}">{{ request.site.configuration.dpo_contact_email }}</a>
+            {% endif %}
         </p>
         <h2 class="fr-mt-3w fr-mb-2v fw-700">7 - Destinataires</h2>
         <p>
