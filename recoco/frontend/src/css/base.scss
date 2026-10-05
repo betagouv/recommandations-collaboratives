@@ -187,17 +187,7 @@ p {
 * BASE EMBED SPECIFICITIES
 */
 .base-embed {
-  --height-header: 0;
-  .fr-header__logo {
-    padding-bottom: 0;
-    padding-top: 0;
-  }
-  .fr-header__body-row {
-    height: 4em;
-  }
-  .project-navigation {
-    top: var(--height-header);
-  }
+  --height-header: 0px;
 }
 
 // Prevent Crisp from causing horizontal scroll on mobile
