@@ -108,8 +108,10 @@ Hook specifications live in ``recoco/apps/plugins/hooks.py``.  They declare
 the *contract* - name, parameters, and return-value semantics - that every
 plugin implementation must follow.
 
-Each spec class is registered with the global plugin manager once in
-``manager.py`` via ``pm.add_hookspecs()``.
+Each spec class subclasses ``HookSpec``. Subclassing is enough to register
+it: ``all_specs()`` returns every ``HookSpec`` subclass, and ``manager.py``
+passes each of them to ``pm.add_hookspecs()``. There is no need to touch
+``manager.py`` when adding a new spec class.
 
 Hook spec classes are organized by domain. ``ProjectSpec`` is the canonical
 home for project-related hooks; ``ResourceSpec`` for resource-related hooks:
@@ -122,7 +124,15 @@ home for project-related hooks; ``ResourceSpec`` for resource-related hooks:
     hookspec = pluggy.HookspecMarker("recoco")
 
 
-    class ProjectSpec:
+    class HookSpec:
+        """Base class for hook specification namespaces."""
+
+
+    def all_specs():
+        return HookSpec.__subclasses__()
+
+
+    class ProjectSpec(HookSpec):
         @hookspec
         def project_tab_entries(self):
             """Return a list of (url_name, label) tuples to add as project tabs.
@@ -136,7 +146,7 @@ home for project-related hooks; ``ResourceSpec`` for resource-related hooks:
             """
 
 
-    class ResourceSpec:
+    class ResourceSpec(HookSpec):
         @hookspec
         def resource_sidebar_panels(self, resource, request):
             """Return an HTML string to inject into the resource detail right sidebar.
@@ -176,7 +186,7 @@ the project-detail view.  Add the spec to ``ProjectSpec``:
 .. code-block:: python
 
     # recoco/apps/plugins/hooks.py
-    class ProjectSpec:
+    class ProjectSpec(HookSpec):
         @hookspec
         def project_tab_entries(self):
             """Return a list of (url_name, label) tuples to add as project tabs."""
@@ -320,7 +330,10 @@ See `Conversation Hooks & JS Integration`_ below for a worked example.
 
 ``crm_navigation_tabs(request)``
     Add a tab to the CRM navigation. Returns a dict with ``label``,
-    ``url_name``, ``tab_key`` and ``index``.
+    ``url_name``, ``tab_key`` and ``index``. Builtin CRM tabs use indexes
+    0, 10, 20, 30, 40, 50 (Accueil, Dossiers, Utilisateurs, Organisations,
+    Ressources, Paramètres). Rendered with the ``plugin_tabs`` template tag,
+    see `Navigation Tabs Template Tag`_.
 
 ``crm_project_list_annotations(request)``
     Add queryset annotations (e.g. ``Count(...)``) to the CRM project list,
@@ -336,6 +349,62 @@ See `Conversation Hooks & JS Integration`_ below for a worked example.
 
 See `CRM Project List Extension Example`_ below for how the three
 ``crm_project_list_*`` hooks work together.
+
+``HeaderSpec``
+--------------
+
+``main_navigation_tabs(request)``
+    Add an entry to the main header navigation
+    (``header/menu-top-secondary.html``). Returns a dict with ``label``,
+    ``url_name`` and ``index``. Unlike ``crm_navigation_tabs``, there is no
+    ``tab_key``: the entry is marked active when the current view name
+    equals ``url_name``.
+
+    The header currently exposes a single insertion slot, right after
+    "Ressources": only entries whose ``index`` is strictly between 40 and
+    50 are rendered.
+
+    Example::
+
+        @hookimpl
+        def main_navigation_tabs(self, request):
+            return {
+                "label": "Giphy",
+                "url_name": "plugin_giphy:search",
+                "index": 45,
+            }
+
+
+Navigation Tabs Template Tag
+============================
+
+Navigation hooks (``crm_navigation_tabs``, ``main_navigation_tabs``) are
+rendered with the generic ``plugin_tabs`` tag from
+``recoco/apps/plugins/templatetags/plugins_extra.py``:
+
+.. code-block:: django
+
+    {% load plugins_extra %}
+
+    {% plugin_tabs "crm_navigation_tabs" 10 20 as plugin_tabs %}
+    {% for tab in plugin_tabs %}
+        <a href="{{ tab.url }}"
+           {% if tab.active %}aria-current="page"{% endif %}>{{ tab.label }}</a>
+    {% endfor %}
+
+``{% plugin_tabs "<hook_name>" min_index max_index as tabs %}``
+
+- calls the hook named ``hook_name`` on the site-scoped plugin manager, so
+  only plugins enabled for the current site contribute;
+- keeps only the tabs whose ``index`` is strictly between ``min_index`` and
+  ``max_index``, sorted by ``index``. Call the tag once between each pair of
+  adjacent builtin tabs so that a plugin can pick its position with its
+  ``index`` (e.g. ``25`` to land between the builtin tabs 20 and 30);
+- adds two keys to each tab dict: ``url`` (``reverse(url_name)``) and
+  ``active`` (``True`` when the current view name equals ``url_name``);
+- silently drops tabs whose ``url_name`` cannot be reversed (e.g. the owning
+  plugin is disabled on the current tenant);
+- raises ``TemplateSyntaxError`` if ``hook_name`` is not a declared hook.
 
 
 CRM Project List Extension Example
