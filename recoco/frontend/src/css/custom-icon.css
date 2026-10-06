@@ -198,6 +198,11 @@
   mask-image: url(../assets/check-line.svg);
 }
 
+.fr-icon-hammer-line::after,
+.fr-icon-hammer-line::before {
+  mask-image: url(../assets/hammer-line.svg);
+}
+
 /* icon without mask - can have multiple colors */
 
 .fr-icon-file-color::after,

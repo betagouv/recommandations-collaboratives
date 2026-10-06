@@ -36,7 +36,7 @@ from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
-from recoco.utils import make_site_slug
+from recoco.utils import make_site_slug, render_markdown
 
 from . import apps
 
@@ -45,6 +45,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.moderate_projects",
         "sites.list_projects",
         "sites.delete_projects",
+        "sites.see_deleted_projects",
         "sites.manage_resources",
         "sites.use_crm",
         "sites.use_addressbook",
@@ -277,6 +278,10 @@ class SiteConfiguration(models.Model):
         null=True,
         blank=True,
     )
+
+    def gdpr_purposes_rendered(self):
+        """Return gdpr_purposes as markdown"""
+        return render_markdown(self.gdpr_purposes)
 
     # FIXME: CMS should manage this field
     main_topic = models.CharField(

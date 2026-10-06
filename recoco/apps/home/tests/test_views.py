@@ -468,12 +468,7 @@ def test_privacy_page_uses_default_values_without_site_configuration(client):
 
     assert response.status_code == 200
     assertContains(response, "est un service numérique porté par CEREMA")
-    assertContains(
-        response,
-        "représentée par Etienne Crépon, directeur général du CEREMA",
-    )
     assertContains(response, "Lutter contre l’artificialisation des sols")
-    assertNotContains(response, 'href="mailto:')
 
 
 @pytest.mark.django_db

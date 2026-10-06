@@ -53,7 +53,7 @@ def test_site_configuration_available_for_admin_users(request, client):
 @pytest.mark.django_db
 def test_crm_site_configuration(request, client):
     site = get_current_site(request)
-    baker.make(
+    site_config = baker.make(
         home_models.SiteConfiguration,
         site=site,
         sender_name="Yoo",
@@ -83,10 +83,15 @@ def test_crm_site_configuration(request, client):
                 "reminder_interval": 42,
                 "logo_small": logo,
                 "favicon": favicon,
+                "gdpr_purposes": 'Finalité <b>légitime</b> <img src="x" onerror="alert(\'mean content\')" /><script>alert(1)</script>',
             },
         )
-
     assert response.status_code == 302
+
+    site_config.refresh_from_db()
+    assert "onerror" not in site_config.gdpr_purposes
+    assert "<script>" not in site_config.gdpr_purposes
+    assert "Finalité <b>légitime</b>" in site_config.gdpr_purposes
 
 
 @pytest.mark.django_db

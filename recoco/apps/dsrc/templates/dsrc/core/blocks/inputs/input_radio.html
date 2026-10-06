@@ -1,4 +1,4 @@
-<input x-model="form['{{ field.html_name }}'].value"
+<input {% if js_validation %}x-model="form['{{ field.html_name }}'].value"{% endif %}
        name="{{ field.id_for_label }}"
        id="{{ field.id_for_label }}"
        type="radio"

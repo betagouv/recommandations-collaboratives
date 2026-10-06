@@ -48,7 +48,7 @@
                         <template x-for="code in (allSelected ? [] : selectedCodes)" :key="code">
                             <input type="hidden" name="departments" :value="code">
                         </template>
-                        {% include "projects/project/fragments/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" %}
+                        {% include "projects/project/fragments/departments_selector/departments_selector.html" with label="Tous les départements" filter_by_regions=True select_all=False selected_departments=selected_departments label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
                     <a href="{% url 'crm-organization-list' %}"
                        class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left text-nowrap"

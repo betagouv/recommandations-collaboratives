@@ -116,6 +116,12 @@ def create_site_permissions(sender, **kwargs):
         content_type=site_ct,
     )
 
+    auth_models.Permission.objects.get_or_create(
+        codename="see_deleted_projects",
+        name="Can see deleted projects for site",
+        content_type=site_ct,
+    )
+
 
 class ProjectManager(models.Manager):
     """Manager for all projects"""

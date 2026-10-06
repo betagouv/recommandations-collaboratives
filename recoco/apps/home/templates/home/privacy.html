@@ -18,26 +18,32 @@
         <p>
             {{ request.site.name }} est un service numérique porté par {{ request.site.configuration.legal_owner|default:"CEREMA" }} et développé grâce au service Recommandations-collaboratives du Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et l’aménagement (CEREMA).
             <br>
-            Les co-responsables de traitement des données à caractère personnel sont le CEREMA représenté par son directeur général, Monsieur Etienne Crépon, et {{ request.site.configuration.legal_owner|default:"CEREMA" }} représentée par {{ request.site.configuration.legal_owner_name|default:"Etienne Crépon, directeur général du CEREMA" }}.
+            {% if request.site.configuration.legal_owner and request.site.configuration.legal_owner_name %}
+                Les co-responsables de traitement des données à caractère personnel sont le CEREMA représenté par son directeur général, Monsieur Etienne Crépon, et {{ request.site.configuration.legal_owner }} représentée par {{ request.site.configuration.legal_owner_name }}.
+            {% else %}
+                Les co-responsables de traitement des données à caractère personnel sont le CEREMA représenté par son directeur général, Monsieur Etienne Crépon.
+            {% endif %}
         </p>
         <h2 class="fr-mt-3w fr-mb-2v fw-700">2 - Finalités</h2>
         <p>
             La plateforme {{ request.site.name }} est un service numérique porté par {{ request.site.configuration.legal_owner|default:"CEREMA" }}, qui manipule des données à caractère personnel pour les raisons suivantes :
         </p>
+        {% if request.site.configuration.gdpr_purposes %}
+            {{ request.site.configuration.gdpr_purposes_rendered|safe }}
+        {% else %}
+            <ul>
+                    <li>Lutter contre l’artificialisation des sols</li>
+                    <li>
+                        Enclencher la revitalisation des friches en fournissant les outils, les acteurs à contacter
+                        et les démarches aux collectivités
+                    </li>
+                    <li>
+                        Suivre les dossiers de réhabilitation de friches dans la durée grâce aux acteurs publics
+                        locaux
+                    </li>
+            </ul>
+        {% endif %}
         <ul>
-            {% if request.site.configuration.gdpr_purposes %}
-                {{ request.site.configuration.gdpr_purposes }}
-            {% else %}
-                <li>Lutter contre l’artificialisation des sols</li>
-                <li>
-                    Enclencher la revitalisation des friches en fournissant les outils, les acteurs à contacter
-                    et les démarches aux collectivités
-                </li>
-                <li>
-                    Suivre les dossiers de réhabilitation de friches dans la durée grâce aux acteurs publics
-                    locaux
-                </li>
-            {% endif %}
             <li>la réalisation d’études quantitatives et d’analyses sur les demandes déposées et les recommandations émises, permettant d’évaluer les besoins des demandeurs, et d’améliorer les accompagnements dispensés</li>
         </ul>
         <h2 class="fr-mt-3w fr-mb-2v fw-700">3 - Catégorie de données à caractère personnel traitées</h2>
@@ -83,7 +89,7 @@
                                         Données de connexion
                                     </td>
                                     <td>
-                                        1 an
+                                        2 ans à compter de la dernière utilisation du compte de l’utilisateur
                                     </td>
                                 </tr>
                             </tbody>
@@ -114,7 +120,9 @@
             Pour vous aider dans votre démarche, vous trouverez un modèle de courrier élaboré par la
             CNIL <a class="text-decoration-underline" href="https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces">ici</a>.
             Nous nous engageons à vous répondre dans un délai raisonnable qui ne saurait dépasser 1 mois à compter de la réception de votre demande.
-            Vous pouvez également contacter le délégué à la protection des données (DPO) de {{ request.site.name }} à l’adresse : {% if request.site.configuration.dpo_contact_email %}<a class="text-decoration-underline" href="mailto:{{ request.site.configuration.dpo_contact_email }}">{{ request.site.configuration.dpo_contact_email }}</a>{% endif %}
+            {% if request.site.configuration.dpo_contact_email %}
+                Vous pouvez également contacter le délégué à la protection des données (DPO) de {{ request.site.name }} à l’adresse : <a class="text-decoration-underline" href="mailto:{{ request.site.configuration.dpo_contact_email }}">{{ request.site.configuration.dpo_contact_email }}</a>
+            {% endif %}
         </p>
         <h2 class="fr-mt-3w fr-mb-2v fw-700">7 - Destinataires</h2>
         <p>
@@ -124,7 +132,7 @@
         <ul>
             <li>agents habilités et membres de l’équipe produit de Recommandations-collaboratives ;</li>
             <li>
-                agents habilités et membres de l’équipe qui gère {{ request.site.name }} au sein de {{ request.site.configuration.legal_owner|default:"CEREMA" }} ;
+                agents habilités et membres de l’équipe qui gèrent {{ request.site.name }} au sein de {{ request.site.configuration.legal_owner|default:"CEREMA" }} ;
             </li>
             <li>
                 conseillers inscrits sur la plateforme avec un accès local ou national, ou autres membres invités à participer sur le dossier.
@@ -247,6 +255,11 @@
                     <td scope="row">Crisp</td>
                     <td>Chat entre les utilisateurs et les admins</td>
                     <td>-</td>
+                </tr>
+                <tr>
+                    <td scope="row">Cookie sesame</td>
+                    <td>Cookie de connexion par lien</td>
+                    <td>2 ans</td>
                 </tr>
             </tbody>
         </table>

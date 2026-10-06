@@ -1,3 +1,4 @@
+import nh3
 from django import forms
 from django.contrib.sites import models as sites_models
 from django.utils.safestring import mark_safe
@@ -40,8 +41,6 @@ class SiteConfigurationForm(forms.ModelForm):
     required_fields = [
         "main_topic",
         "description",
-        "contact_form_recipient",
-        "sender_name",
         "legal_owner",
     ]
 
@@ -74,6 +73,10 @@ class SiteConfigurationForm(forms.ModelForm):
             "accept_handover",
             "crisp_token",
         ]
+
+    def clean_gdpr_purposes(self):
+        com = self.cleaned_data["gdpr_purposes"]
+        return nh3.clean(com)
 
 
 class CRMProfileForm(forms.ModelForm):

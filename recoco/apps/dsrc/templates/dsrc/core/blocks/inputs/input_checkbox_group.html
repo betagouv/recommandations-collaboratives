@@ -1,8 +1,9 @@
-<fieldset x-model="form['{{ field.html_name }}'].value"
+<fieldset {% if js_validation %} x-model="form['{{ field.html_name }}'].value"
           x-ref="{{ field.html_name }}"
           @input="changeInput"
           @focus="touchInput"
           @blur="validateInput"
+          {% endif %}
           id="{{ field.id_for_label }}"
           name="{{ field.html_name }}-fieldset"
           class="fr-fieldset"
@@ -17,8 +18,8 @@
     {% for choice in field %}
         <div class="fr-fieldset__element">
             <div class="fr-checkbox-group{% if field.errors %} fr-input-group--error{% endif %}{% if field.field.is_valid %} fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-checkbox-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
-                 :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
-                <input x-model="{{ choice.id_for_label }}.value"
+                 {% if js_validation %}:class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`"{% endif %}>
+                <input {% if js_validation %}x-model="{{ choice.id_for_label }}.value"{% endif %}
                        name="{{ field.html_name }}"
                        id="{{ choice.id_for_label }}"
                        type="checkbox"
@@ -37,25 +38,26 @@
             </div>
         {% endfor %}
     {% endif %}
-    {% if form.cleaned_data.js_enabled == 'false' and field.error_messages %}
+    {% if not js_validation and field.error_messages %}
         <!-- Display server-side validation errors here -->
         {% for error in field.error_messages %}
             <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
                class="fr-error-text">{{ error }}</p>
         {% endfor %}
+    {% else %}
+        <ul x-show="fieldHasError('{{ field.html_name }}')"
+            class="fr-messages-group"
+            id="{{ field.id_for_label }}-desc-error"
+            aria-live="polite">
+            <template x-for="(error, index) in form['{{ field.html_name }}'].errors"
+                    :key="index">
+                <!-- Display client-side validation errors here -->
+                <li id="`error_${index}_{{ field.auto_id }}`"
+                    x-text="error"
+                    class="fr-error-text">{{ error }}</li>
+            </template>
+        </ul>
     {% endif %}
-    <ul x-show="fieldHasError('{{ field.html_name }}')"
-        class="fr-messages-group"
-        id="{{ field.id_for_label }}-desc-error"
-        aria-live="polite">
-        <template x-for="(error, index) in form['{{ field.html_name }}'].errors"
-                  :key="index">
-            <!-- Display client-side validation errors here -->
-            <li id="`error_${index}_{{ field.auto_id }}`"
-                x-text="error"
-                class="fr-error-text">{{ error }}</li>
-        </template>
-    </ul>
     {% if field.valid_text %}
         <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
     {% endif %}
