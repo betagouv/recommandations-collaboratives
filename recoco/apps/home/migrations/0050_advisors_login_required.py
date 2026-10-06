@@ -6,7 +6,7 @@ from django.db.models import Exists, Subquery, OuterRef
 
 def default_2fa_for_groups(apps, schema_editor):
     UserProfile = apps.get_model("home", "UserProfile")
-    Authenticator = apps.get_model("mfa", "Authenticator")  # todo check
+    Authenticator = apps.get_model("mfa", "Authenticator")
     group_regex = r".*(staff|admin|advisor)$"
     need_2fa = UserProfile.all.filter(user__groups__name__regex=group_regex)
     need_2fa.update(requires_2fa=True)
