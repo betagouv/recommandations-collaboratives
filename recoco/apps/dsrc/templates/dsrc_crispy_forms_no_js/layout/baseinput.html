@@ -1,4 +1,3 @@
-<h1>Field: {{ field.name }}</h1>
 {% if field.field.widget.attrs.data_role == "tagsinput" %}
     {{ field }}
 {% elif field.field.widget.input_type == "text" %}
@@ -8,7 +7,6 @@
 {% elif field.field.widget.input_type == "email" %}
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "tel" %}
-    <h1>Telephone</h1>
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "file" %}
     {{ field }}
