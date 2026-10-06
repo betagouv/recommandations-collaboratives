@@ -34,8 +34,6 @@ Alpine.data('AccordionStatus', () => {
       this.$el.addEventListener('input', () => this.refresh());
       this.$el.addEventListener('change', () => this.refresh());
 
-      // DSFR reads aria-expanded when it initializes the accordion (after Alpine),
-      // so the section with errors is opened by the DSFR itself
       if (this.errorCount > 0) {
         this.$el
           .querySelector('.fr-accordion__btn')

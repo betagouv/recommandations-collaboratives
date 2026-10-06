@@ -46,14 +46,13 @@
                         <p class="fr-error-text">{{ error }}</p>
                     {% endfor %}
                 </div>
-            {% endif %}
-            {% if not js_validation and field.error_messages %}
+            {% elif not js_validation and field.error_messages %}
                 <!-- Display server-side validation errors here -->
                 {% for error in field.error_messages %}
                     <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
                     class="fr-error-text">{{ error }}</p>
                 {% endfor %}
-            {% else %}
+            {% elif js_validation %}
                 <ul x-show="fieldHasError('{{ field.html_name }}')"
                     class="fr-messages-group"
                     id="{{ field.id_for_label }}-desc-error"
