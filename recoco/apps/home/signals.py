@@ -5,6 +5,8 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-06-27 08:06:10 CEST
 """
 
+import re
+
 import sentry_sdk
 from actstream import action
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
@@ -14,7 +16,7 @@ from django.contrib.auth.models import Group, User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import connection
-from django.db.models import Exists, OuterRef, Q, Subquery, Value
+from django.db.models import Exists, OuterRef, Subquery, Value
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 from psycopg import sql
@@ -75,32 +77,49 @@ def create_tenant_schema(sender, instance, **kwargs):
 
 @receiver(m2m_changed, sender=User.groups.through)
 def ensure_2fa_requirement(sender, instance, **kwargs):
-    signal_action = kwargs.get("action")
+    signal_action = kwargs.get("action")  # add/remove/clear
+    reverse = kwargs["reverse"]  # change made from group.users not user.groups
+    requires_2fa = Value(False)
+
+    # user.groups.clear: the user is the only one affected so we only update them
+    if signal_action == "post_clear" and not reverse:
+        instance.profile.requires_2fa = False
+        instance.profile.save()
+        return
+
     user_profile_qs = UserProfile.objects.none()
+    group_regex = r".*(staff|admin|advisor)$"
+
+    # user.groups.add/remove and group.users.add/remove:
+    # we compute requirement after the change, no matter reverse or not
     if signal_action in ["post_add", "post_remove"]:
         user_profile_qs = (
             UserProfile.objects.filter(user=instance)
-            if not kwargs["reverse"]
+            if not reverse
             else UserProfile.objects.filter(user_id__in=kwargs["pk_set"])
         )
-    if signal_action == "post_clear" and not kwargs["reverse"]:
-        user_profile_qs = UserProfile.objects.filter(user=instance)
-
-    requires_2fa = Exists(
-        Subquery(
-            Group.objects.filter(user=OuterRef("user_id")).filter(
-                Q(name__contains="staff") | Q(name__contains="admin")
+        requires_2fa = Exists(
+            Subquery(
+                Group.objects.filter(user=OuterRef("user_id"), name__regex=group_regex)
             )
         )
-    )
 
+    # group.users.clear: no user has this group any longer but they can be in other groups that require 2fa
+    # so we recompute them all
+    # We need to do that prior to the clear, otherwise the related user pool is lost
     if (
         signal_action == "pre_clear"
-        and kwargs["reverse"]
-        and ("staff" in instance.name or "admin" in instance.name)
+        and reverse
+        and re.match(group_regex, instance.name)
     ):
         user_profile_qs = UserProfile.objects.filter(user__groups=instance)
-        requires_2fa = Value(False)
+        requires_2fa = Exists(
+            Subquery(
+                Group.objects.filter(
+                    user=OuterRef("user_id"), name__regex=group_regex
+                ).exclude(pk=instance.pk)
+            )
+        )
 
     has_totp = Exists(
         Subquery(Authenticator.objects.filter(type="totp", user_id=OuterRef("user_id")))
