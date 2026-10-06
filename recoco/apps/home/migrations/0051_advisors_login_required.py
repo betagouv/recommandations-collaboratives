@@ -31,7 +31,7 @@ def no_required_2fa_for_advisors(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0049_remove_siteconfiguration_sender_email"),
+        ("home", "0050_siteconfiguration_legal_fields"),
         ("mfa", "0003_authenticator_type_uniq"),
     ]
 
