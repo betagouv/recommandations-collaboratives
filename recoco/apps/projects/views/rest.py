@@ -20,6 +20,7 @@ from django.db import transaction
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.exceptions import ValidationError
@@ -92,7 +93,12 @@ class CanModerateProjectsOnSite(permissions.BasePermission):
 class ProjectDetail(
     RetrieveAPIView
 ):  # NB : interfaces are not completely respected due to legacy, cf #2077
-    """Retrieve a project"""
+    """Retrieve, update or delete a project
+
+    `DELETE` is a soft delete: the project is only marked as deleted, and can
+    still be seen by the staff with the `with-deleted` query parameter. It
+    requires the `delete_projects` permission on the current site.
+    """
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserProjectSerializer
@@ -166,6 +172,17 @@ class ProjectDetail(
             #     )
             return Response(UserProjectSerializer(p, context=context).data)
         return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        """Mark the project as deleted, as the project admin does"""
+        has_perm_or_403(request.user, "sites.delete_projects", request.site)
+
+        # an already deleted project is not found, so its deletion date is kept
+        p = get_object_or_404(models.Project.on_site, pk=pk)
+        p.deleted = p.updated_on = timezone.now()
+        p.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectCreate(CreateAPIView):
