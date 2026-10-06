@@ -30,12 +30,9 @@
     overflow: visible;
   }
 
-  .project-table__thead th,
-  .resource-table__thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #fff;
+  .project-table__thead,
+  .resource-table__thead {
+
   }
 }
 
@@ -48,11 +45,18 @@
     table-layout: fixed;
 
     &__thead {
+      position: sticky;
+      top: 0;
+
+      text-transform: uppercase;
       font-weight: 700;
       color: var(--light-text-default-grey, #3a3a3a);
-      text-transform: uppercase;
+
       border-bottom: 2px solid var(--text-title, #161616);
       background: #fff;
+    }
+    th {
+      white-space: normal;
     }
     th,
     td {
