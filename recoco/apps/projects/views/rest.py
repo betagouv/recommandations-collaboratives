@@ -74,8 +74,8 @@ from ..serializers import (
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
     get_project_memberships,
-    unassign_roles,
 )
+from ..utils import remove_advisor, remove_collaborator
 
 ########################################################################
 # Project API
@@ -293,17 +293,8 @@ class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
     def delete(self, request, *args, **kwargs):
         user = self.get_object()["user"]
 
-        unassign_roles(user, self.project, request.site)
-
-        # same cleanup as when removing a member from the project admin
-        notifications_models.Notification.on_site.filter(
-            recipient=user,
-            target_content_type=ContentType.objects.get_for_model(models.Project),
-            target_object_id=self.project.pk,
-        ).delete()
-        models.UserProjectStatus.objects.filter(
-            site=request.site, user=user, project=self.project
-        ).delete()
+        remove_collaborator(user, self.project)
+        remove_advisor(user, self.project, request.site)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

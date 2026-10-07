@@ -27,13 +27,7 @@ from .models import (
     Topic,
     UserProjectStatus,
 )
-from .utils import (
-    assign_advisor,
-    assign_collaborator,
-    assign_observer,
-    unassign_advisor,
-    unassign_collaborator,
-)
+from .utils import assign_collaborator, assign_role, change_role
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -376,25 +370,6 @@ def get_project_memberships(
     ]
 
 
-def assign_role(user: User, project: Project, role: str, site: Site):
-    """Attach someone to a project with the given invite role"""
-    if role == "COLLABORATOR":
-        assign_collaborator(user, project)
-    elif role == "SWITCHTENDER":
-        assign_advisor(user, project, site=site)
-    elif role == "OBSERVER":
-        assign_observer(user, project, site=site)
-    else:
-        raise ValueError(f"Unhandled invite role '{role}'")
-
-
-@transaction.atomic
-def unassign_roles(user: User, project: Project, site: Site):
-    """Detach someone from a project, whatever its roles on the given site"""
-    unassign_collaborator(user, project)
-    unassign_advisor(user, project, site=site)
-
-
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     """Attach someone, given by email, to a project with the given role
 
@@ -438,15 +413,11 @@ class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
 
     email = serializers.EmailField(read_only=True)
 
-    @transaction.atomic
     def update(self, instance, validated_data):
         user = instance["user"]
         role = validated_data["role"]
 
-        # removing a role may remove permissions shared w/ the new one,
-        # hence all of them are removed before assigning the new one
-        unassign_roles(user, self.project, self.current_site)
-        assign_role(user, self.project, role, self.current_site)
+        change_role(user, self.project, role, self.current_site)
 
         return make_membership(user, role)
 
