@@ -54,8 +54,8 @@ class ProjectSpec(HookSpec):
         sidebar, right below the project info block (name, organization, commune,
         tags).
 
-        Every enabled plugin may contribute one block; blocks are rendered in
-        plugin registration order.
+        Every enabled plugin may contribute one block; the order in which
+        blocks are rendered is not guaranteed.
 
         The returned string MUST be wrapped with ``mark_safe()``; the framework
         renders it without an additional ``|safe`` filter.

@@ -260,6 +260,7 @@ a quick index.
 ``project_overview_sidebar_blocks(project, request)``
     Inject an HTML fragment into the project overview right sidebar, right
     below the project info block (name, organization, commune, tags). The
+    rendering order of blocks from several plugins is not guaranteed. The
     returned string must be wrapped with ``mark_safe()``. The page is visible
     to anyone allowed to view the project, not only staff: check
     ``request.user`` before exposing sensitive data, and return ``None`` to
