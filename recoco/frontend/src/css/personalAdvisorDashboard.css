@@ -4,10 +4,6 @@ main {
   overflow-x: initial !important;
 }
 
-[x-cloak] {
-  display: none;
-}
-
 .personal-dashboard-container-inner {
   position: relative;
   background-color: #e6e6e6;
