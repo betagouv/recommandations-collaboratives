@@ -14,9 +14,11 @@
         </div>
     </div>
     <!-- Content -->
-    <p>
-        Votre demande sera alors transférée aux administrateurs du site, qui vont la <strong>valider manuellement</strong>. Une fois votre demande validée, vous recevrez un e-mail pour vous en informer et vous inviter à vous connecter.
-    </p>
+    {% if with_demand %}
+      <p>
+          Votre demande sera alors transférée aux administrateurs du site, qui vont la <strong>valider manuellement</strong>. Une fois votre demande validée, vous recevrez un e-mail pour vous en informer et vous inviter à vous connecter.
+      </p>
+    {% endif %}
     <p class="fr-mb-2w">
         Vous n’avez pas reçu d’e-mail ? N’oubliez pas de vérifier dans vos spams (courriers indésirables) ou cliquez sur le bouton ci-dessous pour recevoir un nouvel e-mail de confirmation.
     </p>

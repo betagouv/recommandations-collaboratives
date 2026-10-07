@@ -54,9 +54,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
-from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
-from notifications import notify
 from watson import search as watson
 
 from recoco import verbs
@@ -68,7 +66,11 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.home.adapters import send_confirmation_email
-from recoco.apps.home.utils import deactivate_user, reactivate_user
+from recoco.apps.home.utils import (
+    MAX_ACTIVITY_DISPLAY,
+    deactivate_user,
+    reactivate_user,
+)
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.plugins.manager import get_plugin_manager, get_site_plugin_manager
 from recoco.apps.projects.models import (
@@ -94,7 +96,7 @@ from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
 
-def site_action_stream(site):
+def site_projects_action_stream(site):
     ctype = ContentType.objects.get_for_model(Project)
 
     return (
@@ -139,8 +141,15 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        context["site_action_stream"] = site_action_stream(self.request.site)[:100]
-
+        context["site_action_stream"] = site_projects_action_stream(
+            self.request.site
+        ).exclude(verb=verbs.User.LOGIN)[:3]
+        context["login_stream"] = (
+            Action.objects.filter(site=self.request.site, verb=verbs.User.LOGIN)
+            .order_by("-timestamp")
+            .prefetch_related(GenericPrefetch("actor", [User.objects.all()]))
+            .filter()[:50]
+        )
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
             .filter(site=self.request.site)
@@ -612,7 +621,7 @@ def organization_details(request, organization_id):
             actor_object_id__in=participant_ids,
         )
         .prefetch_related("actor", "action_object", "target")
-        .order_by("-timestamp")
+        .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
@@ -937,7 +946,7 @@ def user_details(request, user_id):
             )
             | crm_user.action_object_actions.all()
         )
-        .order_by("-timestamp")[:50]
+        .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
         .select_related("action_object_content_type", "target_content_type")
         .prefetch_related(
             GenericPrefetch(
@@ -1152,7 +1161,7 @@ def project_details(request, project_id):
 
     actions = Action.objects.filter(
         site=request.site, target_content_type=project_ct, target_object_id=project.pk
-    )
+    )[:MAX_ACTIVITY_DISPLAY]
 
     conversation_stats = {
         "messages_count": Message.not_deleted.filter(project=project).count(),
@@ -1370,7 +1379,6 @@ def create_note_for_organization(request, organization_id):
 
 def notify_note_creation(request, note, target):
     """Notify crm users of new note creation"""
-    # TODO only create action stream not emails
     action.send(
         request.user,
         verb=verbs.CRM.NOTE_CREATED,
@@ -1378,18 +1386,6 @@ def notify_note_creation(request, note, target):
         target=target,
     )
     return
-    crm_users = get_users_with_perms(
-        request.site, only_with_perms_in=["use_crm"]
-    ).exclude(pk=request.user.pk)
-
-    notify.send(
-        sender=request.user,
-        recipient=crm_users,
-        verb=verbs.CRM.NOTE_CREATED,
-        action_object=note,
-        target=target,
-        public=False,
-    )
 
 
 def update_note_for_object(request, note, return_view_name):
@@ -1988,7 +1984,8 @@ def projects_activity_feed(request):
 
     ctype = ContentType.objects.get_for_model(Project)
 
-    actions = site_action_stream(request.site)[:500]
+    # arbitrary enough
+    actions = site_projects_action_stream(request.site)[:500]
 
     search_form = forms.CRMSearchForm()
 

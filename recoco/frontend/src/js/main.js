@@ -66,6 +66,7 @@ import {
   trackOpenRessource,
   trackSeeMoreParticipants,
   trackCopyContactEmail,
+  trackClickFillFolderDemarcheNumerique,
 } from './utils/trackingMatomo';
 
 window.trackCopyContactEmail = trackCopyContactEmail;
@@ -75,3 +76,4 @@ window.trackScrollDepth = trackScrollDepth;
 window.trackReplyToMessage = trackReplyToMessage;
 window.trackOpenRessource = trackOpenRessource;
 window.trackSeeMoreParticipants = trackSeeMoreParticipants;
+window.trackClickFillFolderDemarcheNumerique = trackClickFillFolderDemarcheNumerique;

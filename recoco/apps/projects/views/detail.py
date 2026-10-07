@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.prefetch import GenericPrefetch
+from django.contrib.sites.models import Site
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -25,8 +27,10 @@ from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.survey import models as survey_models
+from recoco.apps.tasks import models as task_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
 
+from ...home.utils import MAX_ACTIVITY_DISPLAY
 from .. import models
 from ..forms import (
     PrivateNoteForm,
@@ -355,6 +359,28 @@ def project_internal_followup_tracking(request, project_id=None):
     advising, advising_position = get_advising_context_for_project(
         request.user, project
     )
+    stream = project.target_actions.all().prefetch_related(
+        GenericPrefetch(
+            "actor",
+            [User.objects.all().prefetch_related("profile", "profile__organization")],
+        ),
+        GenericPrefetch(
+            "action_object",
+            [
+                # _base_manager to not silently miss projects
+                models.Project._base_manager.select_related("commune"),
+                task_models.Task.objects.select_related("project"),
+            ],
+        ),
+        GenericPrefetch(
+            "target",
+            [
+                # _base_manager to not silently miss projects
+                models.Project._base_manager.select_related("commune"),
+                Site.objects.all(),
+            ],
+        ),
+    )[:MAX_ACTIVITY_DISPLAY]
 
     return render(request, "projects/project/internal_followup_tracking.html", locals())
 

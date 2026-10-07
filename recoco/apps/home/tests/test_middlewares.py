@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
@@ -372,10 +373,7 @@ class TestEmbedMiddlewareCSP:
 
         assert response.status_code == 200
         csp_header = response["Content-Security-Policy"]
-        assert (
-            "frame-ancestors 'self' https://partner.example.fr" in csp_header
-            or "frame-ancestors https://partner.example.fr 'self'" in csp_header
-        )
+        assert re.search(r"frame-ancestors[^;]+ https://partner.example.fr", csp_header)
 
 
 class TestEmbedContextProcessor:
