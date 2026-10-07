@@ -53,10 +53,12 @@ class PluginB:
         return [{"name": "plugin_b"}]
 
 
-def make_plugin_manager(*named_plugins):
-    """Build a real PluginManager pre-loaded with the given (name, instance) pairs."""
+def make_plugin_manager(*named_plugins, specs=(ProjectSpec,)):
+    """Build a real PluginManager registered with the given hookspec namespaces
+    and pre-loaded with the given (name, instance) pairs."""
     pm = pluggy.PluginManager("recoco")
-    pm.add_hookspecs(ProjectSpec)
+    for spec in specs:
+        pm.add_hookspecs(spec)
     for name, plugin in named_plugins:
         pm.register(plugin, name=name)
     return pm
@@ -302,15 +304,6 @@ def test_migrate_tenant_command_logic(current_site):
 # ---------------------------------------------------------------------------
 
 
-def make_named_plugin_manager(name, plugin, *specs):
-    """Build a PluginManager registered with the given hookspec namespaces and plugin."""
-    pm = pluggy.PluginManager("recoco")
-    for spec in specs:
-        pm.add_hookspecs(spec)
-    pm.register(plugin, name=name)
-    return pm
-
-
 @pytest.fixture
 def site_with_enabled_plugins(current_site):
     """Factory: create a SiteConfiguration enabling the given plugin names."""
@@ -337,7 +330,7 @@ FAKE_PLUGIN_NAME = "fake_crm_plugin"
 
 def make_crm_plugin_manager(plugin):
     """Build a plugin manager registered with CrmSpec and the given plugin."""
-    return make_named_plugin_manager(FAKE_PLUGIN_NAME, plugin, ProjectSpec, CrmSpec)
+    return make_plugin_manager((FAKE_PLUGIN_NAME, plugin), specs=(ProjectSpec, CrmSpec))
 
 
 class FakeCrmPlugin:
@@ -446,7 +439,7 @@ FAKE_PROJECT_PLUGIN_NAME = "fake_project_plugin"
 
 def make_project_plugin_manager(plugin):
     """Build a plugin manager registered with ProjectSpec and the given plugin."""
-    return make_named_plugin_manager(FAKE_PROJECT_PLUGIN_NAME, plugin, ProjectSpec)
+    return make_plugin_manager((FAKE_PROJECT_PLUGIN_NAME, plugin))
 
 
 class FakeProjectOverviewPlugin:
@@ -512,8 +505,8 @@ class FakeNotificationPlugin:
 
 
 def make_notification_plugin_manager(plugin):
-    return make_named_plugin_manager(
-        FAKE_NOTIFICATION_PLUGIN_NAME, plugin, NotificationSpec
+    return make_plugin_manager(
+        (FAKE_NOTIFICATION_PLUGIN_NAME, plugin), specs=(NotificationSpec,)
     )
 
 
