@@ -50,6 +50,7 @@ from recoco.utils import (
     get_group_for_site,
     has_perm,
     has_perm_or_403,
+    is_staff_for_site,
 )
 
 from .. import models, signals
@@ -87,6 +88,13 @@ class CanModerateProjectsOnSite(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return has_perm(request.user, "sites.moderate_projects", request.site)
+
+
+class IsStaffForSite(permissions.BasePermission):
+    """Allow the staff of the current site"""
+
+    def has_permission(self, request, view):
+        return is_staff_for_site(request.user, request.site)
 
 
 class ProjectDetail(
@@ -201,7 +209,9 @@ class ProjectCreate(CreateAPIView):
 class ProjectMembershipMixin:
     """Give the project of the url to the membership views and serializers"""
 
-    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
+    # restricted to staff, so that it never allows someone the project
+    # administration refuses, cf. test_project_membership_api_never_allows_more
+    permission_classes = [permissions.IsAuthenticated, IsStaffForSite]
 
     @cached_property
     def project(self) -> models.Project:

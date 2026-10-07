@@ -1135,6 +1135,122 @@ def test_owner_is_neither_changed_nor_removed_by_project_member_detail_api(
 
 
 ########################################################################
+# the membership api never allows more than the project administration
+########################################################################
+
+
+def make_user_with_profile(profile, project, site):
+    """Return a user w/ the given profile, or None if anonymous"""
+    if profile == "anonymous":
+        return None
+
+    user = baker.make(auth_models.User)
+    if profile == "collaborator":
+        utils.assign_collaborator(user, project)
+    elif profile == "advisor":
+        utils.assign_advisor(user, project, site=site)
+    elif profile == "observer":
+        utils.assign_observer(user, project, site=site)
+    elif profile in ("staff", "admin"):
+        user.groups.add(get_group_for_site(profile, site))
+    elif profile == "moderator":
+        assign_perm("sites.moderate_projects", user, site)
+    elif profile == "staff_elsewhere":
+        other_site = baker.make(sites_models.Site)
+        user.groups.add(get_group_for_site("staff", other_site, create=True))
+
+    return user
+
+
+# for each action: the targeted role, the admin url, the api call and its effect
+MEMBERSHIP_ACTIONS = {
+    "remove_collaborator": (
+        "COLLABORATOR",
+        lambda p, u: reverse(
+            "projects-project-access-collectivity-delete", args=[p.id, u.username]
+        ),
+        lambda c, url: c.delete(url),
+        lambda p, u: not models.ProjectMember.objects.filter(
+            project=p, member=u
+        ).exists(),
+    ),
+    "remove_advisor": (
+        "SWITCHTENDER",
+        lambda p, u: reverse(
+            "projects-project-access-advisor-delete", args=[p.id, u.username]
+        ),
+        lambda c, url: c.delete(url),
+        lambda p, u: not models.ProjectSwitchtender.objects.filter(
+            project=p, switchtender=u
+        ).exists(),
+    ),
+    "promote_as_advisor": (
+        "COLLABORATOR",
+        lambda p, u: reverse("projects-project-promote-advisor", args=[p.id, u.id]),
+        lambda c, url: c.patch(url, data={"role": "SWITCHTENDER"}),
+        lambda p, u: models.ProjectSwitchtender.objects.filter(
+            project=p, switchtender=u
+        ).exists(),
+    ),
+}
+
+
+def is_membership_action_done(client, project, site, profile, action, via_api):
+    role, admin_url, api_call, is_done = MEMBERSHIP_ACTIONS[action]
+
+    username = f"{'api' if via_api else 'admin'}@example.com"
+    member = baker.make(auth_models.User, username=username, email=username)
+    member.profile.sites.add(site)
+    utils.assign_role(member, project, role, site)
+
+    user = make_user_with_profile(profile, project, site)
+    if via_api:
+        if user:
+            client.force_authenticate(user)
+        api_call(
+            client,
+            reverse("projects-members-detail", args=[project.id, member.username]),
+        )
+    else:
+        if user:
+            client.force_login(user)
+        client.post(admin_url(project, member))
+
+    return is_done(project, member)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("action", MEMBERSHIP_ACTIONS.keys())
+@pytest.mark.parametrize(
+    "profile",
+    [
+        "anonymous",
+        "random",
+        "collaborator",
+        "advisor",
+        "observer",
+        "staff",
+        "admin",
+        "moderator",
+        "staff_elsewhere",
+    ],
+)
+def test_project_membership_api_never_allows_more_than_administration(
+    request, client, api_client, make_project, profile, action
+):
+    site = get_current_site(request)
+
+    by_admin = is_membership_action_done(
+        client, make_project(), site, profile, action, via_api=False
+    )
+    by_api = is_membership_action_done(
+        api_client, make_project(), site, profile, action, via_api=True
+    )
+
+    assert not by_api or by_admin
+
+
+########################################################################
 # patch project details
 ########################################################################
 
