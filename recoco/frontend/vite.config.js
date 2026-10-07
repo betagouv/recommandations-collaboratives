@@ -294,9 +294,6 @@ const config = {
         greyScaleToggleStyles: resolve(
           './src/js/styles/grey-scale-toggle.css.js'
         ),
-        accordionStatus: resolve('./src/js/components/AccordionStatus.js'),
-        dismissibleNotice: resolve('./src/js/components/DismissibleNotice.js'),
-        logoUpload: resolve('./src/js/components/LogoUpload.js'),
       },
       output: {
         chunkFileNames: undefined,
