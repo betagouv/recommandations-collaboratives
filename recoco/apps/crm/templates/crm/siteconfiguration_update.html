@@ -41,7 +41,7 @@
                     </p>
                     <div class="fr-mb-3w">
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-description" icon="fr-icon-file-color" label="Description du service" %}
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-description" icon="fr-icon-file-color" label="Description du service" header_level=2 %}
                             <div class="fr-collapse" id="accordion-description">
                                 <fieldset class="fr-fieldset">
                                     {{ form.main_topic|as_crispy_field:"dsrc_crispy_forms_no_js" }}
@@ -52,7 +52,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-emails" icon="fr-icon-mail-with-hints" label="Paramètres des e-mails" %}
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-emails" icon="fr-icon-mail-with-hints" label="Paramètres des e-mails" header_level=2 %}
                             <div class="fr-collapse" id="accordion-emails">
                                 <fieldset class="fr-fieldset">
                                     {{ form.contact_form_recipient|as_crispy_field:"dsrc_crispy_forms_no_js" }}
@@ -68,7 +68,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-logos" icon="fr-icon-mockup-with-images" label="Logos" %}
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-logos" icon="fr-icon-mockup-with-images" label="Logos" header_level=2 %}
                             <div class="fr-collapse" id="accordion-logos">
                                 <div class="crm-config__notice fr-mb-3w gap-2"
                                      x-data="DismissibleNotice('site-config.logos')"
@@ -100,7 +100,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-legal" icon="fr-icon-justice-scale" label="Informations légales" %}
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-legal" icon="fr-icon-justice-scale" label="Informations légales" header_level=2 %}
                             <div class="fr-collapse" id="accordion-legal">
                                 {% if not request.site_config.legal_owner or not request.site_config.legal_owner_name or not request.site_config.legal_address or not request.site_config.legal_phone_no or not request.site_config.dpo_contact_email or not request.site_config.gdpr_purposes or not request.site_config.target_audience %}
                                 <div class="crm-config__notice fr-mb-3w gap-2"
@@ -149,7 +149,7 @@
                             </div>
                         </section>
                         <section class="fr-accordion" x-data="AccordionStatus">
-                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-config" icon="fr-icon-system" label="Configuration" %}
+                            {% include "crm/fragments/config/accordion_header.html" with accordion_id="accordion-config" icon="fr-icon-system" label="Configuration" header_level=2 %}
                             <div class="fr-collapse" id="accordion-config">
                                 <fieldset class="fr-fieldset">
                                     {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}

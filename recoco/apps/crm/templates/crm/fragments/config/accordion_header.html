@@ -5,8 +5,9 @@
       accordion_id : id of the collapsed content controlled by the header
       icon : icon class
       label : title of the accordion
+      header_level : level of the header (h2, h3, ...)
 {% endcomment %}
-<h2 class="fr-accordion__title">
+<h{{ header_level }} class="fr-accordion__title">
     <button type="button"
             class="fr-accordion__btn"
             aria-expanded="false"
@@ -18,4 +19,4 @@
               :class="[badge?.modifier, badge?.icon]"
               class="fr-badge fr-badge--sm fr-badge--icon-left crm-config__accordion-badge"></span>
     </button>
-</h2>
+</h{{ header_level }}>
