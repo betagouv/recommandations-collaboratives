@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlparse
 
 import django.core.mail
 import pytest
+from allauth.account.models import EmailAddress
 from allauth.mfa.models import Authenticator
 from django.conf import settings
 from django.contrib.auth import models as auth_models
@@ -769,6 +770,31 @@ def test_unkown_user_ask_code_no_fail(client, mocker):
 
     adapter = import_string(settings.ACCOUNT_ADAPTER)
     adapter.send_mail.assert_called_with("account/email/unknown_account", email, ANY)
+
+
+@pytest.mark.django_db
+def test_login_with_code_validates_email(client, mocker):
+    mocker.patch(settings.ACCOUNT_ADAPTER + ".send_mail")
+    user_not_validated = baker.make(auth_models.User, email="not-validated@email.fr")
+    assert not EmailAddress.objects.filter(
+        email=user_not_validated.email, verified=True
+    ).exists()
+
+    url = reverse("account_request_login_code")
+    email = "not-validated@email.fr"
+    data = {"email": email}
+    response = client.post(url, data)
+    assert response.status_code == 302
+
+    adapter = import_string(settings.ACCOUNT_ADAPTER)
+    adapter.send_mail.assert_called_with(
+        "account/email/login_code", user_not_validated.email, ANY
+    )
+    code = adapter.send_mail.call_args.args[2]["code"]
+    client.post(response.url, {"code": code})
+    assert EmailAddress.objects.filter(
+        email=user_not_validated.email, verified=True
+    ).exists()
 
 
 ################################################################
