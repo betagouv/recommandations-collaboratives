@@ -4,7 +4,6 @@
 {% load gravatar %}
 {% load activity_tags %}
 {% block project_detail %}
-    {% activity_stream "target" project %}
     <div class="w-100 h-100">
         <div class="d-flex">
             <a href="{% url 'projects-project-detail' project.id %}"
@@ -25,7 +24,7 @@
                 <ul class="list-group fr-m-0 fr-p-0 activity-stream-container">
                     {% for date, actions in stream_by_day %}
                         <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column fr-mb-2w fr-mx-0 fr-px-0">
-                            <span class="small text-info-custom text-grey-dark fr-mb-2v fr-pl-2v">{{ date|naturalday|capfirst }}</span>
+                            <span class="text-info-custom text-grey-dark fr-mb-2v fr-pl-2v">{{ date|naturalday|capfirst }}</span>
                             <div class="activity-stream-actions-container d-flex flex-column">
                                 {% for action in actions %}
                                     {% display_action action %}
@@ -33,9 +32,10 @@
                             </div>
                         </li>
                     {% empty %}
-                        <span class="text-custom-info text-grey-dark fw-light">Vous trouverez ici l'activité de vos dossiers suivis</span>
+                        <span class="text-info-custom text-grey-dark fw-light">Vous trouverez ici l'activité de vos dossiers suivis</span>
                     {% endfor %}
                 </ul>
+            <p class="text-info-custom text-grey-dark fw-light"><span class="fr-icon-information-fill" aria-hidden="true"></span> Il est possible que des activités plus anciennes ne soient pas affichées ici.</p>
             </article>
         </div>
     </div>
