@@ -99,6 +99,19 @@
   }
 }
 
+.fr-select-group {
+  &--rounded {
+    .fr-select {
+      padding: 5px 15px;
+      padding-right: 35px;
+      background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity));
+      border-radius: var(--bs-border-radius-pill);
+      border:solid 1px #e5e5e5; ;
+      box-shadow: none;
+    }
+  }
+}
+
 /* ¯¯¯¯ *\
   HEADER
 \* ˍˍˍˍ */
