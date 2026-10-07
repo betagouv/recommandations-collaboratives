@@ -6,12 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("home", "0050_siteconfiguration_dpo_contact_email_and_more"),
-        ("home", "0051_alter_siteconfiguration_contact_form_recipient_and_more"),
-        ("home", "0052_alter_siteconfiguration_legal_owner_name"),
-    ]
-
     dependencies = [
         ("home", "0049_remove_siteconfiguration_sender_email"),
     ]
