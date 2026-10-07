@@ -28,13 +28,6 @@
     overflow: visible;
   }
 
-  .project-table__thead th,
-  .resource-table__thead th {
-    position: sticky;
-    top: 64px;
-    z-index: 1;
-    background-color: #fff;
-  }
 }
 
 .crm {
@@ -55,9 +48,15 @@
 
       border-bottom: 2px solid var(--text-title, #161616);
       background: #fff;
+
+      z-index: 1;
     }
     th {
       white-space: normal;
+      position: sticky;
+
+      top: 64px;
+      background-color: #fff;
     }
     th,
     td {
