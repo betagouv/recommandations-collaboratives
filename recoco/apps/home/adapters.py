@@ -106,6 +106,10 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         # might be cleaner through a custom login stage conditionned by signup arg
         if redirect_url == reverse_lazy("advisor-access-request"):
             return redirect(redirect_url)
+        if request.resolver_match.url_name == "account_confirm_login_code":
+            confirm_email(
+                request, user
+            )  # this is a connexion by email so the email is valid
         if not user.is_active:
             return self.respond_user_inactive(request, user)
 
