@@ -202,3 +202,8 @@
 .fr-icon-hammer-line::before {
   mask-image: url(../assets/hammer-line.svg);
 }
+
+.fr-icon-draft::after,
+.fr-icon-draft::before {
+  mask-image: url(../assets/draft.svg);
+}
