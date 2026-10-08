@@ -6,7 +6,7 @@
   line-height: 1.5em;
   position: relative;
   &__topics {
-    --height-header-nav: 63px + var(--height-header);
+    --height-header-nav: calc(63px + var(--height-header));
     display: flex;
     flex-direction: column;
     justify-content: space-between;
