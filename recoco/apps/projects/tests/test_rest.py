@@ -921,6 +921,7 @@ def test_collaborator_is_attached_by_project_membership_api(
     )
 
     assert response.status_code == 201
+    assert response.data == {"email": "jane@example.com", "role": "COLLABORATOR"}
 
     # the account is created on the fly, w/ a lowercased email
     member = auth_models.User.objects.get(username="jane@example.com")
@@ -1009,16 +1010,14 @@ def test_project_members_are_listed_by_project_membership_api(
     response = api_client.get(reverse("projects-members-list", args=[project.id]))
 
     assert response.status_code == 200
-    assert sorted(
-        (m["email"], m["role"], m["is_owner"]) for m in response.data
-    ) == sorted(
-        [
-            (project_members["owner"].email, "COLLABORATOR", True),
-            (project_members["collaborator"].email, "COLLABORATOR", False),
-            (project_members["advisor"].email, "SWITCHTENDER", False),
-            (project_members["observer"].email, "OBSERVER", False),
-        ]
-    )
+    assert [(m["email"], m["is_owner"]) for m in response.data["members"]] == [
+        (project_members["owner"].email, True),
+        (project_members["collaborator"].email, False),
+    ]
+    assert [(a["email"], a["is_observer"]) for a in response.data["advisors"]] == [
+        (project_members["observer"].email, True),
+        (project_members["advisor"].email, False),
+    ]
 
 
 @pytest.mark.django_db

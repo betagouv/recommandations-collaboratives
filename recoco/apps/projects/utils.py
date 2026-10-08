@@ -203,6 +203,13 @@ def remove_advisor(user, project, site):
     ).delete()
 
 
+@transaction.atomic
+def remove_member(user, project, site):
+    """Remove someone from a project, whatever its roles on the given site"""
+    remove_collaborator(user, project)
+    remove_advisor(user, project, site)
+
+
 def assign_role(user, project, role, site):
     """Attach someone to a project with the given invite role"""
     if role == "COLLABORATOR":

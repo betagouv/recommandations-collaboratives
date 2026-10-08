@@ -333,41 +333,28 @@ class NewProjectSerializer(ProjectSerializer):
         return project
 
 
-def make_membership(user: User, role: str, is_owner: bool = False) -> dict:
-    """Return the membership of a user on a project, as serialized by the api"""
-    return {
-        "user": user,
-        "email": user.email or user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "role": role,
-        "is_owner": is_owner,
-    }
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    """A participant of a project"""
+
+    class Meta:
+        model = ProjectMember
+        fields = ["email", "first_name", "last_name", "is_owner"]
+
+    email = serializers.EmailField(source="member.email")
+    first_name = serializers.CharField(source="member.first_name")
+    last_name = serializers.CharField(source="member.last_name")
 
 
-def get_project_memberships(
-    project: Project, site: Site, user: User | None = None
-) -> list[dict]:
-    """Return the participants of a project, and its advisors on the given site
+class ProjectAdvisorSerializer(serializers.ModelSerializer):
+    """An advisor or an observer of a project"""
 
-    Someone both participant and advisor has one membership for each role.
-    """
-    members = ProjectMember.objects.filter(project=project).select_related("member")
-    switchtendings = ProjectSwitchtender.objects.filter(
-        project=project, site=site
-    ).select_related("switchtender")
+    class Meta:
+        model = ProjectSwitchtender
+        fields = ["email", "first_name", "last_name", "is_observer"]
 
-    if user is not None:
-        members = members.filter(member=user)
-        switchtendings = switchtendings.filter(switchtender=user)
-
-    return [
-        make_membership(m.member, "COLLABORATOR", is_owner=m.is_owner)
-        for m in members.order_by("-is_owner", "member__username")
-    ] + [
-        make_membership(s.switchtender, "OBSERVER" if s.is_observer else "SWITCHTENDER")
-        for s in switchtendings.order_by("switchtender__username")
-    ]
+    email = serializers.EmailField(source="switchtender.email")
+    first_name = serializers.CharField(source="switchtender.first_name")
+    last_name = serializers.CharField(source="switchtender.last_name")
 
 
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
@@ -379,10 +366,7 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     """
 
     email = serializers.EmailField(max_length=150)
-    first_name = serializers.CharField(read_only=True)
-    last_name = serializers.CharField(read_only=True)
     role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
-    is_owner = serializers.BooleanField(read_only=True)
 
     @property
     def project(self) -> Project:
@@ -394,14 +378,10 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         user = get_or_create_user_on_site(validated_data["email"], self.current_site)
-        role = validated_data["role"]
 
-        assign_role(user, self.project, role, self.current_site)
+        assign_role(user, self.project, validated_data["role"], self.current_site)
 
-        is_owner = ProjectMember.objects.filter(
-            project=self.project, member=user, is_owner=True
-        ).exists()
-        return make_membership(user, role, is_owner=is_owner and role == "COLLABORATOR")
+        return validated_data
 
 
 class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
@@ -414,12 +394,11 @@ class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
     email = serializers.EmailField(read_only=True)
 
     def update(self, instance, validated_data):
-        user = instance["user"]
         role = validated_data["role"]
 
-        change_role(user, self.project, role, self.current_site)
+        change_role(instance, self.project, role, self.current_site)
 
-        return make_membership(user, role)
+        return {"email": instance.email, "role": role}
 
 
 class ProjectForListSerializer(BaseSerializerMixin):

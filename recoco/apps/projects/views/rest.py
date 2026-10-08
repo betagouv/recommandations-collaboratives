@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.db import transaction
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -27,7 +26,6 @@ from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
     ListAPIView,
-    ListCreateAPIView,
     RetrieveAPIView,
 )
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -65,8 +63,10 @@ from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
     NewProjectSerializer,
+    ProjectAdvisorSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
+    ProjectMemberSerializer,
     ProjectMembershipRoleSerializer,
     ProjectMembershipSerializer,
     ProjectSiteSerializer,
@@ -74,9 +74,8 @@ from ..serializers import (
     UserProjectSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
-    get_project_memberships,
 )
-from ..utils import remove_advisor, remove_collaborator
+from ..utils import remove_member
 
 ########################################################################
 # Project API
@@ -223,13 +222,17 @@ class ProjectMembershipMixin:
         return context
 
 
-class ProjectMembershipList(ProjectMembershipMixin, ListCreateAPIView):
+class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
     """List or attach the participants, advisors and observers of a project
 
-    `GET` lists the members of the project: each one has an `email`, a
-    `first_name`, a `last_name`, a `role` and an `is_owner` flag, only set for
-    the owner of the project. Someone who is both participant and advisor is
-    listed once for each role. Only the advisors of the current site are listed.
+    `GET` lists the people attached to the project, in two lists:
+
+    - `members`: the participants, each one with an `email`, a `first_name`, a
+      `last_name` and an `is_owner` flag, only set for the owner of the project;
+    - `advisors`: the advisors and observers of the current site, each one with
+      an `email`, a `first_name`, a `last_name` and an `is_observer` flag.
+
+    Someone who is both participant and advisor is in both lists.
 
     `POST` attaches someone to the project. The person is given by email, in
     the `email` field, and its account is created if it does not exist yet.
@@ -248,11 +251,23 @@ class ProjectMembershipList(ProjectMembershipMixin, ListCreateAPIView):
     """
 
     serializer_class = ProjectMembershipSerializer
-    pagination_class = None
-    filter_backends = []
 
-    def get_queryset(self):
-        return get_project_memberships(self.project, self.request.site)
+    def get(self, request, *args, **kwargs):
+        members = self.project.projectmember_set.select_related("member")
+        advisors = self.project.switchtender_sites.on_site().select_related(
+            "switchtender"
+        )
+
+        return Response(
+            {
+                "members": ProjectMemberSerializer(
+                    members.order_by("-is_owner", "member__username"), many=True
+                ).data,
+                "advisors": ProjectAdvisorSerializer(
+                    advisors.order_by("switchtender__username"), many=True
+                ).data,
+            }
+        )
 
 
 class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
@@ -277,21 +292,20 @@ class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
 
     serializer_class = ProjectMembershipRoleSerializer
 
-    def get_object(self) -> dict:
+    def get_object(self) -> User:
         user = get_object_or_404(User, username=self.kwargs["email"].lower())
 
-        memberships = get_project_memberships(
-            self.project, self.request.site, user=user
-        )
-        if not memberships:
+        members = self.project.projectmember_set.filter(member=user)
+        advisors = self.project.switchtender_sites.on_site().filter(switchtender=user)
+        if not (members.exists() or advisors.exists()):
             raise Http404
 
-        if any(membership["is_owner"] for membership in memberships):
+        if members.filter(is_owner=True).exists():
             raise ValidationError(
                 {"email": "The owner of a project cannot be changed nor removed."}
             )
 
-        return memberships[0]
+        return user
 
     def patch(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_object(), data=request.data)
@@ -299,12 +313,10 @@ class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
         serializer.save()
         return Response(serializer.data)
 
-    @transaction.atomic
     def delete(self, request, *args, **kwargs):
-        user = self.get_object()["user"]
+        user = self.get_object()
 
-        remove_collaborator(user, self.project)
-        remove_advisor(user, self.project, request.site)
+        remove_member(user, self.project, request.site)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
