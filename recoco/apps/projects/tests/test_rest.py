@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
+import uuid
 from datetime import datetime
 
 import pytest
@@ -965,69 +966,59 @@ def test_advisor_is_attached_by_project_membership_api(
 
 
 @pytest.fixture
-def project_members(request, project):
-    """Return an owner, a participant, an advisor and an observer of project"""
-    site = get_current_site(request)
+def make_member(current_site):
+    """Return a factory attaching someone to a project with the given role"""
 
-    owner = baker.make(
-        auth_models.User, username="owner@example.com", email="owner@example.com"
-    )
-    utils.assign_collaborator(owner, project, is_owner=True)
+    def _make_member(project, role="COLLABORATOR", email=None, is_owner=False):
+        email = email or f"{uuid.uuid4().hex}@example.com"
+        user = baker.make(auth_models.User, username=email, email=email)
+        user.profile.sites.add(current_site)
 
-    collaborator = baker.make(
-        auth_models.User, username="jane@example.com", email="jane@example.com"
-    )
-    utils.assign_collaborator(collaborator, project)
+        if is_owner:
+            utils.assign_collaborator(user, project, is_owner=True)
+        else:
+            utils.assign_role(user, project, role, current_site)
 
-    advisor = baker.make(
-        auth_models.User, username="john@example.com", email="john@example.com"
-    )
-    utils.assign_advisor(advisor, project, site=site)
+        return user
 
-    observer = baker.make(
-        auth_models.User, username="jim@example.com", email="jim@example.com"
-    )
-    utils.assign_observer(observer, project, site=site)
-
-    return {
-        "owner": owner,
-        "collaborator": collaborator,
-        "advisor": advisor,
-        "observer": observer,
-    }
+    return _make_member
 
 
 @pytest.mark.django_db
 def test_project_members_are_listed_by_project_membership_api(
-    api_client, api_user, project, project_members
+    api_client, staff_user, project, make_member
 ):
+    owner = make_member(project, email="owner@example.com", is_owner=True)
+    collaborator = make_member(project, email="jane@example.com")
+    advisor = make_member(project, "SWITCHTENDER", email="john@example.com")
+    observer = make_member(project, "OBSERVER", email="jim@example.com")
+
     # an advisor on another site is not listed
     other_site = baker.make(sites_models.Site)
     utils.assign_advisor(baker.make(auth_models.User), project, site=other_site)
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     response = api_client.get(reverse("projects-members-list", args=[project.id]))
 
     assert response.status_code == 200
     assert [(m["email"], m["is_owner"]) for m in response.data["members"]] == [
-        (project_members["owner"].email, True),
-        (project_members["collaborator"].email, False),
+        (owner.email, True),
+        (collaborator.email, False),
     ]
     assert [(a["email"], a["is_observer"]) for a in response.data["advisors"]] == [
-        (project_members["observer"].email, True),
-        (project_members["advisor"].email, False),
+        (observer.email, True),
+        (advisor.email, False),
     ]
 
 
 @pytest.mark.django_db
 def test_collaborator_is_made_advisor_by_project_member_detail_api(
-    request, api_client, api_user, project, project_members
+    api_client, staff_user, current_site, project, make_member
 ):
-    site = get_current_site(request)
-    collaborator = project_members["collaborator"]
+    collaborator = make_member(project, email="jane@example.com")
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     # the email of the url is case insensitive
     url = reverse("projects-members-detail", args=[project.id, "JANE@example.com"])
@@ -1040,7 +1031,7 @@ def test_collaborator_is_made_advisor_by_project_member_detail_api(
         project=project, member=collaborator
     ).exists()
     switchtending = models.ProjectSwitchtender.objects.get(
-        project=project, switchtender=collaborator, site=site
+        project=project, switchtender=collaborator, site=current_site
     )
     assert switchtending.is_observer is False
     # a permission shared by both roles is kept
@@ -1049,45 +1040,51 @@ def test_collaborator_is_made_advisor_by_project_member_detail_api(
 
 @pytest.mark.django_db
 def test_member_is_removed_by_project_member_detail_api(
-    request, api_client, api_user, project, project_members
+    api_client, staff_user, current_site, project, make_member
 ):
-    site = get_current_site(request)
-    user = project_members["collaborator"]
+    owner = make_member(project, is_owner=True)
+    collaborator = make_member(project)
 
     # to check they are cleaned up when the member is removed
-    notify.send(sender=api_user, recipient=user, verb="a verb", target=project)
-    baker.make(models.UserProjectStatus, site=site, user=user, project=project)
+    notify.send(
+        sender=staff_user, recipient=collaborator, verb="a verb", target=project
+    )
+    baker.make(
+        models.UserProjectStatus, site=current_site, user=collaborator, project=project
+    )
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
-    url = reverse("projects-members-detail", args=[project.id, user.username])
+    url = reverse("projects-members-detail", args=[project.id, collaborator.username])
     response = api_client.delete(url)
 
     assert response.status_code == 204
 
     assert not models.ProjectMember.objects.filter(
-        project=project, member=user
+        project=project, member=collaborator
     ).exists()
     assert not models.ProjectSwitchtender.objects.filter(
-        project=project, switchtender=user
+        project=project, switchtender=collaborator
     ).exists()
-    assert not user.has_perm("projects.view_project", project)
-    assert not notifications_models.Notification.objects.filter(recipient=user).exists()
+    assert not collaborator.has_perm("projects.view_project", project)
+    assert not notifications_models.Notification.objects.filter(
+        recipient=collaborator
+    ).exists()
     assert not models.UserProjectStatus.objects.filter(
-        user=user, project=project
+        user=collaborator, project=project
     ).exists()
 
     # the other members are kept
-    assert models.ProjectMember.objects.filter(
-        project=project, member=project_members["owner"]
-    ).exists()
+    assert models.ProjectMember.objects.filter(project=project, member=owner).exists()
 
 
 @pytest.mark.django_db
 def test_non_staff_cannot_remove_member_by_project_member_detail_api(
-    api_client, project, project_members
+    api_client, project, make_member
 ):
-    url = reverse("projects-members-detail", args=[project.id, "jane@example.com"])
+    collaborator = make_member(project)
+
+    url = reverse("projects-members-detail", args=[project.id, collaborator.username])
 
     # anonymous
     assert api_client.delete(url).status_code == 403
@@ -1097,39 +1094,44 @@ def test_non_staff_cannot_remove_member_by_project_member_detail_api(
     assert api_client.delete(url).status_code == 403
 
     assert models.ProjectMember.objects.filter(
-        project=project, member=project_members["collaborator"]
+        project=project, member=collaborator
     ).exists()
 
 
 @pytest.mark.django_db
 def test_unknown_email_is_reported_by_project_member_detail_api(
-    api_client, api_user, project, project_members
+    api_client, staff_user, project, make_member
 ):
-    api_client.force_authenticate(api_user)
+    make_member(project)
+    make_member(project, "SWITCHTENDER")
+
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-members-detail", args=[project.id, "unknown@example.com"])
 
     assert api_client.delete(url).status_code == 404
 
     # nobody else is removed instead
-    assert models.ProjectMember.objects.filter(project=project).count() == 2
-    assert models.ProjectSwitchtender.objects.filter(project=project).count() == 2
+    assert models.ProjectMember.objects.filter(project=project).count() == 1
+    assert models.ProjectSwitchtender.objects.filter(project=project).count() == 1
 
 
 @pytest.mark.django_db
 def test_owner_is_neither_changed_nor_removed_by_project_member_detail_api(
-    api_client, api_user, project, project_members
+    api_client, staff_user, project, make_member
 ):
-    api_client.force_authenticate(api_user)
+    owner = make_member(project, is_owner=True)
 
-    url = reverse("projects-members-detail", args=[project.id, "owner@example.com"])
+    api_client.force_authenticate(staff_user)
+
+    url = reverse("projects-members-detail", args=[project.id, owner.username])
 
     assert api_client.patch(url, data={"role": "OBSERVER"}).status_code == 400
     assert api_client.delete(url).status_code == 400
 
-    assert project.owner == project_members["owner"]
+    assert project.owner == owner
     assert not models.ProjectSwitchtender.objects.filter(
-        project=project, switchtender=project_members["owner"]
+        project=project, switchtender=owner
     ).exists()
 
 
@@ -1138,19 +1140,23 @@ def test_owner_is_neither_changed_nor_removed_by_project_member_detail_api(
 ########################################################################
 
 
-def make_user_with_profile(profile, project, site):
+PROFILE_ROLES = {
+    "collaborator": "COLLABORATOR",
+    "advisor": "SWITCHTENDER",
+    "observer": "OBSERVER",
+}
+
+
+def make_user_with_profile(make_member, profile, project, site):
     """Return a user w/ the given profile, or None if anonymous"""
     if profile == "anonymous":
         return None
 
+    if profile in PROFILE_ROLES:
+        return make_member(project, PROFILE_ROLES[profile])
+
     user = baker.make(auth_models.User)
-    if profile == "collaborator":
-        utils.assign_collaborator(user, project)
-    elif profile == "advisor":
-        utils.assign_advisor(user, project, site=site)
-    elif profile == "observer":
-        utils.assign_observer(user, project, site=site)
-    elif profile in ("staff", "admin"):
+    if profile in ("staff", "admin"):
         user.groups.add(get_group_for_site(profile, site))
     elif profile == "moderator":
         assign_perm("sites.moderate_projects", user, site)
@@ -1194,15 +1200,14 @@ MEMBERSHIP_ACTIONS = {
 }
 
 
-def is_membership_action_done(client, project, site, profile, action, via_api):
+def is_membership_action_done(
+    client, make_member, project, site, profile, action, via_api
+):
     role, admin_url, api_call, is_done = MEMBERSHIP_ACTIONS[action]
 
-    username = f"{'api' if via_api else 'admin'}@example.com"
-    member = baker.make(auth_models.User, username=username, email=username)
-    member.profile.sites.add(site)
-    utils.assign_role(member, project, role, site)
+    member = make_member(project, role)
 
-    user = make_user_with_profile(profile, project, site)
+    user = make_user_with_profile(make_member, profile, project, site)
     if via_api:
         if user:
             client.force_authenticate(user)
@@ -1235,15 +1240,13 @@ def is_membership_action_done(client, project, site, profile, action, via_api):
     ],
 )
 def test_project_membership_api_never_allows_more_than_administration(
-    request, client, api_client, make_project, profile, action
+    client, api_client, current_site, make_project, make_member, profile, action
 ):
-    site = get_current_site(request)
-
     by_admin = is_membership_action_done(
-        client, make_project(), site, profile, action, via_api=False
+        client, make_member, make_project(), current_site, profile, action, False
     )
     by_api = is_membership_action_done(
-        api_client, make_project(), site, profile, action, via_api=True
+        api_client, make_member, make_project(), current_site, profile, action, True
     )
 
     assert not by_api or by_admin
