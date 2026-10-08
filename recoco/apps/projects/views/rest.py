@@ -199,7 +199,8 @@ class ProjectMembershipCreate(CreateAPIView):
 
     The attachment is immediate: unlike an invitation, no email is sent and
     there is nothing to accept. Attaching someone who already holds the role
-    on this project is a no-op, and still answers a `201`.
+    on this project is a no-op, and still answers a `201`. Attaching an advisor
+    as an observer, or the other way around, switches their role.
 
     The project has to be one of the current site, and the caller must be
     staff for that site.
