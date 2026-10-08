@@ -179,7 +179,7 @@ class ProjectCreate(CreateAPIView):
     to `TO_PROCESS`, which is the status of a project that has been validated
     but not yet processed.
 
-    The caller must be staff for the current site.
+    The caller must be allowed to moderate projects on the current site.
     """
 
     permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
@@ -203,7 +203,7 @@ class ProjectMembershipCreate(CreateAPIView):
     as an observer, or the other way around, switches their role.
 
     The project has to be one of the current site, and the caller must be
-    staff for that site.
+    allowed to moderate projects on that site.
     """
 
     permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
