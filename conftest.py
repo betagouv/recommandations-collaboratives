@@ -5,14 +5,12 @@ import puremagic
 import pytest
 from cookie_consent.cache import delete_cache
 from cookie_consent.models import Cookie, CookieGroup
-from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.test import Client
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe, related
@@ -21,12 +19,6 @@ from rest_framework.test import APIClient
 from recoco.apps.projects.models import Project, ProjectSite
 
 
-@pytest.fixture
-def client():
-    return Client(headers={settings.ALLAUTH_TRUSTED_CLIENT_IP_HEADER: "1.2.3.4"})
-
-
-# -- Global Fixtures
 @pytest.fixture(scope="session", autouse=True)
 def setup_db(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
