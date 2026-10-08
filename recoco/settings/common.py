@@ -64,6 +64,9 @@ INSTALLED_APPS = [
     "notifications",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_api_key",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "generic_relations",
     "django_filters",
     "csvexport",
@@ -96,6 +99,7 @@ INSTALLED_APPS = [
     "recoco.apps.demarches_simplifiees",
     "recoco.apps.social_account",
     "recoco.apps.plugins",
+    "recoco.apps.api_keys",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -488,6 +492,15 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": THROTTLE_RATES,
+}
+
+# https://drf-spectacular.readthedocs.io/en/latest/settings.html
+SPECTACULAR_SETTINGS = {
+    # a service API key is enough to read the schema, on top of the usual
+    # authentication classes (cf recoco.apps.api_keys)
+    "SERVE_AUTHENTICATION": REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
+    + ["recoco.apps.api_keys.authentication.ServiceAPIKeyAuthentication"],
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"],
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
