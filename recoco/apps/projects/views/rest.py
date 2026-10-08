@@ -615,10 +615,11 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
     def get_queryset(self):
         qs = models.ProjectSite.objects.filter(site=self.request.site)
 
-        if not has_perm(self.request.user, "moderate_projects", self.request.site):
+        if not has_perm(self.request.user, "list_projects", self.request.site):
             # from PROJECTSITE_STATES
-            qs = qs.exclude(status__in=["DRAFT", "PRE_DRAFT", "TO_PROCESS"])
-
+            qs = qs.exclude(status="TO_PROCESS")
+        if not has_perm(self.request.user, "moderate_projects", self.request.site):
+            qs = qs.exclude(status__in=["DRAFT", "PRE_DRAFT"])
         return qs
 
     def list(self, request):
