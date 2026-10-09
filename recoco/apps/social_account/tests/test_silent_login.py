@@ -93,7 +93,6 @@ def test_callback_login_required_in_page_mode_goes_back_to_login(client):
 @pytest.mark.django_db
 def test_callback_login_required_in_popup_mode_falls_back_to_interactive(client):
     _set_session(client, **{SILENT_LOGIN_SESSION_KEY: "popup"})
-    _stash_state(client, "x", {"process": "login", "next": POPUP_DONE_URL})
 
     response = client.get(CALLBACK_URL, {"error": "login_required", "state": "x"})
 

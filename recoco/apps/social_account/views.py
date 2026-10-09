@@ -49,6 +49,10 @@ def callback(request, provider_id):
     return view(request)
 
 
+def _popup_done_url(provider_id):
+    return reverse("openid_connect_popup_done", kwargs={"provider_id": provider_id})
+
+
 def _provider_login_url(provider_id, next_url=None, silent=False):
     params = {"process": "login"}
     if next_url:
@@ -76,9 +80,7 @@ def silent_login(request, provider_id):
     """
     if request.GET.get("mode") == SILENT_LOGIN_MODE_POPUP:
         mode = SILENT_LOGIN_MODE_POPUP
-        next_url = reverse(
-            "openid_connect_popup_done", kwargs={"provider_id": provider_id}
-        )
+        next_url = _popup_done_url(provider_id)
     else:
         mode = SILENT_LOGIN_MODE_PAGE
         next_url = request.GET.get("next")
@@ -92,17 +94,18 @@ def silent_login(request, provider_id):
 
 
 def _silent_login_failed(request, provider_id, mode):
-    # drop the state stashed by allauth for the aborted login, keeping its
-    # already validated `next`
-    state = None
-    if state_id := request.GET.get("state"):
-        state = statekit.unstash_state(request, state_id)
-    next_url = (state or {}).get("next")
+    # drop the state stashed by allauth for the aborted login
+    state_id = request.GET.get("state")
+    state = statekit.unstash_state(request, state_id) if state_id else None
 
     if mode == SILENT_LOGIN_MODE_POPUP:
         # we are top-level in a popup: fall back to the interactive login
-        return HttpResponseRedirect(_provider_login_url(provider_id, next_url))
+        return HttpResponseRedirect(
+            _provider_login_url(provider_id, _popup_done_url(provider_id))
+        )
 
+    # allauth already validated `next` before stashing it
+    next_url = state.get("next") if state else None
     url = reverse("account_login")
     if next_url:
         url += "?" + urlencode({"next": next_url})
