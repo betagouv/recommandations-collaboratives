@@ -37,12 +37,10 @@ def login(request, provider_id):
 
 
 def callback(request, provider_id):
-    if request.GET.get("error") in SILENT_LOGIN_ERRORS:
-        mode = request.session.pop(SILENT_LOGIN_SESSION_KEY, None)
-        if mode is not None:
-            return _silent_login_failed(request, provider_id, mode)
+    silent_mode = request.session.pop(SILENT_LOGIN_SESSION_KEY, None)
+    if silent_mode and request.GET.get("error") in SILENT_LOGIN_ERRORS:
+        return _silent_login_failed(request, provider_id, silent_mode)
 
-    request.session.pop(SILENT_LOGIN_SESSION_KEY, None)
     view = OAuth2CallbackView.adapter_view(
         CustomOpenIDConnectOAuth2Adapter(request, provider_id)
     )
