@@ -86,12 +86,17 @@ from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
     AuthenticatedFeed,
+    check_if_advisor,
     get_group_for_site,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
 )
 
+from ..projects.templatetags.projects_extra import (
+    is_admin_for_current_site,
+    is_staff_for_current_site,
+)
 from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
@@ -937,7 +942,9 @@ def user_details(request, user_id):
     )
 
     group_name = make_group_name_for_site("advisor", request.site)
-    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
+    crm_user_is_advisor = check_if_advisor(crm_user)
+    crm_user_is_staff = is_staff_for_current_site(crm_user)
+    crm_user_is_admin = is_admin_for_current_site(crm_user)
 
     actions = (
         (

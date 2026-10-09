@@ -54,8 +54,9 @@
                 <!-- Badges -->
                 {% if crm_user.is_staff or crm_user_is_advisor %}
                     <div class="d-flex flex-wrap gap-1 fr-mb-2v">
-                        {% if crm_user.is_staff %}<span class="user-crm__badges">⭐️ Staff</span>{% endif %}
-                        {% if crm_user_is_advisor %}<span class="user-crm__badges user-crm__badges--advisor">Conseiller</span>{% endif %}
+                        {% if crm_user_is_admin %}<span class="user-crm__badges">Admin</span>
+                        {% elif crm_user_is_staff %}<span class="user-crm__badges">⭐️ Staff</span>
+                        {% elif crm_user_is_advisor %}<span class="user-crm__badges user-crm__badges--advisor">Conseiller</span>{% endif %}
                     </div>
                 {% endif %}
                 <!-- Name -->
