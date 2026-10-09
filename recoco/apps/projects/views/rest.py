@@ -19,7 +19,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.exceptions import ValidationError
@@ -76,7 +75,7 @@ from ..serializers import (
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
-from ..utils import remove_member
+from ..utils import delete_project, remove_member
 
 ########################################################################
 # Project API
@@ -186,8 +185,7 @@ class ProjectDetail(
 
         # an already deleted project is not found, so its deletion date is kept
         p = get_object_or_404(models.Project.on_site, pk=pk)
-        p.deleted = p.updated_on = timezone.now()
-        p.save()
+        delete_project(p)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
