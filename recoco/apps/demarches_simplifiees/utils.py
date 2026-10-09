@@ -93,4 +93,7 @@ project_mapping_fields: list[MappingField] = [
         label="Localisation",
         lookup="location",
     ),
+    MappingField(
+        id="project.location_gpx", label="Localisation GPS", lookup="location_gps_json"
+    ),
 ]
