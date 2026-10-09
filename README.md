@@ -175,7 +175,7 @@ Création du premier site
 
 ```python
 from recoco.apps.home import utils
-site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender", "noreply@example.com", "postal adress")
+site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender", "contact@example.com", "postal adress")
 site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ```
 
