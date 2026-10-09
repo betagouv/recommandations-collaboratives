@@ -5,6 +5,9 @@ function Auth() {
   return {
     initLogin() {
       const loginInput = document.getElementById('id_login');
+      // Crash when SOCIALACCOUNT_ONLY is set to True because the form is not available
+      if (!loginInput) return;
+
       if (loginInput.value.length > 0) {
         this.changeForgotPasswrodButtonHref(loginInput);
       }
@@ -15,6 +18,9 @@ function Auth() {
     },
     changeForgotPasswrodButtonHref(target) {
       const forgotPasswordButton = document.getElementById('forgot-password');
+      // Crash when SOCIALACCOUNT_ONLY is set to True because the form is not available
+      if (!forgotPasswordButton) return;
+
       const newUrlwithHash =
         forgotPasswordButton.getAttribute('href') + '#' + target.value;
 
