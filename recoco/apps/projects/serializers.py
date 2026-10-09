@@ -17,8 +17,17 @@ from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
-from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
-from .utils import assign_advisor, assign_collaborator, assign_observer
+from .models import (
+    Document,
+    Note,
+    Project,
+    ProjectMember,
+    ProjectSite,
+    ProjectSwitchtender,
+    Topic,
+    UserProjectStatus,
+)
+from .utils import assign_collaborator, assign_role, change_role
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -319,6 +328,30 @@ class NewProjectSerializer(ProjectSerializer):
         return project
 
 
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    """A participant of a project"""
+
+    class Meta:
+        model = ProjectMember
+        fields = ["email", "first_name", "last_name", "is_owner"]
+
+    email = serializers.EmailField(source="member.email")
+    first_name = serializers.CharField(source="member.first_name")
+    last_name = serializers.CharField(source="member.last_name")
+
+
+class ProjectAdvisorSerializer(serializers.ModelSerializer):
+    """An advisor or an observer of a project"""
+
+    class Meta:
+        model = ProjectSwitchtender
+        fields = ["email", "first_name", "last_name", "is_observer"]
+
+    email = serializers.EmailField(source="switchtender.email")
+    first_name = serializers.CharField(source="switchtender.first_name")
+    last_name = serializers.CharField(source="switchtender.last_name")
+
+
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     """Attach someone, given by email, to a project with the given role"""
 
@@ -335,16 +368,27 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         user = get_or_create_user_on_site(validated_data["email"], self.current_site)
-        role = validated_data["role"]
 
-        if role == "COLLABORATOR":
-            assign_collaborator(user, self.project)
-        elif role == "SWITCHTENDER":
-            assign_advisor(user, self.project, site=self.current_site)
-        elif role == "OBSERVER":
-            assign_observer(user, self.project, site=self.current_site)
+        assign_role(user, self.project, validated_data["role"], self.current_site)
 
         return validated_data
+
+
+class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
+    """Change the role of someone on a project
+
+    The person keeps only the given role: any other role it holds on the
+    project, for the current site, is removed.
+    """
+
+    email = serializers.EmailField(read_only=True)
+
+    def update(self, instance, validated_data):
+        role = validated_data["role"]
+
+        change_role(instance, self.project, role, self.current_site)
+
+        return {"email": instance.email, "role": role}
 
 
 class ProjectForListSerializer(BaseSerializerMixin):
