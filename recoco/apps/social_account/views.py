@@ -8,7 +8,6 @@ from allauth.socialaccount.providers.oauth2.views import (
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 
 from .adapters import CustomOpenIDConnectOAuth2Adapter
@@ -39,25 +38,15 @@ def login(request, provider_id):
 
 def callback(request, provider_id):
     if request.GET.get("error") in SILENT_LOGIN_ERRORS:
-        silent = request.session.pop(SILENT_LOGIN_SESSION_KEY, None)
-        if silent is not None:
-            return _silent_login_failed(request, provider_id, silent)
+        mode = request.session.pop(SILENT_LOGIN_SESSION_KEY, None)
+        if mode is not None:
+            return _silent_login_failed(request, provider_id, mode)
 
     request.session.pop(SILENT_LOGIN_SESSION_KEY, None)
     view = OAuth2CallbackView.adapter_view(
         CustomOpenIDConnectOAuth2Adapter(request, provider_id)
     )
     return view(request)
-
-
-def _safe_next(request, next_url):
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return None
 
 
 def _provider_login_url(provider_id, next_url=None, silent=False):
@@ -81,34 +70,36 @@ def silent_login(request, provider_id):
 
     In popup mode (embedded Recoco), the popup ends on `popup_done` while the
     iframe polls `status`.
-    """
-    mode = request.GET.get("mode")
-    if mode != SILENT_LOGIN_MODE_POPUP:
-        mode = SILENT_LOGIN_MODE_PAGE
 
-    if mode == SILENT_LOGIN_MODE_POPUP:
+    `next` is validated by allauth and kept in its state, see
+    `_silent_login_failed`.
+    """
+    if request.GET.get("mode") == SILENT_LOGIN_MODE_POPUP:
+        mode = SILENT_LOGIN_MODE_POPUP
         next_url = reverse(
             "openid_connect_popup_done", kwargs={"provider_id": provider_id}
         )
     else:
-        next_url = _safe_next(request, request.GET.get("next"))
+        mode = SILENT_LOGIN_MODE_PAGE
+        next_url = request.GET.get("next")
 
     request.session[SILENT_LOGIN_TRIED_SESSION_KEY] = True
-    request.session[SILENT_LOGIN_SESSION_KEY] = {"mode": mode, "next": next_url}
+    request.session[SILENT_LOGIN_SESSION_KEY] = mode
 
     return HttpResponseRedirect(
         _provider_login_url(provider_id, next_url=next_url, silent=True)
     )
 
 
-def _silent_login_failed(request, provider_id, silent):
-    # drop the state stashed by allauth for the aborted login
+def _silent_login_failed(request, provider_id, mode):
+    # drop the state stashed by allauth for the aborted login, keeping its
+    # already validated `next`
+    state = None
     if state_id := request.GET.get("state"):
-        statekit.unstash_state(request, state_id)
+        state = statekit.unstash_state(request, state_id)
+    next_url = (state or {}).get("next")
 
-    next_url = silent.get("next")
-
-    if silent.get("mode") == SILENT_LOGIN_MODE_POPUP:
+    if mode == SILENT_LOGIN_MODE_POPUP:
         # we are top-level in a popup: fall back to the interactive login
         return HttpResponseRedirect(_provider_login_url(provider_id, next_url))
 

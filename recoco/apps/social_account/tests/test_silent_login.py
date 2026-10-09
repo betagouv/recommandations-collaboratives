@@ -1,6 +1,8 @@
+import time
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
+from allauth.socialaccount.internal.statekit import STATES_SESSION_KEY
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
 from model_bakery import baker
@@ -35,6 +37,11 @@ def _set_session(client, **values):
     session.save()
 
 
+def _stash_state(client, state_id, state):
+    # mimic the state allauth stashes before redirecting to the provider
+    _set_session(client, **{STATES_SESSION_KEY: {state_id: (state, time.time())}})
+
+
 ########################################################################
 # silent_login
 ########################################################################
@@ -49,20 +56,8 @@ def test_silent_login_redirects_to_provider_with_prompt_none(client):
     assert path == PROVIDER_LOGIN_URL
     assert params["auth_params"] == "prompt=none"
     assert params["next"] == "/projects/"
-    assert client.session[SILENT_LOGIN_SESSION_KEY] == {
-        "mode": "page",
-        "next": "/projects/",
-    }
+    assert client.session[SILENT_LOGIN_SESSION_KEY] == "page"
     assert client.session[SILENT_LOGIN_TRIED_SESSION_KEY] is True
-
-
-@pytest.mark.django_db
-def test_silent_login_rejects_external_next(client):
-    response = client.get(SILENT_URL, {"next": "https://evil.example.org/"})
-
-    _, params = _split(response.url)
-    assert "next" not in params
-    assert client.session[SILENT_LOGIN_SESSION_KEY]["next"] is None
 
 
 @pytest.mark.django_db
@@ -72,7 +67,7 @@ def test_silent_login_popup_mode_ends_on_popup_done(client):
     _, params = _split(response.url)
     assert params["next"] == POPUP_DONE_URL
     assert params["auth_params"] == "prompt=none"
-    assert client.session[SILENT_LOGIN_SESSION_KEY]["mode"] == "popup"
+    assert client.session[SILENT_LOGIN_SESSION_KEY] == "popup"
 
 
 ########################################################################
@@ -82,10 +77,8 @@ def test_silent_login_popup_mode_ends_on_popup_done(client):
 
 @pytest.mark.django_db
 def test_callback_login_required_in_page_mode_goes_back_to_login(client):
-    _set_session(
-        client,
-        **{SILENT_LOGIN_SESSION_KEY: {"mode": "page", "next": "/projects/"}},
-    )
+    _set_session(client, **{SILENT_LOGIN_SESSION_KEY: "page"})
+    _stash_state(client, "x", {"process": "login", "next": "/projects/"})
 
     response = client.get(CALLBACK_URL, {"error": "login_required", "state": "x"})
 
@@ -94,14 +87,13 @@ def test_callback_login_required_in_page_mode_goes_back_to_login(client):
     assert path == reverse("account_login")
     assert params == {"next": "/projects/"}
     assert SILENT_LOGIN_SESSION_KEY not in client.session
+    assert client.session[STATES_SESSION_KEY] == {}
 
 
 @pytest.mark.django_db
 def test_callback_login_required_in_popup_mode_falls_back_to_interactive(client):
-    _set_session(
-        client,
-        **{SILENT_LOGIN_SESSION_KEY: {"mode": "popup", "next": POPUP_DONE_URL}},
-    )
+    _set_session(client, **{SILENT_LOGIN_SESSION_KEY: "popup"})
+    _stash_state(client, "x", {"process": "login", "next": POPUP_DONE_URL})
 
     response = client.get(CALLBACK_URL, {"error": "login_required", "state": "x"})
 
@@ -129,19 +121,14 @@ def test_callback_login_required_without_silent_marker_is_an_error(client):
 
 
 @pytest.mark.django_db
-def test_status_anonymous(client):
-    response = client.get(STATUS_URL)
-
-    assert response.json() == {"authenticated": False}
-
-
-@pytest.mark.django_db
-def test_status_authenticated(client):
-    client.force_login(baker.make(auth_models.User))
+@pytest.mark.parametrize("authenticated", [False, True])
+def test_status(client, authenticated):
+    if authenticated:
+        client.force_login(baker.make(auth_models.User))
 
     response = client.get(STATUS_URL)
 
-    assert response.json() == {"authenticated": True}
+    assert response.json() == {"authenticated": authenticated}
 
 
 @pytest.mark.django_db
