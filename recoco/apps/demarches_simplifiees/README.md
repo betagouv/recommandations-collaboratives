@@ -29,3 +29,12 @@ Les conditions sont un système qui permet de conditionner la valeur mappée en 
 La dataclass `MappingField` formalise la nomenclature d'un mapping.
 
 [//]: # ( todo : heading and examples)
+
+-------------
+
+## En pratique
+- Lors d'une nouvelle démarche, on peut s'appuyer sur https://demarche.numerique.gouv.fr/preremplir/<nom de la démarche> pour écrire le mapping et en particulier connaître les identifiants techniques des champs.
+- Potentiellement il faut ajouter des `MappingItem` voire des `property` au modèle `Project`
+- Les admin/staff du portail créent la ressource à associer
+- **Après la publication de la démarche** (sinon le nom de la démarche n'est pas figé, et surtout il n'est pas possible de récupérer le schéma de la démarche), créer un objet `DSResource` sans remplir le schéma : il doit être récupéré à la première sauvegarde
+- puis créer un objet `DSMapping` en remplissant le mapping en question comme explicité ci-dessus
