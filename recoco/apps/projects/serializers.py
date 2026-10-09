@@ -262,20 +262,15 @@ def get_or_create_user_on_site(email: str, site: Site) -> User:
 
 
 class NewProjectSerializer(ProjectSerializer):
-    """Create an already validated project, on the current site
-
-    The commune is given as an insee code rather than as a primary key: it is
-    what identifies a commune unambiguously for an API client. The owner is
-    given as an email, and its account is created if it does not exist yet.
-    The status of the project on the current site can be given, and defaults
-    to `TO_PROCESS`.
-    """
+    """Create an already validated project, on the current site"""
 
     class Meta(ProjectSerializer.Meta):
         fields = ProjectSerializer.Meta.fields + ["insee", "owner_email"]
         read_only_fields = ProjectSerializer.Meta.read_only_fields + [
             "created_on",
             "updated_on",
+            "inactive_since",
+            "is_diagnostic_done",
         ]
 
     insee = serializers.CharField(max_length=5, write_only=True)
@@ -358,12 +353,7 @@ class ProjectAdvisorSerializer(serializers.ModelSerializer):
 
 
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
-    """Attach someone, given by email, to a project with the given role
-
-    The roles are the ones of an invitation, but the account is created if it
-    does not exist yet and the person is attached right away: no invitation is
-    sent, and nothing is to be accepted.
-    """
+    """Attach someone, given by email, to a project with the given role"""
 
     email = serializers.EmailField(max_length=150)
     role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)

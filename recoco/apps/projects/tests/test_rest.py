@@ -724,15 +724,6 @@ def test_project_detail_patch_is_not_available_across_sites(api_client, make_pro
 ########################################################################
 
 
-@pytest.fixture
-def api_user(request):
-    """Return the staff user making the api calls"""
-    user = baker.make(auth_models.User, email="me@example.com")
-    user.groups.add(get_group_for_site("staff", get_current_site(request)))
-
-    return user
-
-
 @pytest.mark.django_db
 def test_non_staff_cannot_use_project_create_api(api_client):
     url = reverse("projects-create")
@@ -754,8 +745,8 @@ def test_non_staff_cannot_use_project_create_api(api_client):
 
 
 @pytest.mark.django_db
-def test_unknown_insee_code_is_reported_by_project_create_api(api_client, api_user):
-    api_client.force_authenticate(api_user)
+def test_unknown_insee_code_is_reported_by_project_create_api(api_client, staff_user):
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-create")
     response = api_client.post(
@@ -775,12 +766,11 @@ def test_unknown_insee_code_is_reported_by_project_create_api(api_client, api_us
 
 @pytest.mark.django_db
 def test_project_is_created_already_validated_by_project_create_api(
-    request, api_client, api_user
+    current_site, api_client, staff_user
 ):
-    site = get_current_site(request)
     commune = baker.make(geomatics_models.Commune, insee="62000")
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-create")
     response = api_client.post(
@@ -800,10 +790,10 @@ def test_project_is_created_already_validated_by_project_create_api(
     assert project.name == "a project"
     assert project.description == "a description"
     assert project.commune == commune
-    assert project.submitted_by == api_user
+    assert project.submitted_by == staff_user
 
     # the project skips moderation, hence nobody is notified of its submission
-    project_site = project.project_sites.get(site=site)
+    project_site = project.project_sites.get(site=current_site)
     assert project_site.status == "TO_PROCESS"
     assert project_site.is_origin is True
     assert notifications_models.Notification.objects.count() == 0
@@ -811,15 +801,16 @@ def test_project_is_created_already_validated_by_project_create_api(
     # the owner account is created on the fly, w/ a lowercased email
     owner = auth_models.User.objects.get(username="owner@example.com")
     assert project.owner == owner
-    assert site in owner.profile.sites.all()
+    assert current_site in owner.profile.sites.all()
 
 
 @pytest.mark.django_db
-def test_project_status_is_given_to_project_create_api(request, api_client, api_user):
-    site = get_current_site(request)
+def test_project_status_is_given_to_project_create_api(
+    current_site, api_client, staff_user
+):
     commune = baker.make(geomatics_models.Commune, insee="62000")
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-create")
     response = api_client.post(
@@ -837,14 +828,16 @@ def test_project_status_is_given_to_project_create_api(request, api_client, api_
     assert response.data["status"] == "IN_PROGRESS"
 
     project = models.Project.objects.get(pk=response.data["id"])
-    assert project.project_sites.get(site=site).status == "IN_PROGRESS"
+    assert project.project_sites.get(site=current_site).status == "IN_PROGRESS"
 
 
 @pytest.mark.django_db
-def test_unknown_project_status_is_rejected_by_project_create_api(api_client, api_user):
+def test_unknown_project_status_is_rejected_by_project_create_api(
+    api_client, staff_user
+):
     commune = baker.make(geomatics_models.Commune, insee="62000")
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-create")
     response = api_client.post(
@@ -864,11 +857,11 @@ def test_unknown_project_status_is_rejected_by_project_create_api(api_client, ap
 
 
 @pytest.mark.django_db
-def test_existing_owner_account_is_reused_by_project_create_api(api_client, api_user):
+def test_existing_owner_account_is_reused_by_project_create_api(api_client, staff_user):
     commune = baker.make(geomatics_models.Commune, insee="62000")
     owner = baker.make(auth_models.User, username="owner@example.com")
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-create")
     response = api_client.post(
@@ -910,11 +903,9 @@ def test_non_staff_cannot_use_project_membership_api(api_client, project):
 
 @pytest.mark.django_db
 def test_collaborator_is_attached_by_project_membership_api(
-    request, api_client, api_user, project
+    current_site, api_client, staff_user, project
 ):
-    site = get_current_site(request)
-
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-members-list", args=[project.id])
     response = api_client.post(
@@ -926,7 +917,7 @@ def test_collaborator_is_attached_by_project_membership_api(
 
     # the account is created on the fly, w/ a lowercased email
     member = auth_models.User.objects.get(username="jane@example.com")
-    assert site in member.profile.sites.all()
+    assert current_site in member.profile.sites.all()
 
     membership = models.ProjectMember.objects.get(project=project, member=member)
     assert membership.is_owner is False
@@ -941,12 +932,11 @@ def test_collaborator_is_attached_by_project_membership_api(
     "role,is_observer", [("SWITCHTENDER", False), ("OBSERVER", True)]
 )
 def test_advisor_is_attached_by_project_membership_api(
-    request, api_client, api_user, project, role, is_observer
+    current_site, api_client, staff_user, project, role, is_observer
 ):
-    site = get_current_site(request)
     advisor = baker.make(auth_models.User, username="john@example.com")
 
-    api_client.force_authenticate(api_user)
+    api_client.force_authenticate(staff_user)
 
     url = reverse("projects-members-list", args=[project.id])
     response = api_client.post(url, data={"email": "john@example.com", "role": role})
@@ -954,7 +944,7 @@ def test_advisor_is_attached_by_project_membership_api(
     assert response.status_code == 201
 
     switchtending = models.ProjectSwitchtender.objects.get(
-        project=project, switchtender=advisor, site=site
+        project=project, switchtender=advisor, site=current_site
     )
     assert switchtending.is_observer is is_observer
     assert advisor.has_perm("projects.view_project", project)

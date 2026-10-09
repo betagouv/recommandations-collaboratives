@@ -198,7 +198,7 @@ class ProjectCreate(CreateAPIView):
     to `TO_PROCESS`, which is the status of a project that has been validated
     but not yet processed.
 
-    The caller must be staff for the current site.
+    The caller must be allowed to moderate projects on the current site.
     """
 
     permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
@@ -244,10 +244,11 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
 
     The attachment is immediate: unlike an invitation, no email is sent and
     there is nothing to accept. Attaching someone who already holds the role
-    on this project is a no-op, and still answers a `201`.
+    on this project is a no-op, and still answers a `201`. Attaching an advisor
+    as an observer, or the other way around, switches their role.
 
     The project has to be one of the current site, and the caller must be
-    staff for that site.
+    allowed to moderate projects on that site.
     """
 
     serializer_class = ProjectMembershipSerializer
