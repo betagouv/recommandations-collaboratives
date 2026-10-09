@@ -1,0 +1,22 @@
+{% comment %}
+    accordion header with status badge (for site configuration form)
+    must be included inside a <section class="fr-accordion" x-data="AccordionStatus">
+    Parameters:
+      accordion_id : id of the collapsed content controlled by the header
+      icon : icon class
+      label : title of the accordion
+      header_level : level of the header (h2, h3, ...)
+{% endcomment %}
+<h{{ header_level }} class="fr-accordion__title">
+    <button type="button"
+            class="fr-accordion__btn"
+            aria-expanded="false"
+            aria-controls="{{ accordion_id }}">
+        <span class="{{ icon }} fr-icon--xl fr-mr-1w" aria-hidden="true"></span>{{ label }}
+        <span x-cloak
+              x-show="badge"
+              x-text="badge?.label"
+              :class="[badge?.modifier, badge?.icon]"
+              class="fr-badge fr-badge--sm fr-badge--icon-left crm-config__accordion-badge"></span>
+    </button>
+</h{{ header_level }}>

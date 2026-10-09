@@ -9,19 +9,18 @@ from notifications import models as notifications_models
 from notifications.models import Notification
 
 from recoco import verbs
-from recoco.apps.projects.utils import (
-    notify_advisors_of_project,
-    notify_members_of_project,
-)
-from recoco.apps.tasks import models as tasks_models
-from recoco.apps.tasks.signals import action_created
-
-from ..projects.utils import reactivate_if_necessary
-from . import models
-from .utils import (
+from recoco.apps.conversations import models
+from recoco.apps.conversations.utils import (
     gather_annotations_for_message_notification,
     post_public_message_with_recommendation,
 )
+from recoco.apps.projects.utils import (
+    notify_advisors_of_project,
+    notify_members_of_project,
+    reactivate_if_necessary,
+)
+from recoco.apps.tasks import models as tasks_models
+from recoco.apps.tasks.signals import action_created
 
 message_posted = django.dispatch.Signal()
 message_updated = django.dispatch.Signal()

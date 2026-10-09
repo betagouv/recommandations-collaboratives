@@ -17,7 +17,7 @@
                 {% endif %}
                 <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}
                     class="fr-label">
-                    {{ field.label|safe }}
+                    {{ field.label|safe }} {{ field.field.required|yesno:"*," }}
                     {% if not field.field.required %}<span class="fr-italic">(facultatif)</span>{% endif %}
                     {% if field.field.help_text %}<span class="fr-hint-text">{{ field.field.help_text }}</span>{% endif %}
                 </label>
@@ -38,13 +38,21 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            {% if not js_validation and field.error_messages %}
+            {% if field.errors %}
+                <div class="fr-messages-group"
+                        id="{{ field.id_for_label }}-desc-error"
+                        aria-live="polite">
+                    {% for error in field.errors %}
+                        <p class="fr-error-text">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% elif not js_validation and field.error_messages %}
                 <!-- Display server-side validation errors here -->
                 {% for error in field.error_messages %}
                     <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
                     class="fr-error-text">{{ error }}</p>
                 {% endfor %}
-            {% else %}
+            {% elif js_validation %}
                 <ul x-show="fieldHasError('{{ field.html_name }}')"
                     class="fr-messages-group"
                     id="{{ field.id_for_label }}-desc-error"

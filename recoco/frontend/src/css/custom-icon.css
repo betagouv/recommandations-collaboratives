@@ -202,3 +202,45 @@
 .fr-icon-hammer-line::before {
   mask-image: url(../assets/hammer-line.svg);
 }
+
+/* icon without mask - can have multiple colors */
+
+.fr-icon-file-color::after,
+.fr-icon-file-color::before {
+  background-color: transparent;
+  background-image: url(../assets/file-color.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-mail-with-hints::after,
+.fr-icon-mail-with-hints::before {
+  background-color: transparent;
+  background-image: url(../assets/mail-with-hints.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-mockup-with-images::after,
+.fr-icon-mockup-with-images::before {
+  background-color: transparent;
+  background-image: url(../assets/mockup-with-images.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-justice-scale::after,
+.fr-icon-justice-scale::before {
+  background-color: transparent;
+  background-image: url(../assets/justice-scale.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-system::after,
+.fr-icon-system::before {
+  background-color: transparent;
+  background-image: url(../assets/system.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}

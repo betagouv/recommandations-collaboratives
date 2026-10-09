@@ -7,11 +7,12 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-10 14:07:17 CEST
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import StringIO
 from unittest.mock import patch
 
 import pytest
+from actstream import action
 from actstream.models import Action
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
@@ -21,18 +22,19 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.utils import timezone
 from freezegun import freeze_time
 from model_bakery import baker
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.crm.models import Note
+from recoco.apps.home.management.commands import cleanuporgs
 from recoco.apps.home.management.commands.update_verbs import (
     Command as UpdateVerbCommand,
 )
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.home.utils import DELETION_ABSENT_FOR_DAYS
 from recoco.utils import get_group_for_site, is_staff_for_site
-
-from ...crm.models import Note
-from ..management.commands import cleanuporgs
 
 ########################################################################
 # cleanup command
@@ -174,7 +176,9 @@ def test_command_create_site(request):
         assert advisor.has_perm("sites.list_projects", new_site)
 
 
+########################################################################
 # rgpd warning and deletions
+########################################################################
 
 
 @pytest.fixture()
@@ -227,7 +231,7 @@ def user_to_delete():
 
 
 @pytest.mark.django_db
-def test_command_increments_warnings(
+def test_gdpr_command_increments_warnings(
     user_to_not_warn, user_to_warn_once, user_to_warn_twice, mocker
 ):
     now = datetime.fromisoformat("2025-12-23T00:00:00+00:00")
@@ -251,7 +255,7 @@ def test_command_increments_warnings(
 
 @pytest.mark.django_db
 @freeze_time("2025-12-23")
-def test_command_forgets_warning_if_recent_activity(user_came_back, mocker):
+def test_gdpr_command_forgets_warning_if_recent_activity(user_came_back, mocker):
     patch = mocker.patch("recoco.apps.home.utils.send_email")
     out = StringIO()
     call_command("warn_delete_users", stdout=out)
@@ -264,7 +268,7 @@ def test_command_forgets_warning_if_recent_activity(user_came_back, mocker):
 
 
 @pytest.mark.django_db
-def test_command_dry_run_does_nothing(
+def test_gdpr_command_dry_run_does_nothing(
     user_to_not_warn, user_to_warn_once, user_to_warn_twice, mocker
 ):
     now = datetime.fromisoformat("2025-12-23T00:00:00+00:00")
@@ -285,7 +289,7 @@ def test_command_dry_run_does_nothing(
 
 @pytest.mark.django_db
 @freeze_time("2025-12-23")
-def test_command_deletes(user_to_delete, mocker, current_site):
+def test_gdpr_command_deletes(user_to_delete, mocker, current_site):
     EmailAddress.objects.create(user_id=user_to_delete.id)
     SocialAccount.objects.create(user_id=user_to_delete.id)
     Note.objects.create(
@@ -326,7 +330,7 @@ def test_command_deletes(user_to_delete, mocker, current_site):
 
 @pytest.mark.django_db
 @pytest.mark.skip(reason="has side effects on other tests")
-def test_command_update_verbs(current_site):
+def test_gdpr_command_update_verbs(current_site):
     v1_old = "old v1"
     v1_new = "new v1"
     v2_old = "old v2"
@@ -354,4 +358,41 @@ def test_command_update_verbs(current_site):
     Action.objects.all().delete()
 
 
-# # eof
+########################################################################
+# actions/trace auto deletion
+########################################################################
+
+
+def define_action_context():
+    user = baker.make(auth_models.User)
+    action.send(user, verb="recent")
+    other_site = baker.make(Site)
+    quite_old = timezone.now() - timedelta(days=(DELETION_ABSENT_FOR_DAYS - 5))
+    very_old = timezone.now() - timedelta(days=(DELETION_ABSENT_FOR_DAYS + 5))
+    with freeze_time(quite_old):
+        action.send(user, verb="quite old", site=other_site)
+    with freeze_time(very_old):
+        action.send(user, verb="very old")
+        action.send(user, verb="very old", site=other_site)
+    pass
+
+
+@pytest.mark.django_db
+@freeze_time("2025-12-23T00:00:00+00:00")
+def test_clean_action_dry_run_does_nothing():
+    define_action_context()
+    call_command("cleanup_action_history", dry_run=True)
+    assert Action.objects.count() == 4
+    assert Action.objects.filter(verb="very old").count() == 2
+
+
+@pytest.mark.django_db
+@freeze_time("2025-12-23T00:00:00+00:00")
+def test_clean_past_only():
+    define_action_context()
+    call_command("cleanup_action_history")
+    assert Action.objects.count() == 2
+    assert Action.objects.filter(verb="very old").count() == 0
+
+
+# eof

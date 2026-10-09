@@ -6,6 +6,7 @@
   line-height: 1.5em;
   position: relative;
   &__topics {
+    --height-header-nav: calc(63px + var(--height-header));
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -14,8 +15,8 @@
     min-width: 18.75rem;
     border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
     position: sticky;
-    height: calc(100vh - 128px);
-    top: 128px;
+    height: calc(100vh - var(--height-header-nav));
+    top: var(--height-header-nav);
 
     // overflow-y: auto;
     overflow-y: hidden;

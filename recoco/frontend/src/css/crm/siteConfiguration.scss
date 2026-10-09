@@ -1,0 +1,73 @@
+.crm-config {
+
+    .fr-accordion__btn {
+        display: flex;
+        align-items: center;
+    }
+
+    .fr-accordion__btn::after {
+        margin-left: 0;
+    }
+
+    &__notice {
+        display: flex;
+        align-items: flex-start;
+        align-self: stretch;
+        gap: 16px;
+        padding: 12px 24px;
+        background: var(--yellow-tournesol-950-100, #feecc2);
+        color: var(--yellow-tournesol-sun-407-moon-922, #716043);
+        font-size: 0.875rem;
+        line-height: 1.5rem;
+
+        a {
+            color: inherit;
+            font-weight: 400;
+        }
+
+        .fr-btn--close {
+            justify-content: center;
+            min-width: 1.5rem;
+            min-height: 1.5rem;
+            max-height: 1.5rem;
+            padding: 0;
+            color: inherit;
+            background-color: transparent;
+
+            &:hover,
+            &:active {
+                background-color: rgb(0 0 0 / 8%);
+            }
+        }
+    }
+
+    &__accordion-badge {
+        flex: 0 0 auto;
+        margin-left: auto;
+        margin-right: 0.5rem;
+    }
+
+    &__logo-preview-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    &__logo-remove {
+        flex: 0 0 auto;
+    }
+
+    &__logo-preview {
+        max-width: 12rem;
+        max-height: 6rem;
+        width: auto;
+        object-fit: contain;
+        padding: 0.5rem;
+        border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    }
+
+    &__logo-cell--separated > * {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-default-grey, #ddd);
+    }
+}
