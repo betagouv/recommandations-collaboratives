@@ -81,6 +81,7 @@ from recoco.apps.projects.models import (
     ProjectSwitchtender,
     Topic,
 )
+from recoco.apps.projects.utils import delete_project
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
@@ -1236,8 +1237,7 @@ def project_delete(request, project_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
     project = get_object_or_404(Project.on_site, pk=project_id)
     if request.method == "POST":
-        project.deleted = timezone.now()
-        project.save()
+        delete_project(project)
         return redirect("crm-project-list")
     return render(request, "crm/project_delete.html", locals())
 

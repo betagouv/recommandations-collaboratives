@@ -75,7 +75,7 @@ from ..serializers import (
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
-from ..utils import remove_member
+from ..utils import delete_project, remove_member
 
 ########################################################################
 # Project API
@@ -99,7 +99,12 @@ class IsStaffForSite(permissions.BasePermission):
 class ProjectDetail(
     RetrieveAPIView
 ):  # NB : interfaces are not completely respected due to legacy, cf #2077
-    """Retrieve a project"""
+    """Retrieve, update or delete a project
+
+    `DELETE` is a soft delete: the project is only marked as deleted, and can
+    still be seen by the staff with the `with-deleted` query parameter. It
+    requires the `delete_projects` permission on the current site.
+    """
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserProjectSerializer
@@ -173,6 +178,16 @@ class ProjectDetail(
             #     )
             return Response(UserProjectSerializer(p, context=context).data)
         return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        """Mark the project as deleted, as the project admin does"""
+        has_perm_or_403(request.user, "sites.delete_projects", request.site)
+
+        # an already deleted project is not found, so its deletion date is kept
+        p = get_object_or_404(models.Project.on_site, pk=pk)
+        delete_project(p)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectCreate(CreateAPIView):

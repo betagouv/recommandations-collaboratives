@@ -720,6 +720,54 @@ def test_project_detail_patch_is_not_available_across_sites(api_client, make_pro
 
 
 ########################################################################
+# delete project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_staff_can_soft_delete_project_with_api(api_client, make_project):
+    project = make_project()
+    updated_on_before = project.updated_on
+
+    url = reverse("projects-detail", args=[project.id])
+    with login(api_client, groups=["example_com_staff"]):
+        response = api_client.delete(url)
+
+    assert response.status_code == 204
+    project = models.Project.deleted_on_site.get(id=project.id)
+    assert project.deleted
+    assert project.updated_on > updated_on_before
+
+
+@pytest.mark.django_db
+def test_advisor_cannot_delete_project_with_api(api_client, make_project):
+    project = make_project()
+
+    url = reverse("projects-detail", args=[project.id])
+    with login(api_client, groups=["example_com_advisor"]) as user:
+        assign_advisor(user, project)
+        response = api_client.delete(url)
+
+    assert response.status_code == 403
+    project.refresh_from_db()
+    assert not project.deleted
+
+
+@pytest.mark.django_db
+def test_project_detail_delete_is_not_available_across_sites(api_client, make_project):
+    other_site = baker.make(sites_models.Site, domain="other-site3.example.com")
+    project = make_project(site=other_site)
+
+    url = reverse("projects-detail", args=[project.id])
+    with login(api_client, groups=["example_com_staff"]):
+        response = api_client.delete(url)
+
+    assert response.status_code == 404
+    project.refresh_from_db()
+    assert not project.deleted
+
+
+########################################################################
 # create project
 ########################################################################
 

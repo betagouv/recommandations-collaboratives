@@ -175,6 +175,12 @@ def assign_observer(user, project, site=None):
 unassign_observer = unassign_advisor
 
 
+def delete_project(project):
+    """Mark a project as deleted, without removing anything from the DB"""
+    project.deleted = project.updated_on = timezone.now()
+    project.save()
+
+
 def delete_project_notifications(user, project):
     """Delete the notifications of someone about a project"""
     project_ct = ContentType.objects.get_for_model(models.Project)

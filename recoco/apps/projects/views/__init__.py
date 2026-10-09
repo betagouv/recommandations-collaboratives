@@ -46,6 +46,7 @@ from ..utils import (
     assign_collaborator_permissions,
     assign_observer,
     can_administrate_project,
+    delete_project,
     is_advisor_for_project,
     is_project_moderator_or_403,
     is_regional_actor_for_project_or_403,
@@ -580,10 +581,9 @@ def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
     has_perm_or_403(request.user, "sites.delete_projects", request.site)
 
-    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
+    project = get_object_or_404(models.Project.on_site, pk=project_id)
     if request.method == "POST":
-        project.deleted = project.updated_on = timezone.now()
-        project.save()
+        delete_project(project)
     return redirect(reverse("projects-project-list"))
 
 
