@@ -35,6 +35,7 @@
     "@iframe-resizer/child": "^5.3.1",
     "@popperjs/core": "^2.11.5",
     "@ryangjchandler/alpine-tooltip": "^2.0.1",
+    "@sentry/browser": "^11.7.0",
     "@tiptap/core": "^3.31.3",
     "@tiptap/extension-hard-break": "^3.31.3",
     "@tiptap/extension-link": "^3.31.3",
