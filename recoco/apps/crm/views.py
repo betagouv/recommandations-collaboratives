@@ -62,6 +62,8 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.conversations.models import Message, RecommendationNode
+from recoco.apps.crm import filters, forms, models
+from recoco.apps.crm.forms import SiteConfigurationForm
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
@@ -81,6 +83,10 @@ from recoco.apps.projects.models import (
     ProjectSwitchtender,
     Topic,
 )
+from recoco.apps.projects.templatetags.projects_extra import (
+    is_admin_for_current_site,
+    is_staff_for_current_site,
+)
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
@@ -92,13 +98,6 @@ from recoco.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
-
-from ..projects.templatetags.projects_extra import (
-    is_admin_for_current_site,
-    is_staff_for_current_site,
-)
-from . import filters, forms, models
-from .forms import SiteConfigurationForm
 
 
 def site_projects_action_stream(site):
