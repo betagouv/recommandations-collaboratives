@@ -39,6 +39,19 @@ export default function Crisp() {
           this.hideCrispPopup();
         }
       });
+
+      this.loadCrisp();
+    },
+
+    loadCrisp() {
+      const websiteIdElement = document.getElementById('crisp-website-id');
+      if (!websiteIdElement) return;
+
+      window.CRISP_WEBSITE_ID = JSON.parse(websiteIdElement.textContent);
+      const script = document.createElement('script');
+      script.src = 'https://client.crisp.chat/l.js';
+      script.async = true;
+      document.head.appendChild(script);
     },
 
     hideCrispPopup() {
