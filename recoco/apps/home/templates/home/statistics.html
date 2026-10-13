@@ -2,6 +2,7 @@
 {% load leaflet_tags %}
 {% load l10n %}
 {% load static %}
+{% load django_vite %}
 {% block title %}
     Statistiques d'impact
 {% endblock title %}
@@ -10,9 +11,9 @@
 {% endblock og_title %}
 {% block js %}
     {% leaflet_js %}
+    {% vite_asset 'js/apps/statistics.js' %}
     <script src="{% static "/js/d3.min.js" %}"></script>
     <script src="{% static "/js/nv.d3.min.js" %}"></script>
-    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
     <!-- Leaflet -->
     <script type="text/javascript">
     function map_init (map, options) {
@@ -73,8 +74,6 @@
 {% endblock js %}
 {% block css %}
     {% leaflet_css %}
-    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
-          rel='stylesheet' />
 {% endblock css %}
 {% block content %}
     <div class="col-9 fr-py-6w fr-mx-auto">

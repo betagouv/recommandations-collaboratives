@@ -663,4 +663,16 @@ ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
 
+# Leaflet
+LEAFLET_CONFIG = {
+    "TILES": [
+        (
+            "OSM France",
+            "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+            {
+                "attribution": '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            },
+        )
+    ],
+}
 # eof
