@@ -68,6 +68,10 @@ export function projectsUrl({
     page,
   });
 
+  Object.entries(extraParams).forEach(([key, value]) => {
+    if (value) params.append(key, value);
+  });
+
   url = '/api/projects/?' + params.toString();
 
   if (departments.length) {
@@ -81,10 +85,6 @@ export function projectsUrl({
   if (myProjects) {
     url = url + '&my_projects=true';
   }
-
-  Object.entries(extraParams).forEach(([key, value]) => {
-    if (value) params.append(key, value);
-  });
 
   return url;
 }

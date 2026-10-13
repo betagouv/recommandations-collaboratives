@@ -174,6 +174,23 @@ class CrmSpec(HookSpec):
         """
 
     @hookspec
+    def crm_project_list_filter_lookups(self, request):
+        """Return a dict of ORM lookups to filter the CRM project list queryset.
+
+        Read your own query parameters from ``request.GET`` (the ones sent by
+        the ``plugin-filter-change`` event of crm_project_list_filters) and
+        return ``None`` when they are absent, so the queryset is left untouched.
+
+        Example:
+            @hookimpl
+            def crm_project_list_filter_lookups(self, request):
+                filter_param = request.GET.get("filter_param")
+                if filter_param:
+                    return {"plugin__filter_param": filter_param}
+                return None
+        """
+
+    @hookspec
     def crm_project_list_extra_serializer_fields(self, request):
         """Return a list of field names (strings) to include in the project list
         REST response. Each name must match an annotation added via
