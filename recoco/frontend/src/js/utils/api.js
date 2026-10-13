@@ -54,6 +54,7 @@ export function projectsUrl({
     'DONE',
     'REJECTED',
   ],
+  extraParams = {},
 } = {}) {
   // if search with tags, make a different url
   let url;
@@ -80,6 +81,11 @@ export function projectsUrl({
   if (myProjects) {
     url = url + '&my_projects=true';
   }
+
+  Object.entries(extraParams).forEach(([key, value]) => {
+    if (value) params.append(key, value);
+  });
+
   return url;
 }
 

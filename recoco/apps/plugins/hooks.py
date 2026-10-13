@@ -205,6 +205,25 @@ class CrmSpec(HookSpec):
                 }
         """
 
+    @hookspec
+    def crm_project_list_filters(self, request):
+        """Return an HTML string to inject into the CRM project list filters bar.
+
+        The HTML is rendered inside the ``ProjectListCrm`` Alpine scope.
+
+        The returned string MUST be wrapped with ``mark_safe()``; the framework
+        renders it without an additional ``|safe`` filter.
+
+        Example:
+            @hookimpl
+            def crm_project_list_filters(self, request):
+                return mark_safe(render_to_string(
+                    "plugin_giphy/fragments/filter_giphy.html",
+                    {},
+                    request=request,
+                ))
+        """
+
 
 class HeaderSpec(HookSpec):
     @hookspec
