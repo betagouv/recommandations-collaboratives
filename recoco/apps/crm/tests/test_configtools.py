@@ -115,7 +115,7 @@ def test_crm_site_configuration_crisp_integration(request, client, settings):
     # Crisp should not be active
     response = client.get(reverse("home"))
     assert response.status_code == 200
-    assert 'data-testid="crisp"' not in str(response.content)
+    assert 'id="crisp-website-id"' not in str(response.content)
 
     # Activate crisp by entering a token
     with login(client, groups=["example_com_admin"]):
@@ -136,7 +136,7 @@ def test_crm_site_configuration_crisp_integration(request, client, settings):
     # crisp should now be active on our site
     response = client.get(reverse("home"))
     assert response.status_code == 200
-    assert 'data-testid="crisp"' in str(response.content)
+    assert 'id="crisp-website-id"' in str(response.content)
     assert crisp_token in str(response.content)
 
 
