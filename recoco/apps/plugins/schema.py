@@ -39,3 +39,27 @@ def tenant_schema_context(site_config: Optional[SiteConfiguration]):
         set_enabled_plugins([])
         with connection.cursor() as cursor:
             cursor.execute("SET search_path TO public")
+
+
+@contextmanager
+def all_schema_context():
+    schemas = SiteConfiguration.objects.filter(schema_name__isnull=False).values_list(
+        "schema_name", flat=True
+    )
+    plugin_lists = SiteConfiguration.objects.exclude(enabled_plugins=[]).values_list(
+        "enabled_plugins", flat=True
+    )
+    plugins = [plugin for plugins in plugin_lists for plugin in plugins]
+    set_enabled_plugins(plugins)
+    schemas_str = SQL(", ").join([Identifier(schema) for schema in schemas])
+
+    with connection.cursor() as cursor:
+        cursor.execute(SQL("SET search_path TO {}, public").format(schemas_str))
+
+    try:
+        yield
+
+    finally:
+        set_enabled_plugins([])
+        with connection.cursor() as cursor:
+            cursor.execute("SET search_path TO public")
