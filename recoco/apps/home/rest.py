@@ -6,9 +6,35 @@ from notifications import models as notifications_models
 from rest_framework import mixins, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import SimpleRateThrottle
 from rest_framework.views import APIView
 
 from .serializers import SiteSerializer
+
+THROTTLE_EXCEPTION_GROUP = "trusted_bots"  # todo by site ?
+
+
+class UserButExceptionThrottle(SimpleRateThrottle):
+    """
+    Limits the rate of API calls that may be made by a given user EXCEPT for the exception group.
+
+    The user id will be used as a unique cache key if the user is
+    authenticated.  For anonymous requests, the IP address of the request will be used.
+    """
+
+    scope = "user_but_exception"
+
+    def get_cache_key(self, request, view):
+        if request.user and request.user.is_authenticated:
+            if request.user.groups.filter(
+                name=THROTTLE_EXCEPTION_GROUP
+            ).exists():  # todo by site ?
+                return None  # no throttling for exceptions
+            ident = request.user.pk
+        else:
+            ident = self.get_ident(request)
+
+        return self.cache_format % {"scope": self.scope, "ident": ident}
 
 
 class UserNotificationsMarkOneAsRead(APIView):
