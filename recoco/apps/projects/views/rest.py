@@ -47,6 +47,7 @@ from .. import models, signals
 from ..filters import (
     DefaultNoDeletedFilter,
     DepartmentsFilter,
+    PluginLookupsFilter,
     ProjectActivityFilter,
     ProjectAssignedToUserFilter,
     ProjectSiteStatusFilter,
@@ -160,6 +161,7 @@ class ProjectList(ListAPIView):
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
         ProjectAssignedToUserFilter,
+        PluginLookupsFilter,
         # todo filter should not be necessary after cleaning recoco_sync 2122
         DefaultNoDeletedFilter,
     ]
