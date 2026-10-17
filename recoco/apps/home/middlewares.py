@@ -5,14 +5,17 @@ from cookie_consent.util import get_cookie_value_from_request
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseRedirect
+from django.urls import Resolver404, resolve, reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 from sesame.middleware import AuthenticationMiddleware as SesameAuthenticationMiddleware
 from sesame.utils import get_user
 from waffle.templatetags import waffle_tags
 
 from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration, UserProfile
+from recoco.apps.social_account.views import SILENT_LOGIN_TRIED_SESSION_KEY
 
 
 class CurrentSiteConfigurationMiddleware:
@@ -77,6 +80,45 @@ class EmbedMiddleware:
                 }
 
         return response
+
+
+class ProConnectSilentLoginMiddleware:
+    """
+    On the login page, try once per session to log the user in through
+    ProConnect without interaction (prompt=none). Not used when embedded:
+    ProConnect cannot run inside an iframe, a popup is used instead.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        if self._should_try_silent_login(request):
+            params = {}
+            if next_url := request.GET.get("next"):
+                params["next"] = next_url
+            url = reverse(
+                "openid_connect_silent_login", kwargs={"provider_id": "proconnect"}
+            )
+            if params:
+                url += "?" + urlencode(params)
+            return HttpResponseRedirect(url)
+
+        return self.get_response(request)
+
+    def _should_try_silent_login(self, request: HttpRequest) -> bool:
+        if request.method != "GET" or request.user.is_authenticated:
+            return False
+        if getattr(request, "is_embedded", False):
+            return False
+        if request.session.get(SILENT_LOGIN_TRIED_SESSION_KEY):
+            return False
+        try:
+            if resolve(request.path_info).url_name != "account_login":
+                return False
+        except Resolver404:
+            return False
+        return waffle_tags.flag_is_active(request, "proconnect_login")
 
 
 class PreviousActivityMiddleware:
