@@ -166,6 +166,7 @@ TEMPLATES = [
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
                 "recoco.apps.projects.context_processors.matomo_context_processor",
                 "recoco.apps.home.context_processors.embed",
+                "recoco.apps.home.context_processors.sentry_frontend",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -256,6 +257,7 @@ CONTENT_SECURITY_POLICY = {
             "https://api-adresse.data.gouv.fr/",
             "https://www.google.com",
             "https://stats.beta.gouv.fr",
+            "https://sentry.incubateur.net",
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
@@ -662,5 +664,14 @@ ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 # Matomo
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
+
+# Sentry (frontend)
+SENTRY_FRONTEND_DSN = os.environ.get("SENTRY_FRONTEND_DSN", "")
+SENTRY_FRONTEND_ENVIRONMENT = os.environ.get(
+    "SENTRY_FRONTEND_ENVIRONMENT", "production"
+)
+SENTRY_FRONTEND_TRACES_SAMPLE_RATE = float(
+    os.environ.get("SENTRY_FRONTEND_TRACES_SAMPLE_RATE", "0")
+)
 
 # eof
