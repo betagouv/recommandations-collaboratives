@@ -3,7 +3,6 @@ from typing import Any
 from urllib.parse import urljoin
 
 import requests
-from django.conf import settings
 from django.contrib.sites.models import Site
 
 from recoco.apps.home.models import SiteConfiguration
@@ -200,7 +199,7 @@ def create_ds_prefill_link(recommendation_id: int):
     if recommendation.resource is None:
         return
 
-    ds_resource: DSResource = find_ds_resource_for_project(
+    ds_resource: DSResource | None = find_ds_resource_for_project(
         project=recommendation.project,
         resource=recommendation.resource,
     )
@@ -213,9 +212,7 @@ def create_ds_prefill_link(recommendation_id: int):
         ds_resource=ds_resource,
     )
     resp = requests.post(
-        url=urljoin(
-            settings.DS_API_BASE_URL, f"demarches/{ds_resource.number}/dossiers"
-        ),
+        url=ds_resource.create_prefill_draft_url,
         json=content,
         timeout=30,
     )
