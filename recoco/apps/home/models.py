@@ -36,7 +36,7 @@ from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
-from recoco.utils import make_site_slug, render_markdown
+from recoco.utils import render_markdown
 
 from . import apps
 
@@ -366,13 +366,6 @@ class SiteConfiguration(models.Model):
         verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
 
-    schema_name = models.SlugField(
-        unique=True,
-        null=True,
-        blank=True,
-        help_text="Le schema PgSQL pour ce portail.",
-    )
-
     enabled_plugins = models.JSONField(
         default=list,
         blank=True,
@@ -387,11 +380,6 @@ class SiteConfiguration(models.Model):
             "intégrer ce portail dans une iframe (embed). Admin uniquement."
         ),
     )
-
-    def save(self, *args, **kwargs):
-        if self.enabled_plugins and not self.schema_name:
-            self.schema_name = make_site_slug(self.site)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"

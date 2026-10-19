@@ -229,7 +229,6 @@ class TestTenantPluginSchemaMiddleware:
         request_mock.site_config = baker.make(
             SiteConfiguration,
             site=current_site,
-            schema_name="tenant_lyon",
             enabled_plugins=["plugin_a"],
         )
         seen = self.capture_enabled_plugins(get_response_mock)
