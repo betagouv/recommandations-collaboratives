@@ -2,10 +2,10 @@
 
 from django.http import HttpRequest
 
-from .schema import tenant_schema_context
+from .context import tenant_plugins_context
 
 
-class TenantPluginSchemaMiddleware:
+class TenantPluginsMiddleware:
     """Enables the current tenant's plugins (hooks, URLs) for the request."""
 
     def __init__(self, get_response):
@@ -13,5 +13,5 @@ class TenantPluginSchemaMiddleware:
 
     def __call__(self, request: HttpRequest):
         site_config = getattr(request, "site_config", None)
-        with tenant_schema_context(site_config):
+        with tenant_plugins_context(site_config):
             return self.get_response(request)

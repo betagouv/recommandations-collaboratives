@@ -15,8 +15,8 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
 from recoco.apps.communication import digests
+from recoco.apps.plugins.context import tenant_plugins_context
 from recoco.apps.plugins.manager import get_site_configuration, get_site_plugin_manager
-from recoco.apps.plugins.schema import tenant_schema_context
 from recoco.apps.projects import models as project_models
 from recoco.utils import get_group_for_site
 
@@ -62,7 +62,7 @@ class Command(BaseCommand):
 
         # Digests call plugin hooks and may reverse plugin URLs, so the whole
         # run must happen with the tenant's plugins enabled.
-        with tenant_schema_context(site_config):
+        with tenant_plugins_context(site_config):
             if user_id is not None:
                 user_qs = user_qs.filter(pk=user_id)
 

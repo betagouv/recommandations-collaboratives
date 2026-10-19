@@ -8,7 +8,7 @@ from django.db import connection
 from psycopg.sql import SQL, Identifier
 
 from .management.commands.migrate_plugins import Command
-from .routers import TenantPluginRouter
+from .routers import PluginRouter
 from .utils import get_plugin_app_labels, get_plugin_search_path
 
 PLUGIN = "plugin_testapp"
@@ -84,7 +84,7 @@ def test_migrate_plugins_is_safe_to_rerun():
 def test_migrate_plugins_restores_router_flag_and_search_path():
     migrate_plugins(PLUGIN)
 
-    assert TenantPluginRouter.is_plugin_operation is False
+    assert PluginRouter.is_plugin_operation is False
     assert search_path() == get_plugin_search_path()
 
 
@@ -105,11 +105,11 @@ def test_migrate_plugins_without_label_migrates_every_installed_plugin():
 
 
 def test_router_only_allows_plugin_migrations_during_plugin_operation():
-    router = TenantPluginRouter()
+    router = PluginRouter()
 
     assert router.allow_migrate("default", "projects") is True
     assert router.allow_migrate("default", PLUGIN) is False
 
-    with patch.object(TenantPluginRouter, "is_plugin_operation", True):
+    with patch.object(PluginRouter, "is_plugin_operation", True):
         assert router.allow_migrate("default", "projects") is False
         assert router.allow_migrate("default", PLUGIN) is True

@@ -16,7 +16,7 @@ from recoco.utils import login
 
 from .hooks import CrmSpec, NotificationSpec, ProjectSpec
 from .manager import get_site_plugin_manager
-from .middlewares import TenantPluginSchemaMiddleware
+from .middlewares import TenantPluginsMiddleware
 from .resolvers import get_enabled_plugins
 
 # --- Fixtures & helpers for get_site_plugin_manager ---
@@ -29,7 +29,7 @@ def get_response_mock():
 
 @pytest.fixture
 def middleware(get_response_mock):
-    return TenantPluginSchemaMiddleware(get_response=get_response_mock)
+    return TenantPluginsMiddleware(get_response=get_response_mock)
 
 
 @pytest.fixture
@@ -187,7 +187,7 @@ def current_search_path():
 
 
 @pytest.mark.django_db
-class TestTenantPluginSchemaMiddleware:
+class TestTenantPluginsMiddleware:
     """Ensure the Middleware enables the tenant's plugins for the request"""
 
     def capture_enabled_plugins(self, get_response_mock):

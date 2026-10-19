@@ -2,8 +2,8 @@ Plugin System
 #############
 
 Recoco supports tenant-specific plugins: independent Python packages that add
-UI, logic, and isolated database tables to a single portal without affecting
-others.
+UI, logic, and database tables to the portals that enable them, without
+affecting the others.
 
 .. contents:: Table of Contents
    :local:
@@ -673,12 +673,12 @@ There are two categories of migration:
   ``manage.py migrate_plugins`` for every installed plugin, whether or not
   a tenant enables it.
 
-The contract is enforced by ``TenantPluginRouter`` in
+The contract is enforced by ``PluginRouter`` in
 ``recoco/apps/plugins/routers.py``:
 
 .. code-block:: python
 
-    class TenantPluginRouter:
+    class PluginRouter:
         is_plugin_operation = False   # class-level flag, set by migrate_plugins
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
@@ -780,7 +780,7 @@ Without an app label, the steps below run for every installed ``plugin_*``
 app. With one, the app must be an installed plugin; an optional migration
 name can follow, as with ``migrate``.
 
-1. **Router flag** : ``TenantPluginRouter.is_plugin_operation = True``.
+1. **Router flag** : ``PluginRouter.is_plugin_operation = True``.
    From this point on ``allow_migrate`` blocks core migrations and permits
    plugin migrations.
 
@@ -833,7 +833,7 @@ restores it with ``set_plugin_search_path(connection)`` instead.
    transaction mode (e.g. PgBouncer ``pool_mode = transaction``).
 
 Tenant isolation is therefore done by the application:
-``TenantPluginSchemaMiddleware`` (and ``tenant_schema_context`` for commands)
+``TenantPluginsMiddleware`` (and ``tenant_plugins_context`` for commands)
 only enables the tenant's plugins for hooks and URLs, and plugin querysets
 must be scoped with ``on_site`` or an explicit ``site`` filter.
 
@@ -869,7 +869,7 @@ such as ``senddigests`` do. Otherwise ``on_site`` managers,
 creating a plugin profile on ``post_save``) silently use the default site.
 
 If the command also calls plugin hooks or reverses plugin URLs, enable the
-tenant's plugins with ``tenant_schema_context`` (what the middleware does for
+tenant's plugins with ``tenant_plugins_context`` (what the middleware does for
 requests).
 
 .. code-block:: python
@@ -879,7 +879,7 @@ requests).
     from django.core.management.base import BaseCommand
 
     from recoco.apps.plugins.manager import get_site_configuration
-    from recoco.apps.plugins.schema import tenant_schema_context
+    from recoco.apps.plugins.context import tenant_plugins_context
 
 
     class Command(BaseCommand):
@@ -890,7 +890,7 @@ requests).
             site = Site.objects.get(domain=options["site_domain"])
             with (
                 settings.SITE_ID.override(site.pk),
-                tenant_schema_context(get_site_configuration(site)),
+                tenant_plugins_context(get_site_configuration(site)),
             ):
                 for realisation in Realisation.on_site.all():
                     ...

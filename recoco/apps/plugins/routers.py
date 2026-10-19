@@ -1,7 +1,7 @@
 from .utils import is_plugin_label
 
 
-class TenantPluginRouter:
+class PluginRouter:
     """
     A router to control which models are migrated to which schema:
      - The "plugin_" apps go to their own plugin schema (see migrate_plugins)

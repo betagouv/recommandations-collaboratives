@@ -4,7 +4,7 @@ from django.db import connection
 from django.db.migrations.recorder import MigrationRecorder
 from psycopg.sql import SQL, Identifier
 
-from recoco.apps.plugins.routers import TenantPluginRouter
+from recoco.apps.plugins.routers import PluginRouter
 from recoco.apps.plugins.utils import get_plugin_app_labels, set_plugin_search_path
 
 
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Migrating '{plugin_app}' in schema '{schema}'...")
 
         try:
-            TenantPluginRouter.is_plugin_operation = True
+            PluginRouter.is_plugin_operation = True
 
             # Point at the plugin schema only so ensure_schema() creates
             # django_migrations there rather than reusing public's.
@@ -98,7 +98,7 @@ class Command(BaseCommand):
             call_command("migrate", *migrate_args, verbosity=verbosity)
 
         finally:
-            TenantPluginRouter.is_plugin_operation = False
+            PluginRouter.is_plugin_operation = False
             set_plugin_search_path(connection)
 
         self.stdout.write(self.style.SUCCESS(f"Successfully migrated '{plugin_app}'"))
