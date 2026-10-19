@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
@@ -20,6 +21,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
+from notifications import models as notifications_models
 from notifications.signals import notify
 
 from recoco import utils as uv_utils
@@ -171,6 +173,65 @@ def assign_observer(user, project, site=None):
 
 # XXX currently no difference, but may need different perms in the future
 unassign_observer = unassign_advisor
+
+
+def delete_project_notifications(user, project):
+    """Delete the notifications of someone about a project"""
+    project_ct = ContentType.objects.get_for_model(models.Project)
+    notifications_models.Notification.on_site.filter(
+        recipient=user,
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    ).delete()
+
+
+@transaction.atomic
+def remove_collaborator(user, project):
+    """Remove a collaborator from a project, along with her notifications"""
+    unassign_collaborator(user, project)
+    delete_project_notifications(user, project)
+
+
+@transaction.atomic
+def remove_advisor(user, project, site):
+    """Remove an advisor from a project, along with her notifications and
+    dashboard entry"""
+    unassign_advisor(user, project, site)
+    delete_project_notifications(user, project)
+    models.UserProjectStatus.objects.filter(
+        site=site, user=user, project=project
+    ).delete()
+
+
+@transaction.atomic
+def remove_member(user, project, site):
+    """Remove someone from a project, whatever its roles on the given site"""
+    remove_collaborator(user, project)
+    remove_advisor(user, project, site)
+
+
+def assign_role(user, project, role, site):
+    """Attach someone to a project with the given invite role"""
+    if role == "COLLABORATOR":
+        assign_collaborator(user, project)
+    elif role == "SWITCHTENDER":
+        assign_advisor(user, project, site=site)
+    elif role == "OBSERVER":
+        assign_observer(user, project, site=site)
+    else:
+        raise ValueError(f"Unhandled invite role '{role}'")
+
+
+@transaction.atomic
+def change_role(user, project, role, site):
+    """Make someone hold only the given invite role on a project
+
+    Removing a role may remove permissions shared with the new one, hence all
+    of them are removed before assigning the new one.
+    """
+    unassign_collaborator(user, project)
+    unassign_advisor(user, project, site=site)
+    assign_role(user, project, role, site)
 
 
 def can_administrate_project(project, user):

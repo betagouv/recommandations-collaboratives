@@ -17,8 +17,17 @@ from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
-from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
-from .utils import assign_advisor, assign_collaborator, assign_observer
+from .models import (
+    Document,
+    Note,
+    Project,
+    ProjectMember,
+    ProjectSite,
+    ProjectSwitchtender,
+    Topic,
+    UserProjectStatus,
+)
+from .utils import assign_collaborator, assign_role, change_role
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -253,18 +262,15 @@ def get_or_create_user_on_site(email: str, site: Site) -> User:
 
 
 class NewProjectSerializer(ProjectSerializer):
-    """Create an already validated project, on the current site
-
-    The commune is given as an insee code rather than as a primary key: it is
-    what identifies a commune unambiguously for an API client. The owner is
-    given as an email, and its account is created if it does not exist yet.
-    """
+    """Create an already validated project, on the current site"""
 
     class Meta(ProjectSerializer.Meta):
         fields = ProjectSerializer.Meta.fields + ["insee", "owner_email"]
         read_only_fields = ProjectSerializer.Meta.read_only_fields + [
             "created_on",
             "updated_on",
+            "inactive_since",
+            "is_diagnostic_done",
         ]
 
     insee = serializers.CharField(max_length=5, write_only=True)
@@ -272,6 +278,13 @@ class NewProjectSerializer(ProjectSerializer):
 
     description = serializers.CharField(required=True)
     tags = TagListSerializerField(required=False)
+
+    # read only on the parent serializer, since it belongs to the project site
+    status = serializers.ChoiceField(
+        choices=ProjectSite.PROJECTSITE_STATES,
+        required=False,
+        default="TO_PROCESS",
+    )
 
     def validate_owner_email(self, value):
         return value.lower()
@@ -295,6 +308,8 @@ class NewProjectSerializer(ProjectSerializer):
     def create(self, validated_data):
         validated_data.pop("insee")
         owner_email = validated_data.pop("owner_email")
+        # status is not a field of the project, but of its site
+        status = validated_data.pop("status")
 
         # the caller submits the project on behalf of its owner,
         # cf. onboarding.views.prefill_project_submit
@@ -304,7 +319,7 @@ class NewProjectSerializer(ProjectSerializer):
 
         # the project skips moderation, it is created already validated
         project.project_sites.create(
-            site=self.current_site, status="TO_PROCESS", is_origin=True
+            site=self.current_site, status=status, is_origin=True
         )
 
         owner = get_or_create_user_on_site(owner_email, self.current_site)
@@ -313,13 +328,32 @@ class NewProjectSerializer(ProjectSerializer):
         return project
 
 
-class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
-    """Attach someone, given by email, to a project with the given role
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    """A participant of a project"""
 
-    The roles are the ones of an invitation, but the account is created if it
-    does not exist yet and the person is attached right away: no invitation is
-    sent, and nothing is to be accepted.
-    """
+    class Meta:
+        model = ProjectMember
+        fields = ["email", "first_name", "last_name", "is_owner"]
+
+    email = serializers.EmailField(source="member.email")
+    first_name = serializers.CharField(source="member.first_name")
+    last_name = serializers.CharField(source="member.last_name")
+
+
+class ProjectAdvisorSerializer(serializers.ModelSerializer):
+    """An advisor or an observer of a project"""
+
+    class Meta:
+        model = ProjectSwitchtender
+        fields = ["email", "first_name", "last_name", "is_observer"]
+
+    email = serializers.EmailField(source="switchtender.email")
+    first_name = serializers.CharField(source="switchtender.first_name")
+    last_name = serializers.CharField(source="switchtender.last_name")
+
+
+class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Attach someone, given by email, to a project with the given role"""
 
     email = serializers.EmailField(max_length=150)
     role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
@@ -334,18 +368,27 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         user = get_or_create_user_on_site(validated_data["email"], self.current_site)
-        role = validated_data["role"]
 
-        if role == "COLLABORATOR":
-            assign_collaborator(user, self.project)
-        elif role == "SWITCHTENDER":
-            assign_advisor(user, self.project, site=self.current_site)
-        elif role == "OBSERVER":
-            assign_observer(user, self.project, site=self.current_site)
-        else:
-            raise ValueError(f"Unhandled invite role '{role}'")
+        assign_role(user, self.project, validated_data["role"], self.current_site)
 
         return validated_data
+
+
+class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
+    """Change the role of someone on a project
+
+    The person keeps only the given role: any other role it holds on the
+    project, for the current site, is removed.
+    """
+
+    email = serializers.EmailField(read_only=True)
+
+    def update(self, instance, validated_data):
+        role = validated_data["role"]
+
+        change_role(instance, self.project, role, self.current_site)
+
+        return {"email": instance.email, "role": role}
 
 
 class ProjectForListSerializer(BaseSerializerMixin):
