@@ -5,3 +5,5 @@ DS_AUTOLOAD_SCHEMA = False
 CELERY_TASK_ALWAYS_EAGER = True
 
 CONTENT_SECURITY_POLICY = common.CONTENT_SECURITY_POLICY
+
+INSTALLED_APPS += ("recoco.apps.plugins.testing.plugin_testapp",)  # noqa: F405

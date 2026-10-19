@@ -14,7 +14,13 @@ class PluginModel(models.Model):
     Use ``on_site`` in views and anywhere tenant data is exposed.
     """
 
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    # Prefixed by the app label so it can't clash with a core model of the
+    # same name (e.g. crm.Note and plugin_x.Note would both give Site.note_set)
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_set",
+    )
 
     objects = models.Manager()
     on_site = CurrentSiteManager()

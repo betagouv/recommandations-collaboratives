@@ -2,10 +2,7 @@ from django.apps import apps
 from django.core import checks
 
 from .models import PluginModel
-
-
-def is_plugin_app(app_config):
-    return app_config.label.startswith("plugin_")
+from .utils import is_plugin_label
 
 
 def check_plugin_model(model):
@@ -43,7 +40,7 @@ def check_plugin_models(app_configs=None, **kwargs):
 
     errors = []
     for app_config in app_configs:
-        if not is_plugin_app(app_config):
+        if not is_plugin_label(app_config.label):
             continue
         for model in app_config.get_models():
             errors.extend(check_plugin_model(model))

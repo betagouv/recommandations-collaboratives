@@ -628,19 +628,20 @@ model of a ``plugin_*`` app that does not subclass ``PluginModel``, except:
 
 .. note::
 
-   Plugin migrations must be run with the ``migrate_tenant`` command, not the
-   standard ``migrate`` command. Running ``migrate`` against a ``plugin_*``
-   app will raise an error.
+   Plugin migrations must be run with the ``migrate_plugins`` command, not the
+   standard ``migrate`` command. A plain ``migrate`` skips the operations of
+   ``plugin_*`` apps (see `Migration Mechanics`_).
 
 .. code-block:: bash
 
-    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+    python manage.py migrate_plugins               # every installed plugin
+    python manage.py migrate_plugins plugin_giphy  # a single plugin
 
 
 Migration Mechanics
 ===================
 
-Understanding how migrations are split between the public schema and tenant
+Understanding how migrations are split between the public schema and plugin
 schemas is essential for anyone working on the plugin system or debugging
 migration issues.
 
@@ -653,8 +654,10 @@ There are two categories of migration:
   ``plugin_``.  These belong to the ``public`` schema and are applied by the
   standard ``manage.py migrate`` command.
 - **Plugin migrations** : apps whose ``app_label`` starts with ``plugin_``.
-  These belong exclusively to the tenant schema for which the plugin is
-  enabled.
+  Each plugin gets its own schema, named after its app label (e.g.
+  ``plugin_giphy``), shared by every tenant. It is applied by
+  ``manage.py migrate_plugins`` for every installed plugin, whether or not
+  a tenant enables it.
 
 The contract is enforced by ``TenantPluginRouter`` in
 ``recoco/apps/plugins/routers.py``:
@@ -662,20 +665,20 @@ The contract is enforced by ``TenantPluginRouter`` in
 .. code-block:: python
 
     class TenantPluginRouter:
-        is_tenant_operation = False   # class-level flag, set by migrate_tenant
+        is_plugin_operation = False   # class-level flag, set by migrate_plugins
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
-            if app_label.startswith("plugin_"):
-                return self.is_tenant_operation   # only allowed in tenant mode
-            return not self.is_tenant_operation   # core only allowed in normal mode
+            if is_plugin_label(app_label):
+                return self.is_plugin_operation   # only allowed in plugin mode
+            return not self.is_plugin_operation   # core only allowed in normal mode
 
-When ``is_tenant_operation`` is ``False`` (the default, i.e. a normal
+When ``is_plugin_operation`` is ``False`` (the default, i.e. a normal
 ``migrate`` run):
 
 - Core migrations → **allowed** ✓
 - Plugin migrations → **blocked** ✗
 
-When ``is_tenant_operation`` is ``True`` (set by ``migrate_tenant``):
+When ``is_plugin_operation`` is ``True`` (set by ``migrate_plugins``):
 
 - Core migrations → **blocked** ✗
 - Plugin migrations → **allowed** ✓
@@ -690,25 +693,29 @@ instead by each **operation** inside the migration : ``CreateModel``,
 any SQL.  If ``allow_migrate`` returns ``False`` the operation is silently
 skipped but the migration **is still recorded** in ``django_migrations``.
 
-This means that even if a core migration ends up in the tenant's execution
+This means that even if a core migration ends up in the plugin's execution
 plan (because it is a declared dependency of a plugin migration), its SQL
-will never touch the tenant schema. The tables of core models live in
-``public`` and are visible to the tenant via ``search_path`` : no copy is
-created per tenant.
+will never touch the plugin schema. The tables of core models live in
+``public`` and are visible from the plugin schema via ``search_path`` : no
+copy is created per plugin.
+
+It also means that a plain ``migrate`` records plugin migrations as applied
+in ``public.django_migrations`` without creating any table. This is why each
+plugin schema has its own ``django_migrations`` table.
 
 
 The ``django_migrations`` ghost-entry mechanism
 -----------------------------------------------
 
 Django's migration planner reads ``django_migrations`` to decide which
-migrations still need to run.  Without intervention, an empty tenant
+migrations still need to run.  Without intervention, an empty plugin
 ``django_migrations`` table would cause Django to include every core migration
 in the plan. Not to execute them (the per-operation guard prevents that) but
 to process them as no-ops, recording them one by one.  On a project with
 hundreds of migrations this produces hundreds of ``Applying auth.0001...``
 lines and a slow first run.
 
-``migrate_tenant`` solves this with a single INSERT before running any plugin
+``migrate_plugins`` solves this with a single INSERT before running any plugin
 migration:
 
 .. code-block:: sql
@@ -716,7 +723,7 @@ migration:
     INSERT INTO "<schema>".django_migrations (app, name, applied)
     SELECT app, name, applied
     FROM public.django_migrations
-    WHERE app NOT LIKE 'plugin_%'
+    WHERE app NOT LIKE 'plugin\_%'
       AND NOT EXISTS (
         SELECT 1 FROM "<schema>".django_migrations existing
         WHERE existing.app = public.django_migrations.app
@@ -725,16 +732,16 @@ migration:
 
 These are called **ghost entries**: records copied from the public schema that
 tell Django "this core migration has already been accounted for : do not
-include it in the tenant plan."
+include it in the plugin plan." Migrations of other plugins are not copied.
 
 Why ghost entries are INSERT-only (no DELETE on rollback)
 ---------------------------------------------------------
 
 A ghost entry for a core migration means *"do not re-apply this here"*.  That
 statement remains true even if the core migration is later rolled back in
-``public``.  The tenant never ran that migration's SQL; rolling it back in
-``public`` changes the shared schema (which the tenant sees through
-``search_path``), but it does not create any obligation for the tenant's
+``public``.  The plugin schema never ran that migration's SQL; rolling it back
+in ``public`` changes the shared schema (which the plugin sees through
+``search_path``), but it does not create any obligation for the plugin's
 ``django_migrations`` bookkeeping.
 
 Deleting ghost entries on rollback would introduce a spurious inconsistency:
@@ -744,43 +751,48 @@ dependency ghost was gone, causing ``check_consistent_history`` to raise
 
 Keeping stale ghosts avoids this problem and is semantically correct: the
 ghost just continues to say "don't try to run this core migration in the
-tenant", which is the right answer before and after any public rollback.
+plugin schema", which is the right answer before and after any public rollback.
 
-``migrate_tenant`` execution flow
-----------------------------------
+``migrate_plugins`` execution flow
+-----------------------------------
 
 Putting it all together, here is what happens when you run:
 
 .. code-block:: bash
 
-    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+    python manage.py migrate_plugins plugin_giphy
 
-1. **Validation** : ``SiteConfiguration`` with ``schema_name="tenant_paris"``
-   must exist; the PostgreSQL schema must be present (created by the
-   ``post_save`` signal on ``SiteConfiguration``).
+Without an app label, the steps below run for every installed ``plugin_*``
+app. With one, the app must be an installed plugin; an optional migration
+name can follow, as with ``migrate``.
 
-2. **Router flag** : ``TenantPluginRouter.is_tenant_operation = True``.
+1. **Router flag** : ``TenantPluginRouter.is_plugin_operation = True``.
    From this point on ``allow_migrate`` blocks core migrations and permits
    plugin migrations.
 
-3. **Create** ``django_migrations`` **in tenant** : ``search_path`` is
-   temporarily set to *only* the tenant schema so that
+2. **Create the schema** : ``CREATE SCHEMA IF NOT EXISTS plugin_giphy``.
+
+3. **Create** ``django_migrations`` **in the plugin schema** : ``search_path``
+   is temporarily set to *only* the plugin schema so that
    ``MigrationRecorder.ensure_schema()`` creates the table there rather than
    picking up ``public.django_migrations``.
 
-4. **Ghost entry sync** : the INSERT above copies all unapplied core migration
-   records from ``public.django_migrations`` into the tenant table.  Any core
+4. **Ghost entry sync** : the INSERT above copies all core migration records
+   from ``public.django_migrations`` into the plugin table.  Any core
    migration already present (from a previous run) is left untouched.
 
-5. **Run plugin migrations** : ``search_path`` is restored to
-   ``tenant_paris, public`` and ``call_command("migrate", "plugin_giphy")``
+5. **Run plugin migrations** : ``search_path`` is set to
+   ``plugin_giphy, public`` and ``call_command("migrate", "plugin_giphy")``
    is called.  Django sees all core migrations as applied (from the ghost
    entries) and only executes the plugin's own unapplied migrations.  Tables
-   created by plugin migrations land in ``tenant_paris``; ForeignKeys to core
+   created by plugin migrations land in ``plugin_giphy``; ForeignKeys to core
    models resolve through ``public`` via ``search_path``.
 
-6. **Cleanup** : ``is_tenant_operation`` is reset to ``False`` and
-   ``search_path`` is reset to ``public`` in a ``finally`` block.
+6. **Cleanup** : ``is_plugin_operation`` is reset to ``False`` and
+   ``search_path`` is reset to the connection default (``RESET search_path``)
+   in a ``finally`` block.
+
+The command is safe to re-run.
 
 
 URL Routing
@@ -1111,9 +1123,9 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
 2. Add ``plugin_giphy`` to ``INSTALLED_APPS`` in the relevant settings file (ie. ``development.py``).
 
-3. Create the tenant schema and run plugin migrations::
+3. Create the plugin schema and run plugin migrations::
 
-    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+    python manage.py migrate_plugins plugin_giphy
 
 4. If the plugin ships JavaScript, install its yarn deps and generate Vite proxies::
 

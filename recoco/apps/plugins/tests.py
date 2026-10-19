@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 import pluggy
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
 from django.db.models import Value
 from django.test import RequestFactory
 from django.urls import reverse
@@ -18,7 +17,6 @@ from recoco.utils import login
 from .hooks import CrmSpec, NotificationSpec, ProjectSpec
 from .manager import get_site_plugin_manager
 from .middlewares import TenantPluginSchemaMiddleware
-from .routers import TenantPluginRouter
 
 # --- Fixtures & helpers for get_site_plugin_manager ---
 
@@ -222,81 +220,6 @@ class TestTenantPluginSchemaMiddleware:
             )
             # search_path is reset to public once the response has been generated
             cursor_instance.execute.assert_called_with("SET search_path TO public")
-
-
-@pytest.mark.django_db
-def test_create_tenant_schema_signal(current_site):
-    with patch("django.db.connection.cursor") as mock_cursor:
-        cursor_instance = mock_cursor.return_value.__enter__.return_value
-
-        baker.make(SiteConfiguration, site=current_site, schema_name="test_schema")
-
-        expected = SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
-            Identifier("test_schema")
-        )
-        cursor_instance.execute.assert_called_with(expected)
-
-
-@pytest.mark.django_db
-def test_create_tenant_schema_signal_no_schema_name(current_site):
-    with patch("django.db.connection.cursor") as mock_cursor:
-        cursor_instance = mock_cursor.return_value.__enter__.return_value
-
-        # Saving SiteConfiguration without schema_name should not trigger schema creation
-        baker.make(SiteConfiguration, site=current_site, schema_name=None)
-
-        # Ensure no call to execute contains "CREATE SCHEMA"
-        for call in cursor_instance.execute.call_args_list:
-            assert "CREATE SCHEMA" not in call[0][0]
-
-
-# --- MANAGEMENT COMMAND--#
-@pytest.mark.django_db
-def test_migrate_tenant_command_logic(current_site):
-    # SiteConfiguration must exist before calling the command.
-    # Created outside the cursor mock so the post_save signal (CREATE SCHEMA)
-    # does not pollute the cursor call assertions below.
-    baker.make(SiteConfiguration, site=current_site, schema_name="tenant_lyon")
-
-    with patch(
-        "recoco.apps.plugins.management.commands.migrate_tenant.call_command"
-    ) as mock_migrate:
-        with patch(
-            "recoco.apps.plugins.management.commands.migrate_tenant.connection"
-        ) as mock_conn:
-            cursor_instance = mock_conn.cursor.return_value.__enter__.return_value
-            # Return a truthy row so the schema-existence SELECT passes.
-            cursor_instance.fetchone.return_value = (1,)
-
-            assert TenantPluginRouter.is_tenant_operation is False
-
-            call_command("migrate_tenant", "--schema", "tenant_lyon", "my_app")
-
-            # Check router flag is back to False after execution
-            assert TenantPluginRouter.is_tenant_operation is False
-
-            # migrate_tenant sets search_path in three steps:
-            # 1. SET search_path TO tenant_lyon        (before ensure_schema)
-            # 2. SET search_path TO tenant_lyon, public (after core-migration copy)
-            # 3. SET search_path TO public             (finally)
-            # Schema creation (CREATE SCHEMA) is handled by the post_save signal
-            # on SiteConfiguration, not by this command.
-            calls = [call[0][0] for call in cursor_instance.execute.call_args_list]
-            assert (
-                SQL("SET search_path TO {}").format(Identifier("tenant_lyon")) in calls
-            )
-            assert (
-                SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
-                in calls
-            )
-            assert "SET search_path TO public" in calls
-
-            # Ghost entries for core migrations must be inserted so Django
-            # skips them in the plan and doesn't re-execute them in the tenant.
-            assert any("django_migrations" in repr(c) for c in calls)
-
-            # Check migrate was called with the correct app
-            mock_migrate.assert_called_with("migrate", "my_app", verbosity=1)
 
 
 # ---------------------------------------------------------------------------
