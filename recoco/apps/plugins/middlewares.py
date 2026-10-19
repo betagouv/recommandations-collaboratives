@@ -6,9 +6,7 @@ from .schema import tenant_schema_context
 
 
 class TenantPluginSchemaMiddleware:
-    """Extends the database search path based on the current tenant name.
-    This allows using plugins contained for each tenant.
-    """
+    """Enables the current tenant's plugins (hooks, URLs) for the request."""
 
     def __init__(self, get_response):
         self.get_response = get_response

@@ -9,7 +9,7 @@ from psycopg.sql import SQL, Identifier
 
 from .management.commands.migrate_plugins import Command
 from .routers import TenantPluginRouter
-from .utils import get_plugin_app_labels
+from .utils import get_plugin_app_labels, get_plugin_search_path
 
 PLUGIN = "plugin_testapp"
 
@@ -42,7 +42,7 @@ def recorded_migrations(schema, app):
 def search_path():
     with connection.cursor() as cursor:
         cursor.execute("SHOW search_path")
-        return cursor.fetchone()[0]
+        return cursor.fetchone()[0].replace(" ", "").split(",")
 
 
 @pytest.mark.django_db
@@ -82,15 +82,10 @@ def test_migrate_plugins_is_safe_to_rerun():
 
 @pytest.mark.django_db
 def test_migrate_plugins_restores_router_flag_and_search_path():
-    # The command resets search_path to the connection default
-    with connection.cursor() as cursor:
-        cursor.execute("RESET search_path")
-    before = search_path()
-
     migrate_plugins(PLUGIN)
 
     assert TenantPluginRouter.is_plugin_operation is False
-    assert search_path() == before
+    assert search_path() == get_plugin_search_path()
 
 
 @pytest.mark.django_db

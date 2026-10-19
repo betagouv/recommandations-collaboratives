@@ -8,9 +8,8 @@ from recoco.apps.plugins.schema import tenant_schema_context
 class TenantCommand(BaseCommand):
     """Base class for management commands that operate on a tenant schema.
 
-    Sets the PostgreSQL search_path to ``<schema>, public`` before handle()
-    is called, so all ORM queries against plugin models resolve to the correct
-    tenant schema.
+    Enables the tenant's plugins before handle() is called, like
+    TenantPluginSchemaMiddleware does for HTTP requests.
 
     By default, the schema is taken from the --schema argument. Override
     get_schema(options) to derive it from other arguments (e.g. --site-domain).

@@ -60,9 +60,8 @@ class Command(BaseCommand):
         # only send emails to active users and those actually linked to the current site
         user_qs = auth_models.User.objects
 
-        # Notifications may reference plugin models (e.g. through a
-        # notification's action_object), so the whole digest run must
-        # happen with the tenant schema on the search_path.
+        # Digests call plugin hooks and may reverse plugin URLs, so the whole
+        # run must happen with the tenant's plugins enabled.
         with tenant_schema_context(site_config):
             if user_id is not None:
                 user_qs = user_qs.filter(pk=user_id)

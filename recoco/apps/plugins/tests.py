@@ -3,12 +3,12 @@ from unittest.mock import Mock, patch
 import pluggy
 import pytest
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.db.models import Value
 from django.test import RequestFactory
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from model_bakery import baker
-from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.context_processors import unread_notifications_processor
@@ -17,6 +17,7 @@ from recoco.utils import login
 from .hooks import CrmSpec, NotificationSpec, ProjectSpec
 from .manager import get_site_plugin_manager
 from .middlewares import TenantPluginSchemaMiddleware
+from .resolvers import get_enabled_plugins
 
 # --- Fixtures & helpers for get_site_plugin_manager ---
 
@@ -179,47 +180,65 @@ class TestGetSitePluginManager:
         assert scoped.list_name_plugin() == []
 
 
+def current_search_path():
+    with connection.cursor() as cursor:
+        cursor.execute("SHOW search_path")
+        return cursor.fetchone()[0]
+
+
 @pytest.mark.django_db
 class TestTenantPluginSchemaMiddleware:
-    """Ensure the Middleware will extend the DB path based on schema_name presence"""
+    """Ensure the Middleware enables the tenant's plugins for the request"""
 
-    def test_does_nothing_if_no_site_config(self, middleware, request_mock):
-        if hasattr(request_mock, "site_config"):
-            delattr(request_mock, "site_config")
+    def capture_enabled_plugins(self, get_response_mock):
+        seen = {}
 
-        with patch("django.db.connection.cursor") as mock_cursor:
-            middleware(request_mock)
-            mock_cursor.assert_not_called()
+        def get_response(request):
+            seen["enabled_plugins"] = get_enabled_plugins()
+            seen["search_path"] = current_search_path()
 
-    def test_does_nothing_if_no_schema_name(
-        self, middleware, request_mock, current_site
+        get_response_mock.side_effect = get_response
+        return seen
+
+    def test_enables_no_plugin_if_no_site_config(
+        self, middleware, get_response_mock, request_mock
     ):
-        site_config = baker.make(SiteConfiguration, site=current_site, schema_name=None)
-        request_mock.site_config = site_config
+        del request_mock.site_config
+        seen = self.capture_enabled_plugins(get_response_mock)
 
-        with patch("django.db.connection.cursor") as mock_cursor:
-            middleware(request_mock)
-            mock_cursor.assert_not_called()
+        middleware(request_mock)
 
-    def test_sets_search_path_if_schema_name_present(
-        self, middleware, request_mock, current_site
+        assert seen["enabled_plugins"] == []
+
+    def test_enables_site_plugins_during_request(
+        self, middleware, get_response_mock, request_mock, current_site
     ):
-        site_config = baker.make(
-            SiteConfiguration, site=current_site, schema_name="tenant_lyon"
+        request_mock.site_config = baker.make(
+            SiteConfiguration, site=current_site, enabled_plugins=["plugin_a"]
         )
-        request_mock.site_config = site_config
+        seen = self.capture_enabled_plugins(get_response_mock)
 
-        with patch("django.db.connection.cursor") as mock_cursor:
-            # We need to mock the context manager __enter__ to get the actual cursor mock
-            cursor_instance = mock_cursor.return_value.__enter__.return_value
+        middleware(request_mock)
 
-            middleware(request_mock)
+        assert seen["enabled_plugins"] == ["plugin_a"]
+        assert get_enabled_plugins() == []
 
-            cursor_instance.execute.assert_any_call(
-                SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
-            )
-            # search_path is reset to public once the response has been generated
-            cursor_instance.execute.assert_called_with("SET search_path TO public")
+    def test_does_not_touch_search_path(
+        self, middleware, get_response_mock, request_mock, current_site
+    ):
+        request_mock.site_config = baker.make(
+            SiteConfiguration,
+            site=current_site,
+            schema_name="tenant_lyon",
+            enabled_plugins=["plugin_a"],
+        )
+        seen = self.capture_enabled_plugins(get_response_mock)
+        before = current_search_path()
+
+        middleware(request_mock)
+
+        assert seen["search_path"] == before
+        assert current_search_path() == before
 
 
 # ---------------------------------------------------------------------------

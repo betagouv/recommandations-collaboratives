@@ -5,7 +5,7 @@ from django.db.migrations.recorder import MigrationRecorder
 from psycopg.sql import SQL, Identifier
 
 from recoco.apps.plugins.routers import TenantPluginRouter
-from recoco.apps.plugins.utils import get_plugin_app_labels
+from recoco.apps.plugins.utils import get_plugin_app_labels, set_plugin_search_path
 
 
 class Command(BaseCommand):
@@ -99,7 +99,6 @@ class Command(BaseCommand):
 
         finally:
             TenantPluginRouter.is_plugin_operation = False
-            with connection.cursor() as cursor:
-                cursor.execute("RESET search_path")
+            set_plugin_search_path(connection)
 
         self.stdout.write(self.style.SUCCESS(f"Successfully migrated '{plugin_app}'"))

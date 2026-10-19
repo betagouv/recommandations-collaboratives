@@ -22,18 +22,22 @@ Architecture Overview
                          │ pluggy hooks
            ┌─────────────┴──────────────┐
            ▼                            ▼
-    ┌─────────────┐             ┌─────────────┐
-    │ plugin_lyon │             │plugin_giphy │
-    │(tenant_lyon │             │(tenant_paris│
-    │   schema)   │             │   schema)   │
-    └─────────────┘             └─────────────┘
+    ┌──────────────────┐        ┌──────────────────┐
+    │ plugin_mi_depafi │        │   plugin_giphy   │
+    │ (plugin_mi_depafi│        │  (plugin_giphy   │
+    │      schema)     │        │     schema)      │
+    └──────────────────┘        └──────────────────┘
 
-Three mechanisms work together:
+    runtime search_path (static): public, plugin_mi_depafi, plugin_giphy
+
+Four mechanisms work together:
 
 - **pluggy** - defines a formal hook contract between the core and plugins.
-- **PostgreSQL schemas** - each tenant gets an isolated schema for its plugin
-  tables; the ``public`` schema holds shared core data.
-- **PluginURLResolver** - routes are only exposed to the tenant that has the
+- **PostgreSQL schemas** - each plugin gets its own schema, named after its
+  app label and shared by all tenants; the ``public`` schema holds core data.
+- **Row-level site scoping** - plugin models subclass ``PluginModel`` and
+  carry a ``site`` foreign key, like core models do.
+- **PluginURLResolver** - routes are only exposed to the tenants that have the
   plugin enabled.
 
 
@@ -574,7 +578,8 @@ Putting it together
 Database Isolation
 ==================
 
-Each plugin tenant gets its own PostgreSQL schema. Plugin models are
+Each plugin gets its own PostgreSQL schema, named after its app label and
+shared by all tenants. Plugin models are
 created there and can safely reference core models in the ``public`` schema
 via foreign keys.
 
@@ -788,11 +793,40 @@ name can follow, as with ``migrate``.
    created by plugin migrations land in ``plugin_giphy``; ForeignKeys to core
    models resolve through ``public`` via ``search_path``.
 
-6. **Cleanup** : ``is_plugin_operation`` is reset to ``False`` and
-   ``search_path`` is reset to the connection default (``RESET search_path``)
-   in a ``finally`` block.
+6. **Cleanup** : ``is_plugin_operation`` is reset to ``False`` and the
+   runtime ``search_path`` is restored (``set_plugin_search_path``) in a
+   ``finally`` block.
 
 The command is safe to re-run.
+
+Runtime ``search_path``
+-----------------------
+
+At runtime the ``search_path`` is static: ``public`` first (so core tables and
+``public.django_migrations`` always win), then every installed plugin schema.
+It does not depend on the tenant, and nothing switches it per request.
+
+``PluginsConfig.ready()`` connects a ``connection_created`` receiver
+(``set_plugin_search_path_on_connection`` in ``recoco/apps/plugins/utils.py``)
+that runs ``SET search_path TO public, <plugin schemas>`` on every new
+PostgreSQL connection. Every connection Django opens gets it: web requests,
+Celery tasks, management commands, ``shell`` and tests. It is done there
+rather than in settings because ``DATABASES`` is defined per environment and
+plugin apps are added to ``INSTALLED_APPS`` after the common settings.
+
+``RESET search_path`` would go back to the database default (``public``
+only), so code that changes the ``search_path`` (like ``migrate_plugins``)
+restores it with ``set_plugin_search_path(connection)`` instead.
+
+.. note::
+
+   This is a session setting: it does not survive a connection pooler in
+   transaction mode (e.g. PgBouncer ``pool_mode = transaction``).
+
+Tenant isolation is therefore done by the application:
+``TenantPluginSchemaMiddleware`` (and ``tenant_schema_context`` for commands)
+only enables the tenant's plugins for hooks and URLs, and plugin querysets
+must be scoped with ``on_site`` or an explicit ``site`` filter.
 
 
 URL Routing
@@ -1136,11 +1170,10 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
     cd recoco/frontend && yarn build
 
-6. In the Django admin, edit the ``SiteConfiguration`` for the target site:
+6. In the Django admin, edit the ``SiteConfiguration`` for the target site
+   and add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list.
 
-   - Set ``schema_name`` to ``tenant_paris``.
-   - Add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list.
-
-On the next request, the middleware switches the PostgreSQL ``search_path``
-to ``tenant_paris, public`` and the ``PluginURLResolver`` exposes the plugin
-routes exclusively to that tenant.
+On the next request, the middleware enables the plugin for that tenant: its
+hooks are called and the ``PluginURLResolver`` exposes its routes, only for
+tenants that have it enabled. The plugin tables are already reachable through
+the static ``search_path``.
