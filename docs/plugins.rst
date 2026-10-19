@@ -828,6 +828,42 @@ Tenant isolation is therefore done by the application:
 only enables the tenant's plugins for hooks and URLs, and plugin querysets
 must be scoped with ``on_site`` or an explicit ``site`` filter.
 
+Plugin management commands
+--------------------------
+
+A command that works on one tenant must make that tenant's site the current
+one (``settings.SITE_ID.override``) for its whole run, like core commands
+such as ``senddigests`` do. Otherwise ``on_site`` managers,
+``Site.objects.get_current()`` and the signal handlers that rely on it (e.g.
+creating a plugin profile on ``post_save``) silently use the default site.
+
+If the command also calls plugin hooks or reverses plugin URLs, enable the
+tenant's plugins with ``tenant_schema_context`` (what the middleware does for
+requests).
+
+.. code-block:: python
+
+    from django.conf import settings
+    from django.contrib.sites.models import Site
+    from django.core.management.base import BaseCommand
+
+    from recoco.apps.plugins.manager import get_site_configuration
+    from recoco.apps.plugins.schema import tenant_schema_context
+
+
+    class Command(BaseCommand):
+        def add_arguments(self, parser):
+            parser.add_argument("--site-domain", required=True)
+
+        def handle(self, **options):
+            site = Site.objects.get(domain=options["site_domain"])
+            with (
+                settings.SITE_ID.override(site.pk),
+                tenant_schema_context(get_site_configuration(site)),
+            ):
+                for realisation in Realisation.on_site.all():
+                    ...
+
 
 URL Routing
 ===========
