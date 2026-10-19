@@ -128,17 +128,13 @@
                                     </p>
                                 </div>
                             </template>
-                            {% if advising_position.is_advisor or is_switchtender or is_staff %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
-                                {% comment %}
-                                advising_position.is_advisor : advisor on current project
-                                is_switchtender : advisor on current site
-                                is_staff : staff on current site
-                                {% endcomment %}
+                            {% if is_embedded %}
+                                {% with placeholder="Écrivez votre message ici" hide_attach_files=True hide_attach_contact=True %}
+                                    {% include "conversations/messages/fragments/conversation_editor.html" %}
+                                {% endwith %}
                             {% else %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+                                    {% include "conversations/messages/fragments/conversation_editor.html" %}
                             {% endif %}
-                            <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>
                         {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
