@@ -614,7 +614,16 @@ Rules for plugin code:
   Don't derive it from a project: a project can be shared by several sites.
 - **Query through ``on_site``** (or filter on ``site`` explicitly) wherever
   tenant data is exposed: views, REST API, filters, digests, commands.
-  ``objects`` returns rows of every site.
+  ``objects`` returns rows of every site. Filtering on the project's sites
+  (``project__project_sites__site``) is not enough: a project shared by two
+  sites would show the rows created on the other one.
+- **Build ``on_site`` querysets at request time**: ``Model.on_site.all()``
+  resolves ``SITE_ID`` when it is called, so a queryset created at import time
+  (e.g. ``PrimaryKeyRelatedField(queryset=Model.on_site.all())`` on a
+  serializer, or a form field declared on the class) stays bound to the
+  default site. Override ``get_queryset()`` or set it in ``__init__``.
+- **Annotations on core models**: filter the related rows on the site too,
+  e.g. ``Count("realisations", filter=Q(realisations__site=request.site))``.
 - **Don't name a field ``site``**: the name is taken by ``PluginModel``. Use
   e.g. ``location`` for a free-text place.
 - **Per-project data is per site**: a "profile" model attached to a core
