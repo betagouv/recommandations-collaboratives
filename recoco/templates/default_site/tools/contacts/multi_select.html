@@ -48,7 +48,7 @@
                         <div class="inline-block position-relative w-100">
                             <div class="d-flex flex-column align-items-center position-relative">
                                 <div class="w-100">
-                                    <div class="my-2 p-1 d-flex container">
+                                    <div class="my-2 p-1 d-flex multi-select__container">
                                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
                                             <template x-for="(option,index) in selectedElms" :key="option.value">
                                                 <div x-show="index < 2"
@@ -78,7 +78,7 @@
                                                        id="select-list-input">
                                             </div>
                                         </div>
-                                        <div class="w-8 py-1 pl-2 pr-1 container__button">
+                                        <div class="w-8 py-1 pl-2 pr-1 multi-select__container--button">
                                             <button type="button"
                                                     x-show="!isOpen()"
                                                     x-on:click="open()"
@@ -99,7 +99,7 @@
                                 <div class="w-100">
                                     <div x-show.transition.origin.top="isOpen()"
                                          x-trap="isOpen()"
-                                         class="position-absolute shadow-lg top-100 bg-white z-1 w-100 left-0 rounded max-h-80"
+                                         class="position-absolute shadow-lg top-100 bg-white z-3 w-100 left-0 rounded max-h-80"
                                          x-on:click.away="close">
                                         <div class="d-flex flex-column w-100">
                                             <div class="fr-px-1w fr-py-1w">

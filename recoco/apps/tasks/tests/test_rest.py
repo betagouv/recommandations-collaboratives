@@ -20,6 +20,7 @@ from recoco import verbs
 from recoco.apps.addressbook.models import Contact
 from recoco.apps.conversations.models import Message
 from recoco.apps.demarches_simplifiees.models import DSResource
+from recoco.apps.projects import models as project_models
 from recoco.apps.projects import utils
 from recoco.apps.resources.models import Resource
 from recoco.apps.tasks import models
@@ -172,6 +173,17 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request, project):
     assert response.status_code == 403
 
 
+@pytest.mark.django_db
+def test_anonymous_user_cannot_see_project_tasks(request, project, current_site):
+    baker.make(models.Task, project=project, site=current_site, public=True)
+
+    client = APIClient()
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
 #
 # create task
 
@@ -284,6 +296,20 @@ def test_cannot_create_project_task_for_site_invalid_contact_or_resource(
 
 
 @pytest.mark.django_db
+def test_project_simple_user_cannot_update_project_task(
+    api_client, project, current_site
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+    user = baker.make(auth_models.User)
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-detail", args=[project.id, task.id])
+    response = api_client.patch(url, data={"public": True})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_project_advisor_cannot_update_other_project_task_for_site(
     request, project, make_project
 ):
@@ -369,6 +395,8 @@ def test_project_advisor_can_update_project_task_for_site_no_content(request, pr
 ##################
 # mark task as visited
 ##################
+
+
 @pytest.mark.django_db
 def test_project_collaborator_can_mark_task_as_visited(request, project):
     user = baker.make(auth_models.User)
@@ -475,7 +503,7 @@ def test_non_project_user_cannot_move_project_tasks_for_site(request, project):
 
 
 @pytest.mark.django_db
-def test_project_advisor_cannot_move_unknown_tasks_for_site(request, project):
+def test_project_advisor_cannot_move_above_unknown_tasks_for_site(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     task = baker.make(models.Task, project=project, site=site, public=True)
@@ -578,6 +606,20 @@ def test_project_advisor_can_move_project_tasks_for_site(request, project):
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_anonymous_user_cannot_move_project_tasks_for_site(request, project):
+    site = get_current_site(request)
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+
+    client = APIClient()
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 403
+
+
 ########################################################################
 # Tasks notification
 ########################################################################
@@ -599,8 +641,16 @@ def test_project_task_notifications_list_closed_to_anonymous_user(request, proje
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "role",
+    [
+        "random",
+        "collaborator",
+        "advisor",
+    ],
+)
 def test_project_task_notifications_list_returns_notifications_of_advisor(
-    request, project
+    request, project, role
 ):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
@@ -616,8 +666,11 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(
         private=False,
     )
 
-    # FIXME here the point should be to state the specific permission
-    utils.assign_advisor(user, project)
+    match role:
+        case "collaborator":
+            utils.assign_collaborator(user, project)
+        case "advisor":
+            utils.assign_advisor(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -642,9 +695,18 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(
 # mark all notifications as read
 
 
+# todo make versions for different user roles
+@pytest.mark.parametrize(
+    "role",
+    [
+        "random",  # can happen if someone has been removed but is not general
+        "collaborator",
+        "advisor",
+    ],
+)
 @pytest.mark.django_db
 def test_project_task_notifications_mark_read_updates_notifications_of_advisor(
-    request, project
+    request, project, role
 ):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
@@ -662,8 +724,11 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(
 
     assert user.notifications.unread().count() == 1
 
-    # FIXME here the point should be to state the specific permission
-    utils.assign_advisor(user, project)
+    match role:
+        case "collaborator":
+            utils.assign_collaborator(user, project)
+        case "advisor":
+            utils.assign_advisor(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -681,7 +746,7 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(
 
 
 @pytest.mark.django_db
-def test_unassigned_switchtender_should_see_recommendations(request):
+def test_assigned_switchtender_should_see_recommendations(request):
     site = get_current_site(request)
     task = baker.make(models.Task, site=site, project__sites=[site])
 
@@ -694,6 +759,23 @@ def test_unassigned_switchtender_should_see_recommendations(request):
         response = client.get(url)
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unassigned_switchtender_should_not_see_recommendations(request):
+    site = get_current_site(request)
+    task = baker.make(models.Task, site=site, project__sites=[site])
+    other_project = baker.make(project_models.Project, sites=[site])
+
+    client = APIClient()
+
+    with login(client) as user:
+        utils.assign_advisor(user, other_project)
+
+        url = reverse("project-tasks-list", args=[task.project.id])
+        response = client.get(url)
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db

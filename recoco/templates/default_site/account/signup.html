@@ -3,14 +3,16 @@
 {% load i18n %}
 {% load django_vite %}
 {% block title %}
-    {% if request.GET.next == '/advisor-access-request' %}
+    {% url "advisor-access-request" as advisor_access_request_url %}
+    {% if request.GET.next == advisor_access_request_url %}
         Demander un accès conseiller
     {% else %}
         Créer mon compte
     {% endif %}
 {% endblock title %}
 {% block og_title %}
-    {% if request.GET.next == '/advisor-access-request' %}
+    {% url "advisor-access-request" as advisor_access_request_url %}
+    {% if request.GET.next == advisor_access_request_url %}
         Demander un accès conseiller
     {% else %}
         Créer mon compte
@@ -26,8 +28,9 @@
 {% endblock head_title %}
 {% block content %}
     <div>
+        {% url "advisor-access-request" as advisor_access_request_url %}
         {% with request.GET.next as next_url %}
-            {% if next_url == '/advisor-access-request' %}
+            {% if next_url == advisor_access_request_url %}
                 {% include "account/fragments/signup_form.html" with stepper=True total_steps=3 step_number=1 current_step_title="Création du compte" next_step_title="Sélection des départements" title="Devenir conseiller ou conseillère" %}
             {% else %}
               {% include "account/fragments/naive_signup_redirect.html" with title="S'inscrire" %}

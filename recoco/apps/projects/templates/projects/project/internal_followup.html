@@ -2,7 +2,6 @@
 {% load humanize %}
 {% load static %}
 {% load survey %}
-{% load activity_tags %}
 {% load gravatar %}
 {% load guardian_tags %}
 {% load django_vite %}
@@ -35,8 +34,6 @@
                             Seuls les acteurs positionnés sur ce dossier et les équipes de conseil (ex: {{ request.site.name }}) ont accès à cet espace, pas le demandeur.
                         </p>
                     </div>
-                    {% activity_stream "target" project %}
-                    {% regroup stream by timestamp.date as stream_by_day %}
                     {% if "use_private_notes" in user_project_perms %}
                         <hr />
                         <form class="form d-flex align-items-end flex-column"

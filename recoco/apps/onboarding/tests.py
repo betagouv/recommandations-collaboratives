@@ -95,7 +95,9 @@ def test_performing_onboarding_creates_notif_and_action(request, client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_creates_a_project_creation_request(request, client):
+def test_anonymous_performing_onboarding_creates_a_project_creation_request(
+    request, client
+):
     site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=site)
 
@@ -163,7 +165,7 @@ def test_performing_onboarding_with_survey_fills_it(request, client):
 
 
 @pytest.mark.django_db
-def test_onboarding_continues_to_user_step_when_valid(request, client):
+def test_anonymous_onboarding_continues_to_user_step_when_valid(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -185,6 +187,36 @@ def test_onboarding_continues_to_user_step_when_valid(request, client):
 
     response = client.post(reverse("onboarding-project"), data=data)
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_logged_in_onboarding_continues_to_user_step_when_valid(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@exAmpLe.Com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
+    user = baker.make(auth.User, email=data["email"].lower(), username=data["email"])
+
+    with login(client, user=user):
+        response = client.post(reverse("onboarding-project"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    p = projects_models.Project.objects.first()
+    assert last_url.startswith(reverse("onboarding-summary", args=[p.id]))
+    assert len(mail.outbox) == 1  # owner notification
 
 
 #########################################
@@ -397,7 +429,7 @@ def test_onboarding_confirm_email_redirects_to_summary(
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url == reverse("account_email_verification_sent")
-    assert len(mail.outbox) == 2  # one new for project's owner
+    assert len(mail.outbox) == 1  # verification email only at this point
 
     project = projects_models.Project.objects.last()
 
@@ -405,6 +437,7 @@ def test_onboarding_confirm_email_redirects_to_summary(
     response = client.get(confirm_email_url, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert last_url == reverse("onboarding-summary", args=(project.pk,))
+    assert len(mail.outbox) == 2  # owner notification only at the end
 
 
 @pytest.mark.django_db

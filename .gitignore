@@ -56,7 +56,7 @@ recoco/frontend/plugin-entries.json
 recoco/frontend/src/js/plugins/
 
 # plugins
-./plugins
+/plugins
 
-# tools
+# graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/

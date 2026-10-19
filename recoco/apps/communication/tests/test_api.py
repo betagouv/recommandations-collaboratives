@@ -191,10 +191,11 @@ def test_send_brevo_email_use_default_template(mocker, request):
     baker.make(
         home_models.SiteConfiguration,
         site=current_site,
+        sender_name="Doe Team",
         legal_address="here",
         legal_owner="Doe",
         description="The short description",
-        sender_email="doe@example.org",
+        contact_form_recipient="contact@me.fr",
     )
 
     template = baker.make(models.EmailTemplate, name=template_name, site=None)
@@ -215,10 +216,11 @@ def test_send_brevo_email_use_default_template(mocker, request):
             "legal_address": "here",
             "legal_owner": "Doe",
             "description": "The short description",
-            "sender_email": "doe@example.org",
+            "sender_email": "contact@me.fr",
         },
         test=False,
         dry_run=False,
+        sender_name="Doe Team",
     )
 
 
@@ -238,10 +240,11 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
     baker.make(
         home_models.SiteConfiguration,
         site=current_site,
+        sender_name="Doe Team",
         legal_address="here",
         legal_owner="Doe",
         description="The short description",
-        sender_email="doe@example.org",
+        contact_form_recipient="contact@me.fr",
     )
 
     baker.make(models.EmailTemplate, name=template_name, site=None)
@@ -265,10 +268,11 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
             "legal_address": "here",
             "legal_owner": "Doe",
             "description": "The short description",
-            "sender_email": "doe@example.org",
+            "sender_email": "contact@me.fr",
         },
         test=False,
         dry_run=False,
+        sender_name="Doe Team",
     )
 
 

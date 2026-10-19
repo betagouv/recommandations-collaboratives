@@ -1,47 +1,25 @@
 import projects from '../../../fixtures/projects/projects.json';
-const currentProject = projects[1];
+import sharedContentsPanel from '../../../support/tools/sharedContentsPanel';
 
-// TODO Réécrire : open-task-actions-button et delete-task-action-button n'existent plus (task_actions.html supprimé)
-describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-suppression', () => {
+const currentProject = projects.find((p) => p.pk === 16);
+
+describe('I can delete a draft recommendation @page-projet-recommandations @page-projet-recommandations-suppression', () => {
   beforeEach(() => {
     cy.login('conseiller1');
-    // cy.createProject('delete task');
+    cy.resetProjectRecommendations(currentProject.pk);
+    cy.createTaskViaApi(currentProject.pk, {
+      intent: `Brouillon à supprimer ${Date.now()}`,
+    });
   });
 
-  it('deletes a task', () => {
-    cy.becomeAdvisor(currentProject.pk);
-    cy.visit(`/project/${currentProject.pk}/actions`);
+  it('deletes a draft recommendation from the shared contents panel', () => {
+    cy.visit(`/project/${currentProject.pk}/conversations`);
+    sharedContentsPanel.openFromTopic('drafts');
+    sharedContentsPanel.expectDraftCount(1);
 
-    cy.createTask('test');
+    sharedContentsPanel.deleteDraft(0);
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
-
-    cy.get('[data-test-id="open-task-actions-button"]').then((el) => {
-      const count3 = el.length;
-      cy.wrap(count3).as('count');
-    });
-
-    cy.get('[data-test-id="open-task-actions-button"]').first().click({
-      force: true,
-    });
-    cy.get('[data-test-id="delete-task-action-button"]').first().click({
-      force: true,
-    });
-    cy.get('[data-test-id="delete-task-modal-button"]').click({
-      force: true,
-    });
-
-    cy.get('@count').then((count) => {
-      cy.get('[data-test-id="open-task-actions-button"]').should(
-        'have.lengthOf',
-        count - 1
-      );
-    });
-
-    // the first test try to see if there are no tasks
-    // Now we test if the list have one element less
-    // cy.get('[data-test-id="no-tasks-banner"]').should('exist');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
+    cy.get('[data-test-id="open-shared-drafts"]').should('not.exist');
   });
 });
-
-// page recommandations

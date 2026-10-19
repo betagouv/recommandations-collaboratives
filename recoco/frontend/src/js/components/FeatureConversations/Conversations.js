@@ -29,9 +29,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   currentUserId,
   feed: {},
   messagesLoaded: false,
+  sharedContentsLoaded: false,
   showMessages: false,
   sendingMessage: false,
-  tasks: [],
   messagesParticipants: [],
   documents: [],
   contacts: [],
@@ -58,25 +58,29 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   isSwitchtender: JSON.parse(
     document.getElementById('isSwitchtender').textContent
   ),
+  get tasks() {
+    return Alpine.store('tasksData').tasks;
+  },
+
   async init() {
-    this.getMessagesParticipants();
-    await this.getActivities();
-    await this.getMessages();
+    await Promise.all([
+      this.getMessagesParticipants(),
+      await this.getActivities(),
+      await this.getMessages(),
+      Alpine.store('tasksData').loadTasks()
+    ]);
     this.createFullFeed();
     this.messagesLoaded = true;
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    Alpine.store('tasksData')._subscribe(async () => {
-      this.tasks = Alpine.store('tasksData').tasks;
-    });
-    Alpine.store('tasksData')._notify();
+    await this.extractSharedContents()
+    this.loadExternalFiles();
+    this.loadPrivateFiles();
+    this.sharedContentsLoaded = true;
+    await this.detectOpenActionsFromHash();
+
     this.countElementsInDiscussion();
-    this.extractSharedContents().then(async () => {
-      this.loadExternalFiles();
-      this.loadPrivateFiles();
-      await this.detectOpenActionsFromHash();
-    });
     window.addEventListener('hashchange', async () => {
       await this.detectOpenActionsFromHash();
     });

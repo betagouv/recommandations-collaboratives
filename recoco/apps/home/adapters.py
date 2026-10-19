@@ -7,7 +7,7 @@ from allauth.account.utils import user_email, user_username
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from . import utils
 from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
@@ -43,6 +43,9 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
     def is_login_by_code_required(self, request, **kwargs):
         if settings.DEBUG:
+            return False
+        if not request.user or request.user.is_anonymous:
+            # fallback for cases with login started as a way to prevent enumeration by allauth
             return False
         return request.user.profile.login_with_code
 
@@ -101,13 +104,18 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
     ):
         # this is to easily skip to controlled second step signup form.
         # might be cleaner through a custom login stage conditionned by signup arg
-        if redirect_url == "/advisor-access-request":
+        if redirect_url == reverse_lazy("advisor-access-request"):
             return redirect(redirect_url)
+        if request.resolver_match.url_name == "account_confirm_login_code":
+            confirm_email(
+                request, user
+            )  # this is a connexion by email so the email is valid
         if not user.is_active:
             return self.respond_user_inactive(request, user)
 
     def respond_email_verification_sent(self, request, user):
-        request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
+        if user:
+            request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
         return super().respond_email_verification_sent(request, user)
 
 

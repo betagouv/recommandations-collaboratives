@@ -46,15 +46,7 @@
                              alt="Pictogramme Démarche numérique">
                         Pré-créer un dossier sur Démarche numérique
                     </h4>
-                    <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                        En cliquant ci-dessous, vous créerez un dossier en brouillon sur demarche.numerique.gouv.fr.
-                        <br>
-                        Certains champs seront pré-remplis avec les informations dont nous disposons sur le dossier.
-                    </p>
-                    <a class="fr-btn fr-btn--secondary fr-btn--sm"
-                       @click.stop=""
-                       href="{% url 'projects-task-ds-prefill' task.id %}"
-                       target="_blank">Aller sur Démarche numérique</a>
+                    {% include "conversations/messages/dn_button.html" with task_id=task.id small_text=True %}
                 </div>
             {% endif %}
         </template>

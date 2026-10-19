@@ -48,6 +48,33 @@ class ProjectSpec(HookSpec):
                 }
         """
 
+    @hookspec
+    def project_overview_sidebar_blocks(self, project, request):
+        """Return an HTML block to inject into the project overview page's right
+        sidebar, right below the project info block (name, organization, commune,
+        tags).
+
+        Every enabled plugin may contribute one block; the order in which
+        blocks are rendered is not guaranteed.
+
+        The returned string MUST be wrapped with ``mark_safe()``; the framework
+        renders it without an additional ``|safe`` filter.
+
+        The overview page is visible to anyone allowed to view the project
+        (including the project owner and their collaborators), not only staff
+        or advisors: check ``request.user`` permissions before exposing any
+        sensitive data, and return ``None`` to render nothing.
+
+        Example:
+            @hookimpl
+            def project_overview_sidebar_blocks(self, project, request):
+                return mark_safe(render_to_string(
+                    "plugin_giphy/project_overview_sidebar_block.html",
+                    {"project": project},
+                    request=request,
+                ))
+        """
+
 
 class ResourceSpec(HookSpec):
     @hookspec
@@ -203,4 +230,16 @@ class CrmSpec(HookSpec):
                     "cell_html": '<td x-text="project.realisations_count"></td>',
                     "col_class": "col--small",
                 }
+        """
+
+
+class HeaderSpec(HookSpec):
+    @hookspec
+    def main_navigation_tabs(self, request):
+        """Return a tab definition dict to inject into the main navigation.
+
+        Keys:
+          label (str)             — display text
+          url_name (str)          — Django URL name (may include namespace, e.g. "myplugin:crm-foo")
+          index (int)             — insertion order; builtin tabs use multiples of 10
         """

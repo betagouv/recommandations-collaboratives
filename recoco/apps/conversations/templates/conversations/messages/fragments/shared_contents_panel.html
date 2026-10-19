@@ -11,6 +11,7 @@ Managed by Alpine store: $store.sharedContentsPanel
              role="dialog"
              aria-modal="true"
              aria-labelledby="shared-contents-panel-title"
+             data-test-id="shared-contents-panel"
              x-trap.inert="$store.sharedContentsPanel.isOpen"
              @keydown.escape.window="$store.sharedContentsPanel.close()">
             <!-- Header -->
@@ -19,6 +20,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                 <button type="button"
                         class="shared-contents-panel__close-btn fr-btn--close fr-btn"
                         aria-label="Fermer"
+                        data-test-id="shared-contents-panel-close"
                         @click="$store.sharedContentsPanel.close()">Fermer</button>
             </div>
             <!-- Tabs - DSFR Segmented Control -->
@@ -31,6 +33,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                 <input type="radio"
                                        value="recommendations"
                                        id="shared-contents-tab-recommendations"
+                                       data-test-id="shared-contents-tab-recommendations"
                                        name="shared-contents-tab"
                                        :checked="$store.sharedContentsPanel.activeTab === 'recommendations'"
                                        :disabled="$store.sharedContentsPanel.recommendationsCount === 0"
@@ -45,6 +48,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                 <input type="radio"
                                        value="files"
                                        id="shared-contents-tab-files"
+                                       data-test-id="shared-contents-tab-files"
                                        name="shared-contents-tab"
                                        :checked="$store.sharedContentsPanel.activeTab === 'files'"
                                        :disabled="$store.sharedContentsPanel.filesCount === 0"
@@ -60,6 +64,7 @@ Managed by Alpine store: $store.sharedContentsPanel
                                     <input type="radio"
                                            value="draft-recommendations"
                                            id="shared-contents-tab-draft-recommendations"
+                                           data-test-id="shared-contents-tab-draft-recommendations"
                                            name="shared-contents-tab"
                                            :checked="$store.sharedContentsPanel.activeTab === 'draft-recommendations'"
                                            :disabled="$store.sharedContentsPanel.draftRecommendationsCount === 0"
@@ -81,7 +86,8 @@ Managed by Alpine store: $store.sharedContentsPanel
                 <template x-if="$store.sharedContentsPanel.activeTab === 'recommendations'">
                     <div>
                         <template x-if="$store.sharedContentsPanel.recommendationsCount === 0">
-                            <div class="shared-contents-panel__empty">
+                            <div class="shared-contents-panel__empty"
+                                 data-test-id="shared-contents-empty-recommendations">
                                 <span class="fr-icon fr-icon-list-check-line" aria-hidden="true"></span>
                                 <p>Aucune recommandation partagée dans cette conversation.</p>
                             </div>
@@ -108,7 +114,8 @@ Managed by Alpine store: $store.sharedContentsPanel
                 <template x-if="$store.sharedContentsPanel.activeTab === 'files'">
                     <div>
                         <template x-if="$store.sharedContentsPanel.filesCount === 0">
-                            <div class="shared-contents-panel__empty">
+                            <div class="shared-contents-panel__empty"
+                                 data-test-id="shared-contents-empty-files">
                                 <span class="fr-icon fr-icon-file-download-line" aria-hidden="true"></span>
                                 <p>Aucun fichier partagé dans cette conversation.</p>
                             </div>
@@ -169,7 +176,8 @@ Managed by Alpine store: $store.sharedContentsPanel
                 <template x-if="isSwitchtender && $store.sharedContentsPanel.activeTab === 'draft-recommendations'">
                     <div>
                         <template x-if="$store.sharedContentsPanel.draftRecommendationsCount === 0">
-                            <div class="shared-contents-panel__empty">
+                            <div class="shared-contents-panel__empty"
+                                 data-test-id="shared-contents-empty-draft-recommendations">
                                 <span class="fr-icon fr-icon-draft-line" aria-hidden="true"></span>
                                 <p>Aucun brouillon de recommandation dans cette conversation.</p>
                             </div>

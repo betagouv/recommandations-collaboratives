@@ -62,12 +62,22 @@ def get_site_params():
     params["legal_address"] = site_config.legal_address or ""
     params["legal_owner"] = site_config.legal_owner or ""
     params["description"] = site_config.description or ""
-    params["sender_email"] = site_config.sender_email or ""
+    # sender_email is the key name used on Brevo's side, painful to update
+    params["sender_email"] = site_config.contact_form_recipient or ""
 
     if site_config.email_logo:
         params["site_logo"] = build_absolute_url(site_config.email_logo.url)
 
     return params
+
+
+def get_site_sender_name():
+    """Return the name displayed as email sender for the current site"""
+    current_site = Site.objects.get_current()
+    try:
+        return current_site.configuration.sender_name
+    except SiteConfiguration.DoesNotExist:
+        return None
 
 
 def brevo_email(
@@ -101,7 +111,12 @@ def brevo_email(
         all_params.update(params)
 
     response = brevo.send_email(
-        template.sib_id, recipients, all_params, test=test, dry_run=dry_run
+        template.sib_id,
+        recipients,
+        all_params,
+        test=test,
+        dry_run=dry_run,
+        sender_name=get_site_sender_name(),
     )
 
     if response and not dry_run:

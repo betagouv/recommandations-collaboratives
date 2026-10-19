@@ -9,6 +9,7 @@ from django.http import HttpRequest
 from django.utils import timezone
 from sesame.middleware import AuthenticationMiddleware as SesameAuthenticationMiddleware
 from sesame.utils import get_user
+from waffle.templatetags import waffle_tags
 
 from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration, UserProfile
@@ -45,7 +46,7 @@ class EmbedMiddleware:
         if (
             request.headers.get("Sec-Fetch-Dest") == "iframe"
             or request.GET.get("embed") == "1"
-        ):
+        ) and waffle_tags.flag_is_active(request, "embeddable"):
             request.session["is_embedded"] = True
         request.is_embedded = request.session.get("is_embedded", False)
 
@@ -61,9 +62,19 @@ class EmbedMiddleware:
                 # (Django admin only) may embed it; everyone else falls
                 # back to the default SAMEORIGIN behaviour.
                 response.xframe_options_exempt = True
-                response["Content-Security-Policy"] = (
-                    "frame-ancestors 'self' " + " ".join(allowed_origins)
+                # _csp_update is used to update django-csp config
+                old_csp_update = (
+                    response._csp_update if hasattr(response, "_csp_update") else {}
                 )
+                old_frame_ancestors = (
+                    old_csp_update.pop("frame-ancestors")
+                    if "frame-ancestors" in old_csp_update
+                    else []
+                )
+                response._csp_update = {
+                    **old_csp_update,
+                    "frame-ancestors": [*old_frame_ancestors, *allowed_origins],
+                }
 
         return response
 

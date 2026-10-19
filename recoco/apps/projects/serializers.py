@@ -1,3 +1,4 @@
+import nh3
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -156,6 +157,26 @@ class ProjectSerializer(
             if obj.owner and obj.owner.profile.organization
             else ""
         )
+
+    def validate_description(self, value):
+        return nh3.clean(value)
+
+
+class ProjectLocationSerializer(BaseSerializerMixin, serializers.ModelSerializer):
+    """Restricted write serializer for the Project PATCH endpoint.
+
+    Used for callers who only hold `projects.change_location` (any project
+    collaborator, draft or not -> see `COLLABORATOR_DRAFT_PERMISSIONS`/
+    `COLLABORATOR_PERMISSIONS`) so that only `location` is writable.
+    `name`/`description`/`tags`/etc. stay reserved for advisors, who hold
+    `projects.change_project`/`projects.use_project_tags`, matching the
+    classic (non-REST) views.
+    """
+
+    class Meta:
+        model = Project
+        fields = ["id", "location"]
+        read_only_fields = ["id"]
 
 
 class UserProjectSerializer(ProjectSerializer):

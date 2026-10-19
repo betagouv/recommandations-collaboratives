@@ -1,5 +1,6 @@
+import re
 from datetime import datetime, timezone
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth import get_user
@@ -10,6 +11,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from model_bakery import baker
 from sesame.utils import get_query_string
+from waffle.testutils import override_flag
 
 from conftest import setup_sesame_cookie
 from recoco.apps.home.context_processors import embed
@@ -231,33 +233,45 @@ class TestEmbedMiddleware:
         request.site_config = None
         return request
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_sets_embedded_from_sec_fetch_dest_header(self):
         request = self._make_request(headers={"Sec-Fetch-Dest": "iframe"})
         self.middleware(request)
         assert request.session["is_embedded"] is True
         assert request.is_embedded is True
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_sets_embedded_from_query_param(self):
         request = self._make_request(get_params={"embed": "1"})
         self.middleware(request)
         assert request.session["is_embedded"] is True
         assert request.is_embedded is True
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_not_embedded_by_default(self):
         request = self._make_request()
         self.middleware(request)
         assert request.is_embedded is False
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_not_embedded_when_embed_param_is_not_one(self):
         request = self._make_request(get_params={"embed": "0"})
         self.middleware(request)
         assert request.is_embedded is False
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_persists_embedded_state_from_session(self):
         request = self._make_request(session={"is_embedded": True})
         self.middleware(request)
         assert request.is_embedded is True
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_does_not_set_session_without_trigger(self):
         session = {}
         request = self._make_request(session=session)
@@ -279,18 +293,21 @@ class TestEmbedMiddlewareCSP:
         request.site_config = site_config
         return request
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_sets_frame_ancestors_header_when_origins_configured(self):
         site_config = Mock(embed_allowed_origins=["https://partner.example.fr"])
         request = self._make_request(site_config=site_config)
 
         response = self.middleware(request)
 
-        assert (
-            response["Content-Security-Policy"]
-            == "frame-ancestors 'self' https://partner.example.fr"
-        )
+        assert response._csp_update == {
+            "frame-ancestors": ["https://partner.example.fr"]
+        }
         assert response.xframe_options_exempt is True
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_joins_multiple_allowed_origins(self):
         site_config = Mock(
             embed_allowed_origins=[
@@ -302,35 +319,61 @@ class TestEmbedMiddlewareCSP:
 
         response = self.middleware(request)
 
-        assert response["Content-Security-Policy"] == (
-            "frame-ancestors 'self' https://partner.example.fr https://other.example.fr"
-        )
+        assert response._csp_update == {
+            "frame-ancestors": [
+                "https://partner.example.fr",
+                "https://other.example.fr",
+            ]
+        }
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_no_csp_header_when_no_allowed_origins(self):
         site_config = Mock(embed_allowed_origins=[])
         request = self._make_request(site_config=site_config)
 
         response = self.middleware(request)
 
-        assert "Content-Security-Policy" not in response
+        assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_no_csp_header_when_no_site_config(self):
         request = self._make_request(site_config=None)
 
         response = self.middleware(request)
 
-        assert "Content-Security-Policy" not in response
+        assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
 
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
     def test_no_csp_header_when_not_embedded(self):
         site_config = Mock(embed_allowed_origins=["https://partner.example.fr"])
         request = self._make_request(site_config=site_config, embedded=False)
 
         response = self.middleware(request)
 
-        assert "Content-Security-Policy" not in response
+        assert "_csp_update" not in response
         assert getattr(response, "xframe_options_exempt", False) is False
+
+    @pytest.mark.django_db
+    @override_flag("embeddable", active=True)
+    def test_csp_update_is_appended_to_content_security_policy_header(self, client):
+        # Bypass the site_config/allowed_origins logic (covered by the tests
+        # above) to test how _csp_update is interpreted
+        def fake_call(self, request):
+            response = self.get_response(request)
+            response._csp_update = {"frame-ancestors": ["https://partner.example.fr"]}
+            return response
+
+        with patch.object(EmbedMiddleware, "__call__", fake_call):
+            response = client.get(reverse("home"))
+
+        assert response.status_code == 200
+        csp_header = response["Content-Security-Policy"]
+        assert re.search(r"frame-ancestors[^;]+ https://partner.example.fr", csp_header)
 
 
 class TestEmbedContextProcessor:
