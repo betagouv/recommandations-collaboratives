@@ -91,6 +91,14 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         serializer.save(project=project)
 
+    def perform_destroy(self, instance):
+        project_id = int(self.kwargs["project_id"])
+        project = projects_models.Project.on_site.get(pk=project_id)
+
+        has_perm_or_403(self.request.user, "projects.manage_tasks", project)
+
+        super().perform_destroy(instance)
+
     def perform_update(self, serializer: TaskSerializer):
         original_object = self.get_object()
 

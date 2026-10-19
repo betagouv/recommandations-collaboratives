@@ -392,6 +392,80 @@ def test_project_advisor_can_update_project_task_for_site_no_content(request, pr
     assert task.content == ""
 
 
+#
+# delete tasks
+
+
+@pytest.mark.django_db
+def test_project_simple_user_cannot_delete_project_task(
+    api_client, project, current_site
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+    user = baker.make(auth_models.User)
+
+    with login(api_client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = api_client.delete(url)
+
+        assert response.status_code == 403
+    assert models.Task.objects.filter(pk=task.id).exists()
+
+
+@pytest.mark.django_db
+def test_project_advisor_cannot_delete_other_project_task_for_site(
+    request, project, make_project, current_site
+):
+    user = baker.make(auth_models.User)
+
+    # to test object level perm, user is collaborator on an other project
+    other_project = make_project(site=current_site)
+    utils.assign_advisor(user, other_project)
+
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+
+    client = APIClient()
+    with login(client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = client.delete(url)
+
+        assert response.status_code == 403
+    assert models.Task.objects.filter(pk=task.id).exists()
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_delete_project_task_for_site(
+    request, project, current_site, api_client
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+
+    utils.assign_collaborator(user, project)
+
+    with login(api_client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = api_client.delete(url)
+
+        assert response.status_code == 403
+    assert models.Task.objects.filter(pk=task.id).exists()
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_delete_project_task_for_site(
+    request, project, current_site, api_client
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+
+    utils.assign_advisor(user, project)
+
+    with login(api_client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = api_client.delete(url)
+        assert response.status_code == 204
+
+    assert not models.Task.objects.filter(pk=task.id).exists()
+
+
 ##################
 # mark task as visited
 ##################
