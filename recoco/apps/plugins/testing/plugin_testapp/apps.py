@@ -7,3 +7,8 @@ class PluginTestappConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "recoco.apps.plugins.testing.plugin_testapp"
     label = "plugin_testapp"
+
+    def ready(self):
+        from watson import search as watson
+
+        watson.register(self.get_model("Note"), fields=("title",))

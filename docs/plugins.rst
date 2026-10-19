@@ -828,6 +828,28 @@ Tenant isolation is therefore done by the application:
 only enables the tenant's plugins for hooks and URLs, and plugin querysets
 must be scoped with ``on_site`` or an explicit ``site`` filter.
 
+Search (watson)
+---------------
+
+Plugin models can be registered with watson like core models. There is a
+single index for all tenants, so ``buildwatson`` needs no tenant handling, but
+a search that can return plugin objects must be scoped:
+
+- ``tenant_search(search_text, models=None, ...)``
+  (``recoco/apps/plugins/search.py``) wraps ``watson.search``. Plugin models
+  of a plugin that is not enabled for the tenant are dropped, and the others
+  are restricted to the current site (``on_site``). Core models are passed
+  through unchanged.
+- ``tenant_search_models(models)`` does the same on a ``models`` list, for
+  code that calls watson itself.
+- ``watson.filter(queryset, ...)`` is already safe: pass an ``on_site``
+  queryset.
+
+Use ``tenant_search`` whenever ``models`` is omitted (every registered model)
+or contains plugin models. Note that ``watson.search`` with an empty
+``models`` list searches every model; ``tenant_search`` returns no results
+instead when everything was filtered out.
+
 Plugin management commands
 --------------------------
 
