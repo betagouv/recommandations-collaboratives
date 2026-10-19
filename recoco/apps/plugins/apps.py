@@ -6,6 +6,7 @@ class PluginsConfig(AppConfig):
     name = "recoco.apps.plugins"
 
     def ready(self):
+        from . import checks  # noqa: F401
         from .manager import get_plugin_manager
 
         get_plugin_manager()

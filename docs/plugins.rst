@@ -578,15 +578,53 @@ Each plugin tenant gets its own PostgreSQL schema. Plugin models are
 created there and can safely reference core models in the ``public`` schema
 via foreign keys.
 
+Plugin models subclass ``PluginModel``
+--------------------------------------
+
+Every concrete model of a ``plugin_*`` app must subclass
+``recoco.apps.plugins.models.PluginModel``. This abstract base scopes rows by
+site, following the same convention as core models (e.g. ``Task``):
+
+- ``site``: a required ``ForeignKey`` to ``django.contrib.sites.models.Site``.
+- ``objects``: an **unscoped** default manager. It comes first so that it is
+  the model's ``_default_manager``, which is what watson, the admin and
+  generic relations use.
+- ``on_site``: a ``CurrentSiteManager``, filtered on the current site.
+
 .. code-block:: python
 
     # plugin_giphy/models.py
     from django.db import models
+    from recoco.apps.plugins.models import PluginModel
     from recoco.apps.projects.models import Project
 
-    class GiphySearch(models.Model):
+    class GiphySearch(PluginModel):
         project = models.ForeignKey(Project, on_delete=models.CASCADE)
         query = models.CharField(max_length=255)
+
+Rules for plugin code:
+
+- **Set ``site`` on creation**: from ``request.site`` in views, or from the
+  parent object for child rows (e.g. a photo takes its realisation's site).
+  Don't derive it from a project: a project can be shared by several sites.
+- **Query through ``on_site``** (or filter on ``site`` explicitly) wherever
+  tenant data is exposed: views, REST API, filters, digests, commands.
+  ``objects`` returns rows of every site.
+- **Don't name a field ``site``**: the name is taken by ``PluginModel``. Use
+  e.g. ``location`` for a free-text place.
+- **Per-project data is per site**: a "profile" model attached to a core
+  project should be unique per ``(project, site)``, not a ``OneToOneField``.
+
+The ``plugins.E001`` system check enforces the base class. It reports every
+model of a ``plugin_*`` app that does not subclass ``PluginModel``, except:
+
+- abstract, proxy and unmanaged models, and auto-created many-to-many tables;
+- multi-table inheritance children (e.g. ``RealisationNode(Node)``), whose
+  primary key comes from the parent table.
+
+.. code-block:: text
+
+    plugin_giphy.GiphySearch: (plugins.E001) Plugin model plugin_giphy.GiphySearch must subclass PluginModel.
 
 .. note::
 
