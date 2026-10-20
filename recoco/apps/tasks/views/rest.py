@@ -18,12 +18,10 @@ from rest_framework.response import Response
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import is_member
 from recoco.apps.resources import models as resource_models
-from recoco.utils import has_perm, has_perm_or_403
+from recoco.utils import has_perm_or_403
 
 from .. import models, signals
 from ..serializers import (
-    TaskFollowupCreateUpdateSerializer,
-    TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
     TaskWithMessageSerializer,
@@ -250,29 +248,13 @@ class TaskNotificationViewSet(
             logger.error(f"Task ID {task_id} should be an integer")
             return notifications.none()
 
-        try:
-            task = models.Task.objects.get(pk=task_id)
-        except models.Task.DoesNotExist:
-            logger.error(f"Task {task_id} does not exist")
-            return notifications.none()
-
         task_ct = ContentType.objects.get_for_model(models.Task)
-        followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
-
         task_actions = notifications.filter(
             action_object_content_type=task_ct.pk,
             action_object_object_id=task_id,
         )
 
-        followup_ids = list(task.followups.all().values_list("id", flat=True))
-
-        # FIXME cannot find who create notifications on followups
-        followup_actions = notifications.filter(
-            action_object_content_type=followup_ct.pk,
-            action_object_object_id__in=followup_ids,
-        )
-
-        return task_actions | followup_actions
+        return task_actions
 
     @action(
         methods=["post"],
@@ -288,72 +270,6 @@ class TaskNotificationViewSet(
 
     serializer_class = TaskNotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-
-########################################################################
-# Task followup
-########################################################################
-
-
-class TaskFollowupPermission(permissions.BasePermission):
-    """
-    Custom permission to check if user can use task followup on given project
-    """
-
-    def has_permission(self, request, view):
-        # conseiller regional
-        if request.method in permissions.SAFE_METHODS and has_perm(
-            request.user, "list_projects", request.site
-        ):
-            return True
-
-        project_id = view.kwargs.get("project_id")
-        project = projects_models.Project.on_site.get(pk=project_id)
-
-        # conseiller ponctuel
-        if request.method in permissions.SAFE_METHODS and has_perm(
-            request.user, "view_tasks", project
-        ):
-            return True
-
-        # conseiller projet
-        return has_perm(request.user, "projects.use_tasks", project)
-
-
-class TaskFollowupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for TaskFollowups
-    """
-
-    permission_classes = [
-        permissions.IsAuthenticated,
-        TaskFollowupPermission,
-    ]
-
-    @property
-    def task_id(self) -> int:
-        return int(self.kwargs["task_id"])
-
-    @property
-    def project_id(self) -> int:
-        return int(self.kwargs["project_id"])
-
-    def get_queryset(self):
-        # also filter with project_id to ensure the given task and project are consistent
-        return models.TaskFollowup.objects.filter(
-            task_id=self.task_id, task__project_id=self.project_id
-        )
-
-    def get_serializer_context(self):
-        return super().get_serializer_context() | {
-            "task_id": self.task_id,
-            "project_id": self.project_id,
-        }
-
-    def get_serializer_class(self):
-        if self.action in ("create", "update", "partial_update"):
-            return TaskFollowupCreateUpdateSerializer
-        return TaskFollowupSerializer
 
 
 # eof
