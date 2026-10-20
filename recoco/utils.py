@@ -121,6 +121,20 @@ def is_admin_for_site(user, site=None):
     return user.groups.filter(name=group_name).exists()
 
 
+def is_trusted_bot_for_site(user, site=None):
+    if user.is_superuser:
+        return True
+
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("trusted_bot", site)
+    return user.groups.filter(name=group_name).exists()
+
+
+def is_trusted_bot_for_any_site(user):
+    group_name_regex = r"\w*_trusted_bot"
+    return user.groups.filter(name__regex=group_name_regex).exists()
+
+
 def is_staff_for_site_or_403(user, site=None):
     """Raise a 403 error is user is not a staff member"""
     if not is_staff_for_site(user, site):
@@ -147,8 +161,8 @@ def is_sensitive_account(user, site=None):
     return (
         user.is_staff
         | user.is_superuser
-        | is_staff_for_site(user)
-        | is_admin_for_site(user)
+        | is_staff_for_site(user, site)
+        | is_admin_for_site(user, site)
     )
 
 
@@ -207,6 +221,12 @@ def get_staff_for_site(site=None):
 def get_admin_for_site(site=None):
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("admin", site)
+    return auth_models.Group.objects.get(name=group_name).user_set.all()
+
+
+def get_trusted_bots_for_site(site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("trusted_bots", site)
     return auth_models.Group.objects.get(name=group_name).user_set.all()
 
 
