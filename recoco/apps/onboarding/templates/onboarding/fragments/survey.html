@@ -5,7 +5,10 @@
         {% if form.fields.answer.choices != None %}
             {% for error in form.answer.errors %}<p class="fr-error-text element-to-focus">{{ error }}</p>{% endfor %}
             <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
-                    id="radio-hint-legend">{{ form.question.text }}</legend>
+                    id="radio-hint-legend">
+                {{ form.question.text }}
+                {% if form.fields.answer.required %}*{% endif %}
+            </legend>
         {% endif %}
         {% for choice in form.fields.answer.choices %}
             <div class="fr-fieldset__element">
@@ -45,6 +48,7 @@
                            for="{{ form.comment.name }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
                         {% if form.fields.answer.choices == None %}
                             {{ form.question.text }}
+                            {% if form.fields.comment.required %}*{% endif %}
                         {% else %}
                             {{ question_comment_title|default:'Commentaire' }}
                         {% endif %}
