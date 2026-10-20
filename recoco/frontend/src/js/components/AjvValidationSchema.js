@@ -5,6 +5,7 @@ import { schemaOnboardingStep1SigninFormValidator } from '../utils/ajv/schema/aj
 import { schemaOnboardingStep2ProjectFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingProjectForm';
 import { schemaOnboardingPrefillSetuserFormValidator } from '../utils/ajv/schema/ajv.schema.PrefillSetuserForm';
 import { schemaPrefillProjectFormValidator } from '../utils/ajv/schema/ajv.schema.PrefillProjectForm';
+import { schemaAdvisorSignupFormValidator } from '../utils/ajv/schema/ajv.schema.AdvisorSignupForm';
 
 Alpine.data('AjvValidationSchema', (schemaValidatorName) => {
   const schemasValidator = {
@@ -14,6 +15,7 @@ Alpine.data('AjvValidationSchema', (schemaValidatorName) => {
     schemaOnboardingStep2ProjectFormValidator,
     schemaOnboardingPrefillSetuserFormValidator,
     schemaPrefillProjectFormValidator,
+    schemaAdvisorSignupFormValidator,
   };
   return {
     schemaValidator: schemasValidator[schemaValidatorName],
