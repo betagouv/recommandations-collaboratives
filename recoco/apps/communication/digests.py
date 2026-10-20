@@ -32,6 +32,8 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
 from ..conversations.models import (
+    ContactNode,
+    DocumentNode,
     MarkdownNode,
     Message,
     RecommendationNode,
@@ -544,6 +546,16 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
 
     md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
     reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
+    # Nodes the digest counts and can show as its first object. Plugin nodes
+    # are counted as part of their message and never shown: the email
+    # template only knows the core objects.
+    object_node_types = (RecommendationNode, ContactNode, DocumentNode)
+    object_node_cts = [
+        ct.id for ct in ContentType.objects.get_for_models(*object_node_types).values()
+    ]
+
+    def count_label(node):
+        return node.count_label if isinstance(node, object_node_types) else "message"
 
     # msg count and title count
     nodes = [
@@ -551,7 +563,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         for notif in notifications_qs
         for n in visible_nodes(notif.action_object.nodes.all())
     ]
-    nodes_types = set(node.count_label for node in nodes)
+    nodes_types = set(count_label(node) for node in nodes)
     if len(nodes_types) > 1 or next(iter(nodes_types)) == "message":
         msg_count = notifications_qs.count()
         single_type = "message"
@@ -602,15 +614,15 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         (
             n.action_object
             for n in notifications_qs
-            if visible_nodes(
-                n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct)
+            if n.action_object.nodes.filter(
+                polymorphic_ctype_id__in=object_node_cts
             ).exists()
         ),
         None,
     )
     first_object_node = (
         (
-            visible_nodes(first_obj_msg.nodes.exclude(polymorphic_ctype=md_node_ct))
+            first_obj_msg.nodes.filter(polymorphic_ctype_id__in=object_node_cts)
             .order_by("position")
             .first()
         )

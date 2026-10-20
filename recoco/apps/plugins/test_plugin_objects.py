@@ -347,3 +347,32 @@ def test_no_msg_digest_for_plugin_only_messages_where_plugin_disabled(
         == 0
     )
     assert sent == []
+
+
+@pytest.mark.django_db
+def test_msg_digest_counts_plugin_nodes_as_messages_where_plugin_enabled(
+    monkeypatch,
+    enabled_plugins,
+    current_site,
+    project_ready,
+    sender,
+    recipient,
+    mixed_message,
+    plugin_message,
+):
+    notify_messages(
+        [plugin_message, mixed_message], sender, recipient, current_site, project_ready
+    )
+    sent = []
+    monkeypatch.setattr(
+        digests, "send_email", lambda *args, **kwargs: sent.append(kwargs["params"])
+    )
+
+    enabled_plugins(PLUGIN)
+    digests.send_msg_digest_by_user_and_project(project_ready, recipient, current_site)
+
+    # Plugin nodes are part of their message, never the digest's first object
+    [digest] = sent
+    assert digest["title_count"] == "2 nouveaux messages"
+    assert digest["first_object"] is None
+    assert f"message-id={plugin_message.pk}" in digest["message_url"]
