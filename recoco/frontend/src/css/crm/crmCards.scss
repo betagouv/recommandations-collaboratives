@@ -1,4 +1,31 @@
 .crm-user-card {
+    position: relative;
+
+    &__badge {
+        border-radius: 1px;
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        height: 26px;
+        padding: 4px 8px;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 18px; /* 180% */
+
+        &--inactive {
+            background: var(--light-text-disabled-grey, #929292);
+            color: var(--light-text-inverted-grey, #fff);
+        }
+        &--advisor {
+            background: var(--background-contrast-success, #b8fec9);
+            color: var(--text-default-success, #18753c);
+        }
+    }
 
     &__name {
         color: var(--light-text-title-blue-france, #000091);
