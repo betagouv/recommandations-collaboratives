@@ -11,7 +11,6 @@ import pytest
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -213,7 +212,7 @@ def test_question_create_error(request, client):
 
 @pytest.mark.django_db
 def test_question_create_on_another_site(request, client):
-    another_site = baker.make(Site)
+    another_site = Recipe(Site).make()
     qs = Recipe(models.QuestionSet, survey__site=another_site).make()
     url = reverse("survey-editor-question-create", args=[qs.id])
     data = {
