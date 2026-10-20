@@ -210,20 +210,27 @@ survey_urls = [
 ]
 
 
-def _collect_plugin_rest_urls():
+def _collect_plugin_rest_urls(pm=None):
+    """Plugin REST routes, each plugin behind a PluginURLResolver so they only
+    resolve on the tenants that have the plugin enabled.
+
+    No namespace is added: plugin REST url names stay global, as before.
+    """
     from recoco.apps.plugins.manager import get_plugin_manager
+    from recoco.apps.plugins.resolvers import PluginURLResolver
 
     urls = []
-    pm = get_plugin_manager()
-    for _name, plugin in pm.list_name_plugin():
+    if pm is None:
+        pm = get_plugin_manager()
+    for name, plugin in pm.list_name_plugin():
         rest_mod_name = getattr(plugin, "rest_urls_module", None)
         if not rest_mod_name:
             continue
         try:
             mod = importlib.import_module(rest_mod_name)
-            urls.extend(getattr(mod, "urlpatterns", []))
         except ImportError:
-            pass
+            continue
+        urls.append(PluginURLResolver(name, "", mod))
     return urls
 
 
