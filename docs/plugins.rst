@@ -104,6 +104,16 @@ Django can resolve migrations and models correctly.
         default_auto_field = "django.db.models.BigAutoField"
         name = "plugin_giphy"
 
+The entry point name, the package name and the app label must be the same
+``plugin_<name>``: a plugin is enabled by name (``enabled_plugins``, hooks,
+URLs), while its schema, search and objects in core tables are found by app
+label. Two system checks enforce it:
+
+- ``plugins.E002``: the plugin name does not start with ``plugin_`` (its
+  tables would go to ``public`` and it would be handled as a core app);
+- ``plugins.E003``: the app label differs from the plugin name (don't set a
+  custom ``label`` on the ``AppConfig``).
+
 
 Defining a Hook Specification
 ==============================
@@ -213,11 +223,11 @@ Then call it in the core view:
 .. code-block:: python
 
     # recoco/apps/projects/views.py
-    from recoco.apps.plugins.manager import get_tenant_hook
+    from recoco.apps.plugins.manager import get_site_plugin_manager
 
     def project_detail(request, pk):
         project = get_object_or_404(Project, pk=pk)
-        pm = get_tenant_hook(request)
+        pm = get_site_plugin_manager(request=request)
 
         extra_context = {}
         for ctx in pm.hook.project_detail_extra_context(
@@ -833,7 +843,7 @@ restores it with ``set_plugin_search_path(connection)`` instead.
    transaction mode (e.g. PgBouncer ``pool_mode = transaction``).
 
 Tenant isolation is therefore done by the application:
-``TenantPluginsMiddleware`` (and ``tenant_plugins_context`` for commands)
+``TenantPluginsMiddleware`` (and ``tenant_context`` for commands)
 only enables the tenant's plugins for hooks and URLs, and plugin querysets
 must be scoped with ``on_site`` or an explicit ``site`` filter.
 
@@ -859,41 +869,72 @@ or contains plugin models. Note that ``watson.search`` with an empty
 ``models`` list searches every model; ``tenant_search`` returns no results
 instead when everything was filtered out.
 
-Plugin management commands
---------------------------
+Plugin objects in core tables
+-----------------------------
 
-A command that works on one tenant must make that tenant's site the current
-one (``settings.SITE_ID.override``) for its whole run, like core commands
-such as ``senddigests`` do. Otherwise ``on_site`` managers,
-``Site.objects.get_current()`` and the signal handlers that rely on it (e.g.
-creating a plugin profile on ``post_save``) silently use the default site.
+Some core tables are shared by every tenant and can point to plugin objects:
+conversation nodes (a plugin ``Node`` subclass), actstream actions and
+notifications (generic relations). Where the plugin is disabled, these rows
+must not show up: their URLs don't reverse there and their data belongs to
+another tenant's feature. ``recoco/apps/plugins/utils.py`` provides:
 
-If the command also calls plugin hooks or reverses plugin URLs, enable the
-tenant's plugins with ``tenant_plugins_context`` (what the middleware does for
-requests).
+- ``get_disabled_plugin_app_labels()`` and ``is_disabled_plugin_model(model)``;
+- ``exclude_disabled_plugin_objects(queryset, *content_type_fields)``: drops
+  the rows whose content type fields point to a model of a disabled plugin.
+  A null content type (e.g. an action without target) is kept.
 
 .. code-block:: python
 
-    from django.conf import settings
+    actions = exclude_disabled_plugin_objects(
+        project.target_actions.all(),
+        "action_object_content_type",
+        "target_content_type",
+    )
+
+The core already applies it to the project and CRM activity streams and to
+unread notifications. For conversations (``recoco/apps/conversations``):
+
+- ``visible_nodes(nodes)`` drops the nodes of disabled plugins, and
+  ``exclude_plugin_only_messages(messages)`` drops the messages made only of
+  such nodes. The messages API uses both, and refuses to create a disabled
+  plugin's node or to edit a message holding hidden nodes.
+- Message email digests leave out the same nodes and messages. Plugin nodes
+  of enabled plugins are counted as part of their message and are never the
+  digest's highlighted object: the email template only knows the core
+  objects (recommendation, contact, document), so a plugin node's
+  ``count_label`` and ``get_digest_recap()`` are not used there.
+
+Any new core code that lists such rows must filter them the same way.
+
+Plugin management commands
+--------------------------
+
+Outside a request, nothing sets the tenant: a command that works on one
+tenant must wrap its whole run in ``tenant_context(site)``. It sets both the
+current site (``SITE_ID``, used by ``on_site`` managers,
+``Site.objects.get_current()`` and the signal handlers that rely on it) and
+the tenant's enabled plugins (hooks, URLs, the filters above), which a
+request gets from its middlewares. Setting only one of them mixes two
+tenants. Contexts nest and are restored on exit, so a command can loop over
+sites.
+
+.. code-block:: python
+
     from django.contrib.sites.models import Site
     from django.core.management.base import BaseCommand
 
-    from recoco.apps.plugins.manager import get_site_configuration
-    from recoco.apps.plugins.context import tenant_plugins_context
+    from recoco.apps.plugins.context import tenant_context
 
 
     class Command(BaseCommand):
-        def add_arguments(self, parser):
-            parser.add_argument("--site-domain", required=True)
-
         def handle(self, **options):
-            site = Site.objects.get(domain=options["site_domain"])
-            with (
-                settings.SITE_ID.override(site.pk),
-                tenant_plugins_context(get_site_configuration(site)),
-            ):
-                for realisation in Realisation.on_site.all():
-                    ...
+            for site in Site.objects.all():
+                with tenant_context(site):
+                    for realisation in Realisation.on_site.all():
+                        ...
+
+``tenant_plugins_context(site_config)`` only sets the enabled plugins, for
+code where the site is already current.
 
 
 URL Routing
@@ -1031,6 +1072,12 @@ global ``urlpatterns``.  The resulting endpoint is served under ``/api/``:
 .. code-block:: text
 
     /api/giphy/search/   →  GiphySearchAPIView
+
+Like the plugin's page URLs, the patterns are wrapped in a
+``PluginURLResolver``: they only resolve (and reverse) on tenants that have
+the plugin enabled, elsewhere the API answers 404. No namespace is added, so
+REST URL names stay global and must be unique, e.g. prefixed with the plugin
+name.
 
 
 Frontend (Vite / Alpine)
@@ -1238,9 +1285,29 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
     cd recoco/frontend && yarn build
 
 6. In the Django admin, edit the ``SiteConfiguration`` for the target site
-   and add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list.
+   and add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list. Only
+   installed plugin names are accepted (``SiteConfiguration.clean()``); a
+   site still listing an uninstalled plugin can't be saved until the entry is
+   removed.
 
 On the next request, the middleware enables the plugin for that tenant: its
 hooks are called and the ``PluginURLResolver`` exposes its routes, only for
 tenants that have it enabled. The plugin tables are already reachable through
 the static ``search_path``.
+
+
+Testing
+=======
+
+Core tests (``recoco.settings.testing``) leave out every third-party
+``plugin_*`` app, even when a local ``development.py`` installs one: they
+only use the test plugin ``recoco.apps.plugins.testing.plugin_testapp``,
+whose tables are created with ``migrate_plugins`` in the tests that need
+them.
+
+A plugin's own tests run from the recoco root with the development settings,
+where the plugin is installed::
+
+    uv run pytest recoco/apps/plugins/                       # core plugin tests
+    uv run pytest --create-db ../plugin-giphy/plugin_giphy/ \
+        --ds=recoco.settings.development                     # plugin tests
