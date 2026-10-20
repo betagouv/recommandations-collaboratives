@@ -39,6 +39,15 @@ export const schemaOnboardingStep1SignupFormValidator = {
         },
       ],
     },
+    org_name: {
+      allOf: [
+        {
+          type: 'string',
+          minLength: 1,
+          errorMessage: minLengthErrorMessage(1),
+        },
+      ]
+    },
     role: { $ref: '#/definitions/text' },
     email: { $ref: '#/definitions/email' },
     password1: { $ref: '#/definitions/passwordNormal' },
@@ -53,6 +62,6 @@ export const schemaOnboardingStep1SignupFormValidator = {
     },
     phone: { $ref: '#/definitions/phone' },
   },
-  required: ['first_name', 'last_name', 'role', 'email', 'password1', 'password2', 'phone'],
+  required: ['first_name', 'last_name', 'org_name', 'role', 'email', 'password1', 'password2', 'phone'],
   definitions: schemaFormInputs,
 };

@@ -22,13 +22,13 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
     isFormEdited: false,
     canSubmit: true,
     submittedForm: requestMethod === 'POST',
-    currentForm: null,
+    formElement: null,
     async init() {
       if (!this.schema) {
         console.error('Missing validation schema');
       }
 
-      this.currentForm = document.getElementById(formId);
+      this.formElement = document.getElementById(formId);
       const fields = Object.keys(this.schema.properties);
       const fieldToCheck = [];
 
@@ -44,9 +44,9 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
           errors: [],
           touched: false,
           changed: false,
-          value: this.currentForm[field].value,
+          value: this.formElement[field].value,
         };
-        if (this.currentForm[field].value) fieldToCheck.push(field);
+        if (this.formElement[field].value) fieldToCheck.push(field);
       });
       fieldToCheck.forEach((field) => {
         this.validateInput({ target: { name: field } });
@@ -60,7 +60,7 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
 
       this.$nextTick(() => {
         // enable form validation for all submission types (click, keyboard, ...)
-        document.getElementById(formId).addEventListener('submit', (event) => {
+        this.formElement.addEventListener('submit', (event) => {
           this.isFormEdited = false;
           this.canSubmit = false;
           this.submittedForm = true;
@@ -73,7 +73,7 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       });
       this.customFocus();
       // Disable browser validation as we are using our own
-      document.getElementById(formId).setAttribute('novalidate', '');
+      this.formElement.setAttribute('novalidate', '');
       // Let the server know that JS is enabled
       document.getElementById(`${formId}_js_enabled`).value = 'true';
     },
@@ -155,7 +155,7 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       this.errors.forEach((error, index) => {
         const currentErrorField = error.instancePath.substring(1);
         // Set the focus on the first field with an error
-        index === 0 && this.currentForm[currentErrorField]?.focus();
+        index === 0 && this.formElement[currentErrorField]?.focus();
         // Set the error class on the field
 
         this.form[currentErrorField].is_valid = false;
@@ -169,20 +169,19 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
         }
     },
     validateInput(event) {
-      const fieldName = event.target.name;
       this.validate();
-      this.form[fieldName].errors = this.getFieldErrors(fieldName);
-      if (
-        (this.form[fieldName].is_valid === false ||
-          this.form[fieldName].is_valid === undefined) &&
-        this.form[fieldName].errors.length === 0
-      ) {
-        this.form[fieldName].is_valid = true;
-        this.form[fieldName].valid_class = 'valid';
-      } else if (this.form[fieldName].errors.length > 0) {
-        this.form[fieldName].is_valid = false;
-        this.form[fieldName].valid_class = 'error';
+      const fieldName = event.target.name;
+      for (const name in this.form) {
+        if (name === fieldName || this.form[name].changed) this.updateFieldState(name);
       }
+    },
+    updateFieldState(fieldName) {
+      const field = this.form[fieldName];
+      field.errors = this.getFieldErrors(fieldName);
+      const hasErrors = field.errors.length > 0;
+      field.is_valid = !hasErrors;
+      field.valid_class = hasErrors ? 'error' : 'valid';
+
       this.setFieldMessages(fieldName);
     },
     touchInput(event) {
