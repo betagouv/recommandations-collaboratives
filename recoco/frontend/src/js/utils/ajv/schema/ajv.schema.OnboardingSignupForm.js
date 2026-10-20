@@ -42,7 +42,15 @@ export const schemaOnboardingStep1SignupFormValidator = {
     role: { $ref: '#/definitions/text' },
     email: { $ref: '#/definitions/email' },
     password1: { $ref: '#/definitions/passwordNormal' },
-    password2: { $ref: '#/definitions/passwordNormal' },
+    password2: {
+      allOf: [
+        {
+          type: 'string',
+          const: { $data: '1/password1' },
+          errorMessage: 'Doit correspondre au mot de passe.',
+        },
+      ]
+    },
     phone: { $ref: '#/definitions/phone' },
   },
   required: ['first_name', 'last_name', 'role', 'email', 'password1', 'password2', 'phone'],

@@ -4,7 +4,7 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import addErrors from 'ajv-errors';
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true, $data: true });
 addFormats(ajv);
 addErrors(ajv);
 /**
@@ -22,26 +22,31 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
     isFormEdited: false,
     canSubmit: true,
     submittedForm: requestMethod === 'POST',
+    currentForm: null,
     async init() {
       if (!this.schema) {
         console.error('Missing validation schema');
       }
 
-      const currentForm = document.getElementById(formId);
+      this.currentForm = document.getElementById(formId);
       const fields = Object.keys(this.schema.properties);
       const fieldToCheck = [];
 
       fields.forEach((field) => {
         this.form[field] = {
           message_group: {
-            messages: [],
+            help_text: '',
+            messages: this.getFieldRuleMessages(field).map((text) => ({
+              text,
+              type: 'info',
+            })),
           },
           errors: [],
           touched: false,
           changed: false,
-          value: currentForm[field].value,
+          value: this.currentForm[field].value,
         };
-        if (currentForm[field].value) fieldToCheck.push(field);
+        if (this.currentForm[field].value) fieldToCheck.push(field);
       });
       fieldToCheck.forEach((field) => {
         this.validateInput({ target: { name: field } });
@@ -93,6 +98,18 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       );
       return errors.map((error) => error.message);
     },
+    getFieldRuleMessages(fieldName) {
+      let definition = this.schema.properties[fieldName];
+
+      // usefull when properties get shared definitions, ex: $ref: '#/definitions/passwordNormal'
+      if (definition.$ref) {
+        const definitionName = definition.$ref.replace('#/definitions/', '');
+        definition = this.schema.definitions?.[definitionName];
+      }
+
+      const rules = definition?.allOf ?? [];
+      return rules.map((rule) => rule.errorMessage);
+    },
     setFieldMessages(fieldName) {
       const field = this.form[fieldName];
       if (!field.message_group || !field.message_group.messages) {
@@ -138,7 +155,7 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       this.errors.forEach((error, index) => {
         const currentErrorField = error.instancePath.substring(1);
         // Set the focus on the first field with an error
-        index === 0 && this.$refs[currentErrorField].focus();
+        index === 0 && this.currentForm[currentErrorField]?.focus();
         // Set the error class on the field
 
         this.form[currentErrorField].is_valid = false;
@@ -146,6 +163,10 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
           this.getFieldErrors(currentErrorField);
         this.form[currentErrorField].valid_class = 'error';
       });
+
+      for (const field in this.form) {
+          this.setFieldMessages(field);
+        }
     },
     validateInput(event) {
       const fieldName = event.target.name;
