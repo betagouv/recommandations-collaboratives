@@ -1,10 +1,18 @@
+import pluggy
+import pytest
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.test.utils import isolate_apps
 
 from recoco.apps.home.models import SiteConfiguration
 
-from .checks import check_plugin_model, check_plugin_models
+from .checks import (
+    check_plugin_model,
+    check_plugin_models,
+    check_plugin_name,
+    check_plugin_names,
+)
 from .models import PluginModel
 
 
@@ -70,9 +78,10 @@ def test_auto_created_m2m_through_is_exempt():
 
 
 class FakeAppConfig:
-    def __init__(self, label, models):
+    def __init__(self, label, models=None, name=None):
         self.label = label
-        self.models = models
+        self.models = models or []
+        self.name = name or label
 
     def get_models(self):
         return self.models
@@ -96,3 +105,53 @@ def test_only_plugin_apps_are_checked():
     )
 
     assert [e.obj for e in errors] == [PluginThing]
+
+
+def test_plugin_named_like_its_app_label_is_valid():
+    app_configs = [FakeAppConfig("plugin_fake")]
+
+    assert check_plugin_name("plugin_fake", app_configs) == []
+
+
+def test_plugin_without_prefix_is_flagged():
+    app_configs = [FakeAppConfig("fake")]
+
+    errors = check_plugin_name("fake", app_configs)
+
+    assert [e.id for e in errors] == ["plugins.E002"]
+
+
+def test_plugin_with_another_app_label_is_flagged():
+    app_configs = [FakeAppConfig("custom_label", name="plugin_fake")]
+
+    errors = check_plugin_name("plugin_fake", app_configs)
+
+    assert [e.id for e in errors] == ["plugins.E003"]
+
+
+def test_installed_plugins_pass_the_checks():
+    assert check_plugin_names() == []
+
+
+# --- SiteConfiguration.enabled_plugins ---
+
+
+@pytest.fixture
+def installed_plugins(monkeypatch):
+    def install(*names):
+        pm = pluggy.PluginManager("recoco")
+        for name in names:
+            pm.register(object(), name=name)
+        monkeypatch.setattr("recoco.apps.plugins.manager._plugin_manager", pm)
+
+    return install
+
+
+def test_enabled_plugins_must_be_installed(installed_plugins):
+    installed_plugins("plugin_fake")
+
+    SiteConfiguration(enabled_plugins=["plugin_fake"]).clean()
+
+    with pytest.raises(ValidationError) as excinfo:
+        SiteConfiguration(enabled_plugins=["plugin_fake", "plugin_typo"]).clean()
+    assert "plugin_typo" in str(excinfo.value.message_dict["enabled_plugins"])

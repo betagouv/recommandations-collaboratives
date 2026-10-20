@@ -14,6 +14,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef
 from django.db.models.query import QuerySet
@@ -383,6 +384,22 @@ class SiteConfiguration(models.Model):
 
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
+
+    def clean(self):
+        super().clean()
+        from recoco.apps.plugins.manager import get_plugin_manager
+
+        installed = {name for name, _ in get_plugin_manager().list_name_plugin()}
+        unknown = [name for name in self.enabled_plugins if name not in installed]
+        if unknown:
+            raise ValidationError(
+                {
+                    "enabled_plugins": (
+                        f"Plugins inconnus : {', '.join(map(str, unknown))}. "
+                        f"Plugins installés : {', '.join(sorted(installed)) or 'aucun'}."
+                    )
+                }
+            )
 
 
 @receiver(post_save, sender=auth_models.User)
