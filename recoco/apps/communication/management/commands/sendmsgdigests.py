@@ -1,12 +1,12 @@
 import logging
 
-from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from recoco.apps.communication import digests
+from recoco.apps.plugins.context import tenant_context
 from recoco.apps.projects import models as project_models
 
 logger = logging.getLogger("main")
@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
     def send_msg_email_digests(self, dry_run, user_id):
         for site in Site.objects.all():
-            with settings.SITE_ID.override(site.pk):
+            with tenant_context(site):
                 logger.info(f"\n#### Sending digests for site <{site.domain}> ####\n")
                 self.send_msg_email_digests_for_site(site, dry_run, user_id)
 
