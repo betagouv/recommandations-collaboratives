@@ -9,6 +9,7 @@ from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
 
+from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
 from recoco.utils import render_markdown
 
 
@@ -73,6 +74,19 @@ class Node(PolymorphicModel):
 
     def get_digest_recap(self):
         raise NotImplementedError()
+
+
+def visible_nodes(nodes):
+    """Drop the nodes of plugins the current tenant has not enabled."""
+    return exclude_disabled_plugin_objects(nodes, "polymorphic_ctype")
+
+
+def exclude_plugin_only_messages(messages):
+    """Drop the messages made only of nodes of plugins the current tenant has
+    not enabled: they would show up empty.
+    """
+    nodes = Node.objects.non_polymorphic().filter(message=models.OuterRef("pk"))
+    return messages.exclude(models.Exists(nodes) & ~models.Exists(visible_nodes(nodes)))
 
 
 class MarkdownTextMixin(models.Model):

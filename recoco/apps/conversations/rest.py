@@ -2,20 +2,19 @@
 
 
 from django.contrib.auth.models import User
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Q
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 
 from recoco import verbs
-from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
 from recoco.apps.projects import models as projects_models
 from recoco.utils import has_perm_or_403
 
 from ...rest_api.permissions import BaseConversationPermission
 from . import signals
-from .models import Message, Node
+from .models import Message, exclude_plugin_only_messages
 from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
 
@@ -30,23 +29,15 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        nodes = Node.objects.non_polymorphic().filter(message=OuterRef("pk"))
-        return (
+        return exclude_plugin_only_messages(
             Message.objects.filter(project_id=project_id)
-            # Messages made only of nodes of plugins the current tenant has
-            # not enabled would show up empty
-            .exclude(
-                Exists(nodes)
-                & ~Exists(exclude_disabled_plugin_objects(nodes, "polymorphic_ctype"))
-            )
-            .annotate(
-                unread=Count(
-                    "notifications",
-                    filter=Q(
-                        notifications__unread=True,
-                        notifications__recipient=self.request.user,
-                    ),
-                )
+        ).annotate(
+            unread=Count(
+                "notifications",
+                filter=Q(
+                    notifications__unread=True,
+                    notifications__recipient=self.request.user,
+                ),
             )
         )
 

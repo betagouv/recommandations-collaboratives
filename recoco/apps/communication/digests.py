@@ -31,7 +31,13 @@ from recoco.apps.reminders.api import (
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
-from ..conversations.models import MarkdownNode, RecommendationNode
+from ..conversations.models import (
+    MarkdownNode,
+    Message,
+    RecommendationNode,
+    exclude_plugin_only_messages,
+    visible_nodes,
+)
 from . import constants as communication_constants
 from .api import send_email
 from .helpers import NotificationFormatter, normalize_user_name
@@ -488,6 +494,14 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
         .unsent()
         .filter(verb=verbs.Conversation.POST_MESSAGE, target_object_id=project.id)
     )
+    # Messages made only of nodes of plugins the site has not enabled are left
+    # out of the digest
+    visible_message_ids = exclude_plugin_only_messages(
+        Message.objects.filter(project=project)
+    ).values_list("pk", flat=True)
+    notifications = notifications.filter(
+        action_object_object_id__in=[str(pk) for pk in visible_message_ids]
+    )
     if notifications.count() == 0:
         return 0
 
@@ -532,7 +546,11 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
 
     # msg count and title count
-    nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
+    nodes = [
+        n
+        for notif in notifications_qs
+        for n in visible_nodes(notif.action_object.nodes.all())
+    ]
     nodes_types = set(node.count_label for node in nodes)
     if len(nodes_types) > 1 or next(iter(nodes_types)) == "message":
         msg_count = notifications_qs.count()
@@ -584,13 +602,15 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         (
             n.action_object
             for n in notifications_qs
-            if n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct).exists()
+            if visible_nodes(
+                n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct)
+            ).exists()
         ),
         None,
     )
     first_object_node = (
         (
-            first_obj_msg.nodes.exclude(polymorphic_ctype=md_node_ct)
+            visible_nodes(first_obj_msg.nodes.exclude(polymorphic_ctype=md_node_ct))
             .order_by("position")
             .first()
         )

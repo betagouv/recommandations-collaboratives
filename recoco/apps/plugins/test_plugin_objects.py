@@ -11,10 +11,16 @@ from actstream.models import Action
 from django.core.management import call_command
 from django.urls import reverse
 from model_bakery import baker
+from notifications.signals import notify
 from rest_framework import serializers
 
+from recoco import verbs
+from recoco.apps.communication import digests
 from recoco.apps.conversations.models import MarkdownNode, Message
 from recoco.apps.conversations.serializers import NodePolymorphicSerializer
+from recoco.apps.conversations.utils import (
+    gather_annotations_for_message_notification,
+)
 from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import login
 
@@ -263,3 +269,81 @@ def test_can_edit_message_with_plugin_nodes_where_plugin_enabled(
         )
 
     assert response.status_code == 200
+
+
+# --- message digests ---
+
+
+@pytest.fixture
+def recipient(project_ready):
+    recipient = baker.make("auth.User")
+    project_ready.members.add(recipient)
+    return recipient
+
+
+def notify_messages(messages, sender, recipient, site, project):
+    for message in messages:
+        notify.send(
+            sender=sender,
+            recipient=[recipient],
+            verb=verbs.Conversation.POST_MESSAGE,
+            action_object=message,
+            target=project,
+            site=site,
+            annotations=gather_annotations_for_message_notification(message),
+        )
+
+
+@pytest.mark.django_db
+def test_msg_digest_leaves_out_plugin_nodes_where_plugin_disabled(
+    monkeypatch,
+    enabled_plugins,
+    current_site,
+    project_ready,
+    sender,
+    recipient,
+    mixed_message,
+    plugin_message,
+):
+    notify_messages(
+        [plugin_message, mixed_message], sender, recipient, current_site, project_ready
+    )
+    sent = []
+    monkeypatch.setattr(
+        digests, "send_email", lambda *args, **kwargs: sent.append(kwargs["params"])
+    )
+
+    enabled_plugins()
+    digests.send_msg_digest_by_user_and_project(project_ready, recipient, current_site)
+
+    # The message made of plugin nodes only is left out
+    [digest] = sent
+    assert digest["title_count"] == "1 nouveau message"
+    assert digest["first_object"] is None
+    assert f"message-id={mixed_message.pk}" in digest["message_url"]
+
+
+@pytest.mark.django_db
+def test_no_msg_digest_for_plugin_only_messages_where_plugin_disabled(
+    monkeypatch,
+    enabled_plugins,
+    current_site,
+    project_ready,
+    sender,
+    recipient,
+    plugin_message,
+):
+    notify_messages([plugin_message], sender, recipient, current_site, project_ready)
+    sent = []
+    monkeypatch.setattr(
+        digests, "send_email", lambda *args, **kwargs: sent.append(kwargs["params"])
+    )
+
+    enabled_plugins()
+    assert (
+        digests.send_msg_digest_by_user_and_project(
+            project_ready, recipient, current_site
+        )
+        == 0
+    )
+    assert sent == []
