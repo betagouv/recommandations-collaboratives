@@ -2,7 +2,8 @@ import threading
 
 import pluggy
 import pytest
-from django.urls import Resolver404
+from django.http import HttpResponse
+from django.urls import Resolver404, path
 
 from recoco.rest_api.urls import _collect_plugin_rest_urls
 
@@ -13,8 +14,18 @@ PLUGIN = "plugin_testapp"
 PATH = "plugin-testapp/ping/"
 
 
+def ping(request):
+    return HttpResponse("pong")
+
+
+# This module doubles as the plugin's REST urls module
+urlpatterns = [
+    path(PATH, ping, name="plugin-testapp-ping"),
+]
+
+
 class FakeRestPlugin:
-    rest_urls_module = "recoco.apps.plugins.testing.plugin_testapp.rest_urls"
+    rest_urls_module = __name__
 
 
 class FakeSiteConfig:
