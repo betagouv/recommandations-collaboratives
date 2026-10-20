@@ -10,6 +10,7 @@ from notifications import models as notifications_models
 
 from recoco import verbs
 from recoco.apps.plugins.manager import get_site_plugin_manager
+from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
 from recoco.apps.projects.models import Project
 from recoco.apps.projects.utils import can_administrate_project
 from recoco.utils import check_if_advisor, is_admin_for_site, is_staff_for_site
@@ -65,7 +66,12 @@ def unread_notifications_processor(request):
     ]
 
     unread_notifications = (
-        notifications_models.Notification.on_site.unread()
+        exclude_disabled_plugin_objects(
+            notifications_models.Notification.on_site.unread(),
+            "actor_content_type",
+            "action_object_content_type",
+            "target_content_type",
+        )
         .filter(recipient=request.user)
         .exclude(verb__in=excluded_verbs)
         .prefetch_related("actor__profile__organization")

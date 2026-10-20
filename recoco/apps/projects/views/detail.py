@@ -26,6 +26,7 @@ from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.plugins.manager import get_site_plugin_manager
+from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as task_models
 from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site
@@ -359,7 +360,11 @@ def project_internal_followup_tracking(request, project_id=None):
     advising, advising_position = get_advising_context_for_project(
         request.user, project
     )
-    stream = project.target_actions.all().prefetch_related(
+    stream = exclude_disabled_plugin_objects(
+        project.target_actions.all(),
+        "actor_content_type",
+        "action_object_content_type",
+    ).prefetch_related(
         GenericPrefetch(
             "actor",
             [User.objects.all().prefetch_related("profile", "profile__organization")],

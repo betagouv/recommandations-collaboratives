@@ -58,7 +58,7 @@ def test_migrate_plugins_records_migrations_in_plugin_schema():
     migrate_plugins(PLUGIN)
 
     assert table_exists(PLUGIN, "django_migrations")
-    assert recorded_migrations(PLUGIN, PLUGIN) == ["0001_initial"]
+    assert recorded_migrations(PLUGIN, PLUGIN) == ["0001_initial", "0002_notenode"]
     # Core migrations are copied over as ghost entries...
     assert "0001_initial" in recorded_migrations(PLUGIN, "sites")
     # ...but not the ones of other plugins
@@ -76,7 +76,7 @@ def test_migrate_plugins_is_safe_to_rerun():
     migrate_plugins(PLUGIN)
     migrate_plugins(PLUGIN)
 
-    assert recorded_migrations(PLUGIN, PLUGIN) == ["0001_initial"]
+    assert recorded_migrations(PLUGIN, PLUGIN) == ["0001_initial", "0002_notenode"]
     assert recorded_migrations(PLUGIN, "sites").count("0001_initial") == 1
 
 

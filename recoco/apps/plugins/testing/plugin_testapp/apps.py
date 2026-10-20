@@ -9,6 +9,8 @@ class PluginTestappConfig(AppConfig):
     label = "plugin_testapp"
 
     def ready(self):
+        from actstream import registry
         from watson import search as watson
 
+        registry.register(self.get_model("Note"))
         watson.register(self.get_model("Note"), fields=("title",))
