@@ -4,7 +4,7 @@
 {% endblock js %}
 <div x-data='OrganizationSearch("{{ value|default:"" }}", {% if isRequired %}true{% else %}false{% endif %}, {% if dsfr %}true{% else %}false{% endif %}, "{{ request.method }}", {% if validation %}true{% else %}false{% endif %})'
      x-effect='validateData({% if request.method is "POST" %}true{% else %}false{% endif %})'
-     class="{% if dsfr %}fr-input-group {% if errors and validation %}fr-input-group--error{% endif %}{% endif %}">
+     class="{% if dsfr %}fr-input-group {% if errors and validation %}fr-input-group--error{% endif %}{% endif %}{% if is_dsfr_element %} fr-fieldset__element{% endif %}">
     <label class="{% if dsfr %}fr-label{% else %} text-info-custom text-grey-dark{% endif %}"
            for="{{ id_for_label }}">{{ label }}</label>
     <input x-on:input.change.debounce="handleOrganizationChange"
