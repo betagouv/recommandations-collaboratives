@@ -172,7 +172,7 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       this.validate();
       const fieldName = event.target.name;
       for (const name in this.form) {
-        if (name === fieldName || this.form[name].changed) this.updateFieldState(name);
+        if (name === fieldName || this.form[name].changed || this.submittedForm) this.updateFieldState(name);
       }
     },
     updateFieldState(fieldName) {

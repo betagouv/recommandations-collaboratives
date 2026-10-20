@@ -8,7 +8,8 @@ describe('The Signup Page @inscription', () => {
     '[name=role]': 'Tester',
     '[name=email]': 'signup4@success.test',
     '[name=phone]': '0102030405',
-    '[name=password]': 'Recoco2000',
+    '[name=password1]': 'Recoco2000',
+    '[name=password2]': 'Recoco2000',
   };
 
   it('signup a new user', function () {

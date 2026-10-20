@@ -64,7 +64,7 @@ class OnboardingSignupForm(SetPasswordMixin, DsrcBaseForm):
             first_name=self.cleaned_data.get("first_name"),
             last_name=self.cleaned_data.get("last_name"),
         )
-        self.validate_password_for_user(user)
+        self.validate_password_for_user(user, password_field_name="password1")  # noqa: S106
 
     first_name = forms.CharField(label="Prénom", initial="", required=True)
     last_name = forms.CharField(label="Nom", initial="", required=True)
