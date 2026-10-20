@@ -45,8 +45,9 @@ def test_create_contact_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_create_contact_available_for_switchtender(client):
-    organization = Recipe(Organization).make()
+def test_create_contact_available_for_switchtender(request, client):
+    current_site = get_current_site(request)
+    organization = Recipe(Organization, sites=[current_site]).make()
     url = reverse(
         "addressbook-organization-contact-create",
         args=[organization.id],
