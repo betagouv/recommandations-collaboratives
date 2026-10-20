@@ -6,4 +6,11 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 CONTENT_SECURITY_POLICY = common.CONTENT_SECURITY_POLICY
 
-INSTALLED_APPS += ("recoco.apps.plugins.testing.plugin_testapp",)  # noqa: F405
+# Third-party plugins (enabled in a local development.py) have their own test
+# suites, run with --ds=recoco.settings.development. Core tests only use the
+# test plugin.
+INSTALLED_APPS = tuple(  # noqa: F405
+    app
+    for app in INSTALLED_APPS  # noqa: F405
+    if not app.startswith("plugin_")
+) + ("recoco.apps.plugins.testing.plugin_testapp",)
