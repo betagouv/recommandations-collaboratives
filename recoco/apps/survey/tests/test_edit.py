@@ -8,8 +8,10 @@ created: 2021-08-02 16:24:35 CEST
 """
 
 import pytest
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -207,6 +209,24 @@ def test_question_create_error(request, client):
 
     assert models.Question.objects.count() == 0
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_question_create_on_another_site(request, client):
+    another_site = baker.make(Site)
+    qs = Recipe(models.QuestionSet, survey__site=another_site).make()
+    url = reverse("survey-editor-question-create", args=[qs.id])
+    data = {
+        "text_short": "short version",
+        "text": "the text of the question",
+        "priority": 1,
+    }
+
+    with login(client, groups=["example_com_admin"]):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 404
+    assert models.Question.objects.count() == 0
 
 
 #
