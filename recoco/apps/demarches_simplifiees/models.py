@@ -42,7 +42,16 @@ class DSResource(TimeStampedModel):
 
     @property
     def preremplir_url(self) -> str:
+        # https://doc.demarches-simplifiees.fr/pour-aller-plus-loin/api-de-preremplissage#demarrage-rapide
         return urljoin(settings.DS_BASE_URL, f"preremplir/{self.name}/")
+
+    @property
+    def create_prefill_draft_url(self):
+        return urljoin(
+            # https://doc.demarches-simplifiees.fr/pour-aller-plus-loin/api-de-preremplissage#preremplissage-en-post
+            settings.DS_API_BASE_URL,
+            f"demarches/{self.number}/dossiers",
+        )
 
     @property
     def fields(self) -> list[MappingField]:

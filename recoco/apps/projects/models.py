@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
 
+import json
 import os
 import uuid
 from datetime import datetime
@@ -499,8 +500,16 @@ class Project(models.Model):
         return f"{self.first_name} {self.last_name}"
 
     @property
-    def full_name_reversed(self):
+    def full_name_reversed(self):  # useful for DN mappings
         return f"{self.last_name} {self.first_name}"
+
+    @property
+    def location_gps_json(self):  # useful for DN mappings
+        json_dict = {
+            "type": "Point",
+            "coordinates": [self.location_x, self.location_y],
+        }
+        return json.dumps(json_dict)
 
     @property
     def has_blocked_action(self):
