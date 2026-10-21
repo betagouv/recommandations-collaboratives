@@ -32,8 +32,7 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
 from ..conversations.models import (
-    ContactNode,
-    DocumentNode,
+    OBJECT_NODE_TYPES,
     MarkdownNode,
     Message,
     RecommendationNode,
@@ -549,13 +548,12 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     # Nodes the digest counts and can show as its first object. Plugin nodes
     # are counted as part of their message and never shown: the email
     # template only knows the core objects.
-    object_node_types = (RecommendationNode, ContactNode, DocumentNode)
     object_node_cts = [
-        ct.id for ct in ContentType.objects.get_for_models(*object_node_types).values()
+        ct.id for ct in ContentType.objects.get_for_models(*OBJECT_NODE_TYPES).values()
     ]
 
     def count_label(node):
-        return node.count_label if isinstance(node, object_node_types) else "message"
+        return node.count_label if isinstance(node, OBJECT_NODE_TYPES) else "message"
 
     # msg count and title count
     nodes = [

@@ -161,3 +161,9 @@ class DocumentNode(Node):
     def get_digest_recap(self):
         d = self.document
         return {"type": "document", "name": d.filename()}
+
+
+# Core nodes standing for an object of their own (with a count_label and a
+# digest recap). Plugin nodes are deliberately left out: digest templates only
+# know these.
+OBJECT_NODE_TYPES = (RecommendationNode, ContactNode, DocumentNode)
