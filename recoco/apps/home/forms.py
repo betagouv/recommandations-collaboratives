@@ -46,6 +46,7 @@ class UVSignupForm(SignupForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+        self.fields["phone_no"].widget.input_type = "text"
 
     def custom_signup(self, request, user):
         super().custom_signup(request, user)
