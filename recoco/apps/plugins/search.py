@@ -54,6 +54,6 @@ def tenant_search(search_text, models=None, exclude=(), **kwargs):
     """
     scoped_models = tenant_search_models(models)
     if not scoped_models:
-        # watson.search treats an empty list as "every registered model"
+        # watson.search treats an empty list as "every registered model" which we want to avoid
         return SearchEntry.objects.none()
     return watson.search(search_text, models=scoped_models, exclude=exclude, **kwargs)
