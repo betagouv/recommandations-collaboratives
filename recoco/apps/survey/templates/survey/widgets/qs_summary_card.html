@@ -84,11 +84,18 @@
                                 {% endif %}
                                 {% if answer.attachment %}
                                     <div>
-                                        <span class="align-middle">
+                                        <span class="align-middle" x-data>
                                             <a class="position-relative z-2 tmp-usevar"
                                                style="color: {{ question_set.color|default:'black' }} !important"
                                                target="_new"
                                                href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                                            <template x-if="$store.utils.isPreviewableFile('{{ answer.attachment.name|escapejs }}')">
+                                                <a class="position-relative z-2 tmp-usevar fr-ml-2w"
+                                                   style="color: {{ question_set.color|default:'black' }} !important"
+                                                   target="_blank"
+                                                   title="Prévisualiser le fichier joint - nouvelle fenêtre"
+                                                   href="{{ answer.attachment.url }}">Prévisualiser</a>
+                                            </template>
                                         </span>
                                     </div>
                                 {% endif %}

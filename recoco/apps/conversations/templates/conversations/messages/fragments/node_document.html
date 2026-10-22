@@ -15,6 +15,12 @@
                 <template x-if="document.uploaded_by == {{ request.user.id }} || $store.djangoData.canManageDocuments">
                     <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-delete-line fr-mr-1v"></button>
                 </template>
+                <template x-if="$store.utils.isPreviewableFile(document.the_file)">
+                    <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                       :href="document.the_file"
+                       target="_blank"
+                       title="Prévisualiser le fichier - nouvelle fenêtre">Prévisualiser</a>
+                </template>
                 <a class="fr-btn fr-btn--sm fr-btn--tertiary"
                    :href="document.the_file"
                    target="_new"
