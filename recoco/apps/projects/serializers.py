@@ -352,6 +352,13 @@ class ProjectAdvisorSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source="switchtender.last_name")
 
 
+class ProjectMembersSerializer(serializers.Serializer):
+    """The participants, and the advisors and observers, of a project"""
+
+    members = ProjectMemberSerializer(many=True)
+    advisors = ProjectAdvisorSerializer(many=True)
+
+
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     """Attach someone, given by email, to a project with the given role"""
 
