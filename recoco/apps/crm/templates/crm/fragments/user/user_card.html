@@ -20,4 +20,9 @@
         {% endif %}
     </div>
     {% include "account/fragments/unvalidated_email_indicator.html" %}
+    {% if not user.is_active %}
+        <span class="crm-user-card__badge crm-user-card__badge--inactive">compte désactivé</span>
+    {% elif user.is_advisor %}
+        <span class="crm-user-card__badge crm-user-card__badge--advisor">conseiller</span>
+    {% endif %}
 </div>
