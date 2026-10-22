@@ -28,6 +28,7 @@
         <div x-data="ProjectListCrm(departmentsArray, regionsArray)"
              @selected-departments="saveSelectedDepartment($event)"
              @multi-select-change="saveSelectedStatus($event)"
+             @plugin-filter-change="savePluginFilter($event)"
              class="w-100 d-flex flex-column justify-content-start project-list-crm">
             <h1 class="fr-h3 fr-px-5v fr-pt-1w">Liste des dossiers</h1>
             <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
@@ -40,6 +41,7 @@
                 <div class="w-100 position-relative">
                     {% include "projects/project/fragments/search_bar.html" with on_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher parmi les dossiers" show_search_button=True %}
                 </div>
+                {% for filter_html in plugin_filters %}{{ filter_html }}{% endfor %}
                 {% include "projects/project/fragments/departments_selector/departments_selector.html" with label="Projets de mon territoire" label_filter="Localisation :" filter_by_regions=True zone_objects="regions" select_all=True %}
                 <div class="d-flex align-items-center w-100" x-data="{ selected: [] }">
                     <label class="filter__label">Statut:</label>
