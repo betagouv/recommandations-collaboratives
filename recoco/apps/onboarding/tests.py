@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth
@@ -552,7 +554,10 @@ def test_create_prefilled_project_set_user_is_not_reachable_without_login(
 
     url = reverse("onboarding-prefill-set-user")
     response = client.get(url)
-    assert response.status_code == 403
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
 
 
 @pytest.mark.django_db
@@ -619,7 +624,10 @@ def test_create_prefilled_project_is_not_reachable_without_login(request, client
 
     url = reverse("onboarding-prefill")
     response = client.get(url)
-    assert response.status_code == 403
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
 
 
 @pytest.mark.django_db

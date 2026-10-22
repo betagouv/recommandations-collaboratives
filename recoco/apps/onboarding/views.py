@@ -379,6 +379,7 @@ def onboarding_summary(request, project_id=None):
 ########################################################################
 
 
+@login_required
 def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
     site_config = request.site_config
@@ -397,6 +398,7 @@ def prefill_project_set_user(request):
     return render(request, "prefill/prefill-user.html", locals())
 
 
+@login_required
 def prefill_project_submit(request):
     """Create a new project for someone else - step 2 create project"""
     site_config = request.site_config
