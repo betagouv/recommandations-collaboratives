@@ -120,6 +120,7 @@
     }
   },
   "resolutions": {
+    "markdown-it": "^14.3.3",
     "prosemirror-model": "1.25.11",
     "prosemirror-state": "1.4.4",
     "prosemirror-transform": "1.12.1",
