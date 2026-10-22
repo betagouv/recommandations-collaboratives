@@ -3,13 +3,12 @@ from unittest.mock import Mock, patch
 import pluggy
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
+from django.db import connection
 from django.db.models import Value
 from django.test import RequestFactory
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from model_bakery import baker
-from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.context_processors import unread_notifications_processor
@@ -17,8 +16,8 @@ from recoco.utils import login
 
 from .hooks import CrmSpec, NotificationSpec, ProjectSpec
 from .manager import get_site_plugin_manager
-from .middlewares import TenantPluginSchemaMiddleware
-from .routers import TenantPluginRouter
+from .middlewares import TenantPluginsMiddleware
+from .resolvers import get_enabled_plugins
 
 # --- Fixtures & helpers for get_site_plugin_manager ---
 
@@ -30,7 +29,7 @@ def get_response_mock():
 
 @pytest.fixture
 def middleware(get_response_mock):
-    return TenantPluginSchemaMiddleware(get_response=get_response_mock)
+    return TenantPluginsMiddleware(get_response=get_response_mock)
 
 
 @pytest.fixture
@@ -181,122 +180,64 @@ class TestGetSitePluginManager:
         assert scoped.list_name_plugin() == []
 
 
+def current_search_path():
+    with connection.cursor() as cursor:
+        cursor.execute("SHOW search_path")
+        return cursor.fetchone()[0]
+
+
 @pytest.mark.django_db
-class TestTenantPluginSchemaMiddleware:
-    """Ensure the Middleware will extend the DB path based on schema_name presence"""
+class TestTenantPluginsMiddleware:
+    """Ensure the Middleware enables the tenant's plugins for the request"""
 
-    def test_does_nothing_if_no_site_config(self, middleware, request_mock):
-        if hasattr(request_mock, "site_config"):
-            delattr(request_mock, "site_config")
+    def capture_enabled_plugins(self, get_response_mock):
+        seen = {}
 
-        with patch("django.db.connection.cursor") as mock_cursor:
-            middleware(request_mock)
-            mock_cursor.assert_not_called()
+        def get_response(request):
+            seen["enabled_plugins"] = get_enabled_plugins()
+            seen["search_path"] = current_search_path()
 
-    def test_does_nothing_if_no_schema_name(
-        self, middleware, request_mock, current_site
+        get_response_mock.side_effect = get_response
+        return seen
+
+    def test_enables_no_plugin_if_no_site_config(
+        self, middleware, get_response_mock, request_mock
     ):
-        site_config = baker.make(SiteConfiguration, site=current_site, schema_name=None)
-        request_mock.site_config = site_config
+        del request_mock.site_config
+        seen = self.capture_enabled_plugins(get_response_mock)
 
-        with patch("django.db.connection.cursor") as mock_cursor:
-            middleware(request_mock)
-            mock_cursor.assert_not_called()
+        middleware(request_mock)
 
-    def test_sets_search_path_if_schema_name_present(
-        self, middleware, request_mock, current_site
+        assert seen["enabled_plugins"] == []
+
+    def test_enables_site_plugins_during_request(
+        self, middleware, get_response_mock, request_mock, current_site
     ):
-        site_config = baker.make(
-            SiteConfiguration, site=current_site, schema_name="tenant_lyon"
+        request_mock.site_config = baker.make(
+            SiteConfiguration, site=current_site, enabled_plugins=["plugin_a"]
         )
-        request_mock.site_config = site_config
+        seen = self.capture_enabled_plugins(get_response_mock)
 
-        with patch("django.db.connection.cursor") as mock_cursor:
-            # We need to mock the context manager __enter__ to get the actual cursor mock
-            cursor_instance = mock_cursor.return_value.__enter__.return_value
+        middleware(request_mock)
 
-            middleware(request_mock)
+        assert seen["enabled_plugins"] == ["plugin_a"]
+        assert get_enabled_plugins() == []
 
-            cursor_instance.execute.assert_any_call(
-                SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
-            )
-            # search_path is reset to public once the response has been generated
-            cursor_instance.execute.assert_called_with("SET search_path TO public")
-
-
-@pytest.mark.django_db
-def test_create_tenant_schema_signal(current_site):
-    with patch("django.db.connection.cursor") as mock_cursor:
-        cursor_instance = mock_cursor.return_value.__enter__.return_value
-
-        baker.make(SiteConfiguration, site=current_site, schema_name="test_schema")
-
-        expected = SQL("CREATE SCHEMA IF NOT EXISTS {}").format(
-            Identifier("test_schema")
+    def test_does_not_touch_search_path(
+        self, middleware, get_response_mock, request_mock, current_site
+    ):
+        request_mock.site_config = baker.make(
+            SiteConfiguration,
+            site=current_site,
+            enabled_plugins=["plugin_a"],
         )
-        cursor_instance.execute.assert_called_with(expected)
+        seen = self.capture_enabled_plugins(get_response_mock)
+        before = current_search_path()
 
+        middleware(request_mock)
 
-@pytest.mark.django_db
-def test_create_tenant_schema_signal_no_schema_name(current_site):
-    with patch("django.db.connection.cursor") as mock_cursor:
-        cursor_instance = mock_cursor.return_value.__enter__.return_value
-
-        # Saving SiteConfiguration without schema_name should not trigger schema creation
-        baker.make(SiteConfiguration, site=current_site, schema_name=None)
-
-        # Ensure no call to execute contains "CREATE SCHEMA"
-        for call in cursor_instance.execute.call_args_list:
-            assert "CREATE SCHEMA" not in call[0][0]
-
-
-# --- MANAGEMENT COMMAND--#
-@pytest.mark.django_db
-def test_migrate_tenant_command_logic(current_site):
-    # SiteConfiguration must exist before calling the command.
-    # Created outside the cursor mock so the post_save signal (CREATE SCHEMA)
-    # does not pollute the cursor call assertions below.
-    baker.make(SiteConfiguration, site=current_site, schema_name="tenant_lyon")
-
-    with patch(
-        "recoco.apps.plugins.management.commands.migrate_tenant.call_command"
-    ) as mock_migrate:
-        with patch(
-            "recoco.apps.plugins.management.commands.migrate_tenant.connection"
-        ) as mock_conn:
-            cursor_instance = mock_conn.cursor.return_value.__enter__.return_value
-            # Return a truthy row so the schema-existence SELECT passes.
-            cursor_instance.fetchone.return_value = (1,)
-
-            assert TenantPluginRouter.is_tenant_operation is False
-
-            call_command("migrate_tenant", "--schema", "tenant_lyon", "my_app")
-
-            # Check router flag is back to False after execution
-            assert TenantPluginRouter.is_tenant_operation is False
-
-            # migrate_tenant sets search_path in three steps:
-            # 1. SET search_path TO tenant_lyon        (before ensure_schema)
-            # 2. SET search_path TO tenant_lyon, public (after core-migration copy)
-            # 3. SET search_path TO public             (finally)
-            # Schema creation (CREATE SCHEMA) is handled by the post_save signal
-            # on SiteConfiguration, not by this command.
-            calls = [call[0][0] for call in cursor_instance.execute.call_args_list]
-            assert (
-                SQL("SET search_path TO {}").format(Identifier("tenant_lyon")) in calls
-            )
-            assert (
-                SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
-                in calls
-            )
-            assert "SET search_path TO public" in calls
-
-            # Ghost entries for core migrations must be inserted so Django
-            # skips them in the plan and doesn't re-execute them in the tenant.
-            assert any("django_migrations" in repr(c) for c in calls)
-
-            # Check migrate was called with the correct app
-            mock_migrate.assert_called_with("migrate", "my_app", verbosity=1)
+        assert seen["search_path"] == before
+        assert current_search_path() == before
 
 
 # ---------------------------------------------------------------------------

@@ -14,6 +14,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef
 from django.db.models.query import QuerySet
@@ -36,7 +37,7 @@ from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
-from recoco.utils import make_site_slug, render_markdown
+from recoco.utils import render_markdown
 
 from . import apps
 
@@ -366,13 +367,6 @@ class SiteConfiguration(models.Model):
         verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
 
-    schema_name = models.SlugField(
-        unique=True,
-        null=True,
-        blank=True,
-        help_text="Le schema PgSQL pour ce portail.",
-    )
-
     enabled_plugins = models.JSONField(
         default=list,
         blank=True,
@@ -388,13 +382,24 @@ class SiteConfiguration(models.Model):
         ),
     )
 
-    def save(self, *args, **kwargs):
-        if self.enabled_plugins and not self.schema_name:
-            self.schema_name = make_site_slug(self.site)
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
+
+    def clean(self):
+        super().clean()
+        from recoco.apps.plugins.manager import get_plugin_manager
+
+        installed = {name for name, _ in get_plugin_manager().list_name_plugin()}
+        unknown = [name for name in self.enabled_plugins if name not in installed]
+        if unknown:
+            raise ValidationError(
+                {
+                    "enabled_plugins": (
+                        f"Plugins inconnus : {', '.join(map(str, unknown))}. "
+                        f"Plugins installés : {', '.join(sorted(installed)) or 'aucun'}."
+                    )
+                }
+            )
 
 
 @receiver(post_save, sender=auth_models.User)
