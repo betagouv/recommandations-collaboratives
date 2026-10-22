@@ -256,6 +256,8 @@ CONTENT_SECURITY_POLICY = {
             "https://api-adresse.data.gouv.fr/",
             "https://www.google.com",
             "https://stats.beta.gouv.fr",
+            "https://storage.crisp.chat",
+            "wss://client.relay.rescue.crisp.chat",  # Fallback if primary WebSocket servers are down
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
@@ -270,6 +272,7 @@ CONTENT_SECURITY_POLICY = {
             "https://secure.gravatar.com",
             "https://data.geopf.fr",
             "https://*.tile.openstreetmap.fr",
+            "https://storage.crisp.chat",  # help to display img shared in chat
         ],
         "script-src": [
             SELF,
@@ -278,12 +281,11 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://www.gstatic.com/",
             UNSAFE_EVAL,
-            UNSAFE_INLINE,  # fixme crisp uses this
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
             "https://client.crisp.chat",
-            UNSAFE_INLINE,
+            UNSAFE_INLINE,  # fixme crisp uses this
         ],  # fixme with @alpine/csp and manual checks
         "worker-src": [SELF, "blob:", "https://*.crisp.chat"],
     },
