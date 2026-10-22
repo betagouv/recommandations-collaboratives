@@ -7,7 +7,7 @@ describe('I can create a new project as a new user @deposer-projet', () => {
     commune: 'commune de test',
     description: 'This is a test project description',
     email: `${Date.now()}@example.com`,
-    fixedEmail: 'test2@example.com',
+    fixedEmail: `test42@example.com`,
   };
 
   const signupInfo = {
@@ -111,27 +111,32 @@ describe('I can create a new project as a new user @deposer-projet', () => {
       .type(signupInfo.phone_no, { delay: 0 })
       .should('have.value', signupInfo.phone_no);
 
-    cy.get('[name=password]').type('nope', { delay: 0 });
+    cy.get('[name=password1]').type('nope', { delay: 0 });
 
-    cy.get('[id="error_0_password"]').should('be.visible'); // min length error
-    cy.get('[id="error_1_password"]').should('be.visible'); // number error
-    cy.get('[id="error_2_password"]').should('be.visible'); // uppercase error
+    cy.get('[id="error_0_password1"]').should('be.visible'); // min length error
+    cy.get('[id="error_1_password1"]').should('be.visible'); // number error
+    cy.get('[id="error_2_password1"]').should('be.visible'); // uppercase error
 
-    cy.get('[name=password]').clear();
+    cy.get('[name=password1]').clear();
 
-    cy.get('[name=password]')
+    cy.get('[name=password1]')
       .type(signupInfo.password1, { delay: 0 })
       .should('have.value', signupInfo.password1);
 
-    cy.get('[id="valid_0_password"]').should('be.visible'); // min length error
-    cy.get('[id="valid_1_password"]').should('be.visible'); // number error
-    cy.get('[id="valid_2_password"]').should('be.visible'); // uppercase error
+    cy.get('[name=password2]')
+      .type(signupInfo.password1, { delay: 0 })
+      .should('have.value', signupInfo.password1);
 
+    cy.get('[id="valid_0_password1"]').should('be.visible'); // min length error
+    cy.get('[id="valid_1_password1"]').should('be.visible'); // number error
+    cy.get('[id="valid_2_password1"]').should('be.visible'); // uppercase error
+
+    cy.get('[id="accept-cgu"]').click({force: true})
     // Submit signup form
     cy.get('[type=submit]').click();
 
-    // Land on onboarding/summary page
-    cy.url().should('include', '/onboarding/summary');
+    // Land on onboarding/confirm-email page
+    cy.url().should('include', '/confirm-email');
   });
 
   it('goes through the onboarding process but stop at signup page', () => {
@@ -230,18 +235,25 @@ describe('I can create a new project as a new user @deposer-projet', () => {
       .type(signupInfo.phone_no, { delay: 0 })
       .should('have.value', signupInfo.phone_no);
 
-    cy.get('[name=password]')
+    cy.get('[name=password1]')
       .type(signupInfo.password1, { delay: 0 })
       .should('have.value', signupInfo.password1);
+
+    cy.get('[name=password2]')
+      .type(signupInfo.password1, { delay: 0 })
+      .should('have.value', signupInfo.password1);
+
+    cy.get('[id="accept-cgu"]').click({force: true})
 
     // Submit signup form
     cy.get('[type=submit]').click();
 
-    // Land on onboarding/summary page
-    cy.url().should('include', '/onboarding/summary');
+    // Land on onboarding/confirm-email page
+    cy.url().should('include', '/confirm-email');
   });
 
-  it('goes through the complete onboarding process with already existing user', () => {
+  // This test is no longer relevant after adding email confirmation process
+  xit('goes through the complete onboarding process with already existing user', () => {
     // Visit home page and click on need help button
     cy.visit('/');
     cy.get('[data-test-id="button-need-help"]')

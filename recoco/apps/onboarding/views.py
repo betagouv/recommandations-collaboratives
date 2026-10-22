@@ -190,7 +190,7 @@ def onboarding_signup(request):
             return redirect(f"{login_url}?{next_args}")
 
         # user is new from here otherwise it would have been redirected to login
-        user.set_password(form.cleaned_data.get("password"))
+        user.set_password(form.cleaned_data.get("password1"))
         user = update_user(
             site=request.site,
             user=user,
