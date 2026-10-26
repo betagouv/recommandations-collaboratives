@@ -44,9 +44,13 @@ export const schemaAdvisorSignupFormValidator = {
     phone_no: { $ref: '#/definitions/phone' },
     password1: { $ref: '#/definitions/passwordNormal' },
     password2: {
-      type: 'string',
-      minLength: 1,
-      errorMessage: minLengthErrorMessage(1),
+      allOf: [
+        {
+          type: 'string',
+          const: { $data: '1/password1' },
+          errorMessage: 'Doit correspondre au mot de passe.',
+        },
+      ],
     },
   },
   required: [
