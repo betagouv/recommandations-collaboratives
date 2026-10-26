@@ -224,7 +224,9 @@ class ProjectMembershipMixin:
         return context
 
 
-class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
+class ProjectMembershipList(
+    ProjectMembershipMixin, ServiceAPIKeyAllowedMixin, CreateAPIView
+):
     """List or attach the participants, advisors and observers of a project
 
     `GET` lists the people attached to the project, in two lists:
@@ -273,7 +275,9 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
         )
 
 
-class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
+class ProjectMembershipDetail(
+    ProjectMembershipMixin, ServiceAPIKeyAllowedMixin, GenericAPIView
+):
     """Change the role of a member of a project, or remove it from the project
 
     The member is given by email, in the url.
