@@ -29,7 +29,9 @@
                     <div x-data="{acceptCgu: false}" class="fr-fieldset__content">
                         {{ form.first_name|as_crispy_field }}
                         {{ form.last_name|as_crispy_field }}
-                        {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True isRequired=True validation=True is_dsfr_element=True %}
+                        <div class="fr-fieldset__element">
+                            {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True isRequired=True validation=True is_dsfr_element=True %}
+                        </div>
                         {{ form.organization_position|as_crispy_field }}
                         {{ form.email|as_crispy_field }}
                         {{ form.phone_no|as_crispy_field }}
