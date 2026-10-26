@@ -884,11 +884,11 @@ def test_existing_owner_account_is_reused_by_project_create_api(api_client, staf
 
 @pytest.mark.django_db
 def test_project_create_api_accepts_a_valid_service_api_key(
-    request, api_client, api_user
+    api_client, current_site, staff_user
 ):
     commune = baker.make(geomatics_models.Commune, insee="62000")
     _, key = ServiceAPIKey.objects.create_key(
-        name="svc-test", user=api_user, site=get_current_site(request)
+        name="svc-test", user=staff_user, site=current_site
     )
 
     url = reverse("projects-create")
@@ -977,13 +977,13 @@ def test_advisor_is_attached_by_project_membership_api(
 
 @pytest.mark.django_db
 def test_project_membership_api_accepts_a_valid_service_api_key(
-    request, api_client, api_user, project
+    api_client, current_site, staff_user, project
 ):
     _, key = ServiceAPIKey.objects.create_key(
-        name="svc-test", user=api_user, site=get_current_site(request)
+        name="svc-test", user=staff_user, site=current_site
     )
 
-    url = reverse("projects-members-create", args=[project.id])
+    url = reverse("projects-members-list", args=[project.id])
     response = api_client.post(
         url,
         data={"email": "jane@example.com", "role": "COLLABORATOR"},
@@ -991,6 +991,10 @@ def test_project_membership_api_accepts_a_valid_service_api_key(
     )
 
     assert response.status_code == 201
+
+    response = api_client.get(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
+
+    assert response.status_code == 200
 
 
 ########################################################################
@@ -1166,6 +1170,55 @@ def test_owner_is_neither_changed_nor_removed_by_project_member_detail_api(
     assert not models.ProjectSwitchtender.objects.filter(
         project=project, switchtender=owner
     ).exists()
+
+
+@pytest.mark.django_db
+def test_project_member_detail_api_accepts_a_valid_service_api_key(
+    api_client, current_site, staff_user, project, make_member
+):
+    collaborator = make_member(project)
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-test", user=staff_user, site=current_site
+    )
+
+    url = reverse("projects-members-detail", args=[project.id, collaborator.username])
+    response = api_client.patch(
+        url, data={"role": "OBSERVER"}, HTTP_AUTHORIZATION=f"Api-Key {key}"
+    )
+
+    assert response.status_code == 200
+
+    response = api_client.delete(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
+
+    assert response.status_code == 204
+
+
+@pytest.mark.django_db
+def test_service_api_key_of_non_staff_cannot_use_project_membership_api(
+    api_client, current_site, project, make_member
+):
+    collaborator = make_member(project)
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-test", user=baker.make(auth_models.User), site=current_site
+    )
+    auth = {"HTTP_AUTHORIZATION": f"Api-Key {key}"}
+
+    list_url = reverse("projects-members-list", args=[project.id])
+    detail_url = reverse(
+        "projects-members-detail", args=[project.id, collaborator.username]
+    )
+
+    # the key authenticates, but does not bypass the staff permission
+    assert api_client.get(list_url, **auth).status_code == 403
+    data = {"email": "jane@example.com", "role": "COLLABORATOR"}
+    assert api_client.post(list_url, data=data, **auth).status_code == 403
+    assert (
+        api_client.patch(detail_url, data={"role": "OBSERVER"}, **auth).status_code
+        == 403
+    )
+    assert api_client.delete(detail_url, **auth).status_code == 403
+
+    assert models.ProjectMember.objects.filter(project=project).count() == 1
 
 
 ########################################################################
