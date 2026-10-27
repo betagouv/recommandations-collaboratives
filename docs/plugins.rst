@@ -2,8 +2,8 @@ Plugin System
 #############
 
 Recoco supports tenant-specific plugins: independent Python packages that add
-UI, logic, and isolated database tables to a single portal without affecting
-others.
+UI, logic, and database tables to the portals that enable them, without
+affecting the others.
 
 .. contents:: Table of Contents
    :local:
@@ -22,18 +22,22 @@ Architecture Overview
                          │ pluggy hooks
            ┌─────────────┴──────────────┐
            ▼                            ▼
-    ┌─────────────┐             ┌─────────────┐
-    │ plugin_lyon │             │plugin_giphy │
-    │(tenant_lyon │             │(tenant_paris│
-    │   schema)   │             │   schema)   │
-    └─────────────┘             └─────────────┘
+    ┌──────────────────┐        ┌──────────────────┐
+    │ plugin_mi_depafi │        │   plugin_giphy   │
+    │ (plugin_mi_depafi│        │  (plugin_giphy   │
+    │      schema)     │        │     schema)      │
+    └──────────────────┘        └──────────────────┘
 
-Three mechanisms work together:
+    runtime search_path (static): public, plugin_mi_depafi, plugin_giphy
+
+Four mechanisms work together:
 
 - **pluggy** - defines a formal hook contract between the core and plugins.
-- **PostgreSQL schemas** - each tenant gets an isolated schema for its plugin
-  tables; the ``public`` schema holds shared core data.
-- **PluginURLResolver** - routes are only exposed to the tenant that has the
+- **PostgreSQL schemas** - each plugin gets its own schema, named after its
+  app label and shared by all tenants; the ``public`` schema holds core data.
+- **Row-level site scoping** - plugin models subclass ``PluginModel`` and
+  carry a ``site`` foreign key, like core models do.
+- **PluginURLResolver** - routes are only exposed to the tenants that have the
   plugin enabled.
 
 
@@ -99,6 +103,16 @@ Django can resolve migrations and models correctly.
     class PluginGiphyConfig(AppConfig):
         default_auto_field = "django.db.models.BigAutoField"
         name = "plugin_giphy"
+
+The entry point name, the package name and the app label must be the same
+``plugin_<name>``: a plugin is enabled by name (``enabled_plugins``, hooks,
+URLs), while its schema, search and objects in core tables are found by app
+label. Two system checks enforce it:
+
+- ``plugins.E002``: the plugin name does not start with ``plugin_`` (its
+  tables would go to ``public`` and it would be handled as a core app);
+- ``plugins.E003``: the app label differs from the plugin name (don't set a
+  custom ``label`` on the ``AppConfig``).
 
 
 Defining a Hook Specification
@@ -209,11 +223,11 @@ Then call it in the core view:
 .. code-block:: python
 
     # recoco/apps/projects/views.py
-    from recoco.apps.plugins.manager import get_tenant_hook
+    from recoco.apps.plugins.manager import get_site_plugin_manager
 
     def project_detail(request, pk):
         project = get_object_or_404(Project, pk=pk)
-        pm = get_tenant_hook(request)
+        pm = get_site_plugin_manager(request=request)
 
         extra_context = {}
         for ctx in pm.hook.project_detail_extra_context(
@@ -574,35 +588,84 @@ Putting it together
 Database Isolation
 ==================
 
-Each plugin tenant gets its own PostgreSQL schema. Plugin models are
+Each plugin gets its own PostgreSQL schema, named after its app label and
+shared by all tenants. Plugin models are
 created there and can safely reference core models in the ``public`` schema
 via foreign keys.
+
+Plugin models subclass ``PluginModel``
+--------------------------------------
+
+Every concrete model of a ``plugin_*`` app must subclass
+``recoco.apps.plugins.models.PluginModel``. This abstract base scopes rows by
+site, following the same convention as core models (e.g. ``Task``):
+
+- ``site``: a required ``ForeignKey`` to ``django.contrib.sites.models.Site``.
+- ``objects``: an **unscoped** default manager. It comes first so that it is
+  the model's ``_default_manager``, which is what watson, the admin and
+  generic relations use.
+- ``on_site``: a ``CurrentSiteManager``, filtered on the current site.
 
 .. code-block:: python
 
     # plugin_giphy/models.py
     from django.db import models
+    from recoco.apps.plugins.models import PluginModel
     from recoco.apps.projects.models import Project
 
-    class GiphySearch(models.Model):
+    class GiphySearch(PluginModel):
         project = models.ForeignKey(Project, on_delete=models.CASCADE)
         query = models.CharField(max_length=255)
 
+Rules for plugin code:
+
+- **Set ``site`` on creation**: from ``request.site`` in views, or from the
+  parent object for child rows (e.g. a photo takes its realisation's site).
+  Don't derive it from a project: a project can be shared by several sites.
+- **Query through ``on_site``** (or filter on ``site`` explicitly) wherever
+  tenant data is exposed: views, REST API, filters, digests, commands.
+  ``objects`` returns rows of every site. Filtering on the project's sites
+  (``project__project_sites__site``) is not enough: a project shared by two
+  sites would show the rows created on the other one.
+- **Build ``on_site`` querysets at request time**: ``Model.on_site.all()``
+  resolves ``SITE_ID`` when it is called, so a queryset created at import time
+  (e.g. ``PrimaryKeyRelatedField(queryset=Model.on_site.all())`` on a
+  serializer, or a form field declared on the class) stays bound to the
+  default site. Override ``get_queryset()`` or set it in ``__init__``.
+- **Annotations on core models**: filter the related rows on the site too,
+  e.g. ``Count("realisations", filter=Q(realisations__site=request.site))``.
+- **Don't name a field ``site``**: the name is taken by ``PluginModel``. Use
+  e.g. ``location`` for a free-text place.
+- **Per-project data is per site**: a "profile" model attached to a core
+  project should be unique per ``(project, site)``, not a ``OneToOneField``.
+
+The ``plugins.E001`` system check enforces the base class. It reports every
+model of a ``plugin_*`` app that does not subclass ``PluginModel``, except:
+
+- abstract, proxy and unmanaged models, and auto-created many-to-many tables;
+- multi-table inheritance children (e.g. ``RealisationNode(Node)``), whose
+  primary key comes from the parent table.
+
+.. code-block:: text
+
+    plugin_giphy.GiphySearch: (plugins.E001) Plugin model plugin_giphy.GiphySearch must subclass PluginModel.
+
 .. note::
 
-   Plugin migrations must be run with the ``migrate_tenant`` command, not the
-   standard ``migrate`` command. Running ``migrate`` against a ``plugin_*``
-   app will raise an error.
+   Plugin migrations must be run with the ``migrate_plugins`` command, not the
+   standard ``migrate`` command. A plain ``migrate`` skips the operations of
+   ``plugin_*`` apps (see `Migration Mechanics`_).
 
 .. code-block:: bash
 
-    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+    python manage.py migrate_plugins               # every installed plugin
+    python manage.py migrate_plugins plugin_giphy  # a single plugin
 
 
 Migration Mechanics
 ===================
 
-Understanding how migrations are split between the public schema and tenant
+Understanding how migrations are split between the public schema and plugin
 schemas is essential for anyone working on the plugin system or debugging
 migration issues.
 
@@ -615,29 +678,31 @@ There are two categories of migration:
   ``plugin_``.  These belong to the ``public`` schema and are applied by the
   standard ``manage.py migrate`` command.
 - **Plugin migrations** : apps whose ``app_label`` starts with ``plugin_``.
-  These belong exclusively to the tenant schema for which the plugin is
-  enabled.
+  Each plugin gets its own schema, named after its app label (e.g.
+  ``plugin_giphy``), shared by every tenant. It is applied by
+  ``manage.py migrate_plugins`` for every installed plugin, whether or not
+  a tenant enables it.
 
-The contract is enforced by ``TenantPluginRouter`` in
+The contract is enforced by ``PluginRouter`` in
 ``recoco/apps/plugins/routers.py``:
 
 .. code-block:: python
 
-    class TenantPluginRouter:
-        is_tenant_operation = False   # class-level flag, set by migrate_tenant
+    class PluginRouter:
+        is_plugin_operation = False   # class-level flag, set by migrate_plugins
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
-            if app_label.startswith("plugin_"):
-                return self.is_tenant_operation   # only allowed in tenant mode
-            return not self.is_tenant_operation   # core only allowed in normal mode
+            if is_plugin_label(app_label):
+                return self.is_plugin_operation   # only allowed in plugin mode
+            return not self.is_plugin_operation   # core only allowed in normal mode
 
-When ``is_tenant_operation`` is ``False`` (the default, i.e. a normal
+When ``is_plugin_operation`` is ``False`` (the default, i.e. a normal
 ``migrate`` run):
 
 - Core migrations → **allowed** ✓
 - Plugin migrations → **blocked** ✗
 
-When ``is_tenant_operation`` is ``True`` (set by ``migrate_tenant``):
+When ``is_plugin_operation`` is ``True`` (set by ``migrate_plugins``):
 
 - Core migrations → **blocked** ✗
 - Plugin migrations → **allowed** ✓
@@ -652,25 +717,29 @@ instead by each **operation** inside the migration : ``CreateModel``,
 any SQL.  If ``allow_migrate`` returns ``False`` the operation is silently
 skipped but the migration **is still recorded** in ``django_migrations``.
 
-This means that even if a core migration ends up in the tenant's execution
+This means that even if a core migration ends up in the plugin's execution
 plan (because it is a declared dependency of a plugin migration), its SQL
-will never touch the tenant schema. The tables of core models live in
-``public`` and are visible to the tenant via ``search_path`` : no copy is
-created per tenant.
+will never touch the plugin schema. The tables of core models live in
+``public`` and are visible from the plugin schema via ``search_path`` : no
+copy is created per plugin.
+
+It also means that a plain ``migrate`` records plugin migrations as applied
+in ``public.django_migrations`` without creating any table. This is why each
+plugin schema has its own ``django_migrations`` table.
 
 
 The ``django_migrations`` ghost-entry mechanism
 -----------------------------------------------
 
 Django's migration planner reads ``django_migrations`` to decide which
-migrations still need to run.  Without intervention, an empty tenant
+migrations still need to run.  Without intervention, an empty plugin
 ``django_migrations`` table would cause Django to include every core migration
 in the plan. Not to execute them (the per-operation guard prevents that) but
 to process them as no-ops, recording them one by one.  On a project with
 hundreds of migrations this produces hundreds of ``Applying auth.0001...``
 lines and a slow first run.
 
-``migrate_tenant`` solves this with a single INSERT before running any plugin
+``migrate_plugins`` solves this with a single INSERT before running any plugin
 migration:
 
 .. code-block:: sql
@@ -678,7 +747,7 @@ migration:
     INSERT INTO "<schema>".django_migrations (app, name, applied)
     SELECT app, name, applied
     FROM public.django_migrations
-    WHERE app NOT LIKE 'plugin_%'
+    WHERE app NOT LIKE 'plugin\_%'
       AND NOT EXISTS (
         SELECT 1 FROM "<schema>".django_migrations existing
         WHERE existing.app = public.django_migrations.app
@@ -687,16 +756,16 @@ migration:
 
 These are called **ghost entries**: records copied from the public schema that
 tell Django "this core migration has already been accounted for : do not
-include it in the tenant plan."
+include it in the plugin plan." Migrations of other plugins are not copied.
 
 Why ghost entries are INSERT-only (no DELETE on rollback)
 ---------------------------------------------------------
 
 A ghost entry for a core migration means *"do not re-apply this here"*.  That
 statement remains true even if the core migration is later rolled back in
-``public``.  The tenant never ran that migration's SQL; rolling it back in
-``public`` changes the shared schema (which the tenant sees through
-``search_path``), but it does not create any obligation for the tenant's
+``public``.  The plugin schema never ran that migration's SQL; rolling it back
+in ``public`` changes the shared schema (which the plugin sees through
+``search_path``), but it does not create any obligation for the plugin's
 ``django_migrations`` bookkeeping.
 
 Deleting ghost entries on rollback would introduce a spurious inconsistency:
@@ -706,43 +775,166 @@ dependency ghost was gone, causing ``check_consistent_history`` to raise
 
 Keeping stale ghosts avoids this problem and is semantically correct: the
 ghost just continues to say "don't try to run this core migration in the
-tenant", which is the right answer before and after any public rollback.
+plugin schema", which is the right answer before and after any public rollback.
 
-``migrate_tenant`` execution flow
-----------------------------------
+``migrate_plugins`` execution flow
+-----------------------------------
 
 Putting it all together, here is what happens when you run:
 
 .. code-block:: bash
 
-    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+    python manage.py migrate_plugins plugin_giphy
 
-1. **Validation** : ``SiteConfiguration`` with ``schema_name="tenant_paris"``
-   must exist; the PostgreSQL schema must be present (created by the
-   ``post_save`` signal on ``SiteConfiguration``).
+Without an app label, the steps below run for every installed ``plugin_*``
+app. With one, the app must be an installed plugin; an optional migration
+name can follow, as with ``migrate``.
 
-2. **Router flag** : ``TenantPluginRouter.is_tenant_operation = True``.
+1. **Router flag** : ``PluginRouter.is_plugin_operation = True``.
    From this point on ``allow_migrate`` blocks core migrations and permits
    plugin migrations.
 
-3. **Create** ``django_migrations`` **in tenant** : ``search_path`` is
-   temporarily set to *only* the tenant schema so that
+2. **Create the schema** : ``CREATE SCHEMA IF NOT EXISTS plugin_giphy``.
+
+3. **Create** ``django_migrations`` **in the plugin schema** : ``search_path``
+   is temporarily set to *only* the plugin schema so that
    ``MigrationRecorder.ensure_schema()`` creates the table there rather than
    picking up ``public.django_migrations``.
 
-4. **Ghost entry sync** : the INSERT above copies all unapplied core migration
-   records from ``public.django_migrations`` into the tenant table.  Any core
+4. **Ghost entry sync** : the INSERT above copies all core migration records
+   from ``public.django_migrations`` into the plugin table.  Any core
    migration already present (from a previous run) is left untouched.
 
-5. **Run plugin migrations** : ``search_path`` is restored to
-   ``tenant_paris, public`` and ``call_command("migrate", "plugin_giphy")``
+5. **Run plugin migrations** : ``search_path`` is set to
+   ``plugin_giphy, public`` and ``call_command("migrate", "plugin_giphy")``
    is called.  Django sees all core migrations as applied (from the ghost
    entries) and only executes the plugin's own unapplied migrations.  Tables
-   created by plugin migrations land in ``tenant_paris``; ForeignKeys to core
+   created by plugin migrations land in ``plugin_giphy``; ForeignKeys to core
    models resolve through ``public`` via ``search_path``.
 
-6. **Cleanup** : ``is_tenant_operation`` is reset to ``False`` and
-   ``search_path`` is reset to ``public`` in a ``finally`` block.
+6. **Cleanup** : ``is_plugin_operation`` is reset to ``False`` and the
+   runtime ``search_path`` is restored (``set_plugin_search_path``) in a
+   ``finally`` block.
+
+The command is safe to re-run.
+
+Runtime ``search_path``
+-----------------------
+
+At runtime the ``search_path`` is static: ``public`` first (so core tables and
+``public.django_migrations`` always win), then every installed plugin schema.
+It does not depend on the tenant, and nothing switches it per request.
+
+``PluginsConfig.ready()`` connects a ``connection_created`` receiver
+(``set_plugin_search_path_on_connection`` in ``recoco/apps/plugins/utils.py``)
+that runs ``SET search_path TO public, <plugin schemas>`` on every new
+PostgreSQL connection. Every connection Django opens gets it: web requests,
+Celery tasks, management commands, ``shell`` and tests. It is done there
+rather than in settings because ``DATABASES`` is defined per environment and
+plugin apps are added to ``INSTALLED_APPS`` after the common settings.
+
+``RESET search_path`` would go back to the database default (``public``
+only), so code that changes the ``search_path`` (like ``migrate_plugins``)
+restores it with ``set_plugin_search_path(connection)`` instead.
+
+.. note::
+
+   This is a session setting: it does not survive a connection pooler in
+   transaction mode (e.g. PgBouncer ``pool_mode = transaction``).
+
+Tenant isolation is therefore done by the application:
+``TenantPluginsMiddleware`` (and ``tenant_context`` for commands)
+only enables the tenant's plugins for hooks and URLs, and plugin querysets
+must be scoped with ``on_site`` or an explicit ``site`` filter.
+
+Search (watson)
+---------------
+
+Plugin models can be registered with watson like core models. There is a
+single index for all tenants, so ``buildwatson`` needs no tenant handling, but
+a search that can return plugin objects must be scoped:
+
+- ``tenant_search(search_text, models=None, ...)``
+  (``recoco/apps/plugins/search.py``) wraps ``watson.search``. Plugin models
+  of a plugin that is not enabled for the tenant are dropped, and the others
+  are restricted to the current site (``on_site``). Core models are passed
+  through unchanged.
+- ``tenant_search_models(models)`` does the same on a ``models`` list, for
+  code that calls watson itself.
+- ``watson.filter(queryset, ...)`` is already safe: pass an ``on_site``
+  queryset.
+
+Use ``tenant_search`` whenever ``models`` is omitted (every registered model)
+or contains plugin models. Note that ``watson.search`` with an empty
+``models`` list searches every model; ``tenant_search`` returns no results
+instead when everything was filtered out.
+
+Plugin objects in core tables
+-----------------------------
+
+Some core tables are shared by every tenant and can point to plugin objects:
+conversation nodes (a plugin ``Node`` subclass), actstream actions and
+notifications (generic relations). Where the plugin is disabled, these rows
+must not show up: their URLs don't reverse there and their data belongs to
+another tenant's feature. ``recoco/apps/plugins/utils.py`` provides:
+
+- ``get_disabled_plugin_app_labels()`` and ``is_disabled_plugin_model(model)``;
+- ``exclude_disabled_plugin_objects(queryset, *content_type_fields)``: drops
+  the rows whose content type fields point to a model of a disabled plugin.
+  A null content type (e.g. an action without target) is kept.
+
+.. code-block:: python
+
+    actions = exclude_disabled_plugin_objects(
+        project.target_actions.all(),
+        "action_object_content_type",
+        "target_content_type",
+    )
+
+The core already applies it to the project and CRM activity streams and to
+unread notifications. For conversations (``recoco/apps/conversations``):
+
+- ``visible_nodes(nodes)`` drops the nodes of disabled plugins, and
+  ``exclude_plugin_only_messages(messages)`` drops the messages made only of
+  such nodes. The messages API uses both, and refuses to create a disabled
+  plugin's node or to edit a message holding hidden nodes.
+- Message email digests leave out the same nodes and messages. Plugin nodes
+  of enabled plugins are counted as part of their message and are never the
+  digest's highlighted object: the email template only knows the core
+  objects (recommendation, contact, document), so a plugin node's
+  ``count_label`` and ``get_digest_recap()`` are not used there.
+
+Any new core code that lists such rows must filter them the same way.
+
+Plugin management commands
+--------------------------
+
+Outside a request, nothing sets the tenant: a command that works on one
+tenant must wrap its whole run in ``tenant_context(site)``. It sets both the
+current site (``SITE_ID``, used by ``on_site`` managers,
+``Site.objects.get_current()`` and the signal handlers that rely on it) and
+the tenant's enabled plugins (hooks, URLs, the filters above), which a
+request gets from its middlewares. Setting only one of them mixes two
+tenants. Contexts nest and are restored on exit, so a command can loop over
+sites.
+
+.. code-block:: python
+
+    from django.contrib.sites.models import Site
+    from django.core.management.base import BaseCommand
+
+    from recoco.apps.plugins.context import tenant_context
+
+
+    class Command(BaseCommand):
+        def handle(self, **options):
+            for site in Site.objects.all():
+                with tenant_context(site):
+                    for realisation in Realisation.on_site.all():
+                        ...
+
+``tenant_plugins_context(site_config)`` only sets the enabled plugins, for
+code where the site is already current.
 
 
 URL Routing
@@ -880,6 +1072,12 @@ global ``urlpatterns``.  The resulting endpoint is served under ``/api/``:
 .. code-block:: text
 
     /api/giphy/search/   →  GiphySearchAPIView
+
+Like the plugin's page URLs, the patterns are wrapped in a
+``PluginURLResolver``: they only resolve (and reverse) on tenants that have
+the plugin enabled, elsewhere the API answers 404. No namespace is added, so
+REST URL names stay global and must be unique, e.g. prefixed with the plugin
+name.
 
 
 Frontend (Vite / Alpine)
@@ -1073,9 +1271,9 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
 2. Add ``plugin_giphy`` to ``INSTALLED_APPS`` in the relevant settings file (ie. ``development.py``).
 
-3. Create the tenant schema and run plugin migrations::
+3. Create the plugin schema and run plugin migrations::
 
-    python manage.py migrate_tenant --schema=tenant_paris plugin_giphy
+    python manage.py migrate_plugins plugin_giphy
 
 4. If the plugin ships JavaScript, install its yarn deps and generate Vite proxies::
 
@@ -1086,11 +1284,30 @@ Plugins are activated per tenant through the ``SiteConfiguration`` admin:
 
     cd recoco/frontend && yarn build
 
-6. In the Django admin, edit the ``SiteConfiguration`` for the target site:
+6. In the Django admin, edit the ``SiteConfiguration`` for the target site
+   and add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list. Only
+   installed plugin names are accepted (``SiteConfiguration.clean()``); a
+   site still listing an uninstalled plugin can't be saved until the entry is
+   removed.
 
-   - Set ``schema_name`` to ``tenant_paris``.
-   - Add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list.
+On the next request, the middleware enables the plugin for that tenant: its
+hooks are called and the ``PluginURLResolver`` exposes its routes, only for
+tenants that have it enabled. The plugin tables are already reachable through
+the static ``search_path``.
 
-On the next request, the middleware switches the PostgreSQL ``search_path``
-to ``tenant_paris, public`` and the ``PluginURLResolver`` exposes the plugin
-routes exclusively to that tenant.
+
+Testing
+=======
+
+Core tests (``recoco.settings.testing``) leave out every third-party
+``plugin_*`` app, even when a local ``development.py`` installs one: they
+only use the test plugin ``recoco.apps.plugins.testing.plugin_testapp``,
+whose tables are created with ``migrate_plugins`` in the tests that need
+them.
+
+A plugin's own tests run from the recoco root with the development settings,
+where the plugin is installed::
+
+    uv run pytest recoco/apps/plugins/                       # core plugin tests
+    uv run pytest --create-db ../plugin-giphy/plugin_giphy/ \
+        --ds=recoco.settings.development                     # plugin tests
