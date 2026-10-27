@@ -460,6 +460,7 @@ def project_create_or_update_topics(request, project_id=None):
     return render(request, "projects/project/topics.html", locals())
 
 
+@login_required
 def project_update_tags(request, project_id=None):
     """Create/Update tags for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
@@ -489,6 +490,7 @@ def project_update_tags(request, project_id=None):
 ###########################################################################
 
 
+@login_required
 def project_update_location(request, project_id=None):
     """Fill/update geolocation for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)

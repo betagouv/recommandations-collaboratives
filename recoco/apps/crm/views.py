@@ -1164,9 +1164,14 @@ def project_list(request):
         request=request
     )
 
+    plugin_filters = get_site_plugin_manager(request).hook.crm_project_list_filters(
+        request=request
+    )
+
     context = {
         "regions": list(RegionSerializer(region_queryset, many=True).data),
         "plugin_columns": plugin_columns,
+        "plugin_filters": plugin_filters,
     }
 
     return render(request, "crm/project_list.html", context)

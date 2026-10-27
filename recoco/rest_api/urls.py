@@ -19,11 +19,6 @@ from recoco.apps.training import rest as training_rest
 router = routers.DefaultRouter()
 
 router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-    tasks_rest.TaskFollowupViewSet,
-    basename="project-tasks-followups",
-)
-router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
     tasks_rest.TaskViewSet,
     basename="project-tasks",

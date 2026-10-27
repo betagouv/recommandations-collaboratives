@@ -293,6 +293,17 @@ class FakeCrmPlugin:
             "col_class": "col--small",
         }
 
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_filters(self, request):
+        return mark_safe('<div data-test-id="fake-filter"></div>')
+
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_filter_lookups(self, request):
+        fake_filter = request.GET.get("fake_filter")
+        if fake_filter:
+            return {"name": fake_filter}
+        return None
+
 
 @pytest.fixture
 def site_with_fake_plugin(site_with_enabled_plugins):
@@ -369,6 +380,79 @@ class TestCrmProjectListColumnsHook:
 
         assert response.status_code == 200
         assert response.context["plugin_columns"] == []
+
+
+@pytest.mark.django_db
+class TestCrmProjectListFiltersHook:
+    def test_plugin_filters_in_view_context(self, client, site_with_fake_plugin):
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("crm-project-list"))
+
+        assert response.status_code == 200
+        assert len(response.context["plugin_filters"]) == 1
+        assert b'data-test-id="fake-filter"' in response.content
+
+    def test_no_plugin_filters_when_plugin_disabled(self, client, current_site):
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("crm-project-list"))
+
+        assert response.status_code == 200
+        assert response.context["plugin_filters"] == []
+
+
+@pytest.mark.django_db
+class TestCrmProjectListFilterLookupsHook:
+    def test_lookups_filter_the_queryset(
+        self, client, make_project, site_with_fake_plugin
+    ):
+        kept = make_project(name="kept")
+        make_project(name="dropped")
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"), {"fake_filter": "kept"})
+
+        assert response.status_code == 200
+        assert [p["id"] for p in response.json()["results"]] == [kept.id]
+
+    def test_no_filtering_without_query_param(
+        self, client, make_project, site_with_fake_plugin
+    ):
+        projects = [make_project(name="kept"), make_project(name="dropped")]
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"))
+
+        assert response.status_code == 200
+        assert {p["id"] for p in response.json()["results"]} == {p.id for p in projects}
+
+    def test_lookups_ignored_when_plugin_disabled(
+        self, client, make_project, current_site
+    ):
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+        projects = [make_project(name="kept"), make_project(name="dropped")]
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"), {"fake_filter": "kept"})
+
+        assert response.status_code == 200
+        assert {p["id"] for p in response.json()["results"]} == {p.id for p in projects}
 
 
 # ---------------------------------------------------------------------------
