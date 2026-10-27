@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth
@@ -241,7 +243,8 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
         "email": user.username,
         "phone": "0610101010",
         "role": "Ouistiti",
-        "password": "blah",
+        "password1": "!correctPassword01",
+        "password2": "!correctPassword01",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
@@ -380,7 +383,8 @@ def setups_onboarding_signup(current_site, client):
         "email": "a@example.com",
         "phone": "0610101010",
         "role": "Ouistiti",
-        "password": "blah",
+        "password1": "!correctPassword01",
+        "password2": "!correctPassword01",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
@@ -457,7 +461,8 @@ def test_performing_onboarding_without_session_key_redirects_to_project_onboardi
         "email": user.username,
         "phone": "0610101010",
         "role": "Ouistiti",
-        "password": "blah",
+        "password1": "!correctPassword01",
+        "password2": "!correctPassword01",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
@@ -552,7 +557,10 @@ def test_create_prefilled_project_set_user_is_not_reachable_without_login(
 
     url = reverse("onboarding-prefill-set-user")
     response = client.get(url)
-    assert response.status_code == 403
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
 
 
 @pytest.mark.django_db
@@ -619,7 +627,10 @@ def test_create_prefilled_project_is_not_reachable_without_login(request, client
 
     url = reverse("onboarding-prefill")
     response = client.get(url)
-    assert response.status_code == 403
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
 
 
 @pytest.mark.django_db

@@ -10,7 +10,6 @@ from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
-from recoco.apps.tasks.models import Task
 
 from .exceptions import DSAPIError
 from .models import DSMapping, DSResource
@@ -189,27 +188,20 @@ def load_ds_resource_schema(ds_resource_id: int):
     ds_resource.save()
 
 
-def create_ds_prefill_link(recommendation_id: int):
-    try:
-        recommendation = Task.objects.select_related(
-            "project__commune__department"
-        ).get(id=recommendation_id)
-    except Task.DoesNotExist:
+def create_ds_prefill_link(reco):
+    if reco.resource is None:
         return
 
-    if recommendation.resource is None:
-        return
-
-    ds_resource: DSResource = find_ds_resource_for_project(
-        project=recommendation.project,
-        resource=recommendation.resource,
+    ds_resource: DSResource | None = find_ds_resource_for_project(
+        project=reco.project,
+        resource=reco.resource,
     )
     if ds_resource is None:
         return
 
     content = make_ds_data_from_project(
-        site=recommendation.site,
-        project=recommendation.project,
+        site=reco.site,
+        project=reco.project,
         ds_resource=ds_resource,
     )
     resp = requests.post(
