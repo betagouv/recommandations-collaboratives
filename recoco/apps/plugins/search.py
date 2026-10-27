@@ -36,7 +36,7 @@ def tenant_search_models(models=None):
             continue
         if app_label not in enabled_plugins:
             continue
-
+        # an enabled plugin's model
         if queryset is None:
             # Keep the adapter's live queryset, as watson would
             queryset = watson.get_adapter(model_cls).get_live_queryset()
