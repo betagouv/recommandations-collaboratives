@@ -626,14 +626,6 @@ def organization_details(request, organization_id):
 
     actions = (
         exclude_disabled_plugin_objects(
-            Action.objects.filter(site=request.site),
-            "action_object_content_type",
-            "target_content_type",
-        )
-        .filter(
-            actor_content_type=user_ct,
-            actor_object_id__in=participant_ids,
-        exclude_disabled_plugin_objects(
             Action.objects.filter(
                 site=request.site,
                 actor_content_type=user_ct,
@@ -642,7 +634,6 @@ def organization_details(request, organization_id):
             "action_object_content_type",
             "target_content_type",
         )
-
         .prefetch_related("actor", "action_object", "target")
         .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
     )
