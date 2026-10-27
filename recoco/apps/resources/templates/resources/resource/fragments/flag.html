@@ -2,17 +2,19 @@
     {% if not resource.expired %}
         <div data-test-id="non-expired-resource-banner"
              class="flag blue fr-mb-3w d-flex align-items-center justify-content-start">
-            <span class="title-info text-blue text-uppercase fr-my-0 fr-mr-2w">Attention</span>
-            <p class="text-info-custom text-blue fr-my-0 ">
-                Cette ressource a une date limite fixée au <strong>{{ resource.expires_on }}</strong>
+             <span class="fr-icon-warning-line fr-text-default--warning fr-mr-2w" aria-hidden="true"></span>
+             <p class="text-info-custom text-blue fr-my-0 ">
+                <span class="title-info text-blue text-uppercase fr-my-0">Attention</span>
+                : Cette ressource a une date limite fixée au <strong>{{ resource.expires_on }}</strong>
             </p>
         </div>
     {% else %}
         <div data-test-id="expired-resource-banner"
              class="flag red fr-mb-3w d-flex align-items-center justify-content-start">
-            <span class="title-info text-red text-uppercase fr-my-0 fr-mr-2w">Attention</span>
-            <p class="text-info-custom text-red fr-my-0">
-                Cette ressource a expiré, les informations ne sont probablement plus à jour !
+             <span class="fr-icon-warning-line fr-text-default--warning fr-mr-2w" aria-hidden="true"></span>
+             <p class="text-info-custom text-red fr-my-0">
+                <span class="title-info text-red text-uppercase fr-my-0">Attention</span>
+                : Cette ressource a expiré, les informations ne sont probablement plus à jour !
             </p>
         </div>
     {% endif %}
@@ -21,9 +23,10 @@
 {% if is_switchtender %}
     {% if not resource.public %}
         <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
-            <span class="title-info text-uppercase fr-my-0 fr-mr-2w">Édition</span>
-            <p class="text-info-custom fr-my-0">
-                Cette ressource est en cours d'écriture. Pensez à la
+            <span class="fr-icon-draft-line fr-text-label--yellow-tournesol fr-mr-2w" aria-hidden="true"></span>
+            <p class="text-info-custom fr-text-label--yellow-tournesol fr-my-0">
+                <span class="title-info text-uppercase fr-my-0">Édition</span>
+                : Cette ressource est en cours d'écriture. Pensez à la
                 <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en <strong><em>la publiant</em></strong> si vous souhaitez que les visiteurs puissent la consulter !
             </p>
         </div>
@@ -31,7 +34,8 @@
 {% else %}
     {% if not resource.public %}
         <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
-            <p class="text-info-custom fr-my-0">Cette ressource est en cours d'écriture.</p>
+            <span class="fr-icon-draft-line fr-text-label--yellow-tournesol fr-mr-2w" aria-hidden="true"></span>
+            <p class="text-info-custom fr-text-label--yellow-tournesol fr-my-0">Cette ressource est en cours d'écriture.</p>
         </div>
     {% endif %}
 {% endif %}

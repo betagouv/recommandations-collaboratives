@@ -1,13 +1,15 @@
 {% if resource.title %}
-    <h1 class="title-primary text-black {% if resource.support_orga %}fr-mb-1v{% endif %}">
+    <h1 class="resource-details__title fr-mb-3v">
         {{ resource.title|capfirst }}
     </h1>
 {% endif %}
-{% if resource.support_orga %}
-    <div class="fr-mb-1w">
-        <span class="subtitle-primary text-black-secondary">{{ resource.support_orga|upper }}</span>
+{% if resource.subtitle %}
+    <div class="resource-details__subtitle fr-mb-3v">
+        <span>{{ resource.subtitle|capfirst }}</span>
     </div>
 {% endif %}
-{% if resource.subtitle %}
-    <span class="subtitle-primary text-black-secondary">{{ resource.subtitle|capfirst }}</span>
+{% if resource.support_orga %}
+    <div class="resource-details__organization">
+        <span><span class="fr-icon-briefcase-line"></span> Structure porteuse : <span class="fw-700">{{ resource.support_orga|upper }}</span></span>
+    </div>
 {% endif %}
