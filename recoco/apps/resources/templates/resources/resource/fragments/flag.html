@@ -21,9 +21,10 @@
 {% if is_switchtender %}
     {% if not resource.public %}
         <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
-            <span class="title-info text-uppercase fr-my-0 fr-mr-2w">Édition</span>
+            <span class="fr-icon-draft-line fr-mr-2w" aria-hidden="true"></span>
             <p class="text-info-custom fr-my-0">
-                Cette ressource est en cours d'écriture. Pensez à la
+                <span class="title-info text-uppercase fr-my-0">Édition</span>
+                : Cette ressource est en cours d'écriture. Pensez à la
                 <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en <strong><em>la publiant</em></strong> si vous souhaitez que les visiteurs puissent la consulter !
             </p>
         </div>
@@ -31,6 +32,7 @@
 {% else %}
     {% if not resource.public %}
         <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
+            <span class="fr-icon-draft-line fr-mr-2w" aria-hidden="true"></span>
             <p class="text-info-custom fr-my-0">Cette ressource est en cours d'écriture.</p>
         </div>
     {% endif %}
