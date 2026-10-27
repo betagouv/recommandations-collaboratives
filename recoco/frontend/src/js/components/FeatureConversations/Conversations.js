@@ -479,6 +479,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     // Check if editor contains message
     if (!Alpine.store('editor').currentMessageJSON) return;
 
+    Alpine.store('editor').isEditorBusy = true;
+
     // Parse message in Editor
     const parsedNodesFromEditor = Alpine.store('editor').parseTipTapContent(
       Alpine.store('editor').currentMessageJSON
@@ -511,6 +513,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } else {
       await this.sendMessage(payload);
     }
+
+    Alpine.store('editor').isEditorBusy = false;
     Alpine.store('onLeaveAlert').setDirty(false);
   },
   uploadFile(file) {
