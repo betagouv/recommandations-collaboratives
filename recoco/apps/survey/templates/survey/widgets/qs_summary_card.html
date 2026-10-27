@@ -12,12 +12,12 @@
 <div class="survey-card">
     <div class="card-body fr-m-1v">
         <div>
-            <div class="fr-mb-0 fr-mb-2v d-flex justify-content-between align-items-start tmp-usevar"
+            <div class="fr-mb-0 fr-mb-2v d-flex justify-content-between align-items-start"
                  style="color: {{ question_set.color|default:'black' }}">
                 <h5 class="card-title align-middle d-inline fr-mb-0">{{ question_set.heading }}</h5>
                 <span class="card-completion">{{ completion }}%</span>
             </div>
-            <!-- <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small tmp-usevar">
+            <!-- <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
                 {% if completion < 100 %}
 
                 {% if answers %}
@@ -85,12 +85,12 @@
                                 {% if answer.attachment %}
                                     <div>
                                         <span class="align-middle" x-data>
-                                            <a class="position-relative z-2 tmp-usevar"
+                                            <a class="position-relative z-2"
                                                style="color: {{ question_set.color|default:'black' }} !important"
                                                target="_new"
                                                href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
                                             <template x-if="$store.utils.isPreviewableFile('{{ answer.attachment.name|escapejs }}')">
-                                                <a class="position-relative z-2 tmp-usevar fr-ml-2w"
+                                                <a class="position-relative z-2 fr-ml-2w"
                                                    style="color: {{ question_set.color|default:'black' }} !important"
                                                    target="_blank"
                                                    title="Prévisualiser le fichier joint - nouvelle fenêtre"
@@ -121,7 +121,7 @@
         </div>
         {% if "use_surveys" in user_project_perms and completion < 100 and question_set.questions.count %}
             <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}"
-               class="border-0 btn btn-primary w-100 fr-mt-1v fw-bold fr-py-2v tmp-usevar"
+               class="border-0 btn btn-primary w-100 fr-mt-1v fw-bold fr-py-2v"
                data-test-id="link-fill-survey"
                style="background-color: {{ question_set.color|default:'black' }} !important">Compléter cette section</a>
         {% endif %}
