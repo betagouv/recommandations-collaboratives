@@ -665,13 +665,9 @@ ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
 
-# Sentry (frontend)
-SENTRY_FRONTEND_DSN = os.environ.get("SENTRY_FRONTEND_DSN", "")
-SENTRY_FRONTEND_ENVIRONMENT = os.environ.get(
-    "SENTRY_FRONTEND_ENVIRONMENT", "production"
-)
-SENTRY_FRONTEND_TRACES_SAMPLE_RATE = float(
-    os.environ.get("SENTRY_FRONTEND_TRACES_SAMPLE_RATE", "0")
+# Sentry (frontend) - public DSN of the "recoco front" project
+SENTRY_FRONTEND_DSN = (
+    "https://caf46e9eca66a6aee8e9dfc9434f00a8@sentry.incubateur.net/261"
 )
 
 # eof

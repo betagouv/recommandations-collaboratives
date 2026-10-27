@@ -9,14 +9,12 @@ def embed(request: HttpRequest) -> dict:
 
 
 def sentry_frontend(request: HttpRequest) -> dict:
-    if not settings.SENTRY_FRONTEND_DSN:
+    if settings.DEBUG:
         return {}
 
     config = {
         "dsn": settings.SENTRY_FRONTEND_DSN,
-        "environment": settings.SENTRY_FRONTEND_ENVIRONMENT,
         "release": f"recoco@{__version__}",
-        "tracesSampleRate": settings.SENTRY_FRONTEND_TRACES_SAMPLE_RATE,
     }
     if request.user.is_authenticated:
         config["userId"] = request.user.id
