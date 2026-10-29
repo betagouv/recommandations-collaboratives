@@ -505,12 +505,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       nodes: parsedNodesFromEditor,
       in_reply_to: this.messageIdToReply,
     };
+    try {
+      Alpine.store('editor').isEditorBusy = true;
 
-    if (this.isEditorInEditMode) {
-      await this.updateMessage(payload);
-    } else {
-      await this.sendMessage(payload);
+      if (this.isEditorInEditMode) {
+        await this.updateMessage(payload);
+      } else {
+        await this.sendMessage(payload);
+      }
+    } finally {
+      Alpine.store('editor').isEditorBusy = false;
     }
+
     Alpine.store('onLeaveAlert').setDirty(false);
   },
   uploadFile(file) {
