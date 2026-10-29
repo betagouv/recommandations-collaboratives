@@ -19,7 +19,6 @@ from rest_framework.test import APIClient
 from recoco.apps.projects.models import Project, ProjectSite
 
 
-# -- Global Fixtures
 @pytest.fixture(scope="session", autouse=True)
 def setup_db(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():

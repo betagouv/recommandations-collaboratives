@@ -145,7 +145,7 @@ def resource_search(request):
 
     category_options = [
         {"value": str(c.id), "text": str(c), "search": str(c)}
-        for c in models.Category.on_site.all()
+        for c in models.Category.on_site.order_by("name").all()
     ]
 
     # prefetch and select related must be after all filters, else they are useless

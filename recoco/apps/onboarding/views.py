@@ -122,7 +122,6 @@ class OnboardingLogin(LoginView):
 
         # Send notifications
         utils.notify_new_project(self.request.site, project, self.request.user)
-        utils.email_owner_of_project(self.request.site, project, self.request.user)
 
         refresh_user_projects_in_session(self.request, self.request.user)
 
@@ -191,7 +190,7 @@ def onboarding_signup(request):
             return redirect(f"{login_url}?{next_args}")
 
         # user is new from here otherwise it would have been redirected to login
-        user.set_password(form.cleaned_data.get("password"))
+        user.set_password(form.cleaned_data.get("password1"))
         user = update_user(
             site=request.site,
             user=user,
@@ -225,7 +224,6 @@ def onboarding_signup(request):
             assign_collaborator(user, project, is_owner=True)
 
             utils.notify_new_project(request.site, project, user)
-            utils.email_owner_of_project(request.site, project, user)
 
             redirect_url = reverse("onboarding-summary", args=(project.id,))
 
@@ -299,7 +297,6 @@ def onboarding_project(request):
                 assign_collaborator(user, project, is_owner=True)
 
                 utils.notify_new_project(request.site, project, user)
-                utils.email_owner_of_project(request.site, project, user)
 
                 refresh_user_projects_in_session(request, user)
 
@@ -341,6 +338,7 @@ def onboarding_summary(request, project_id=None):
     site_config = request.site_config
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
+    utils.email_owner_of_project(request.site, project, request.user)
 
     if not project.location:
         next_url = f"{reverse('survey-project-session' if site_config.project_survey else 'projects-project-detail', args=(project.pk,))}"
@@ -381,6 +379,7 @@ def onboarding_summary(request, project_id=None):
 ########################################################################
 
 
+@login_required
 def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
     site_config = request.site_config
@@ -399,6 +398,7 @@ def prefill_project_set_user(request):
     return render(request, "prefill/prefill-user.html", locals())
 
 
+@login_required
 def prefill_project_submit(request):
     """Create a new project for someone else - step 2 create project"""
     site_config = request.site_config

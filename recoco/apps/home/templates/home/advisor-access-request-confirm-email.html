@@ -7,5 +7,5 @@
     Demander un accès conseiller
 {% endblock og_title %}
 {% block content %}
-    {% include "account/fragments/confirm_email_form.html" with title="Devenir conseiller ou conseillère" stepper=True total_steps=3 step_number=3 current_step_title="Confirmation de l'adresse e-mail" %}
+    {% include "account/fragments/confirm_email_form.html" with title="Devenir conseiller ou conseillère" stepper=True total_steps=3 step_number=3 current_step_title="Confirmation de l'adresse e-mail" with_demand=True %}
 {% endblock content %}

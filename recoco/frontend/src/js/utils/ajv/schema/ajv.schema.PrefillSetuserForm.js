@@ -40,11 +40,12 @@ export const schemaOnboardingPrefillSetuserFormValidator = {
         },
       ],
     },
+    org_name: { $ref: '#/definitions/text' },
     role: { $ref: '#/definitions/text' },
     message: textOptional(0, 500),
     email: { $ref: '#/definitions/email' },
     phone: { $ref: '#/definitions/phone' },
   },
-  required: ['first_name', 'last_name', 'role', 'email', 'phone'],
+  required: ['first_name', 'last_name', 'org_name', 'role', 'email', 'phone'],
   definitions: schemaFormInputs,
 };

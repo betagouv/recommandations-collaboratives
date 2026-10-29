@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
+from recoco.apps.home.adapters import confirm_email
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
@@ -79,6 +80,9 @@ def invite_accept(request, invite_id):
 
         # user now has access to site
         user.profile.sites.add(current_site)
+
+        # they arrived by clicking an email so it is valid
+        confirm_email(request, user)
 
         # Now, grant the user her new rights
         if invite.role == "SWITCHTENDER":

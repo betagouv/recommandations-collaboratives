@@ -1,0 +1,13 @@
+<p class="fr-text-mention--grey {% if small_text %}fr-text--sm{% elif extra_small_text %}fr-text--xs{% endif %} fr-mb-3v">
+    En cliquant ci-dessous, vous créerez un dossier en brouillon sur demarche.numerique.gouv.fr.
+    <br>
+    Certains champs seront pré-remplis avec les informations dont nous disposons sur le dossier.
+</p>
+<a class="fr-btn fr-btn--secondary fr-btn--sm"
+    @click.stop="trackClickFillFolderDemarcheNumerique"
+    {% if task_id %}
+        href="{% url 'projects-task-ds-prefill' task_id %}"
+    {% else %}
+        :href="'{% url 'projects-task-ds-prefill' 0 %}'.replace(0, recommendation.id)"
+    {% endif %}
+    target="_blank">Aller sur Démarche numérique</a>

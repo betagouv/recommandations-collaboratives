@@ -335,7 +335,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Email Configuration
 # Technical sender address, shared by every site (must be a verified sender on
 # Brevo). The displayed name comes from SiteConfiguration.sender_name.
-DEFAULT_SENDER_EMAIL = "noreply@recoconseil.fr"
+DEFAULT_SENDER_EMAIL = "ne-pas-repondre@recoconseil.fr"
 # Displayed name used when the site has no SiteConfiguration, or no sender_name
 DEFAULT_SENDER_NAME = "Recoco"
 DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"
@@ -397,7 +397,6 @@ LOGIN_REDIRECT_URL = "login-redirect"
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 ACCOUNT_LOGIN_BY_CODE_TIMEOUT = 60 * 60  # 1 hour in seconds
 ACCOUNT_LOGIN_TIMEOUT = 60 * 60
-ALLAUTH_TRUSTED_CLIENT_IP_HEADER = "X-Real-IP"
 
 # Common signup form shared by account and socialaccount
 ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"

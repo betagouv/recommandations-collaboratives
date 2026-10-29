@@ -23,20 +23,11 @@
 // Le .table-responsive interne doit repasser en overflow visible, sinon
 // position: sticky ne fonctionne pas à l'intérieur.
 .crm-list-scroll {
-  max-height: calc(100vh - 90px);
-  overflow: auto;
 
   .table-responsive {
     overflow: visible;
   }
 
-  .project-table__thead th,
-  .resource-table__thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #fff;
-  }
 }
 
 .crm {
@@ -48,11 +39,24 @@
     table-layout: fixed;
 
     &__thead {
+      position: sticky;
+      top: 0;
+
+      text-transform: uppercase;
       font-weight: 700;
       color: var(--light-text-default-grey, #3a3a3a);
-      text-transform: uppercase;
+
       border-bottom: 2px solid var(--text-title, #161616);
       background: #fff;
+
+      z-index: 1;
+    }
+    th {
+      white-space: normal;
+      position: sticky;
+
+      top: 64px;
+      background-color: #fff;
     }
     th,
     td {

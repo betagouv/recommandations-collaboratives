@@ -156,7 +156,9 @@ def question_create(request, question_set_id=None):
     """Create new question"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
-    question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
+    question_set = get_object_or_404(
+        models.QuestionSet, survey__site=request.site, pk=question_set_id
+    )
 
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST)

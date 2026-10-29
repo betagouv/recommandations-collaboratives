@@ -136,7 +136,9 @@ def contact_create(request, organization_id: int):
     """Create a new Contact"""
     has_perm_or_403(request.user, "change_addressbook", request.site)
 
-    organization = get_object_or_404(models.Organization, pk=organization_id)
+    organization = get_object_or_404(
+        models.Organization, sites=request.site, pk=organization_id
+    )
 
     if request.method == "POST":
         form = ContactForm(request.POST)

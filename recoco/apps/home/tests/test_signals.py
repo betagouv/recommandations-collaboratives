@@ -104,14 +104,11 @@ def test_user_signin_shouldnt_be_logged_if_hijacked(request, client):
     assert hijacked.actor_actions.count() == 0
 
 
+SENSITIVE_GROUPS = ["admin", "staff", "advisor"]
+
+
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "group",
-    [
-        ("admin"),
-        ("staff"),
-    ],
-)
+@pytest.mark.parametrize("group", SENSITIVE_GROUPS)
 def test_sensitive_get_2fa(request, client, group):
     user = baker.make(auth_models.User)
     group = "example_com_" + group
@@ -126,10 +123,7 @@ def test_sensitive_get_2fa(request, client, group):
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "group",
-    [
-        ("admin"),
-        ("staff"),
-    ],
+    SENSITIVE_GROUPS,
 )
 def test_no_longer_sensitive_no_2fa(request, client, group):
     user = baker.make(auth_models.User)
@@ -142,13 +136,7 @@ def test_no_longer_sensitive_no_2fa(request, client, group):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "group",
-    [
-        ("admin"),
-        ("staff"),
-    ],
-)
+@pytest.mark.parametrize("group", SENSITIVE_GROUPS)
 def test_set_requires_keeps_totp(request, client, group):
     user = baker.make(auth_models.User)
     baker.make(Authenticator, type="totp", user_id=user.id)
@@ -163,7 +151,7 @@ def test_set_requires_keeps_totp(request, client, group):
 
 
 @pytest.mark.django_db
-def test_removing_totp_if_2fa_required_enables_login_by_code(request, client):
+def test_removing_totp_if_2fa_required_enables_login_with_code(request, client):
     user = baker.make(auth_models.User)
     user.profile.requires_2fa = True
     user.profile.save()
@@ -171,9 +159,9 @@ def test_removing_totp_if_2fa_required_enables_login_by_code(request, client):
 
 
 @pytest.mark.django_db
-def test_adding_totp_disables_login_by_code(request, client):
+def test_adding_totp_disables_login_with_code(request, client):
     user = baker.make(auth_models.User)
-    user.profile.login_by_code = True
+    user.profile.login_with_code = True
     user.profile.save()
 
     authenticator_added.send(
@@ -187,9 +175,9 @@ def test_adding_totp_disables_login_by_code(request, client):
 
 
 @pytest.mark.django_db
-def test_removing_totp_enables_login_by_code_sensitive_account(request, client):
+def test_removing_totp_enables_login_with_code_sensitive_account(request, client):
     user = baker.make(auth_models.User)
-    user.profile.login_by_code = False
+    user.profile.login_with_code = False
     user.profile.requires_2fa = True
     user.profile.save()
 
@@ -204,9 +192,9 @@ def test_removing_totp_enables_login_by_code_sensitive_account(request, client):
 
 
 @pytest.mark.django_db
-def test_removing_totp_does_not_enable_login_by_code_normal_account(request, client):
+def test_removing_totp_does_not_enable_login_with_code_normal_account(request, client):
     user = baker.make(auth_models.User)
-    user.profile.login_by_code = False
+    user.profile.login_with_code = False
     user.profile.requires_2fa = False
     user.profile.save()
 
@@ -221,9 +209,6 @@ def test_removing_totp_does_not_enable_login_by_code_normal_account(request, cli
 
 
 # signals that ensure that requires_2fa is up to date
-
-
-SENSITIVE_GROUPS = ["admin", "staff"]
 
 
 @pytest.mark.django_db
@@ -290,7 +275,6 @@ def test_ensure_2fa_pre_clear_reverse_non_sensitive_group_does_not_update():
 @pytest.mark.django_db
 @pytest.mark.parametrize("group_suffix", SENSITIVE_GROUPS)
 def test_ensure_2fa_post_clear_forward_clears_2fa(group_suffix):
-    # user.groups.clear()
     user = baker.make(auth_models.User)
     group = auth_models.Group.objects.get(name=f"example_com_{group_suffix}")
     user.groups.add(group)
