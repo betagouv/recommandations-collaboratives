@@ -144,8 +144,10 @@ const FileCardExtension = Node.create({
           event.stopPropagation();
 
           // Remove the file card from the editor
-          if (getPos !== undefined) {
-            const pos = getPos();
+          // change with tiptap v3
+          const pos = getPos();
+
+          if (pos !== undefined) {
             const nodeSize = node.nodeSize;
 
             // Delete the entire node

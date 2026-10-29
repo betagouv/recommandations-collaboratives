@@ -1,7 +1,9 @@
 {% load gravatar %}
 {% load humanize %}
 <div class="d-flex flex-column fr-m-2v fr-p-3w comment {% if followup.pk in followups_with_notifications %}bg-light-yellow{% else %}bg-light{% endif %}">
-    <p class="fr-m-0 fr-p-0">{{ comment|safe }}</p>
+    {# `comment` is expected to already be sanitized HTML (rendered via
+       recoco.utils.render_markdown) -- callers must not pass raw user input. #}
+    <div class="fr-m-0 fr-p-0">{{ comment|safe }}</div>
     <div>
         <!-- Image -->
         <img src="{% gravatar_url author.email 16 %}"

@@ -19,11 +19,6 @@ from recoco.apps.training import rest as training_rest
 router = routers.DefaultRouter()
 
 router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-    tasks_rest.TaskFollowupViewSet,
-    basename="project-tasks-followups",
-)
-router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
     tasks_rest.TaskViewSet,
     basename="project-tasks",
@@ -178,7 +173,7 @@ auth_urls = [
     ),
 ]
 
-tasks_urls = [
+acra_tasks_urls = [
     path(
         "projects/<int:project_id>/tasks/acra/ask/",
         tasks_acra_proxy.AcraAskView.as_view(),
@@ -231,7 +226,7 @@ urlpatterns = (
     router.urls
     + api_urls
     + auth_urls
-    + tasks_urls
+    + acra_tasks_urls
     + survey_urls
     + _collect_plugin_rest_urls()
 )

@@ -67,6 +67,14 @@
   text-transform: uppercase;
 }
 
+.fr-hint-text-blue {
+  color: var(--light-text-default-info, #0063cb);
+}
+
+.fr-hint-text::before {
+  margin-right: 0.25rem;
+}
+
 /* ¯¯¯¯ *\
   INPUTS
 \* ˍˍˍˍ */
@@ -88,6 +96,19 @@
   }
   input {
     padding-left: 2rem;
+  }
+}
+
+.fr-select-group {
+  &--rounded {
+    .fr-select {
+      padding: 5px 15px;
+      padding-right: 35px;
+      background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity));
+      border-radius: var(--bs-border-radius-pill);
+      border:solid 1px #e5e5e5; ;
+      box-shadow: none;
+    }
   }
 }
 
@@ -116,6 +137,11 @@
 
 .fr-icon-margin-right-sm::before {
   margin-right: 0.2rem;
+}
+
+.fr-icon--xl::before {
+  width: 48px;
+  height: 48px;
 }
 
 p a {

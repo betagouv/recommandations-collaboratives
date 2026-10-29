@@ -30,7 +30,10 @@
         {{ form.email|as_crispy_field }}
         {{ form.phone|as_crispy_field }}
         {% if include_message_field %}{{ form.message|as_crispy_field }}{% endif %}
-        {% if include_password_field %}{{ form.password|as_crispy_field }}{% endif %}
+        {% if include_password_field %}
+          {{ form.password1|as_crispy_field }}
+          {{ form.password2|as_crispy_field }}
+        {% endif %}
         <div class="fr-fieldset__element">
             {% include "account/fragments/accept_cgu.html" %}
         </div>

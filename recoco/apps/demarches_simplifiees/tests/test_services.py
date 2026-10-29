@@ -217,27 +217,22 @@ class TestMakeDSDataFromProject:
         }, print(data)
 
 
-def returns_empty(reco_id):
-    res = create_ds_prefill_link(reco_id)
+def returns_empty(reco):
+    res = create_ds_prefill_link(reco)
     assert res is None
-
-
-@pytest.mark.django_db
-def test_create_ds_prefill_link_no_reco():
-    returns_empty(42)
 
 
 @pytest.mark.django_db
 def test_create_ds_prefill_link_no_resource():
     task = baker.make(Task)
-    returns_empty(task.id)
+    returns_empty(task)
 
 
 @pytest.mark.django_db
 def test_create_ds_prefill_link_no_ds_resource():
     resource = baker.make(Resource)
     task = baker.make(Task, resource=resource)
-    returns_empty(task.id)
+    returns_empty(task)
 
 
 @pytest.mark.django_db
@@ -279,7 +274,7 @@ def test_return_ds_prefill_link_calls_ds_data_with_prefill(client):
             ),
         ) as mock_post,
     ):
-        response = create_ds_prefill_link(task.id)
+        response = create_ds_prefill_link(task)
         mock_make_ds_data.assert_called_with(
             project=task.project, site=task.site, ds_resource=ds_resource
         )

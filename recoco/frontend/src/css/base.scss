@@ -1,4 +1,8 @@
 /* variables */
+:root {
+  --height-header: 65px;
+}
+
 $blue: var(--background-action-high-blue-france);
 $dark-blue: #224a6d;
 $turquoise: #5dc2b0;
@@ -17,7 +21,7 @@ main {
   display: flex;
   flex-wrap: nowrap;
 
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - var(--height-header));
   height: -webkit-fill-available;
 }
 
@@ -183,13 +187,7 @@ p {
 * BASE EMBED SPECIFICITIES
 */
 .base-embed {
-  .fr-header__logo {
-    padding-bottom: 0;
-    padding-top: 0;
-  }
-  .fr-header__body-row {
-    height: 4em;
-  }
+  --height-header: 0px;
 }
 
 // Prevent Crisp from causing horizontal scroll on mobile

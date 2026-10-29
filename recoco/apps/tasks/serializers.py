@@ -11,7 +11,6 @@ from recoco.apps.addressbook.models import Contact
 from recoco.apps.addressbook.serializers import NestedContactSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
-from recoco.apps.projects.utils import reactivate_if_necessary
 from recoco.apps.resources.models import Resource
 from recoco.apps.resources.serializers import (
     ResourceDetailSerializer,
@@ -21,44 +20,6 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 
 from ..conversations.serializers import MessageSerializer
 from .models import Task, TaskFollowup
-
-
-class TaskFollowupCreateUpdateSerializer(
-    BaseSerializerMixin, serializers.ModelSerializer
-):
-    class Meta:
-        model = TaskFollowup
-        fields = [
-            "id",
-            "status",
-            "contact",
-            "comment",
-            "who",
-            "task",
-        ]
-        read_only_fields = [
-            "who",
-            "task",
-        ]
-
-    def create(self, validated_data):
-        followup = super().create(
-            validated_data
-            | {
-                "who": self.current_user,
-                "task_id": self.context.get("task_id"),
-            }
-        )
-        self._update_activity_flags_and_states(followup)
-        return followup
-
-    def update(self, instance, validated_data):
-        followup = super().update(instance, validated_data)
-        self._update_activity_flags_and_states(followup)
-        return followup
-
-    def _update_activity_flags_and_states(self, followup):
-        reactivate_if_necessary(followup.task.project, followup.who)
 
 
 class TaskFollowupSerializer(serializers.ModelSerializer):

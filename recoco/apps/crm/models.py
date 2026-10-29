@@ -8,11 +8,11 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from markdownx.utils import markdownify
 from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.projects import models as projects_models
+from recoco.utils import render_markdown
 
 from . import apps
 
@@ -150,7 +150,7 @@ class Note(models.Model):
     @property
     def content_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.content)
+        return render_markdown(self.content)
 
     def __str__(self):
         if self.title:

@@ -335,7 +335,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Email Configuration
 # Technical sender address, shared by every site (must be a verified sender on
 # Brevo). The displayed name comes from SiteConfiguration.sender_name.
-DEFAULT_SENDER_EMAIL = "noreply@recoconseil.fr"
+DEFAULT_SENDER_EMAIL = "ne-pas-repondre@recoconseil.fr"
 # Displayed name used when the site has no SiteConfiguration, or no sender_name
 DEFAULT_SENDER_NAME = "Recoco"
 DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"
@@ -388,9 +388,6 @@ ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_RATE_LIMITS = {
-    "login_failed": "20/m/ip",
-}
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -467,6 +464,7 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 # Hijack
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 
+THROTTLE_RATES = {"anon": "100/day", "user": "10000/day"}
 # Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -485,6 +483,11 @@ REST_FRAMEWORK = {
     ],
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": THROTTLE_RATES,
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html

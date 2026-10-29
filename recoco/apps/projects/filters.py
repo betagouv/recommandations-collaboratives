@@ -7,6 +7,7 @@ from django.db.models.functions import Cast
 from django.utils import timezone
 from rest_framework.filters import BaseFilterBackend
 
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects.models import Project
 from recoco.utils import has_perm
 
@@ -73,7 +74,7 @@ def request_hide_deleted_projects(request):
     # TODO should not be necessary after #2122
     return not (
         request.GET.get("with-deleted", None)
-        and has_perm(request.user, "delete_projects", request.site)
+        and has_perm(request.user, "see_deleted_projects", request.site)
     )
 
 
@@ -98,4 +99,17 @@ class ProjectAssignedToUserFilter(BaseFilterBackend):
                 switchtender_sites__switchtender=request.user,
                 switchtender_sites__site=request.site,
             ).distinct()
+        return queryset
+
+
+class PluginLookupsFilter(BaseFilterBackend):
+    """Apply the lookups returned by the crm_project_list_filter_lookups hook"""
+
+    def filter_queryset(self, request, queryset, view):
+        lookups = {}
+        pm = get_site_plugin_manager(request)
+        for p_lookups in pm.hook.crm_project_list_filter_lookups(request=request):
+            lookups.update(p_lookups)
+        if lookups:
+            queryset = queryset.filter(**lookups)
         return queryset

@@ -488,7 +488,7 @@ def project_maplist(request):
 def project_switchtender_join(request, project_id=None):
     """Join as switchtender"""
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
 
     if not can_administrate_project(project, request.user):
         is_regional_actor_for_project_or_403(
@@ -519,7 +519,7 @@ def project_switchtender_join(request, project_id=None):
 @login_required
 def project_observer_join(request, project_id=None):
     """Join as observer"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
 
     if not can_administrate_project(project, request.user):
         is_regional_actor_for_project_or_403(
@@ -580,7 +580,7 @@ def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
     has_perm_or_403(request.user, "sites.delete_projects", request.site)
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()
         project.save()

@@ -1,0 +1,17 @@
+{% extends "layouts/error_page.html" %}
+{% load static %}
+{% block content %}
+    <p class="fr-text--lead fr-mb-3w">
+        Notre site rencontre un problème temporaire, nous allons le résoudre dès que possible.
+        <br><br>
+        Essayez de rafraîchir la page ou de revenir plus tard. Si votre problème est urgent, contactez les administrateurs du site.
+    </p>
+{% endblock content %}
+{% block buttons %}
+    <li>
+        <a class="fr-btn fr-btn--secondary" href="{% url 'home-contact' %}">Contactez les administrateurs</a>
+    </li>
+{% endblock buttons %}
+{% block image %}
+    <img src="{% static 'svg/outer-space.svg' %}" alt="">
+{% endblock image %}
