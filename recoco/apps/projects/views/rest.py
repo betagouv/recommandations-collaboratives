@@ -63,10 +63,9 @@ from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
     NewProjectSerializer,
-    ProjectAdvisorSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
-    ProjectMemberSerializer,
+    ProjectMembersSerializer,
     ProjectMembershipRoleSerializer,
     ProjectMembershipSerializer,
     ProjectSiteSerializer,
@@ -243,15 +242,18 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
     `GET` lists the people attached to the project, in two lists:
 
     - `members`: the participants, each one with an `email`, a `first_name`, a
-      `last_name` and an `is_owner` flag, only set for the owner of the project;
+      `last_name` and an `is_owner` flag, true only for the owner of the
+      project, who comes first, the others being ordered by username;
     - `advisors`: the advisors and observers of the current site, each one with
-      an `email`, a `first_name`, a `last_name` and an `is_observer` flag.
+      an `email`, a `first_name`, a `last_name` and an `is_observer` flag,
+      ordered by username.
 
     Someone who is both participant and advisor is in both lists.
 
     `POST` attaches someone to the project. The person is given by email, in
-    the `email` field, and its account is created if it does not exist yet.
-    The `role` field says how it is attached to the project:
+    the `email` field: their account is created if it does not exist yet, and
+    added to the current site in any case. The `role` field says how they are
+    attached to the project:
 
     - `COLLABORATOR`: a participant, member of the project team;
     - `SWITCHTENDER`: an advisor, who follows the project for the site;
@@ -260,13 +262,17 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
     The attachment is immediate: unlike an invitation, no email is sent and
     there is nothing to accept. Attaching someone who already holds the role
     on this project is a no-op, and still answers a `201`. Attaching an advisor
-    as an observer, or the other way around, switches their role.
+    as an observer, or the other way around, switches their role. The answer
+    gives back the `email` and the `role`.
 
     The project has to be one of the current site, and the caller must be
-    allowed to moderate projects on that site.
+    staff for that site.
     """
 
-    serializer_class = ProjectMembershipSerializer
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return ProjectMembersSerializer
+        return ProjectMembershipSerializer
 
     def get(self, request, *args, **kwargs):
         members = self.project.projectmember_set.select_related("member")
@@ -274,16 +280,13 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
             "switchtender"
         )
 
-        return Response(
+        serializer = self.get_serializer(
             {
-                "members": ProjectMemberSerializer(
-                    members.order_by("-is_owner", "member__username"), many=True
-                ).data,
-                "advisors": ProjectAdvisorSerializer(
-                    advisors.order_by("switchtender__username"), many=True
-                ).data,
+                "members": members.order_by("-is_owner", "member__username"),
+                "advisors": advisors.order_by("switchtender__username"),
             }
         )
+        return Response(serializer.data)
 
 
 class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
@@ -291,15 +294,15 @@ class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
 
     The member is given by email, in the url.
 
-    `PATCH` changes its role, given in the `role` field, with the same values
+    `PATCH` changes their role, given in the `role` field, with the same values
     as for attaching someone to the project. The member only keeps the given
     role: someone both participant and advisor is no longer the other one.
 
-    `DELETE` removes the member from the project, whatever its roles, and
-    deletes its notifications about the project.
+    `DELETE` removes the member from the project, whatever their roles, and
+    deletes their notifications about the project.
 
     In both cases, a `404` is answered if the person is not a member of the
-    project, and a `400` if it is the owner of the project, who cannot be
+    project, and a `400` if they are the owner of the project, who cannot be
     changed nor removed.
 
     The project has to be one of the current site, and the caller must be
