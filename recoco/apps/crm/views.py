@@ -62,6 +62,8 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.conversations.models import Message, RecommendationNode
+from recoco.apps.crm import filters, forms, models
+from recoco.apps.crm.forms import SiteConfigurationForm
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
@@ -81,19 +83,21 @@ from recoco.apps.projects.models import (
     ProjectSwitchtender,
     Topic,
 )
+from recoco.apps.projects.templatetags.projects_extra import (
+    is_admin_for_current_site,
+    is_staff_for_current_site,
+)
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
     AuthenticatedFeed,
+    check_if_advisor,
     get_group_for_site,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
 )
-
-from . import filters, forms, models
-from .forms import SiteConfigurationForm
 
 
 def site_projects_action_stream(site):
@@ -937,7 +941,9 @@ def user_details(request, user_id):
     )
 
     group_name = make_group_name_for_site("advisor", request.site)
-    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
+    crm_user_is_advisor = check_if_advisor(crm_user)
+    crm_user_is_staff = is_staff_for_current_site(crm_user)
+    crm_user_is_admin = is_admin_for_current_site(crm_user)
 
     actions = (
         (
@@ -1137,9 +1143,14 @@ def project_list(request):
         request=request
     )
 
+    plugin_filters = get_site_plugin_manager(request).hook.crm_project_list_filters(
+        request=request
+    )
+
     context = {
         "regions": list(RegionSerializer(region_queryset, many=True).data),
         "plugin_columns": plugin_columns,
+        "plugin_filters": plugin_filters,
     }
 
     return render(request, "crm/project_list.html", context)
