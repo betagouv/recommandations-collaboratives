@@ -281,7 +281,7 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://www.gstatic.com/",
             UNSAFE_EVAL,
-            UNSAFE_INLINE,  # crisp uses this
+            UNSAFE_INLINE,  # fixme
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
