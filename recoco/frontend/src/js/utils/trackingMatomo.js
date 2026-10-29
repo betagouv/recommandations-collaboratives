@@ -31,6 +31,10 @@ export const trackCopyContactEmail = () => {
   generateTrackEvent('Click', 'copy-contact-email');
 };
 
+export const trackClickFillFolderDemarcheNumerique = () => {
+  generateTrackEvent('Click', 'fill-folder-demarche-numerique');
+};
+
 export const trackScrollDepth = ({ pageLoaded }) => {
   if (!pageLoaded) {
     return;
@@ -50,14 +54,4 @@ export const trackScrollDepth = ({ pageLoaded }) => {
     generateTrackEvent('Scroll', '75%');
     window.scroll75 = true;
   }
-};
-
-export default {
-  trackClickOnRecoLink,
-  trackClickOnFileLink,
-  trackScrollDepth,
-  trackReplyToMessage,
-  trackOpenRessource,
-  trackSeeMoreParticipants,
-  trackCopyContactEmail,
 };

@@ -3,12 +3,15 @@ from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
+from django.core import mail
 from django.urls import reverse
 from model_bakery import baker
+from pytest_django.asserts import assertContains
 from sesame.utils import get_query_string
 
 from conftest import setup_sesame_cookie
-from recoco.utils import login
+from recoco.apps.home.adapters import UVAccountAdapter
+from recoco.utils import confirm_mail, login
 
 
 @pytest.mark.django_db
@@ -18,8 +21,10 @@ def test_admin_signin_should_not_be_logged(request, client):
 
 
 @pytest.mark.django_db
-def test_allauth_signin_should_be_logged(request, client):
+def test_allauth_verified_signin_should_be_logged(request, client):
     user = baker.make(auth_models.User, email="truc@truc.fr")
+    confirm_mail(user)
+
     assert user.actor_actions.count() == 0
     password = "mon mot de passe"  # nosec B105
     user.set_password(password)
@@ -32,6 +37,40 @@ def test_allauth_signin_should_be_logged(request, client):
 
     assert response.status_code == 302
     assert user.actor_actions.count() == 1
+    assert get_user(client).is_authenticated
+
+
+@pytest.mark.django_db
+def test_allauth_not_verified_signin_should_not_be_logged(request, client, mocker):
+    user = baker.make(auth_models.User, email="truc@truc.fr")
+    assert user.actor_actions.count() == 0
+    spy_adapter = mocker.spy(UVAccountAdapter, "get_email_confirmation_url")
+
+    password = "mon mot de passe"  # nosec B105
+    user.set_password(password)
+    user.save()
+
+    redirect_url = "/tata"  # intentionnally random url
+    url = reverse("account_login") + f"?next={redirect_url}"
+    response = client.post(
+        url,
+        data={"login": user.email, "password": password, "remember": False},
+        follow=True,
+    )
+
+    assert get_user(client).is_anonymous
+    assert user.actor_actions.count() == 0  # no login trace
+
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("account_email_verification_sent")
+    assertContains(response, user.email)
+    assert len(mail.outbox) == 1
+
+    confirm_email_url = spy_adapter.spy_return
+    response = client.get(confirm_email_url, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert last_url == redirect_url
 
 
 @pytest.mark.django_db
@@ -65,14 +104,11 @@ def test_user_signin_shouldnt_be_logged_if_hijacked(request, client):
     assert hijacked.actor_actions.count() == 0
 
 
+SENSITIVE_GROUPS = ["admin", "staff", "advisor"]
+
+
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "group",
-    [
-        ("admin"),
-        ("staff"),
-    ],
-)
+@pytest.mark.parametrize("group", SENSITIVE_GROUPS)
 def test_sensitive_get_2fa(request, client, group):
     user = baker.make(auth_models.User)
     group = "example_com_" + group
@@ -87,10 +123,7 @@ def test_sensitive_get_2fa(request, client, group):
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "group",
-    [
-        ("admin"),
-        ("staff"),
-    ],
+    SENSITIVE_GROUPS,
 )
 def test_no_longer_sensitive_no_2fa(request, client, group):
     user = baker.make(auth_models.User)
@@ -103,13 +136,7 @@ def test_no_longer_sensitive_no_2fa(request, client, group):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "group",
-    [
-        ("admin"),
-        ("staff"),
-    ],
-)
+@pytest.mark.parametrize("group", SENSITIVE_GROUPS)
 def test_set_requires_keeps_totp(request, client, group):
     user = baker.make(auth_models.User)
     baker.make(Authenticator, type="totp", user_id=user.id)
@@ -124,7 +151,7 @@ def test_set_requires_keeps_totp(request, client, group):
 
 
 @pytest.mark.django_db
-def test_removing_totp_if_2fa_required_enables_login_by_code(request, client):
+def test_removing_totp_if_2fa_required_enables_login_with_code(request, client):
     user = baker.make(auth_models.User)
     user.profile.requires_2fa = True
     user.profile.save()
@@ -132,9 +159,9 @@ def test_removing_totp_if_2fa_required_enables_login_by_code(request, client):
 
 
 @pytest.mark.django_db
-def test_adding_totp_disables_login_by_code(request, client):
+def test_adding_totp_disables_login_with_code(request, client):
     user = baker.make(auth_models.User)
-    user.profile.login_by_code = True
+    user.profile.login_with_code = True
     user.profile.save()
 
     authenticator_added.send(
@@ -148,9 +175,9 @@ def test_adding_totp_disables_login_by_code(request, client):
 
 
 @pytest.mark.django_db
-def test_removing_totp_enables_login_by_code_sensitive_account(request, client):
+def test_removing_totp_enables_login_with_code_sensitive_account(request, client):
     user = baker.make(auth_models.User)
-    user.profile.login_by_code = False
+    user.profile.login_with_code = False
     user.profile.requires_2fa = True
     user.profile.save()
 
@@ -165,9 +192,9 @@ def test_removing_totp_enables_login_by_code_sensitive_account(request, client):
 
 
 @pytest.mark.django_db
-def test_removing_totp_does_not_enable_login_by_code_normal_account(request, client):
+def test_removing_totp_does_not_enable_login_with_code_normal_account(request, client):
     user = baker.make(auth_models.User)
-    user.profile.login_by_code = False
+    user.profile.login_with_code = False
     user.profile.requires_2fa = False
     user.profile.save()
 
@@ -182,9 +209,6 @@ def test_removing_totp_does_not_enable_login_by_code_normal_account(request, cli
 
 
 # signals that ensure that requires_2fa is up to date
-
-
-SENSITIVE_GROUPS = ["admin", "staff"]
 
 
 @pytest.mark.django_db
@@ -251,7 +275,6 @@ def test_ensure_2fa_pre_clear_reverse_non_sensitive_group_does_not_update():
 @pytest.mark.django_db
 @pytest.mark.parametrize("group_suffix", SENSITIVE_GROUPS)
 def test_ensure_2fa_post_clear_forward_clears_2fa(group_suffix):
-    # user.groups.clear()
     user = baker.make(auth_models.User)
     group = auth_models.Group.objects.get(name=f"example_com_{group_suffix}")
     user.groups.add(group)

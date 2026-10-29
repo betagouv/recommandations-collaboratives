@@ -5,7 +5,7 @@
 <div class="crm__note-empty-state">
     <p class="crm__note-empty-state__title">Il n'y a pas encore de note ici.</p>
     <p class="crm__note-empty-state__cta">
-        Vous pouvez <a href="{% url 'crm-project-note-create' project.pk %}"
+        Vous pouvez <a href="{{ create_note_url }}"
     class="crm__note-empty-state__cta-link">en créer une.</a>
     </p>
 </div>

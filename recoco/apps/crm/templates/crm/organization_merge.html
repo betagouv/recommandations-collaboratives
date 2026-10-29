@@ -50,7 +50,7 @@
                                 <li>
                                     <button type="button"
                                             class="fr-tag"
-                                            @click="name = '{{ organization.name|escapejs }}'"
+                                            @click="$event.stopImmediatePropagation(); name = '{{ organization.name|escapejs }}'"
                                             :aria-pressed="name === '{{ organization.name|escapejs }}'">
                                         {{ organization.name }}
                                     </button>

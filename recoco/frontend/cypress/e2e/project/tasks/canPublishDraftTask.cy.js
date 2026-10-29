@@ -1,63 +1,29 @@
-let currentProjectId;
-// TODO Réécrire pour la nouvelle interface conversation
-//      (les boutons publish/unpublish/update étaient dans task_actions.html supprimé)
-describe.skip('I can go to tasks tab @page-projet-recommandations @page-projet-recommandations-creation', () => {
+import projects from '../../../fixtures/projects/projects.json';
+import sharedContentsPanel from '../../../support/tools/sharedContentsPanel';
+
+const currentProject = projects.find((p) => p.pk === 29);
+
+describe('I can publish a draft recommendation @page-projet-recommandations @page-projet-recommandations-creation', () => {
+  const intent = `Brouillon à publier ${Date.now()}`;
+
   beforeEach(() => {
     cy.login('conseiller1');
-    cy.createProject('draft project').then((projectId) => {
-      currentProjectId = projectId;
-      cy.logout();
-    });
+    cy.resetProjectRecommendations(currentProject.pk);
+    cy.createTaskViaApi(currentProject.pk, { intent });
   });
 
-  it('publishes a task', () => {
-    cy.login('conseiller2');
-    cy.visit(`/project/${currentProjectId}/actions`).then(() => {
-      cy.becomeAdvisor(currentProjectId);
-      cy.visit(`/project/${currentProjectId}/actions`);
+  it('sees the draft in the drafts tab and publishes it', () => {
+    cy.visit(`/project/${currentProject.pk}/conversations`);
+    sharedContentsPanel.openFromTopic('drafts');
+    sharedContentsPanel.expectDraftCount(1);
+    sharedContentsPanel.getDraftCards().should('contain.text', intent);
 
-      cy.get('[data-test-id="submit-task-button"]').click();
-      cy.get('[data-cy="reco-pusher-selected-project"]').should(
-        'contains.text',
-        'draft project'
-      );
-      cy.get('#push-noresource').click({ force: true });
+    // Publishing removes it from the drafts tab...
+    sharedContentsPanel.publishDraft(0);
+    sharedContentsPanel.expectDraftCount(0);
 
-      cy.get('#intent')
-        .type(`draft project`, { force: true, delay: 0 })
-        .should('have.value', `draft project`);
-
-      cy.get('textarea')
-        .type(`reco test from action description`, { force: true, delay: 0 })
-        .should('have.value', `reco test from action description`);
-
-      cy.get('.ProseMirror p').click();
-      cy.focused().type('reco test for draft task');
-
-      cy.get('[data-test-id="publish-draft-task-button"]').click();
-
-      cy.url().should('include', '/actions');
-
-      cy.contains('draft project');
-
-      cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
-
-      cy.get('#unpublish-task-button').click({ force: true });
-      cy.get('[data-test-id="task-draft-status"]').should('be.visible');
-      cy.get('#publish-task-button').click({ force: true });
-      cy.get('[data-test-id="task-draft-status"]').should('not.exist');
-      cy.get('[data-test-id="update-task-action-button"]').click({
-        force: true,
-      });
-      cy.get('textarea').type(
-        `reco test from action description modification`,
-        { force: true, delay: 0 }
-      );
-      cy.get('[data-cy="button-submit-task"]').click();
-      cy.url().should('include', '/actions');
-      cy.contains('reco test from action description modification');
-    });
+    // ...and it becomes a published recommendation.
+    sharedContentsPanel.switchTab('recommendations');
+    sharedContentsPanel.getRecommendationCards().should('contain.text', intent);
   });
 });
-
-// page recommandations

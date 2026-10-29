@@ -9,13 +9,13 @@
 -->
 {% load static %}
 <a class="position-relative crm-home__card d-flex flex-column" href="{{ link_url }}{{ anchor }}">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center fr-pb-1v">
         {% if is_alert %}
             <span class="badge text-bg-danger no-underline fr-mr-1w">{{ nb_alert }}</span>
         {% else %}
             <span class="crm-home__card--icon {{ icon }} fr-icon--sm fr-mr-1w" aria-hidden="true"></span>
         {% endif %}
-        <span class="crm-home__card--title d-block text-center font-very-small">{{ name }}</span>
+        <span class="crm-home__card--title d-block font-very-small">{{ name }}</span>
     </div>
     <div>
         <span class="crm-home__card--text">{{ text }}</span>

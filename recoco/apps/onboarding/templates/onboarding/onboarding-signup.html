@@ -17,44 +17,11 @@
     </style>
 {% endblock css %}
 {% block title %}
-    | Solliciter l'équipe {{ request.site.name }}
+    Solliciter l'équipe {{ request.site.name }}
 {% endblock title %}
 {% block og_title %}
-    | Solliciter l'équipe {{ request.site.name }}
+    Solliciter l'équipe {{ request.site.name }}
 {% endblock og_title %}
-{% block page_title %}
-    Solliciter {{ request.site }}
-{% endblock page_title %}
-{% block tagline %}
-    Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
-{% endblock tagline %}
 {% block content %}
-    <div class="container">
-        <div class="banner text-center">
-            {% if site_config.email_logo %}
-                <img src="{{ site_config.email_logo.url }}"
-                     width="10%"
-                     height="auto"
-                     alt="Logo {{ request.site.name }}" />
-            {% endif %}
-            <h1>
-                <strong>Décrivez votre demande sur</strong> {{ request.site.name }}
-            </h1>
-        </div>
-        <div class="fr-stepper fr-mb-2w">
-            <h2 class="fr-stepper__title">
-                Identifiez-vous
-                <span class="fr-stepper__state">Étape 2 sur 2</span>
-            </h2>
-            <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
-        </div>
-        <div class="container__form d-flex justify-content-center"
-             x-data="AjvValidationSchema('schemaOnboardingStep1SignupFormValidator')">
-            <div class="onboarding__form"
-                 x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
-                 x-init="init">
-                {% include "onboarding/fragments/form-user.html" with include_password_field=True include_message_field=False %}
-            </div>
-        </div>
-    </div>
+    {% include "onboarding/fragments/onboarding-signup-content.html" with title="Déposer une demande" title_new_line=False stepper=True total_steps=3 step_number=2 current_step_title="Création d'un compte" next_step_title="Confirmation de l'adresse e-mail" %}
 {% endblock content %}

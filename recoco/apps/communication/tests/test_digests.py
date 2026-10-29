@@ -164,18 +164,6 @@ def test_send_digests_for_new_reco_empty(client, request, make_project):
 
 
 @pytest.mark.django_db
-def test_make_site_digest_with_siteconfiguration(client, request):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
-    data = digests.make_site_digest(site)
-
-    assert "legal_owner" in data
-
-    assert len(data) > 0
-
-
-@pytest.mark.django_db
 def test_make_project_survey_for_site_digest_without_configuration(
     project_ready, client, request
 ):
@@ -263,8 +251,9 @@ def test_send_digests_for_new_sites_by_user(request, make_project):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_switchtender_by_user(request, client, make_project):
-    current_site = get_current_site(request)
+def test_send_digests_for_switchtender_by_user(
+    request, client, make_project, current_site
+):
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     advisor_group = auth.Group.objects.get(name="example_com_advisor")
@@ -682,15 +671,33 @@ class TestSendNewRecommendationsRemindersDigestByProject:
     def test_dryrun(
         self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
     ):
+        due_reminder = baker.make(Reminder)
         project = baker.make(projects_models.Project, sites=[current_site])
-        res = send_new_recommendations_reminders_digest_by_project(
-            site=current_site, project=project, dry_run=True
+        owner = baker.make(auth.User)
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
         )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {"any": "digest"}
+
+        # dry_run now flows all the way to send_email (so params/template
+        # resolution are exercised for real). Only the actual Brevo HTTP
+        # call is skipped, further down inside send_email itself.
+        with patch("recoco.apps.communication.digests.send_email") as mock_send_email:
+            res = send_new_recommendations_reminders_digest_by_project(
+                site=current_site, project=project, dry_run=True
+            )
 
         assert res is True
         mock_make_reminder.assert_called_once_with(current_site, project)
         mock_get_due_reminder.assert_called_once_with(current_site, project)
-        mock_make_digest.assert_not_called()
+        mock_make_digest.assert_called_once_with(project, ANY, owner)
+        mock_send_email.assert_called_once()
+        assert mock_send_email.call_args.kwargs["dry_run"] is True
+
+        due_reminder.refresh_from_db()
+        assert due_reminder.sent_to is None
 
     def test_no_due_reminder(
         self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
@@ -757,6 +764,7 @@ class TestSendNewRecommendationsRemindersDigestByProject:
             },
             params={"any": "digest"},
             related=due_reminder,
+            dry_run=False,
         )
 
         due_reminder.refresh_from_db()
@@ -801,15 +809,30 @@ class TestSendWhatsupRemindersDigestByProject:
     def test_dryrun(
         self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
     ):
+        due_reminder = baker.make(Reminder)
         project = baker.make(projects_models.Project, sites=[current_site])
-        res = send_whatsup_reminders_digest_by_project(
-            site=current_site, project=project, dry_run=True
+        owner = baker.make(auth.User)
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
         )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {"any": "digest"}
+
+        with patch("recoco.apps.communication.digests.send_email") as mock_send_email:
+            res = send_whatsup_reminders_digest_by_project(
+                site=current_site, project=project, dry_run=True
+            )
 
         assert res is True
         mock_make_reminder.assert_called_once_with(current_site, project)
         mock_get_due_reminder.assert_called_once_with(current_site, project)
-        mock_make_digest.assert_not_called()
+        mock_make_digest.assert_called_once_with(project, ANY, owner)
+        mock_send_email.assert_called_once()
+        assert mock_send_email.call_args.kwargs["dry_run"] is True
+
+        due_reminder.refresh_from_db()
+        assert due_reminder.sent_to is None
 
     def test_no_due_reminder(
         self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
@@ -876,6 +899,7 @@ class TestSendWhatsupRemindersDigestByProject:
             },
             params={"any": "digest"},
             related=due_reminder,
+            dry_run=False,
         )
 
         due_reminder.refresh_from_db()

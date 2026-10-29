@@ -17,8 +17,8 @@
     {% vite_asset 'js/apps/documents.js' %}
 {% endblock js %}
 {% block project_detail %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+    {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
     {% include "projects/project/navigation.html" with files_links=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     <div class="fr-p-3w">

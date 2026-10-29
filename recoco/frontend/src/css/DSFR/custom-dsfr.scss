@@ -67,6 +67,14 @@
   text-transform: uppercase;
 }
 
+.fr-hint-text-blue {
+  color: var(--light-text-default-info, #0063cb);
+}
+
+.fr-hint-text::before {
+  margin-right: 0.25rem;
+}
+
 /* ¯¯¯¯ *\
   INPUTS
 \* ˍˍˍˍ */
@@ -78,12 +86,62 @@
   opacity: 1;
 }
 
+.search-bar {
+  position: relative;
+  span {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    color: var(--light-text-mention-grey, #666);
+  }
+  input {
+    padding-left: 2rem;
+  }
+}
+
+.fr-select-group {
+  &--rounded {
+    .fr-select {
+      padding: 5px 15px;
+      padding-right: 35px;
+      background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity));
+      border-radius: var(--bs-border-radius-pill);
+      border:solid 1px #e5e5e5; ;
+      box-shadow: none;
+    }
+  }
+}
+
+/* ¯¯¯¯ *\
+  HEADER
+\* ˍˍˍˍ */
+
+.fr-header {
+  &.sticky-top {
+    position: sticky;
+    top: 0;
+  }
+  &__tools {
+    line-height: 1rem;
+  }
+  &__separator {
+    border-left: 1px solid #aaa ;
+    height: 24px;
+    padding-left: 1rem;
+  }
+}
+
 /* ¯¯¯¯ *\
   ICONS
 \* ˍˍˍˍ */
 
 .fr-icon-margin-right-sm::before {
   margin-right: 0.2rem;
+}
+
+.fr-icon--xl::before {
+  width: 48px;
+  height: 48px;
 }
 
 p a {
@@ -581,6 +639,15 @@ form > p {
   cursor: pointer;
 }
 
+/* ¯¯¯¯¯¯ *\
+  CONTAINER
+\* ˍˍˍˍˍˍ */
+
+.fr-container--small {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
 /* ¯¯¯ *\
   UTILS
 \* ˍˍˍ */
@@ -688,6 +755,11 @@ form > p {
 
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
+}
+
+.font-size-16px,
+.font-size-16px p {
+  font-size: 16px;
 }
 
 .font-size-14px,

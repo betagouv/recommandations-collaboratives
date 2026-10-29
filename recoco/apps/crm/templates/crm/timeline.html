@@ -16,7 +16,7 @@
                         <div class="w-100 font-size-12px">
                             {% if action.actor %}
                                 <span class="d-inline-flex align-middle">
-                                    {% include "user/user_card.html" with user=action.actor show_organization=False %}
+                                    {% include "user/user_card.html" with user=action.actor show_organization=True %}
                                 </span>
                             {% else %}
                                 <span class="actor">(compte supprimé)</span>
@@ -59,3 +59,7 @@
         {% endfor %}
     {% endfor %}
 </ul>
+
+{% if not no_explain_trunc %}
+  <span class="fr-icon-information-fill" aria-hidden="true"></span> Il est possible que des activités plus anciennes ne soient pas affichées ici.
+{% endif %}

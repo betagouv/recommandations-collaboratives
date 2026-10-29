@@ -65,6 +65,8 @@
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="button red filled fr-mt-2v">Oui, je supprime cette ressource</button>
+                <a class="button fr-mt-2v fr-ml-2v"
+                   href="{% url 'crm-resource-list' %}">Annuler</a>
             </form>
         </div>
     </div>

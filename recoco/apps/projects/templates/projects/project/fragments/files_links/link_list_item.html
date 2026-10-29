@@ -1,8 +1,8 @@
 {% load static %}
 {% load humanize %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 <div class="fr-mb-2w">
     <div class="rounded border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-start">

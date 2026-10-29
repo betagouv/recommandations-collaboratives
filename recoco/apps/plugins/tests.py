@@ -2,16 +2,20 @@ from unittest.mock import Mock, patch
 
 import pluggy
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.db.models import Value
+from django.test import RequestFactory
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from model_bakery import baker
 from psycopg.sql import SQL, Identifier
 
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.projects.context_processors import unread_notifications_processor
 from recoco.utils import login
 
-from .hooks import CrmSpec, ProjectSpec
+from .hooks import CrmSpec, NotificationSpec, ProjectSpec
 from .manager import get_site_plugin_manager
 from .middlewares import TenantPluginSchemaMiddleware
 from .routers import TenantPluginRouter
@@ -49,10 +53,12 @@ class PluginB:
         return [{"name": "plugin_b"}]
 
 
-def make_plugin_manager(*named_plugins):
-    """Build a real PluginManager pre-loaded with the given (name, instance) pairs."""
+def make_plugin_manager(*named_plugins, specs=(ProjectSpec,)):
+    """Build a real PluginManager registered with the given hookspec namespaces
+    and pre-loaded with the given (name, instance) pairs."""
     pm = pluggy.PluginManager("recoco")
-    pm.add_hookspecs(ProjectSpec)
+    for spec in specs:
+        pm.add_hookspecs(spec)
     for name, plugin in named_plugins:
         pm.register(plugin, name=name)
     return pm
@@ -211,9 +217,11 @@ class TestTenantPluginSchemaMiddleware:
 
             middleware(request_mock)
 
-            cursor_instance.execute.assert_called_once_with(
+            cursor_instance.execute.assert_any_call(
                 SQL("SET search_path TO {}, public").format(Identifier("tenant_lyon"))
             )
+            # search_path is reset to public once the response has been generated
+            cursor_instance.execute.assert_called_with("SET search_path TO public")
 
 
 @pytest.mark.django_db
@@ -292,6 +300,28 @@ def test_migrate_tenant_command_logic(current_site):
 
 
 # ---------------------------------------------------------------------------
+# Shared helpers for hook extension point tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def site_with_enabled_plugins(current_site):
+    """Factory: create a SiteConfiguration enabling the given plugin names."""
+
+    def _make(names):
+        return baker.make(
+            SiteConfiguration, site=current_site, enabled_plugins=list(names)
+        )
+
+    return _make
+
+
+@pytest.fixture
+def site_without_plugins(current_site):
+    return baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+
+
+# ---------------------------------------------------------------------------
 # CRM hook extension points
 # ---------------------------------------------------------------------------
 
@@ -300,25 +330,21 @@ FAKE_PLUGIN_NAME = "fake_crm_plugin"
 
 def make_crm_plugin_manager(plugin):
     """Build a plugin manager registered with CrmSpec and the given plugin."""
-    pm = pluggy.PluginManager("recoco")
-    pm.add_hookspecs(ProjectSpec)
-    pm.add_hookspecs(CrmSpec)
-    pm.register(plugin, name=FAKE_PLUGIN_NAME)
-    return pm
+    return make_plugin_manager((FAKE_PLUGIN_NAME, plugin), specs=(ProjectSpec, CrmSpec))
 
 
 class FakeCrmPlugin:
     """Minimal plugin that adds a sentinel annotation + field + column."""
 
-    @pluggy.HookimplMarker("recoco")
+    @hookimpl
     def crm_project_list_annotations(self, request):
         return {"plugin_sentinel": Value(42)}
 
-    @pluggy.HookimplMarker("recoco")
+    @hookimpl
     def crm_project_list_extra_serializer_fields(self, request):
         return ["plugin_sentinel"]
 
-    @pluggy.HookimplMarker("recoco")
+    @hookimpl
     def crm_project_list_columns(self, request):
         return {
             "header": "Sentinel",
@@ -326,14 +352,21 @@ class FakeCrmPlugin:
             "col_class": "col--small",
         }
 
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_filters(self, request):
+        return mark_safe('<div data-test-id="fake-filter"></div>')
+
+    @pluggy.HookimplMarker("recoco")
+    def crm_project_list_filter_lookups(self, request):
+        fake_filter = request.GET.get("fake_filter")
+        if fake_filter:
+            return {"name": fake_filter}
+        return None
+
 
 @pytest.fixture
-def site_with_fake_plugin(current_site):
-    return baker.make(
-        SiteConfiguration,
-        site=current_site,
-        enabled_plugins=[FAKE_PLUGIN_NAME],
-    )
+def site_with_fake_plugin(site_with_enabled_plugins):
+    return site_with_enabled_plugins([FAKE_PLUGIN_NAME])
 
 
 @pytest.mark.django_db
@@ -365,10 +398,8 @@ class TestCrmProjectListAnnotationsHook:
         assert results[0]["plugin_sentinel"] == 42
 
     def test_extra_field_absent_when_plugin_disabled(
-        self, client, project, current_site
+        self, client, project, site_without_plugins
     ):
-        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
-
         pm = make_crm_plugin_manager(FakeCrmPlugin())
 
         with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
@@ -398,8 +429,32 @@ class TestCrmProjectListColumnsHook:
         assert columns[0]["header"] == "Sentinel"
 
     def test_no_plugin_columns_when_plugin_disabled(
-        self, request, client, current_site
+        self, request, client, site_without_plugins
     ):
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("crm-project-list"))
+
+        assert response.status_code == 200
+        assert response.context["plugin_columns"] == []
+
+
+@pytest.mark.django_db
+class TestCrmProjectListFiltersHook:
+    def test_plugin_filters_in_view_context(self, client, site_with_fake_plugin):
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("crm-project-list"))
+
+        assert response.status_code == 200
+        assert len(response.context["plugin_filters"]) == 1
+        assert b'data-test-id="fake-filter"' in response.content
+
+    def test_no_plugin_filters_when_plugin_disabled(self, client, current_site):
         baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
 
         pm = make_crm_plugin_manager(FakeCrmPlugin())
@@ -409,4 +464,161 @@ class TestCrmProjectListColumnsHook:
                 response = client.get(reverse("crm-project-list"))
 
         assert response.status_code == 200
-        assert response.context["plugin_columns"] == []
+        assert response.context["plugin_filters"] == []
+
+
+@pytest.mark.django_db
+class TestCrmProjectListFilterLookupsHook:
+    def test_lookups_filter_the_queryset(
+        self, client, make_project, site_with_fake_plugin
+    ):
+        kept = make_project(name="kept")
+        make_project(name="dropped")
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"), {"fake_filter": "kept"})
+
+        assert response.status_code == 200
+        assert [p["id"] for p in response.json()["results"]] == [kept.id]
+
+    def test_no_filtering_without_query_param(
+        self, client, make_project, site_with_fake_plugin
+    ):
+        projects = [make_project(name="kept"), make_project(name="dropped")]
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"))
+
+        assert response.status_code == 200
+        assert {p["id"] for p in response.json()["results"]} == {p.id for p in projects}
+
+    def test_lookups_ignored_when_plugin_disabled(
+        self, client, make_project, current_site
+    ):
+        baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
+        projects = [make_project(name="kept"), make_project(name="dropped")]
+
+        pm = make_crm_plugin_manager(FakeCrmPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(reverse("projects-list"), {"fake_filter": "kept"})
+
+        assert response.status_code == 200
+        assert {p["id"] for p in response.json()["results"]} == {p.id for p in projects}
+
+
+# ---------------------------------------------------------------------------
+# Project overview sidebar blocks hook extension point
+# ---------------------------------------------------------------------------
+
+FAKE_PROJECT_PLUGIN_NAME = "fake_project_plugin"
+
+
+def make_project_plugin_manager(plugin):
+    """Build a plugin manager registered with ProjectSpec and the given plugin."""
+    return make_plugin_manager((FAKE_PROJECT_PLUGIN_NAME, plugin))
+
+
+class FakeProjectOverviewPlugin:
+    """Minimal plugin contributing a sidebar block to the project overview."""
+
+    @hookimpl
+    def project_overview_sidebar_blocks(self, project, request):
+        return mark_safe("<div class='plugin-block-sentinel'>sentinel block</div>")
+
+
+@pytest.fixture
+def site_with_fake_project_plugin(site_with_enabled_plugins):
+    return site_with_enabled_plugins([FAKE_PROJECT_PLUGIN_NAME])
+
+
+@pytest.mark.django_db
+class TestProjectOverviewSidebarBlocksHook:
+    def test_block_rendered_in_sidebar(
+        self, client, project, site_with_fake_project_plugin
+    ):
+        pm = make_project_plugin_manager(FakeProjectOverviewPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(
+                    reverse("projects-project-detail-overview", args=[project.pk])
+                )
+
+        assert response.status_code == 200
+        blocks = response.context["project_overview_sidebar_blocks"]
+        assert len(blocks) == 1
+        assert "plugin-block-sentinel" in blocks[0]
+        assert b"<div class='plugin-block-sentinel'>" in response.content
+
+    def test_no_block_when_plugin_disabled(self, client, project, site_without_plugins):
+        pm = make_project_plugin_manager(FakeProjectOverviewPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            with login(client, groups=["example_com_staff"]):
+                response = client.get(
+                    reverse("projects-project-detail-overview", args=[project.pk])
+                )
+
+        assert response.status_code == 200
+        assert response.context["project_overview_sidebar_blocks"] == []
+        assert b"plugin-block-sentinel" not in response.content
+
+
+# ---------------------------------------------------------------------------
+# Notification hook extension point
+# ---------------------------------------------------------------------------
+
+FAKE_NOTIFICATION_PLUGIN_NAME = "fake_notification_plugin"
+FAKE_NOTIFICATION_VERB = "plugin_fake:custom_verb"
+
+
+class FakeNotificationPlugin:
+    """Minimal plugin contributing an extra notification verb."""
+
+    @hookimpl
+    def notification_project_verbs(self):
+        return [FAKE_NOTIFICATION_VERB]
+
+
+def make_notification_plugin_manager(plugin):
+    return make_plugin_manager(
+        (FAKE_NOTIFICATION_PLUGIN_NAME, plugin), specs=(NotificationSpec,)
+    )
+
+
+@pytest.mark.django_db
+class TestNotificationProjectVerbsHook:
+    def test_verb_added_when_plugin_enabled(self, site_with_enabled_plugins):
+        site_config = site_with_enabled_plugins([FAKE_NOTIFICATION_PLUGIN_NAME])
+        user = baker.make(get_user_model())
+        request = RequestFactory().get("/")
+        request.user = user
+        request.site_config = site_config
+
+        pm = make_notification_plugin_manager(FakeNotificationPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            context = unread_notifications_processor(request)
+
+        assert FAKE_NOTIFICATION_VERB in context["show_project_verb_list"]
+
+    def test_verb_absent_when_plugin_disabled(self, site_without_plugins):
+        user = baker.make(get_user_model())
+        request = RequestFactory().get("/")
+        request.user = user
+        request.site_config = site_without_plugins
+
+        pm = make_notification_plugin_manager(FakeNotificationPlugin())
+
+        with patch("recoco.apps.plugins.manager.get_plugin_manager", return_value=pm):
+            context = unread_notifications_processor(request)
+
+        assert FAKE_NOTIFICATION_VERB not in context["show_project_verb_list"]

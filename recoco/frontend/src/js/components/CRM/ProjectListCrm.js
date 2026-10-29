@@ -15,6 +15,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     searchText: '',
     searchDepartment: [],
     searchStatus: [],
+    pluginFilters: {},
   },
   searchText: '',
   pagination: {
@@ -96,6 +97,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.projectsTotal = projects.count;
     this.pagination.total = Math.ceil(projects.count / this.pagination.limit);
   },
+
   async saveSelectedDepartment(event) {
     if (!event.detail) return;
 
@@ -103,6 +105,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+
   async saveSelectedStatus(event) {
     if (!event.detail) return;
 
@@ -110,10 +113,12 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+
   async onSearch() {
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+
   async handleProjectSearch() {
     try {
       return await this.getProjects({
@@ -130,6 +135,20 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       });
       throw new Error(`Error while searching projects`, error);
     }
+  },
+
+  /**
+   * PLUGINS: hook filter function trigger by plugin filter
+   */
+  async savePluginFilter(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.pluginFilters = {
+      ...this.backendSearch.pluginFilters,
+      ...event.detail,
+    };
+    const projects = await this.handleProjectSearch();
+    this.updateProjectListAndPagination(projects);
   },
 
   /************************
@@ -160,6 +179,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
           searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
           status: this.backendSearch.searchStatus,
+          extraParams: this.backendSearch.pluginFilters,
         })
       );
       return response.data;
@@ -238,11 +258,14 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
    * Display functions
    ********************/
   projectsCountLabel() {
-    if (this.projectsTotal > 0) {
-      return `${this.projectsTotal} résultat${this.projectsTotal > 1 ? 's' : ''}`;
-    } else {
+    if (this.projectsTotal === 0) {
       return 'Aucun résultat';
     }
+    const plural = this.projectsTotal > 1 ? 's' : '';
+    if (this.projectsTotal > this.pagination.limit) {
+      return `${this.projectsToDisplay.length} sur ${this.projectsTotal} résultat${plural}`;
+    }
+    return `${this.projectsTotal} résultat${plural}`;
   },
   projectTooltip(project) {
     return this.options.find((option) => option.value === project.status)

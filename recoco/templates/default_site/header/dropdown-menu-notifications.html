@@ -50,17 +50,6 @@
                         {% endif %}
                         {% if notification.verb == verbs.Recommendation.CREATED %}
                             <span class="notification__project">{{ notification.action_object.feed_label }}</span>
-                        {% elif notification.verb == verbs.User.ADVISOR_REQUEST %}
-                            <span class="notification__verb">
-                                {% for department in notification.action_object.departments.all %}
-                                    {% with count=action.action_object.departments.count %}
-                                        {% if forloop.first %}sur le{{ count|pluralize }} département{{ count|pluralize }}{% endif %}
-                                        {{ department.name }} ({{ department.code }})
-                                    {% endwith %}
-                                {% empty %}
-                                    sur la France entière
-                                {% endfor %}
-                            </span>
                         {% endif %}
                         {% if notification.action_object.comment %}
                             <span class="notification__project">{{ notification.action_object.task.resource.title }}</span>

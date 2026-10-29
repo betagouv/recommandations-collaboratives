@@ -47,6 +47,7 @@ from .. import models, signals
 from ..filters import (
     DefaultNoDeletedFilter,
     DepartmentsFilter,
+    PluginLookupsFilter,
     ProjectActivityFilter,
     ProjectAssignedToUserFilter,
     ProjectSiteStatusFilter,
@@ -55,6 +56,7 @@ from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
     ProjectForListSerializer,
+    ProjectLocationSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
@@ -80,22 +82,25 @@ class ProjectDetail(
     def get_object(self, pk):
         try:
             return (
-                self.filter_queryset(self.get_queryset()).prefetch_related(
-                    Prefetch(
-                        "switchtenders",
-                        User.objects.select_related(
-                            "profile",
-                            "profile__organization",
-                            "profile__organization__group",
+                (
+                    self.filter_queryset(self.get_queryset()).prefetch_related(
+                        Prefetch(
+                            "switchtenders",
+                            User.objects.select_related(
+                                "profile",
+                                "profile__organization",
+                                "profile__organization__group",
+                            ),
                         ),
-                    ),
-                    "project_sites",
-                    "tags",
-                    models.Project.prefetch_owner(),
-                    "project_creation_requests",
-                    "topics",
+                        "project_sites",
+                        "tags",
+                        "project_creation_requests",
+                        "topics",
+                    )
                 )
-            ).get(pk=pk)
+                .with_perf_prefetch("owner")
+                .get(pk=pk)
+            )
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
 
@@ -116,22 +121,31 @@ class ProjectDetail(
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
-        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-            request.user, "projects.change_location", p
-        )  # need at least one write perm
+
+        # The minimal perm required to allow a PATCH
+        has_perm_or_403(request.user, "projects.change_location", p)
         context = {"request": request, "view": self, "format": format}
-        serializer = UserProjectSerializer(
+
+        # Only advisors/observers hold `change_project` (and, together with
+        # it, `use_project_tags` -> see `ADVISOR_PERMISSIONS`).
+        # Collaborators, draft or not, only hold `change_location`.
+        write_serializer_class = (
+            UserProjectSerializer
+            if has_perm(request.user, "projects.change_project", p)
+            else ProjectLocationSerializer
+        )
+        write_serializer = write_serializer_class(
             p, context=context, data=request.data, partial=True
         )
-        if serializer.is_valid():
+        if write_serializer.is_valid():
             # old = copy(p)
-            serializer.save()
+            write_serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
             #     )
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(UserProjectSerializer(p, context=context).data)
+        return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectList(ListAPIView):
@@ -147,6 +161,7 @@ class ProjectList(ListAPIView):
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
         ProjectAssignedToUserFilter,
+        PluginLookupsFilter,
         # todo filter should not be necessary after cleaning recoco_sync 2122
         DefaultNoDeletedFilter,
     ]
@@ -190,10 +205,11 @@ class ProjectList(ListAPIView):
                 ),
                 "project_sites",
                 "tags",
+                "topics",
                 "members",
-                models.Project.prefetch_owner(),
                 "project_creation_requests",
             )
+            .with_perf_prefetch("owner")
             .select_related(
                 "commune__department__region",
             )
@@ -601,9 +617,11 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
     def get_queryset(self):
         qs = models.ProjectSite.objects.filter(site=self.request.site)
 
+        if not has_perm(self.request.user, "list_projects", self.request.site):
+            # from PROJECTSITE_STATES
+            qs = qs.exclude(status="TO_PROCESS")
         if not has_perm(self.request.user, "moderate_projects", self.request.site):
-            qs = qs.exclude(status__in=["DRAFT", "PROPOSED"])
-
+            qs = qs.exclude(status__in=["DRAFT", "PRE_DRAFT"])
         return qs
 
     def list(self, request):

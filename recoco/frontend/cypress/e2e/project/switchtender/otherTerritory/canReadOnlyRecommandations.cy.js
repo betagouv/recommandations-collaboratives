@@ -1,17 +1,22 @@
 import projects from '../../../../fixtures/projects/projects.json';
-const currentProject = projects[1];
 
-// TODO Réécrire pour la nouvelle interface conversation (/actions redirige vers /conversations#actions)
-describe.skip('I can read only recommandations @page-projet-recommandations', () => {
+const currentProject = projects[1]; // pk 2 - conseiller3 is NOT advisor of this project
+
+describe('I can read only recommandations @page-projet-recommandations', () => {
   beforeEach(() => {
     cy.login('conseiller3');
   });
 
-  it('goes to recommandations and read only content', () => {
-    cy.visit(`/project/${currentProject.pk}/actions`);
+  it('goes to the conversation and cannot create a recommendation', () => {
+    cy.visit(`/project/${currentProject.pk}`);
 
-    cy.contains('Ajouter une recommandation').should('not.exist');
+    cy.get('[data-test-id="project-navigation-conversations-new"]').should(
+      'have.attr',
+      'disabled'
+    );
+
+    // Advisor on another territory only: the recommendation creation entry
+    // point must not be available.
+    cy.get('[data-test-id="create-task-button"]').should('not.exist');
   });
 });
-
-// page recommandations

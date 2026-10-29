@@ -1,0 +1,86 @@
+[
+  {
+    "model": "feature_flag.flag",
+    "pk": 1,
+    "fields": {
+      "name": "login_with_credentials",
+      "everyone": true,
+      "percent": null,
+      "testing": false,
+      "superusers": true,
+      "staff": false,
+      "authenticated": false,
+      "languages": "",
+      "rollout": false,
+      "note": "Affiche le formulaire de connexion par identifiants (#id_login). Requis par cypress/e2e/auth/loginWithUi.cy.js.",
+      "created": "2026-07-31T09:00:00Z",
+      "modified": "2026-07-31T09:00:00Z",
+      "groups": [],
+      "users": [],
+      "sites": []
+    }
+  },
+  {
+    "model": "feature_flag.flag",
+    "pk": 2,
+    "fields": {
+      "name": "enable_submit_new_project",
+      "everyone": true,
+      "percent": null,
+      "testing": false,
+      "superusers": true,
+      "staff": false,
+      "authenticated": false,
+      "languages": "",
+      "rollout": false,
+      "note": "Affiche le bouton « Déposer un dossier » ([data-test-id=create-project]). Requis par cypress/e2e/header/canCreateANewProject.cy.js.",
+      "created": "2026-07-31T09:00:00Z",
+      "modified": "2026-07-31T09:00:00Z",
+      "groups": [],
+      "users": [],
+      "sites": []
+    }
+  },
+  {
+    "model": "feature_flag.flag",
+    "pk": 3,
+    "fields": {
+      "name": "suggest_reco_btn",
+      "everyone": true,
+      "percent": null,
+      "testing": false,
+      "superusers": true,
+      "staff": false,
+      "authenticated": false,
+      "languages": "",
+      "rollout": false,
+      "note": "Affiche le bouton de suggestion de recommandation dans l'éditeur. Requis par cypress/e2e/project/tasks/canSeeSuggestTasks.cy.js.",
+      "created": "2026-07-31T09:00:00Z",
+      "modified": "2026-07-31T09:00:00Z",
+      "groups": [],
+      "users": [],
+      "sites": []
+    }
+  },
+  {
+    "model": "feature_flag.flag",
+    "pk": 4,
+    "fields": {
+      "name": "proconnect_login",
+      "everyone": false,
+      "percent": null,
+      "testing": false,
+      "superusers": false,
+      "staff": false,
+      "authenticated": false,
+      "languages": "",
+      "rollout": false,
+      "note": "Volontairement désactivé : ProConnect dépend d'un fournisseur d'identité externe, inutilisable en e2e. Passer everyone à true pour tester la mise en page à deux colonnes de la page de connexion.",
+      "created": "2026-07-31T09:00:00Z",
+      "modified": "2026-07-31T09:00:00Z",
+      "groups": [],
+      "users": [],
+      "sites": []
+    }
+  }
+]

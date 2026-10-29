@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
+    {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
+{% endblock js %}
+{% block title %}
+    Demander un accès conseiller
+{% endblock title %}
+{% block og_title %}
+    Demander un accès conseiller
+{% endblock og_title %}
+{% block content %}
+    {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller ou conseillère" %}
+{% endblock content %}

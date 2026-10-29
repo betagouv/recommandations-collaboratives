@@ -310,7 +310,23 @@ def update_task(request, task_id=None):
 @require_http_methods(["GET"])
 def task_generate_ds_prefill(request, task_id):
     """Generates a link to a prefilled ds demande and redirect to it"""
+
+    # fetches task to check permission
+    try:
+        task = models.Task.objects.select_related("project__commune__department").get(
+            id=task_id
+        )
+    except models.Task.DoesNotExist:
+        return
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
+
     url = create_ds_prefill_link(task_id)
+    if not url:
+        messages.error(
+            request,
+            "Cette recommandation n'est pas compatible avec le pré-remplissage sur démarche numérique.",
+        )
+        url = task.get_absolute_url()
     return redirect(url)
 
 
@@ -456,6 +472,19 @@ def presuggest_task(request, project_id):
             )
 
     return render(request, "tasks/tasks/task_suggest.html", locals())
+
+
+@login_required
+def exploration_ia_task(request, project_id):
+    """Exploration IA task"""
+    project = get_object_or_404(
+        project_models.Project, sites=request.site, pk=project_id
+    )
+    project_tags = list(project.tags.values("name"))
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
+
+    return render(request, "tasks/tasks/exploration_ia.html", locals())
 
 
 @login_required

@@ -49,7 +49,9 @@
                  x-data="{isOpen: false}"
                  :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
-                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Demandeurs</h3>
+                {% if not is_embedded %}
+                    <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Demandeurs</h3>
+                {% endif %}
                 <ul class="flex-column list-unstyled fr-mb-0">
                     {% for projectmember in project.projectmember_set.all %}
                         {% if projectmember.is_owner and projectmember.member.is_active %}
@@ -59,7 +61,9 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
-                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Equipe de suivi</h3>
+                {% if not is_embedded %}
+                    <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Equipe de suivi</h3>
+                {% endif %}
                 <ul class="d-flex flex-column list-unstyled fr-mb-0">
                     {% for advisor in project.switchtender_sites.all %}
                         {% if advisor.switchtender.is_active %}
@@ -93,7 +97,7 @@
                  {% comment %}
                  @topic-switched.window="scrollToFirstNotification($event.detail)"
                  {% endcomment %}>
-                {% get_obj_perms request.user for project as "user_project_perms" %}
+                {% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
                 {% include "conversations/messages/fragments/conversations_new_feed.html" %}
                 {% if "use_public_notes" in user_project_perms %}
                     <!-- Post message -->
@@ -124,17 +128,13 @@
                                     </p>
                                 </div>
                             </template>
-                            {% if advising_position.is_advisor or is_switchtender or is_staff %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
-                                {% comment %}
-                                advising_position.is_advisor : advisor on current project
-                                is_switchtender : advisor on current site
-                                is_staff : staff on current site
-                                {% endcomment %}
+                            {% if is_embedded %}
+                                {% with placeholder="Écrivez votre message ici" hide_attach_files=True hide_attach_contact=True %}
+                                    {% include "conversations/messages/fragments/conversation_editor.html" %}
+                                {% endwith %}
                             {% else %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+                                    {% include "conversations/messages/fragments/conversation_editor.html" %}
                             {% endif %}
-                            <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>
                         {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>

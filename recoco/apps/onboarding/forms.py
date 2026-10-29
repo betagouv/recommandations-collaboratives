@@ -14,6 +14,8 @@ from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
+from django.contrib.auth.forms import SetPasswordMixin
+from django.contrib.auth.models import User
 from django.urls import reverse
 
 from recoco.apps.dsrc.forms import DsrcBaseForm
@@ -22,7 +24,9 @@ from recoco.apps.dsrc.forms import DsrcBaseForm
 ##################################################
 # Onboarding multi-step forms
 ##################################################
-class OnboardingSignupForm(DsrcBaseForm):
+class OnboardingSignupForm(SetPasswordMixin, DsrcBaseForm):
+    password1, password2 = SetPasswordMixin.create_password_fields()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper.form_id = "id-onboarding-signup-form"  # The form id is used for validation, it must be set and unique in the page
@@ -40,7 +44,8 @@ class OnboardingSignupForm(DsrcBaseForm):
                 "role",
                 "email",
                 "phone",
-                "password",
+                "password1",
+                "password2",
             ),
         )
 
@@ -50,49 +55,38 @@ class OnboardingSignupForm(DsrcBaseForm):
         email = self.cleaned_data["email"]
         return email.lower()
 
-    # Messages used to provide help to the user: overload in your forms to change the messages
-    def password_message_group(errors=None):
-        return {
-            "help_text": "Votre mot de passe doit contenir :",
-            "messages": [
-                {
-                    "text": "(10 caractères minimum et au moins 1 majuscule et 1 chiffre)",
-                    "type": "info",
-                }
-            ],
-        }
+    def clean(self):
+        super().clean()
+        self.validate_passwords()
+        user = User(
+            username=self.cleaned_data.get("email"),
+            email=self.cleaned_data.get("email"),
+            first_name=self.cleaned_data.get("first_name"),
+            last_name=self.cleaned_data.get("last_name"),
+        )
+        self.validate_password_for_user(user, password_field_name="password1")  # noqa: S106
 
-    first_name = forms.CharField(label="Prénom *", initial="", required=True)
-    last_name = forms.CharField(label="Nom *", initial="", required=True)
+    first_name = forms.CharField(label="Prénom", initial="", required=True)
+    last_name = forms.CharField(label="Nom", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre organisation *",
+        label="Nom de votre organisation",
         help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
-    role = forms.CharField(label="Fonction *", initial="", required=True)
+    role = forms.CharField(label="Fonction", initial="", required=True)
 
     # TODO: add an email validation, pattern / mask
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
         disabled=True,
     )
 
-    # Password input, with a password widget, show/hide control, and a help text
-    password = forms.CharField(
-        label="Mot de passe *",
-        required=True,
-        help_text="Votre mot de passe doit contenir 10 caractères minimum et au moins 1 majuscule et 1 chiffre",
-        widget=forms.PasswordInput(
-            attrs={"size": "sm", "message_group": password_message_group()}
-        ),
-    )
-
     # TODO: add a phone number validation, pattern / mask
     phone = forms.CharField(
         max_length=16,
-        label="Numéro de téléphone *",
+        label="Numéro de téléphone",
         initial="",
         help_text="Votre numéro de téléphone ne sera jamais diffusé en dehors du site. Il permet aux administrateurs ou aux partenaires de votre dossier de vous joindre plus facilement. Format attendu: 0102030405.",
         required=True,
@@ -130,7 +124,7 @@ class OnboardingProject(DsrcBaseForm):
             self.fields.pop("captcha")
 
     name = forms.CharField(
-        label="Nom de votre dossier *",
+        label="Nom de votre dossier",
         initial="",
         required=True,
         help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
@@ -141,7 +135,7 @@ class OnboardingProject(DsrcBaseForm):
         required=False,
         help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
     )
-    postcode = forms.CharField(label="Code postal *", initial="", required=True)
+    postcode = forms.CharField(label="Code postal", initial="", required=True)
 
     insee = forms.CharField(
         max_length=5,
@@ -150,7 +144,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé de votre demande *",
+        label="Résumé de votre demande",
         initial="",
         required=True,
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
@@ -158,7 +152,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email",
         required=True,
         help_text="Format attendu : prenom.nom@domaine.fr",
     )

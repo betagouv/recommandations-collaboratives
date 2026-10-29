@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_vite %}
+{% load projects_extra %}
+{% block title %}
+    Exploration assistée des ressources
+{% endblock title %}
+{% block og_title %}
+    Exploration assistée des ressources
+{% endblock og_title %}
+{% block css %}
+    {% vite_asset 'js/styles/exploration-ia.css.js' %}
+    {% vite_asset 'js/styles/resource-card.css.js' %}
+{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/apps/explorationIA.js' %}
+{% endblock js %}
+{% block content %}
+    {{ project.name|json_script:"project-name" }}
+    {{ project.description|json_script:"project-description" }}
+    {% if project.commune %}
+        {{ project.commune.name|json_script:"project-commune-name" }}
+        {{ project.commune.postal|json_script:"project-commune-postal" }}
+        {{ project.commune.department.code|json_script:"project-department-code" }}
+        {{ project.commune.department.region.name|json_script:"project-region" }}
+    {% endif %}
+    {{ project_tags|json_script:"project-tags" }}
+    <div class="row justify-content-center">
+        <div class="col-10 fr-p-3w"
+             x-data="ExplorationIA({ projectId: {{ project.id }} })">
+            <!-- Barre d'actions : aide -->
+            <div class="d-flex justify-content-end fr-mb-1w">
+                <button @click="$dispatch('exploration-ia:open-welcome-modal')"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm"
+                        type="button"
+                        aria-label="Revoir l'aide sur l'exploration assistée">
+                    <span class="fr-icon-question-line fr-mr-1v" aria-hidden="true"></span>
+                    Revoir l'aide
+                </button>
+            </div>
+            {% include "tasks/tasks/fragments/exploration_ia/stepper.html" %}
+            {% include "tasks/tasks/fragments/exploration_ia/header_search_bar.html" %}
+            <template x-if="$store.explorationIA.currentPhase === 1">
+                {% include "tasks/tasks/fragments/exploration_ia/phase_1_results.html" %}
+            </template>
+            <template x-if="$store.explorationIA.currentPhase === 2">
+                {% include "tasks/tasks/fragments/exploration_ia/phase_2_co_recommendations.html" %}
+            </template>
+            <template x-if="$store.explorationIA.currentPhase === 3">
+                {% include "tasks/tasks/fragments/exploration_ia/phase_3_synthesis.html" %}
+            </template>
+            {% include "tasks/tasks/fragments/exploration_ia/welcome_modal.html" %}
+            {% include "tasks/tasks/fragments/exploration_ia/resource_modal.html" %}
+        </div>
+    </div>
+{% endblock content %}

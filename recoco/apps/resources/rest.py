@@ -10,8 +10,8 @@ from reversion.models import Version
 
 from recoco.rest_api.filters import WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
-from recoco.utils import has_perm
 
+from ...utils import has_perm
 from ..tasks.models import Task
 from .filters import ResourceCategoryFilter, ResourceStatusFilter
 from .importers import ResourceImporter
@@ -226,11 +226,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
         return meta
 
-    @action(
-        detail=False,
-        methods=["post"],
-        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
-    )
+    @action(detail=False, methods=["post"])
     def import_from_uri(self, request):
         """Import (create) a resource from an external known site, miroring it.
 

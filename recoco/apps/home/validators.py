@@ -1,7 +1,9 @@
 import re
 
+import puremagic
 from django.core.exceptions import ValidationError
-from django.core.validators import EmailValidator
+from django.core.validators import EmailValidator, FileExtensionValidator
+from django.utils.deconstruct import deconstructible
 
 
 class UppercaseAndDigitPasswordValidator:
@@ -48,3 +50,80 @@ class EmailValidatorForBrevo(EmailValidator):
             or len(domain_part) > 63
         ):
             raise ValidationError(self.message, code=self.code, params={"value": value})
+
+
+@deconstructible
+class MimetypeValidator(object):
+    def __init__(self, allows=None, forbids=None, code="file-type"):
+        self.forbidden_mimetypes = forbids or []
+        self.allowed_mimetypes = allows or []
+        self.code = code
+
+    def __call__(self, value):
+        try:
+            # filename is only used to distinguish same header mime types
+            mime = puremagic.from_string(
+                value.read(2048), mime=True, filename=value.name
+            )
+
+            if (mime in self.forbidden_mimetypes) or (
+                mime not in self.allowed_mimetypes
+            ):
+                raise ValidationError(
+                    f"{value} n'est pas un fichier autorisé", code=self.code
+                )
+
+        except puremagic.main.PureError:
+            return "text/plain"
+
+            # puremagic does not detect mime if no header until v2 that needs python 3.12 or later
+
+            # raise ValidationError(
+            #     "Impossible d'évaluer le type de ficher", code=self.code
+            # ) from e
+
+
+file_validators = [
+    MimetypeValidator(
+        allows=[
+            "text/plain",
+            "image/png",
+            "image/jpg",
+            "image/gif",
+            "image/jpeg",
+            "image/pjpeg",
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.oasis.opendocument.text",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.oasis.opendocument.spreadsheet",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.oasis.opendocument.presentation",
+            "application/x-zip-compressed",
+            "application/zip",
+        ],
+    ),
+    FileExtensionValidator(
+        [
+            "txt",
+            "md",
+            "png",
+            "jpg",
+            "jpeg",
+            "pdf",
+            "doc",
+            "docx",
+            "odt",
+            "xls",
+            "xlsx",
+            "odc",
+            "ppt",
+            "pptx",
+            "odp",
+            "zip",
+        ]
+    ),
+]

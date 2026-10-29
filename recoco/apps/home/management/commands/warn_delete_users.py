@@ -20,7 +20,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "-d", "--dry-run", action="store_true", help="Do not actually send stuff"
+            "-d",
+            "--dry-run",
+            action="store_true",
+            help="Do not actually send nor delete stuff",
         )
 
     def warn_and_delete(self, dry_run):

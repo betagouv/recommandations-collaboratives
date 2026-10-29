@@ -13,8 +13,9 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.home.adapters import UVAccountAdapter
 from recoco.apps.reminders import models as reminders_models
-from recoco.utils import get_group_for_site, login
+from recoco.utils import confirm_mail, get_group_for_site, login
 
 ########################################################################
 # users list
@@ -63,6 +64,28 @@ def test_crm_user_list_contains_site_users(request, client):
 
     unexpected = reverse("crm-user-details", args=[other.id])
     assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_user_list_contains_verified_user_data(request, client, current_site):
+    confirmed_user = baker.make(auth_models.User)
+    confirmed_user.profile.sites.add(current_site)
+    confirm_mail(confirmed_user)
+
+    not_confirmed_user = baker.make(auth_models.User)
+    not_confirmed_user.profile.sites.add(current_site)
+
+    url = reverse("crm-user-list")
+
+    with login(client) as user:
+        assign_perm("use_crm", user, current_site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    users = response.context["users"].qs
+    assert users.get(pk=confirmed_user.pk).profile.email_validated
+    assert not users.get(pk=not_confirmed_user.pk).profile.email_validated
 
 
 @pytest.mark.django_db
@@ -363,8 +386,9 @@ def test_crm_user_update_profile_information(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_update_profile_information_and_email_address(request, client):
+def test_crm_user_update_profile_information_and_email_address(request, client, mocker):
     site = get_current_site(request)
+    spy_adapter = mocker.spy(UVAccountAdapter, "get_email_confirmation_url")
 
     organization = baker.make(addressbook_models.Organization)
 
@@ -410,6 +434,11 @@ def test_crm_user_update_profile_information_and_email_address(request, client):
     # the confirmation email has been sent
     assert len(django.core.mail.outbox) == 1
     assert "Confirmez votre adresse email" in django.core.mail.outbox[0].subject
+
+    confirm_email_url = spy_adapter.spy_return
+    response = client.get(confirm_email_url, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert last_url == "/"
 
 
 @pytest.mark.django_db

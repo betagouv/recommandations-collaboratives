@@ -3,7 +3,7 @@
 {% load l10n %}
 {% load projects_extra %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 {% is_staff_for_current_site request.user as is_staff %}
 <aside class="w-25 crm-aside">
     <div x-ref="sidebar"

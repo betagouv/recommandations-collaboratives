@@ -9,8 +9,8 @@ created: 2023-07-17 20:39:35 CEST
 
 import uuid
 
+from allauth.account.utils import complete_signup
 from allauth.account.views import LoginView
-from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
@@ -22,6 +22,10 @@ from django.utils.http import urlencode
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.home.config import (
+    EMAIL_CONFIRMATION_FLOW_SESSION_KEY,
+    SIGNUP_USER_ID_SESSION_KEY,
+)
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -36,6 +40,10 @@ from recoco.utils import (
 )
 
 from . import forms, utils
+
+########################################################################
+# User driven onboarding for a new project
+########################################################################
 
 
 class OnboardingLogin(LoginView):
@@ -52,7 +60,7 @@ class OnboardingLogin(LoginView):
         )
 
         context["user_other_sites"] = []
-        if onboarding_uuid_str is not None:
+        if onboarding_uuid_str is not None:  # currently creating project
             try:
                 project_creation_request = projects.ProjectCreationRequest.objects.get(
                     site=self.request.site, uuid=uuid.UUID(onboarding_uuid_str)
@@ -63,6 +71,14 @@ class OnboardingLogin(LoginView):
                 context["onboarding_email"] = onboarding_user.email
                 context["user_other_sites"] = onboarding_user.profile.sites.exclude(
                     id=current_site.id
+                )
+                context["next_query_param"] = urlencode(
+                    {
+                        "next": reverse(
+                            "onboarding-summary",
+                            args=(project_creation_request.project_id,),
+                        )
+                    }
                 )
             except projects.ProjectCreationRequest.DoesNotExist:
                 pass
@@ -106,7 +122,6 @@ class OnboardingLogin(LoginView):
 
         # Send notifications
         utils.notify_new_project(self.request.site, project, self.request.user)
-        utils.email_owner_of_project(self.request.site, project, self.request.user)
 
         refresh_user_projects_in_session(self.request, self.request.user)
 
@@ -114,11 +129,6 @@ class OnboardingLogin(LoginView):
         redirect_url = reverse("onboarding-summary", args=(project.pk,))
 
         return redirect(redirect_url)
-
-
-########################################################################
-# User driven onboarding for a new project
-########################################################################
 
 
 def onboarding_signup(request):
@@ -179,7 +189,8 @@ def onboarding_signup(request):
             )
             return redirect(f"{login_url}?{next_args}")
 
-        user.set_password(form.cleaned_data.get("password"))
+        # user is new from here otherwise it would have been redirected to login
+        user.set_password(form.cleaned_data.get("password1"))
         user = update_user(
             site=request.site,
             user=user,
@@ -189,10 +200,6 @@ def onboarding_signup(request):
             org_position=form.cleaned_data.get("role"),
             phone=form.cleaned_data.get("phone"),
         )
-
-        log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
-        ##--- Starting this point, we are logged in as the submitter ---##
 
         try:
             project = projects.Project.objects.get(
@@ -217,18 +224,17 @@ def onboarding_signup(request):
             assign_collaborator(user, project, is_owner=True)
 
             utils.notify_new_project(request.site, project, user)
-            utils.email_owner_of_project(request.site, project, user)
 
-            refresh_user_projects_in_session(request, user)
+            redirect_url = reverse("onboarding-summary", args=(project.id,))
 
-            # Cleanup session
-            if "onboarding_uuid" in request.session:
-                del request.session["onboarding_uuid"]
-
-            if "project_id" in request.session:
-                del request.session["project_id"]
-
-            return redirect(f"{reverse('onboarding-summary', args=(project.id,))}")
+            request.session[SIGNUP_USER_ID_SESSION_KEY] = user.id
+            request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY] = "onboarding"
+            return complete_signup(
+                request,
+                user=user,
+                email_verification=None,
+                success_url=redirect_url,
+            )
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
@@ -291,7 +297,6 @@ def onboarding_project(request):
                 assign_collaborator(user, project, is_owner=True)
 
                 utils.notify_new_project(request.site, project, user)
-                utils.email_owner_of_project(request.site, project, user)
 
                 refresh_user_projects_in_session(request, user)
 
@@ -333,6 +338,7 @@ def onboarding_summary(request, project_id=None):
     site_config = request.site_config
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
+    utils.email_owner_of_project(request.site, project, request.user)
 
     if not project.location:
         next_url = f"{reverse('survey-project-session' if site_config.project_survey else 'projects-project-detail', args=(project.pk,))}"
@@ -351,6 +357,18 @@ def onboarding_summary(request, project_id=None):
         )
         next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
 
+    refresh_user_projects_in_session(request, request.user)
+
+    # Cleanup session
+    if "onboarding_uuid" in request.session:
+        del request.session["onboarding_uuid"]
+    if "project_id" in request.session:
+        del request.session["project_id"]
+    if SIGNUP_USER_ID_SESSION_KEY in request.session:
+        del request.session[SIGNUP_USER_ID_SESSION_KEY]
+    if EMAIL_CONFIRMATION_FLOW_SESSION_KEY in request.session:
+        del request.session[EMAIL_CONFIRMATION_FLOW_SESSION_KEY]
+
     context = {"project": project, "next_url": next_url, "site_config": site_config}
 
     return render(request, "onboarding/onboarding-summary.html", context)
@@ -361,6 +379,7 @@ def onboarding_summary(request, project_id=None):
 ########################################################################
 
 
+@login_required
 def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
     site_config = request.site_config
@@ -379,6 +398,7 @@ def prefill_project_set_user(request):
     return render(request, "prefill/prefill-user.html", locals())
 
 
+@login_required
 def prefill_project_submit(request):
     """Create a new project for someone else - step 2 create project"""
     site_config = request.site_config

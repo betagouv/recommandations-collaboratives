@@ -20,7 +20,7 @@
 {% endblock og_title %}
 {% block content %}
     {% if user.is_authenticated %}
-        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% endif %}
     {{ category_options|json_script:"categoryOptions" }}
     <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))"
@@ -80,7 +80,7 @@
                         <template x-for="code in selectedCodes" :key="code">
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
-                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Départements :" extra_classes="inline-chevron" %}
+                        {% include "projects/project/fragments/departments_selector/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Départements :" extra_classes="inline-chevron" %}
                     </div>
                 </div>
             </div>

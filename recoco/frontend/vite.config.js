@@ -18,6 +18,7 @@ function discoverPluginEntries() {
 const config = {
   plugins: [],
   root: resolve('./src'),
+  envDir: resolve('./'),
   base: '/static/',
   server: {
     origin: 'http://localhost:3000',
@@ -242,6 +243,8 @@ const config = {
           './src/js/styles/resource-preview-panel.css.js'
         ),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
+        explorationIA: resolve('./src/js/apps/explorationIA.js'),
+        explorationIAStyles: resolve('./src/js/styles/exploration-ia.css.js'),
         userListCrm: resolve('./src/js/apps/CRM/userListCrm.js'),
         organizationListCrm: resolve(
           './src/js/apps/CRM/organizationListCrm.js'
@@ -278,11 +281,19 @@ const config = {
           './src/js/styles/form-information.css.js'
         ),
         layoutFormStyles: resolve('./src/js/styles/layout-form.css.js'),
-        projectLowReachStyles: resolve('./src/js/styles/project-low-reach.css.js'),
+        projectLowReachStyles: resolve(
+          './src/js/styles/project-low-reach.css.js'
+        ),
         errorPageStyles: resolve('./src/js/styles/layouts/error-page.css.js'),
         crmDashboardStyles: resolve('./src/js/styles/crm_dashboard.css.js'),
+        siteConfigurationStyles: resolve(
+          './src/js/styles/site-configuration.css.js'
+        ),
         ...discoverPluginEntries(),
         mapStyles: resolve('./src/js/styles/map.css.js'),
+        greyScaleToggleStyles: resolve(
+          './src/js/styles/grey-scale-toggle.css.js'
+        ),
       },
       output: {
         chunkFileNames: undefined,

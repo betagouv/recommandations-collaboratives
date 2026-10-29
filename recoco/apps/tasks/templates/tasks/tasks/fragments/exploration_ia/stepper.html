@@ -1,0 +1,14 @@
+<div class="fr-stepper fr-mb-3w" data-test-id="exploration-ia-stepper">
+    <h2 class="fr-stepper__title">
+        <span x-text="$store.explorationIA.getPhaseTitle($store.explorationIA.currentPhase)"></span>
+        <span class="fr-stepper__state">Étape <span x-text="$store.explorationIA.currentPhase"></span> sur 3</span>
+    </h2>
+    <div class="fr-stepper__steps"
+         :data-fr-current-step="$store.explorationIA.currentPhase"
+         data-fr-steps="3"></div>
+    <p class="fr-stepper__details"
+       x-show="$store.explorationIA.currentPhase < 3">
+        <span class="fr-text--bold">Étape suivante :</span>
+        <span x-text="$store.explorationIA.getPhaseTitle($store.explorationIA.currentPhase + 1)"></span>
+    </p>
+</div>

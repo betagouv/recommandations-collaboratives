@@ -1,0 +1,10 @@
+{% extends "account/layout/layout.html" %}
+
+<div class="container">
+    {% block layout_content %}
+        <div x-data="AjvValidationSchema('schemaOnboardingStep2ProjectFormValidator')">
+            <div x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
+                 x-init="init">{% include "onboarding/fragments/form-project.html" %}</div>
+        </div>
+    {% endblock layout_content %}
+</div>

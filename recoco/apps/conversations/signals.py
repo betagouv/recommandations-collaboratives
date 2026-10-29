@@ -9,21 +9,21 @@ from notifications import models as notifications_models
 from notifications.models import Notification
 
 from recoco import verbs
+from recoco.apps.conversations import models
+from recoco.apps.conversations.utils import (
+    gather_annotations_for_message_notification,
+    post_public_message_with_recommendation,
+)
 from recoco.apps.projects.utils import (
     notify_advisors_of_project,
     notify_members_of_project,
+    reactivate_if_necessary,
 )
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.signals import action_created
 
-from ..projects.utils import reactivate_if_necessary
-from . import models
-from .utils import (
-    gather_annotations_for_message_notification,
-    post_public_message_with_recommendation,
-)
-
 message_posted = django.dispatch.Signal()
+message_updated = django.dispatch.Signal()
 
 
 @receiver(action_created)
@@ -140,6 +140,17 @@ def notify_message_created(sender, message, **kwargs):
     notify_advisors_of_project(project, notification, exclude=user)
     if not project.inactive_since:
         notify_members_of_project(project, notification, exclude=user)
+
+
+@receiver(message_updated)
+def notify_message_updated(sender, message, **kwargs):
+    new_annotations = gather_annotations_for_message_notification(message)
+    message_ct = ContentType.objects.get_for_model(message)
+    Notification.objects.filter(
+        action_object_object_id=message.id,
+        action_object_content_type=message_ct,
+        verb=verbs.Conversation.POST_MESSAGE,
+    ).update(data={"annotations": new_annotations})
 
 
 @receiver(message_posted)

@@ -144,11 +144,14 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
    * Display functions
    ********************/
   resourcesCountLabel() {
-    if (this.resourcesTotal > 0) {
-      return `${this.resourcesTotal} résultat${this.resourcesTotal > 1 ? 's' : ''}`;
-    } else {
+    if (this.resourcesTotal === 0) {
       return 'Aucun résultat';
     }
+    const plural = this.resourcesTotal > 1 ? 's' : '';
+    if (this.resourcesTotal > this.pagination.limit) {
+      return `${this.resourcesToDisplay.length} sur ${this.resourcesTotal} résultat${plural}`;
+    }
+    return `${this.resourcesTotal} résultat${plural}`;
   },
   resourceStatusLabel(status) {
     return (

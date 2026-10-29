@@ -4,6 +4,7 @@ import importlib.metadata
 
 import pluggy
 import sentry_sdk
+from django.apps import apps
 
 from recoco.apps.home.models import SiteConfiguration
 
@@ -34,7 +35,7 @@ def _build_plugin_manager():
 
     for dist in importlib.metadata.distributions():
         for ep in dist.entry_points:
-            if ep.group == "recoco.plugins":
+            if ep.group == "recoco.plugins" and apps.is_installed(ep.name):
                 try:
                     plugin_cls = ep.load()
                     pm.register(plugin_cls(), name=ep.name)
@@ -43,6 +44,14 @@ def _build_plugin_manager():
                     sentry_sdk.capture_exception(e)
 
     return pm
+
+
+def get_site_configuration(site):
+    """Return the SiteConfiguration for a given Site, or None if absent."""
+    try:
+        return SiteConfiguration.objects.get(site=site)
+    except SiteConfiguration.DoesNotExist:
+        return None
 
 
 def get_site_plugin_manager(request=None, site=None):
@@ -62,9 +71,8 @@ def get_site_plugin_manager(request=None, site=None):
     if request:
         site_config = getattr(request, "site_config", None)
     elif site:
-        try:
-            site_config = SiteConfiguration.objects.get(site=site)
-        except SiteConfiguration.DoesNotExist:
+        site_config = get_site_configuration(site)
+        if site_config is None:
             return recoco_pm
 
     # Feed the scoped plugin manager with enabled plugins

@@ -12,16 +12,12 @@ from recoco.apps.home import rest as home_rest
 from recoco.apps.projects.views import rest as projects_rest
 from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.views import rest as survey_rest
+from recoco.apps.tasks.views import acra_proxy as tasks_acra_proxy
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
 
 router = routers.DefaultRouter()
 
-router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-    tasks_rest.TaskFollowupViewSet,
-    basename="project-tasks-followups",
-)
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
     tasks_rest.TaskViewSet,
@@ -177,6 +173,19 @@ auth_urls = [
     ),
 ]
 
+acra_tasks_urls = [
+    path(
+        "projects/<int:project_id>/tasks/acra/ask/",
+        tasks_acra_proxy.AcraAskView.as_view(),
+        name="tasks-acra-ask",
+    ),
+    path(
+        "projects/<int:project_id>/tasks/acra/co-recommendations/",
+        tasks_acra_proxy.AcraCoRecommendationsView.as_view(),
+        name="tasks-acra-co-recommendations",
+    ),
+]
+
 survey_urls = [
     path(
         "survey/sessions/",
@@ -214,5 +223,10 @@ def _collect_plugin_rest_urls():
 
 
 urlpatterns = (
-    router.urls + api_urls + auth_urls + survey_urls + _collect_plugin_rest_urls()
+    router.urls
+    + api_urls
+    + auth_urls
+    + acra_tasks_urls
+    + survey_urls
+    + _collect_plugin_rest_urls()
 )

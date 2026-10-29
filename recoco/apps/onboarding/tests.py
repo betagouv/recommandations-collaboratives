@@ -1,9 +1,12 @@
+from urllib.parse import urlparse
+
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.core import mail
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
@@ -13,6 +16,7 @@ from notifications.models import Notification
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
+from recoco.apps.home.adapters import UVAccountAdapter
 from recoco.apps.invites import models as invites_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
@@ -93,7 +97,9 @@ def test_performing_onboarding_creates_notif_and_action(request, client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_creates_a_project_creation_request(request, client):
+def test_anonymous_performing_onboarding_creates_a_project_creation_request(
+    request, client
+):
     site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=site)
 
@@ -161,7 +167,7 @@ def test_performing_onboarding_with_survey_fills_it(request, client):
 
 
 @pytest.mark.django_db
-def test_onboarding_continues_to_user_step_when_valid(request, client):
+def test_anonymous_onboarding_continues_to_user_step_when_valid(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -183,6 +189,36 @@ def test_onboarding_continues_to_user_step_when_valid(request, client):
 
     response = client.post(reverse("onboarding-project"), data=data)
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_logged_in_onboarding_continues_to_user_step_when_valid(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@exAmpLe.Com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
+    user = baker.make(auth.User, email=data["email"].lower(), username=data["email"])
+
+    with login(client, user=user):
+        response = client.post(reverse("onboarding-project"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    p = projects_models.Project.objects.first()
+    assert last_url.startswith(reverse("onboarding-summary", args=[p.id]))
+    assert len(mail.outbox) == 1  # owner notification
 
 
 #########################################
@@ -207,7 +243,8 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
         "email": user.username,
         "phone": "0610101010",
         "role": "Ouistiti",
-        "password": "blah",
+        "password1": "!correctPassword01",
+        "password2": "!correctPassword01",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
@@ -336,20 +373,18 @@ def test_onboarding_signup_redirects_to_project_form_when_logged_in_if_no_projec
         assert last_url == reverse("onboarding-project")
 
 
-@pytest.mark.django_db
-def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, client):
-    current_site = get_current_site(request)
-
+def setups_onboarding_signup(current_site, client):
     baker.make(
         home_models.SiteConfiguration,
         site=current_site,
     )
 
-    data = {
+    user_data = {
         "email": "a@example.com",
         "phone": "0610101010",
         "role": "Ouistiti",
-        "password": "blah",
+        "password1": "!correctPassword01",
+        "password2": "!correctPassword01",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
@@ -359,33 +394,54 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, cli
     project_creation_request = baker.make(
         projects_models.ProjectCreationRequest,
         project__sites=[current_site],
-        email=data["email"],
+        email=user_data["email"],
         site=current_site,
     )
 
     session = client.session
     session["onboarding_uuid"] = str(project_creation_request.uuid)
+    session["project_id"] = project_creation_request.project.id
     session.save()
 
-    response = client.post(reverse("onboarding-signup"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
+    return user_data
 
-    project = projects_models.Project.objects.last()
-    assert last_url == reverse("onboarding-summary", args=(project.pk,))
+
+@pytest.mark.django_db
+def test_performing_onboarding_signup_create_a_new_user(request, client, current_site):
+    user_data = setups_onboarding_signup(current_site, client)
+    client.post(reverse("onboarding-signup"), data=user_data, follow=True)
 
     # the user and profile are filled according to provided information
-    user = auth.User.objects.get(username=data["email"])
-    assert user.email == data["email"]
-    assert user.first_name == data["first_name"]
-    assert user.last_name == data["last_name"]
+    user = auth.User.objects.get(username=user_data["email"])
+    assert user.email == user_data["email"]
+    assert user.first_name == user_data["first_name"]
+    assert user.last_name == user_data["last_name"]
     assert current_site in user.profile.sites.all()
-    assert user.profile.organization.name == data["org_name"]
-    assert user.profile.organization_position == data["role"]
-    assert user.profile.phone_no == data["phone"]
+    assert user.profile.organization.name == user_data["org_name"]
+    assert user.profile.organization_position == user_data["role"]
+    assert user.profile.phone_no == user_data["phone"]
 
-    # present if logged_in
-    assert int(client.session["_auth_user_id"]) == user.pk
+
+@pytest.mark.django_db
+def test_onboarding_confirm_email_redirects_to_summary(
+    request, client, mocker, current_site
+):
+    spy_adapter = mocker.spy(UVAccountAdapter, "get_email_confirmation_url")
+    user_data = setups_onboarding_signup(current_site, client)
+    response = client.post(reverse("onboarding-signup"), data=user_data, follow=True)
+
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("account_email_verification_sent")
+    assert len(mail.outbox) == 1  # verification email only at this point
+
+    project = projects_models.Project.objects.last()
+
+    confirm_email_url = spy_adapter.spy_return
+    response = client.get(confirm_email_url, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert last_url == reverse("onboarding-summary", args=(project.pk,))
+    assert len(mail.outbox) == 2  # owner notification only at the end
 
 
 @pytest.mark.django_db
@@ -405,7 +461,8 @@ def test_performing_onboarding_without_session_key_redirects_to_project_onboardi
         "email": user.username,
         "phone": "0610101010",
         "role": "Ouistiti",
-        "password": "blah",
+        "password1": "!correctPassword01",
+        "password2": "!correctPassword01",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
@@ -500,7 +557,10 @@ def test_create_prefilled_project_set_user_is_not_reachable_without_login(
 
     url = reverse("onboarding-prefill-set-user")
     response = client.get(url)
-    assert response.status_code == 403
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
 
 
 @pytest.mark.django_db
@@ -567,7 +627,10 @@ def test_create_prefilled_project_is_not_reachable_without_login(request, client
 
     url = reverse("onboarding-prefill")
     response = client.get(url)
-    assert response.status_code == 403
+
+    assert response.status_code == 302
+    parsed = urlparse(response.url)
+    assert parsed.path == reverse("account_login")
 
 
 @pytest.mark.django_db

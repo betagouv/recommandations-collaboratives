@@ -34,7 +34,7 @@ Example usage in parent:
 {% endblock js %}
 {% block content %}
     {% if user.is_authenticated %}
-        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% endif %}
     <div x-data="User()" data-test-id="contact-card-component">
         <template x-if="typeof contact !== 'undefined' && contact">

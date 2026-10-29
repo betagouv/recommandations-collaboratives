@@ -18,6 +18,18 @@
   }
 }
 
+// Conteneur de scroll des pages liste : permet aux en-têtes de colonnes
+// de rester visibles (sticky) pendant le défilement du tableau.
+// Le .table-responsive interne doit repasser en overflow visible, sinon
+// position: sticky ne fonctionne pas à l'intérieur.
+.crm-list-scroll {
+
+  .table-responsive {
+    overflow: visible;
+  }
+
+}
+
 .crm {
   .project-table,
   .resource-table {
@@ -27,11 +39,24 @@
     table-layout: fixed;
 
     &__thead {
+      position: sticky;
+      top: 0;
+
+      text-transform: uppercase;
       font-weight: 700;
       color: var(--light-text-default-grey, #3a3a3a);
-      text-transform: uppercase;
+
       border-bottom: 2px solid var(--text-title, #161616);
       background: #fff;
+
+      z-index: 1;
+    }
+    th {
+      white-space: normal;
+      position: sticky;
+
+      top: 64px;
+      background-color: #fff;
     }
     th,
     td {

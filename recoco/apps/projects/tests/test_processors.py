@@ -8,17 +8,20 @@ created: 2023-01-31 14:24:56 CEST
 """
 
 import pytest
+from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import reverse
 from model_bakery import baker
 from notifications.signals import notify
 
+from recoco import verbs
 from recoco.apps.conversations import models as conversation_models
 from recoco.apps.home import models as home_models
 from recoco.apps.tasks import models as task_models
 from recoco.utils import login
 
 from .. import models, utils
+from ..context_processors import unread_notifications_processor
 
 
 @pytest.mark.django_db
@@ -54,6 +57,76 @@ def test_active_project_processor(request, client):
         )
 
         assert "unread_notifications_count" in response.context
+
+
+@pytest.mark.django_db
+def test_unread_notifications_processor_includes_private_notifications(
+    rf, project_ready, current_site
+):
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    user = baker.make(auth_models.User)
+    utils.assign_collaborator(user, project_ready)
+
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb="a public notification",
+        action_object=project_ready,
+        target=project_ready,
+        public=True,
+    )
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb="a private notification",
+        action_object=project_ready,
+        target=project_ready,
+        public=False,
+    )
+
+    request = rf.get("/")
+    request.user = user
+    request.site = current_site
+
+    context = unread_notifications_processor(request)
+
+    assert context["unread_notifications_count"] == 2
+
+
+@pytest.mark.django_db
+def test_unread_notifications_processor_does_not_include_crm_moderation_notifications(
+    rf, project_ready, current_site
+):
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    user = baker.make(auth_models.User)
+    utils.assign_collaborator(user, project_ready)
+    project_submitter = baker.make(auth_models.User)
+    advisor_access_request = baker.make(home_models.AdvisorAccessRequest)
+    project = baker.make(models.Project, submitted_by=project_submitter)
+
+    notify.send(
+        sender=advisor_access_request.user,
+        recipient=user,
+        verb=verbs.User.ADVISOR_REQUEST,
+        action_object=advisor_access_request,
+    )
+    notify.send(
+        sender=project.submitted_by,
+        recipient=user,
+        verb=verbs.Project.SUBMITTED_BY,
+        action_object=project,
+        target=project,
+    )
+
+    request = rf.get("/")
+    request.user = user
+    request.site = current_site
+
+    context = unread_notifications_processor(request)
+
+    assert context["unread_notifications_count"] == 0
 
 
 # eof

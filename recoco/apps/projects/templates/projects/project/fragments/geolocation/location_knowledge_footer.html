@@ -1,7 +1,7 @@
 {% load static %}
 {% load l10n %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 <div class="card-text map">
     <div class="d-flex gap-1 text-muted">
         <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>

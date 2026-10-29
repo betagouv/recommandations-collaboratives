@@ -1,5 +1,21 @@
+{# project.is_current_site must have been annotated in backend #}
+
 <div class="crm-project-card d-flex flex-column">
-    <span class="crm-project-card__name"><a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a></span>
+    {% with origin_site=project.origin_site %}
+        <a class="crm-project-card__name fr-link d-flex align-items-center gap-2"
+           {% if project.is_current_site %}href="{% url 'crm-project-details' project.pk %}"{% endif %}>
+                <span {% if project.deleted %}class="text-decoration-line-through"{% endif %}>{% if project.owner.profile.organization %}{{ project.owner.profile.organization.name }} - {% endif %}{{ project.name }}</span>
+                {% if origin_site != request.site %}
+                    {% if origin_site.configuration.logo_small %}
+                    <img class="crm-project-card__portal-logo"
+                         src="{{ origin_site.configuration.logo_small.url }}"
+                         alt="{{ origin_site.name }}"
+                         title="Dossier actif sur {{ origin_site.name }}">
+                {% endif %}
+            {% endif %}
+        </a>
+    {% endwith %}
+
     {% if project.commune %}
         <span class="crm-project-card__org fr-icon-people fr-icon--sm fr-btn--icon-left">{{ project.commune }}</span>
     {% endif %}

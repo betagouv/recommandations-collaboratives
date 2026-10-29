@@ -6,8 +6,8 @@
 {% block js %}
     {% vite_asset 'js/styles/survey.css.js' %}
 {% endblock js %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 {% question_set_completion session question_set as completion %}
 <div class="survey-card">
     <div class="card-body fr-m-1v">

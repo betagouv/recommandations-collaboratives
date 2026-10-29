@@ -7,7 +7,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from recoco.utils import login
 
-from ..models import Contact, Organization
+from ..models import Contact, Organization, Site
 
 
 # Contact list
@@ -45,8 +45,9 @@ def test_create_contact_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_create_contact_available_for_switchtender(client):
-    organization = Recipe(Organization).make()
+def test_create_contact_available_for_switchtender(request, client):
+    current_site = get_current_site(request)
+    organization = Recipe(Organization, sites=[current_site]).make()
     url = reverse(
         "addressbook-organization-contact-create",
         args=[organization.id],
@@ -73,6 +74,22 @@ def test_contact_create_and_redirect(request, client):
 
     new_url = reverse("addressbook-organization-details", args=[organization.id])
     assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_create_contact_on_another_site_organization_is_not_found(client):
+    another_site = Recipe(Site).make()
+    organization = Recipe(Organization, sites=[another_site]).make()
+    url = reverse(
+        "addressbook-organization-contact-create",
+        args=[organization.id],
+    )
+    with login(client, groups=["example_com_staff"]):
+        data = {"first_name": "my contact"}
+        response = client.post(url, data=data)
+
+    assert response.status_code == 404
+    assert Contact.objects.count() == 0
 
 
 # update

@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
+from csp.constants import NONE, SELF, UNSAFE_EVAL, UNSAFE_INLINE
 from multisite import SiteID
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -71,6 +73,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "csp",
     "recoco.apps.feature_flag",
     "recoco.apps.hitcount",
     "recoco.apps.dsrc",
@@ -128,13 +131,15 @@ MIDDLEWARE = [
     "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
     "recoco.apps.plugins.middlewares.TenantPluginSchemaMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "recoco.apps.home.middlewares.SesameWithCookieMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "recoco.apps.home.middlewares.EmbedMiddleware",
     "recoco.apps.home.middlewares.SetEnableSesameCookieMiddleware",
     "recoco.apps.home.middlewares.PreviousActivityMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
@@ -157,8 +162,10 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.contrib.messages.context_processors.messages",
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
+                "recoco.apps.projects.context_processors.user_perm_checker_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
                 "recoco.apps.projects.context_processors.matomo_context_processor",
+                "recoco.apps.home.context_processors.embed",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -221,6 +228,15 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+PROCONNECT_SERVER_URL = os.getenv(
+    "PROCONNECT_SERVER_URL",
+    "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
+)
+pro_connect_split_url = urlsplit(PROCONNECT_SERVER_URL)
+PROCONNECT_ORIGIN = urlunsplit(
+    (pro_connect_split_url[0], pro_connect_split_url[1], "", "", "")
+)
+
 # GUARDIAN
 GUARDIAN_USER_OBJ_PERMS_MODEL = "home.UserObjectPermissionOnSite"
 GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
@@ -228,6 +244,50 @@ GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
 # SESAME Configuration
 SESAME_MAX_AGE = 60 * 60 * 24 * 10
 SESAME_ONE_TIME = False
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [NONE],
+        "connect-src": [
+            SELF,
+            "https://client.crisp.chat/",
+            "wss://client.relay.crisp.chat/",
+            "https://geo.api.gouv.fr/",
+            "https://api-adresse.data.gouv.fr/",
+            "https://www.google.com",
+            "https://stats.beta.gouv.fr",
+        ],
+        "font-src": [SELF, "https://client.crisp.chat/"],
+        "frame-ancestors": [SELF],
+        "frame-src": [SELF, "https://www.google.com", "https://*.crisp.help"],
+        "form-action": [SELF, PROCONNECT_ORIGIN],
+        "img-src": [
+            SELF,
+            "data:",
+            "https://client.crisp.chat",
+            "https://image.crisp.chat",
+            "https://www.gravatar.com",
+            "https://secure.gravatar.com",
+            "https://data.geopf.fr",
+            "https://*.tile.openstreetmap.fr",
+        ],
+        "script-src": [
+            SELF,
+            "https://stats.beta.gouv.fr/",
+            "https://client.crisp.chat",
+            "https://www.google.com",
+            "https://www.gstatic.com/",
+            UNSAFE_EVAL,
+            UNSAFE_INLINE,  # fixme crisp uses this
+        ],  # fixme with @alpine/csp and manual checks
+        "style-src": [
+            SELF,
+            "https://client.crisp.chat",
+            UNSAFE_INLINE,
+        ],  # fixme with @alpine/csp and manual checks
+        "worker-src": [SELF, "blob:", "https://*.crisp.chat"],
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -273,7 +333,12 @@ SASS_PROCESSOR_INCLUDE_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Email Configuration
-EMAIL_FROM = "Recoco <no-reply@recoco.fr>"
+# Technical sender address, shared by every site (must be a verified sender on
+# Brevo). The displayed name comes from SiteConfiguration.sender_name.
+DEFAULT_SENDER_EMAIL = "ne-pas-repondre@recoconseil.fr"
+# Displayed name used when the site has no SiteConfiguration, or no sender_name
+DEFAULT_SENDER_NAME = "Recoco"
+DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"
 
 # MARKDOWNX
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
@@ -322,10 +387,7 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_RATE_LIMITS = {
-    "login_failed": "20/m/ip",
-}
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -374,10 +436,7 @@ SOCIALACCOUNT_PROVIDERS = {
                 "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
                 "secret": os.getenv("PROCONNECT_SECRET"),
                 "settings": {
-                    "server_url": os.getenv(
-                        "PROCONNECT_SERVER_URL",
-                        "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
-                    ),
+                    "server_url": PROCONNECT_SERVER_URL,
                     "token_auth_method": "client_secret_post",
                 },
             },
@@ -405,6 +464,7 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 # Hijack
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 
+THROTTLE_RATES = {"anon": "100/day", "user": "10000/day"}
 # Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -423,6 +483,11 @@ REST_FRAMEWORK = {
     ],
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": THROTTLE_RATES,
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
@@ -589,6 +654,10 @@ WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 # https://github.com/etianen/django-watson/wiki/language-support
 WATSON_POSTGRES_SEARCH_CONFIG = "pg_catalog.french"
+
+# ACRA (ML) proxy
+ACRA_API_BASE_URL = os.environ.get("ACRA_API_BASE_URL", "")
+ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 
 # Matomo
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
