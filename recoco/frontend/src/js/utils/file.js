@@ -62,6 +62,28 @@ export const getExternalFileUrl = (attachment) => {
 };
 
 /**
+ * Extensions de fichiers que le navigateur peut afficher.
+ */
+export const PREVIEWABLE_EXTENSIONS = [
+  'pdf',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'webp',
+];
+
+/**
+ * Indique si un fichier peut être prévisualisé dans le navigateur
+ * @param {string} fileName - Nom, chemin ou URL du fichier
+ * @returns {boolean}
+ */
+export const isPreviewableFile = (fileName) => {
+  const cleanName = getFilenameFromPath(fileName);
+  return PREVIEWABLE_EXTENSIONS.includes(getFileExtension(cleanName));
+};
+
+/**
  * Obtient le type MIME à partir de l'extension du fichier
  * @param {string} fileName - Nom du fichier
  * @returns {string} Type MIME
