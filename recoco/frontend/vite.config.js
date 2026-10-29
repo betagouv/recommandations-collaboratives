@@ -286,6 +286,9 @@ const config = {
         ),
         errorPageStyles: resolve('./src/js/styles/layouts/error-page.css.js'),
         crmDashboardStyles: resolve('./src/js/styles/crm_dashboard.css.js'),
+        siteConfigurationStyles: resolve(
+          './src/js/styles/site-configuration.css.js'
+        ),
         ...discoverPluginEntries(),
         mapStyles: resolve('./src/js/styles/map.css.js'),
         greyScaleToggleStyles: resolve(

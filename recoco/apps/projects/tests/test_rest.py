@@ -1050,10 +1050,14 @@ def test_list_project_statuses_for_moderators(
     assert actual_ids == expected_ids
 
 
+@pytest.mark.parametrize("from_status", ["TO_PROCESS", "IN_PROGRESS"])
 @pytest.mark.django_db
-def test_project_status_is_updated_by_patch_api(request, api_client, project):
+def test_project_status_is_updated_by_patch_api(
+    request, api_client, project, from_status
+):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
+    project.project_sites.update(status=from_status)
     assign_perm("list_projects", user, site)
 
     new_status = "DONE"

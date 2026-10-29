@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlparse
 
 import django.core.mail
 import pytest
+from allauth.account.models import EmailAddress
 from allauth.mfa.models import Authenticator
 from django.conf import settings
 from django.contrib.auth import models as auth_models
@@ -22,7 +23,11 @@ from django.urls import reverse
 from django.utils.module_loading import import_string
 from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertNotContains,
+    assertRedirects,
+)
 
 from recoco.apps.home import models as home_models
 from recoco.apps.home.config import SIGNUP_USER_ID_SESSION_KEY
@@ -408,6 +413,92 @@ def test_user_can_access_followus(client):
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_user_can_access_terms_of_use(client):
+    url = reverse("termsofuse")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+#######################################################################
+# Legal pages fed by the site configuration
+#######################################################################
+
+
+@pytest.mark.django_db
+def test_legals_page_uses_default_values_without_site_configuration(client):
+    url = reverse("legals")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(
+        response,
+        "Le Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et l’aménagement (CEREMA)",
+    )
+    assertContains(
+        response,
+        "Cité des mobilités – 25 avenue François Mitterrand – CS 92803 69674 Bron Cedex",
+    )
+
+
+@pytest.mark.django_db
+def test_legals_page_uses_site_configuration_values(client, current_site):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        legal_owner="Communauté de communes du Test",
+        legal_address="1 rue de la Mairie, 75000 Paris",
+        legal_owner_name="Jane Doe, directrice générale",
+        legal_phone_no="+33123456789",
+    )
+
+    url = reverse("legals")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, "Communauté de communes du Test")
+    assertContains(response, "1 rue de la Mairie, 75000 Paris")
+    assertContains(response, "Jane Doe, directrice générale")
+    assertContains(response, "+33123456789")
+
+
+@pytest.mark.django_db
+def test_privacy_page_uses_default_values_without_site_configuration(client):
+    url = reverse("privacy")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, "est un service numérique porté par CEREMA")
+    assertContains(response, "Lutter contre l’artificialisation des sols")
+
+
+@pytest.mark.django_db
+def test_privacy_page_uses_site_configuration_values(client, current_site):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        legal_owner="Communauté de communes du Test",
+        legal_owner_name="Jane Doe, directrice générale",
+        contact_form_recipient="contact@example.org",
+        dpo_contact_email="dpo@example.org",
+        gdpr_purposes="Suivre les demandes déposées par les collectivités",
+    )
+
+    url = reverse("privacy")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(
+        response,
+        "est un service numérique porté par Communauté de communes du Test",
+    )
+    assertContains(response, "représentée par Jane Doe, directrice générale")
+    assertContains(response, "Suivre les demandes déposées par les collectivités")
+    assertContains(response, 'href="mailto:contact@example.org"')
+    assertContains(response, 'href="mailto:dpo@example.org"')
+    assertNotContains(response, "Lutter contre l’artificialisation des sols")
+
+
 ################################################################
 # guardian
 ################################################################
@@ -679,6 +770,31 @@ def test_unkown_user_ask_code_no_fail(client, mocker):
 
     adapter = import_string(settings.ACCOUNT_ADAPTER)
     adapter.send_mail.assert_called_with("account/email/unknown_account", email, ANY)
+
+
+@pytest.mark.django_db
+def test_login_with_code_validates_email(client, mocker):
+    mocker.patch(settings.ACCOUNT_ADAPTER + ".send_mail")
+    user_not_validated = baker.make(auth_models.User, email="not-validated@email.fr")
+    assert not EmailAddress.objects.filter(
+        email=user_not_validated.email, verified=True
+    ).exists()
+
+    url = reverse("account_request_login_code")
+    email = "not-validated@email.fr"
+    data = {"email": email}
+    response = client.post(url, data)
+    assert response.status_code == 302
+
+    adapter = import_string(settings.ACCOUNT_ADAPTER)
+    adapter.send_mail.assert_called_with(
+        "account/email/login_code", user_not_validated.email, ANY
+    )
+    code = adapter.send_mail.call_args.args[2]["code"]
+    client.post(response.url, {"code": code})
+    assert EmailAddress.objects.filter(
+        email=user_not_validated.email, verified=True
+    ).exists()
 
 
 ################################################################
