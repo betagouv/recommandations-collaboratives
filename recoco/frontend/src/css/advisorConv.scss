@@ -1,0 +1,38 @@
+:root {
+  --width-left-col: 20%;
+  --width-right-col: 80%;
+}
+
+.advisor-conv {
+  display: flex;
+  &__col-participants {
+    --height-header-nav: calc(63px + var(--height-header));
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    width: var(--width-left-col);
+    min-width: 18.75rem;
+    border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
+    position: sticky;
+    height: calc(100vh - var(--height-header-nav));
+    top: var(--height-header-nav);
+    overflow-y: hidden;
+  }
+  &__col-messages {
+    display: flex;
+    flex-direction: column;
+    width: var(--width-right-col);
+    position: relative;
+  }
+  &__container-editor-form {
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+    z-index: 2;
+    .send-button {
+      position: absolute;
+      bottom: 0.5rem;
+    }
+  }
+}

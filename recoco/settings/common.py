@@ -258,6 +258,8 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://stats.beta.gouv.fr",
             "https://sentry.incubateur.net",
+            "https://storage.crisp.chat",
+            "wss://client.relay.rescue.crisp.chat",  # Fallback if primary WebSocket servers are down
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
@@ -272,6 +274,7 @@ CONTENT_SECURITY_POLICY = {
             "https://secure.gravatar.com",
             "https://data.geopf.fr",
             "https://*.tile.openstreetmap.fr",
+            "https://storage.crisp.chat",  # help to display img shared in chat
         ],
         "script-src": [
             SELF,
@@ -280,12 +283,12 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://www.gstatic.com/",
             UNSAFE_EVAL,
-            UNSAFE_INLINE,  # fixme crisp uses this
+            UNSAFE_INLINE,  # fixme
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
             "https://client.crisp.chat",
-            UNSAFE_INLINE,
+            UNSAFE_INLINE,  # crisp uses this
         ],  # fixme with @alpine/csp and manual checks
         "worker-src": [SELF, "blob:", "https://*.crisp.chat"],
     },
@@ -664,10 +667,5 @@ ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 # Matomo
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
-
-# Sentry (frontend) - public DSN of the "recoco front" project
-SENTRY_FRONTEND_DSN = (
-    "https://caf46e9eca66a6aee8e9dfc9434f00a8@sentry.incubateur.net/261"
-)
 
 # eof
