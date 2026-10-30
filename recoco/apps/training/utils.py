@@ -34,10 +34,10 @@ def get_challenge_for(user, codename):
         snoozed_days = (timezone.now() - challenge.snoozed_on).days
         repetition = challenge_definition.week_inactivity_repeat * 7
         if repetition == 0:
-            return None
+            return None  # snoozed and no repetition configured
         if snoozed_days > repetition:
-            return challenge
-        return None
+            return challenge  # snoozing is expired
+        return None  # snoozing still active so we wait
 
     if challenge.acquired_on:
         last_month = timezone.now() - datetime.timedelta(weeks=4)
@@ -47,8 +47,8 @@ def get_challenge_for(user, codename):
         ) and challenge.acquired_on < last_month:
             challenge.acquired_on = None
             challenge.save()
-            return challenge
-        return None
+            return challenge  # acquired but too long ago so we start again
+        return None  # already acquired so we don't return one
 
     return challenge
 

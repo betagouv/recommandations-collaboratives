@@ -58,6 +58,7 @@ class ChallengeView(generics.RetrieveUpdateAPIView):
         challenge = utils.get_challenge_for(request.user, codename=slug)
 
         if not challenge:
+            # todo this happens if challenged was done or snoozed. fix utils callx
             raise Http404()
 
         if "start" in request.data:
