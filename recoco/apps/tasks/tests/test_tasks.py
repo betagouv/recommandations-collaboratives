@@ -4,6 +4,7 @@
 Tests for project application, tasks
 
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
+authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
@@ -14,6 +15,7 @@ from unittest.mock import ANY, patch
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
@@ -996,6 +998,28 @@ def test_create_new_action_with_existing_topic(request, client, project_ready):
 
 
 @pytest.mark.django_db
+def test_create_new_action_without_resource_default_push_type(
+    request, client, project_ready
+):
+    content = "My Content"
+
+    with login(client) as user:
+        utils.assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-task"),
+            data={
+                "project": project_ready.pk,
+                "push_type": "single",
+                "public": True,
+                "content": content,
+            },
+        )
+    assert not models.Task.on_site.exists()
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_create_new_action_without_resource(request, client, project_ready):
     intent = "My Intent"
     content = "My Content"
@@ -1058,6 +1082,41 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
     assert task.resource == resource
     assert task.contact == contact
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_new_action_with_single_resource_other_site(
+    request, client, project_ready, current_site
+):
+    other_site = baker.make(Site)
+    resource = Recipe(
+        resources.Resource,
+        sites=[other_site],
+        status=resources.Resource.PUBLISHED,
+    ).make()
+
+    intent = "My Intent"
+    content = "My Content"
+
+    contact = baker.make(Contact, site=current_site)
+
+    with login(client) as user:
+        utils.assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-task"),
+            data={
+                "project": project_ready.pk,
+                "push_type": "single",
+                "public": True,
+                "resource": resource.pk,
+                "intent": intent,
+                "content": content,
+                "contact": contact.pk,
+            },
+        )
+    assert not models.Task.on_site.exists()
+    assert response.status_code != 500
 
 
 @pytest.mark.django_db
