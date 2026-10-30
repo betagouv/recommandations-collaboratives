@@ -8,10 +8,8 @@ from recoco.utils import make_group_name_for_site
 def create_trusted_bot_groups(apps, schema_editor):
     Site = apps.get_model("sites", "Site")
     Group = apps.get_model("auth", "Group")
-    new_groups = []
     for site in Site.objects.all():
-        new_groups.append(Group(name=make_group_name_for_site("trusted_bot", site)))
-    Group.objects.bulk_create(new_groups)
+        Group.objects.get_or_create(name=make_group_name_for_site("trusted_bot", site))
 
 
 class Migration(migrations.Migration):
