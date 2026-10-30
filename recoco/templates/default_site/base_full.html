@@ -14,6 +14,9 @@
         <meta property="og:title"
               content="{% spaceless %}{% block og_title %}{% endblock og_title %}{% endspaceless %} - {{ request.site.name }}">
         {% vite_hmr_client %}
+        {% if sentry_frontend_config %}
+            {{ sentry_frontend_config|json_script:"sentryConfig" }}
+        {% endif %}
         {% vite_asset 'js/main.js' %}
         {% cache 3600 crisp request.site %}
         {% include "crisp.html" %}
@@ -115,10 +118,6 @@
             </div>
         </main>
         {% include "tools/on_leave_modal.html" %}
-        {% if debug is False %}
-            <script src="https://sentry.incubateur.net/js-sdk-loader/caf46e9eca66a6aee8e9dfc9434f00a8.min.js"
-                    crossorigin="anonymous"></script>
-        {% endif %}
         {% block js %}
         {% endblock js %}
     </body>

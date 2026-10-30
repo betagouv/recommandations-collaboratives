@@ -166,6 +166,7 @@ TEMPLATES = [
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
                 "recoco.apps.projects.context_processors.matomo_context_processor",
                 "recoco.apps.home.context_processors.embed",
+                "recoco.apps.home.context_processors.sentry_frontend",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -256,6 +257,7 @@ CONTENT_SECURITY_POLICY = {
             "https://api-adresse.data.gouv.fr/",
             "https://www.google.com",
             "https://stats.beta.gouv.fr",
+            "https://sentry.incubateur.net",
             "https://storage.crisp.chat",
             "wss://client.relay.rescue.crisp.chat",  # Fallback if primary WebSocket servers are down
         ],

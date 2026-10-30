@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11, <3.14"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -3746,7 +3746,7 @@ requires-dist = [
     { name = "requests-html", specifier = "==0.10.0" },
     { name = "rest-framework-generic-relations", specifier = ">=2.2.0" },
     { name = "sentry-sdk", specifier = ">=2.20.0" },
-    { name = "setuptools", specifier = "==84.1.0" },
+    { name = "setuptools", specifier = ">=84.1.0" },
     { name = "sib-api-v3-sdk", specifier = ">=7.6.0" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "wagtail", specifier = "==7.0.9" },
@@ -3774,7 +3774,7 @@ dev = [
     { name = "notebook", specifier = "==6.4.12" },
     { name = "pre-commit", specifier = "==3.6.0" },
     { name = "pylint", specifier = ">=4.0.9" },
-    { name = "pylint-django", specifier = ">=2.6.1" },
+    { name = "pylint-django", specifier = ">=2.6.2" },
     { name = "pytest", specifier = "==9.0.3" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-django", specifier = "==4.8.0" },
