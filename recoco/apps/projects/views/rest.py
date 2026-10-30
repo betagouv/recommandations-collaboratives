@@ -10,6 +10,7 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
+from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -20,7 +21,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+)
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,6 +48,7 @@ from recoco.utils import (
     get_group_for_site,
     has_perm,
     has_perm_or_403,
+    is_staff_for_site,
 )
 
 from .. import models, signals
@@ -58,6 +66,8 @@ from ..serializers import (
     NewProjectSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
+    ProjectMembersSerializer,
+    ProjectMembershipRoleSerializer,
     ProjectMembershipSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -65,6 +75,7 @@ from ..serializers import (
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
+from ..utils import remove_member
 
 ########################################################################
 # Project API
@@ -76,6 +87,13 @@ class CanModerateProjectsOnSite(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return has_perm(request.user, "sites.moderate_projects", request.site)
+
+
+class IsStaffForSite(permissions.BasePermission):
+    """Allow the staff of the current site"""
+
+    def has_permission(self, request, view):
+        return is_staff_for_site(request.user, request.site)
 
 
 class ProjectDetail(
@@ -187,12 +205,41 @@ class ProjectCreate(CreateAPIView):
     serializer_class = NewProjectSerializer
 
 
-class ProjectMembershipCreate(CreateAPIView):
-    """Attach a participant, an advisor or an observer to a project
+class ProjectMembershipMixin:
+    """Give the project of the url to the membership views and serializers"""
 
-    The person is given by email, in the `email` field, and its account is
-    created if it does not exist yet. The `role` field says how it is attached
-    to the project:
+    # restricted to staff, so that it never allows someone the project
+    # administration refuses, cf. test_project_membership_api_never_allows_more
+    permission_classes = [permissions.IsAuthenticated, IsStaffForSite]
+
+    @cached_property
+    def project(self) -> models.Project:
+        return get_object_or_404(models.Project.on_site, pk=self.kwargs["pk"])
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["project"] = self.project
+        return context
+
+
+class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
+    """List or attach the participants, advisors and observers of a project
+
+    `GET` lists the people attached to the project, in two lists:
+
+    - `members`: the participants, each one with an `email`, a `first_name`, a
+      `last_name` and an `is_owner` flag, true only for the owner of the
+      project, who comes first, the others being ordered by username;
+    - `advisors`: the advisors and observers of the current site, each one with
+      an `email`, a `first_name`, a `last_name` and an `is_observer` flag,
+      ordered by username.
+
+    Someone who is both participant and advisor is in both lists.
+
+    `POST` attaches someone to the project. The person is given by email, in
+    the `email` field: their account is created if it does not exist yet, and
+    added to the current site in any case. The `role` field says how they are
+    attached to the project:
 
     - `COLLABORATOR`: a participant, member of the project team;
     - `SWITCHTENDER`: an advisor, who follows the project for the site;
@@ -201,21 +248,82 @@ class ProjectMembershipCreate(CreateAPIView):
     The attachment is immediate: unlike an invitation, no email is sent and
     there is nothing to accept. Attaching someone who already holds the role
     on this project is a no-op, and still answers a `201`. Attaching an advisor
-    as an observer, or the other way around, switches their role.
+    as an observer, or the other way around, switches their role. The answer
+    gives back the `email` and the `role`.
 
     The project has to be one of the current site, and the caller must be
-    allowed to moderate projects on that site.
+    staff for that site.
     """
 
-    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
-    serializer_class = ProjectMembershipSerializer
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return ProjectMembersSerializer
+        return ProjectMembershipSerializer
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["project"] = get_object_or_404(
-            models.Project.on_site, pk=self.kwargs["pk"]
+    def get(self, request, *args, **kwargs):
+        members = self.project.projectmember_set.select_related("member")
+        advisors = self.project.switchtender_sites.on_site().select_related(
+            "switchtender"
         )
-        return context
+
+        serializer = self.get_serializer(
+            {
+                "members": members.order_by("-is_owner", "member__username"),
+                "advisors": advisors.order_by("switchtender__username"),
+            }
+        )
+        return Response(serializer.data)
+
+
+class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
+    """Change the role of a member of a project, or remove it from the project
+
+    The member is given by email, in the url.
+
+    `PATCH` changes their role, given in the `role` field, with the same values
+    as for attaching someone to the project. The member only keeps the given
+    role: someone both participant and advisor is no longer the other one.
+
+    `DELETE` removes the member from the project, whatever their roles, and
+    deletes their notifications about the project.
+
+    In both cases, a `404` is answered if the person is not a member of the
+    project, and a `400` if they are the owner of the project, who cannot be
+    changed nor removed.
+
+    The project has to be one of the current site, and the caller must be
+    staff for that site.
+    """
+
+    serializer_class = ProjectMembershipRoleSerializer
+
+    def get_object(self) -> User:
+        user = get_object_or_404(User, username=self.kwargs["email"].lower())
+
+        members = self.project.projectmember_set.filter(member=user)
+        advisors = self.project.switchtender_sites.on_site().filter(switchtender=user)
+        if not (members.exists() or advisors.exists()):
+            raise Http404
+
+        if members.filter(is_owner=True).exists():
+            raise ValidationError(
+                {"email": "The owner of a project cannot be changed nor removed."}
+            )
+
+        return user
+
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object(), data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+
+        remove_member(user, self.project, request.site)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectList(ListAPIView):
