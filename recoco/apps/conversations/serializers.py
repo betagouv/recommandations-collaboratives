@@ -1,11 +1,12 @@
 # serializers.py
 from actstream.models import Action
 from django.contrib.auth.models import User
-from django.db import transaction
+from django.db import models, transaction
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from recoco.apps.home.serializers import UserSerializer
+from recoco.apps.plugins.utils import is_disabled_plugin_model
 from recoco.apps.projects.models import Document, Project
 from recoco.apps.tasks.models import Task
 
@@ -71,8 +72,22 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
     )
 
 
+class NodeListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        # Plugins add their own node types (model_serializer_mapping is
+        # extended at startup, for every tenant): hide the nodes of plugins
+        # the current tenant has not enabled.
+        nodes = data.all() if isinstance(data, models.manager.BaseManager) else data
+        return super().to_representation(
+            [node for node in nodes if not is_disabled_plugin_model(type(node))]
+        )
+
+
 class NodePolymorphicSerializer(PolymorphicSerializer):
     resource_type_field_name = "type"
+
+    class Meta:
+        list_serializer_class = NodeListSerializer
 
     model_serializer_mapping = {
         Node: NodeSerializer,
@@ -81,6 +96,18 @@ class NodePolymorphicSerializer(PolymorphicSerializer):
         ContactNode: ContactNodeSerializer,
         DocumentNode: DocumentNodeSerializer,
     }
+
+    def _get_serializer_from_resource_type(self, resource_type):
+        # Node types of plugins the current tenant has not enabled can't be
+        # posted
+        model = self.resource_type_model_mapping.get(resource_type)
+        if model is not None and is_disabled_plugin_model(model):
+            raise serializers.ValidationError(
+                {
+                    self.resource_type_field_name: f"Invalid {self.resource_type_field_name}"
+                }
+            )
+        return super()._get_serializer_from_resource_type(resource_type)
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -123,6 +150,17 @@ class MessageSerializer(serializers.ModelSerializer):
                 node_data["message_id"] = message.id
                 NodePolymorphicSerializer().create(node_data)
         return message
+
+    def validate(self, attrs):
+        # Updating replaces every node: it would drop the nodes of plugins
+        # the current tenant has not enabled, which it can't see
+        if self.instance and any(
+            is_disabled_plugin_model(type(node)) for node in self.instance.nodes.all()
+        ):
+            raise serializers.ValidationError(
+                "This message can't be edited from this site."
+            )
+        return attrs
 
     def update(self, instance, validated_data):
         nodes_data = validated_data.pop("nodes")

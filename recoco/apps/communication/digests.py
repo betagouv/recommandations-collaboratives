@@ -31,7 +31,14 @@ from recoco.apps.reminders.api import (
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
-from ..conversations.models import MarkdownNode, RecommendationNode
+from ..conversations.models import (
+    OBJECT_NODE_TYPES,
+    MarkdownNode,
+    Message,
+    RecommendationNode,
+    exclude_plugin_only_messages,
+    visible_nodes,
+)
 from . import constants as communication_constants
 from .api import send_email
 from .helpers import NotificationFormatter, normalize_user_name
@@ -488,6 +495,14 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
         .unsent()
         .filter(verb=verbs.Conversation.POST_MESSAGE, target_object_id=project.id)
     )
+    # Messages made only of nodes of plugins the site has not enabled are left
+    # out of the digest
+    visible_message_ids = exclude_plugin_only_messages(
+        Message.objects.filter(project=project)
+    ).values_list("pk", flat=True)
+    notifications = notifications.filter(
+        action_object_object_id__in=[str(pk) for pk in visible_message_ids]
+    )
     if notifications.count() == 0:
         return 0
 
@@ -530,10 +545,23 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
 
     md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
     reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
+    # Nodes the digest counts and can show as its first object. Plugin nodes
+    # are counted as part of their message and never shown: the email
+    # template only knows the core objects.
+    object_node_cts = [
+        ct.id for ct in ContentType.objects.get_for_models(*OBJECT_NODE_TYPES).values()
+    ]
+
+    def count_label(node):
+        return node.count_label if isinstance(node, OBJECT_NODE_TYPES) else "message"
 
     # msg count and title count
-    nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
-    nodes_types = set(node.count_label for node in nodes)
+    nodes = [
+        n
+        for notif in notifications_qs
+        for n in visible_nodes(notif.action_object.nodes.all())
+    ]
+    nodes_types = set(count_label(node) for node in nodes)
     if len(nodes_types) > 1 or next(iter(nodes_types)) == "message":
         msg_count = notifications_qs.count()
         single_type = "message"
@@ -584,13 +612,15 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         (
             n.action_object
             for n in notifications_qs
-            if n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct).exists()
+            if n.action_object.nodes.filter(
+                polymorphic_ctype_id__in=object_node_cts
+            ).exists()
         ),
         None,
     )
     first_object_node = (
         (
-            first_obj_msg.nodes.exclude(polymorphic_ctype=md_node_ct)
+            first_obj_msg.nodes.filter(polymorphic_ctype_id__in=object_node_cts)
             .order_by("position")
             .first()
         )
