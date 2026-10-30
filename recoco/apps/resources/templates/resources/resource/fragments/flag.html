@@ -1,3 +1,13 @@
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% if pending_patch and "manage_resources" in user_site_perms %}
+    <div class="flag blue fr-mb-3w d-flex align-items-center justify-content-start">
+        <span class="title-info text-blue text-uppercase fr-my-0 fr-mr-2w">Modération</span>
+        <p class="text-info-custom text-blue fr-my-0">
+            Une <a href="{% url 'resources-patch-review' resource.pk pending_patch.pk %}">proposition de modification</a> est en attente de relecture.
+        </p>
+    </div>
+{% endif %}
 {% if resource.expires_on %}
     {% if not resource.expired %}
         <div data-test-id="non-expired-resource-banner"
