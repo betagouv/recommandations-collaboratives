@@ -41,6 +41,8 @@ from recoco.utils import (
     get_group_for_site,
     has_perm,
     has_perm_or_403,
+    is_admin_for_site,
+    is_staff_for_site,
 )
 
 from .. import models, signals
@@ -71,11 +73,13 @@ from ..serializers import (
 ########################################################################
 
 
-class CanModerateProjectsOnSite(permissions.BasePermission):
-    """Allow users who can moderate projects on the current site"""
+class IsStaffOrAdminForSite(permissions.BasePermission):
+    """Allow staff and admins of the current site only"""
 
     def has_permission(self, request, view):
-        return has_perm(request.user, "sites.moderate_projects", request.site)
+        return is_staff_for_site(request.user, request.site) or is_admin_for_site(
+            request.user, request.site
+        )
 
 
 class ProjectDetail(
@@ -180,10 +184,10 @@ class ProjectCreate(CreateAPIView):
     to `TO_PROCESS`, which is the status of a project that has been validated
     but not yet processed.
 
-    The caller must be allowed to moderate projects on the current site.
+    The caller must be staff or admin of the current site.
     """
 
-    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
+    permission_classes = [permissions.IsAuthenticated, IsStaffOrAdminForSite]
     serializer_class = NewProjectSerializer
 
 
@@ -204,10 +208,10 @@ class ProjectMembershipCreate(CreateAPIView):
     as an observer, or the other way around, switches their role.
 
     The project has to be one of the current site, and the caller must be
-    allowed to moderate projects on that site.
+    staff or admin of that site.
     """
 
-    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
+    permission_classes = [permissions.IsAuthenticated, IsStaffOrAdminForSite]
     serializer_class = ProjectMembershipSerializer
 
     def get_serializer_context(self):

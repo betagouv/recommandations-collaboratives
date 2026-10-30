@@ -744,6 +744,45 @@ def test_non_staff_cannot_use_project_create_api(api_client):
 
 
 @pytest.mark.django_db
+def test_moderator_not_staff_cannot_use_project_create_api(api_client, current_site):
+    # being allowed to moderate projects is not enough, one has to be staff
+    moderator = baker.make(auth_models.User)
+    assign_perm("sites.moderate_projects", moderator, current_site)
+    api_client.force_authenticate(moderator)
+
+    url = reverse("projects-create")
+    data = {
+        "name": "a project",
+        "description": "a description",
+        "insee": "62000",
+        "owner_email": "owner@example.com",
+    }
+    assert api_client.post(url, data=data).status_code == 403
+
+    assert not models.Project.objects.exists()
+
+
+@pytest.mark.django_db
+def test_admin_can_use_project_create_api(api_client, admin_user):
+    api_client.force_authenticate(admin_user)
+
+    url = reverse("projects-create")
+    response = api_client.post(
+        url,
+        data={
+            "name": "a project",
+            "description": "a description",
+            "insee": "00000",
+            "owner_email": "owner@example.com",
+        },
+    )
+
+    # past the permission check, the request reaches the validation
+    assert response.status_code == 400
+    assert "insee" in response.data
+
+
+@pytest.mark.django_db
 def test_unknown_insee_code_is_reported_by_project_create_api(api_client, staff_user):
     api_client.force_authenticate(staff_user)
 
@@ -898,6 +937,37 @@ def test_non_staff_cannot_use_project_membership_api(api_client, project):
     assert api_client.post(url, data=data).status_code == 403
 
     assert not models.ProjectMember.objects.exists()
+
+
+@pytest.mark.django_db
+def test_moderator_not_staff_cannot_use_project_membership_api(
+    api_client, current_site, project
+):
+    # being allowed to moderate projects is not enough, one has to be staff
+    moderator = baker.make(auth_models.User)
+    assign_perm("sites.moderate_projects", moderator, current_site)
+    api_client.force_authenticate(moderator)
+
+    url = reverse("projects-members-create", args=[project.id])
+    data = {"email": "jane@example.com", "role": "COLLABORATOR"}
+    assert api_client.post(url, data=data).status_code == 403
+
+    assert not models.ProjectMember.objects.exists()
+
+
+@pytest.mark.django_db
+def test_admin_can_use_project_membership_api(api_client, admin_user, project):
+    api_client.force_authenticate(admin_user)
+
+    url = reverse("projects-members-create", args=[project.id])
+    response = api_client.post(
+        url, data={"email": "jane@example.com", "role": "COLLABORATOR"}
+    )
+
+    assert response.status_code == 201
+    assert models.ProjectMember.objects.filter(
+        project=project, member__username="jane@example.com"
+    ).exists()
 
 
 @pytest.mark.django_db
