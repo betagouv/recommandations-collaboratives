@@ -228,24 +228,24 @@ Cypress.Commands.add(
           }
         }
       }
+
+      cy.get('[id="accept-cgu"]').click({force: true})
+
       cy.get('[type=submit]').click();
+      cy.url().should('include', '/confirm-email');
+    } else {
+      cy.url().then((url) => {
+        const idMatch = url.match(/\/onboarding\/summary\/(\d+)$/);
 
-      cy.url().should('include', 'onboarding/summary');
+        if (idMatch) {
+          const id = idMatch[1];
+          cy.log(`L'ID récupéré est : ${id}`);
+          cy.wrap(id).as('projectId');
+        } else {
+          throw new Error("ID non trouvé dans l'URL");
+        }
+      });
     }
-
-    cy.url().should('include', '/onboarding/summary');
-
-    cy.url().then((url) => {
-      const idMatch = url.match(/\/onboarding\/summary\/(\d+)$/);
-
-      if (idMatch) {
-        const id = idMatch[1];
-        cy.log(`L'ID récupéré est : ${id}`);
-        cy.wrap(id).as('projectId');
-      } else {
-        throw new Error("ID non trouvé dans l'URL");
-      }
-    });
   }
 );
 

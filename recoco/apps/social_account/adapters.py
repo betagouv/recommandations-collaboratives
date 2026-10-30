@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter, get_adapter
 from allauth.socialaccount.internal import jwtkit
 from allauth.socialaccount.models import SocialToken
@@ -24,14 +25,22 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         raising an ImmediateHttpResponse
         """
 
-        user = sociallogin.user
-        if user.id:
-            confirm_email(request, user)
-            return
+        def reset_session_to_validate_if_needed(user, request):
+            if EmailAddress.objects.filter(
+                email=user.email, verified=True
+            ).exists():  # address is valid
+                return
 
-        try:
-            user = User.objects.get(username=user.email)
+            user.set_unusable_password()
+            # this resets all session
+            # cf https://docs.djangoproject.com/en/5.2/topics/auth/default/#session-invalidation-on-password-change
+
             confirm_email(request, user)
+
+        user = sociallogin.user
+        try:
+            user = User.objects.get(email=user.email)
+            reset_session_to_validate_if_needed(user, request)
             sociallogin.connect(request, user)
         except User.DoesNotExist:
             pass

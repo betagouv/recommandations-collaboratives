@@ -294,7 +294,8 @@ const config = {
         greyScaleToggleStyles: resolve(
           './src/js/styles/grey-scale-toggle.css.js'
         ),
-        statistics: resolve('./src/js/apps/statistics.js')
+        statistics: resolve('./src/js/apps/statistics.js'),
+        advisorConvStyles: resolve('./src/js/styles/advisor-conv.css.js'),
       },
       output: {
         chunkFileNames: undefined,

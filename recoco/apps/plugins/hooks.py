@@ -48,6 +48,33 @@ class ProjectSpec(HookSpec):
                 }
         """
 
+    @hookspec
+    def project_overview_sidebar_blocks(self, project, request):
+        """Return an HTML block to inject into the project overview page's right
+        sidebar, right below the project info block (name, organization, commune,
+        tags).
+
+        Every enabled plugin may contribute one block; the order in which
+        blocks are rendered is not guaranteed.
+
+        The returned string MUST be wrapped with ``mark_safe()``; the framework
+        renders it without an additional ``|safe`` filter.
+
+        The overview page is visible to anyone allowed to view the project
+        (including the project owner and their collaborators), not only staff
+        or advisors: check ``request.user`` permissions before exposing any
+        sensitive data, and return ``None`` to render nothing.
+
+        Example:
+            @hookimpl
+            def project_overview_sidebar_blocks(self, project, request):
+                return mark_safe(render_to_string(
+                    "plugin_giphy/project_overview_sidebar_block.html",
+                    {"project": project},
+                    request=request,
+                ))
+        """
+
 
 class ResourceSpec(HookSpec):
     @hookspec
@@ -174,6 +201,23 @@ class CrmSpec(HookSpec):
         """
 
     @hookspec
+    def crm_project_list_filter_lookups(self, request):
+        """Return a dict of ORM lookups to filter the CRM project list queryset.
+
+        Read your own query parameters from ``request.GET`` (the ones sent by
+        the ``plugin-filter-change`` event of crm_project_list_filters) and
+        return ``None`` when they are absent, so the queryset is left untouched.
+
+        Example:
+            @hookimpl
+            def crm_project_list_filter_lookups(self, request):
+                filter_param = request.GET.get("filter_param")
+                if filter_param:
+                    return {"plugin__filter_param": filter_param}
+                return None
+        """
+
+    @hookspec
     def crm_project_list_extra_serializer_fields(self, request):
         """Return a list of field names (strings) to include in the project list
         REST response. Each name must match an annotation added via
@@ -203,6 +247,25 @@ class CrmSpec(HookSpec):
                     "cell_html": '<td x-text="project.realisations_count"></td>',
                     "col_class": "col--small",
                 }
+        """
+
+    @hookspec
+    def crm_project_list_filters(self, request):
+        """Return an HTML string to inject into the CRM project list filters bar.
+
+        The HTML is rendered inside the ``ProjectListCrm`` Alpine scope.
+
+        The returned string MUST be wrapped with ``mark_safe()``; the framework
+        renders it without an additional ``|safe`` filter.
+
+        Example:
+            @hookimpl
+            def crm_project_list_filters(self, request):
+                return mark_safe(render_to_string(
+                    "plugin_giphy/fragments/filter_giphy.html",
+                    {},
+                    request=request,
+                ))
         """
 
 

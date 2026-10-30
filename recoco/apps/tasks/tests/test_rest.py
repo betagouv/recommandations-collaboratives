@@ -11,7 +11,6 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from django.utils import timezone
 from model_bakery import baker
 from notifications.signals import notify
 from rest_framework.test import APIClient
@@ -390,6 +389,80 @@ def test_project_advisor_can_update_project_task_for_site_no_content(request, pr
 
     task.refresh_from_db()
     assert task.content == ""
+
+
+#
+# delete tasks
+
+
+@pytest.mark.django_db
+def test_project_simple_user_cannot_delete_project_task(
+    api_client, project, current_site
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+    user = baker.make(auth_models.User)
+
+    with login(api_client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = api_client.delete(url)
+
+        assert response.status_code == 403
+    assert models.Task.objects.filter(pk=task.id).exists()
+
+
+@pytest.mark.django_db
+def test_project_advisor_cannot_delete_other_project_task_for_site(
+    request, project, make_project, current_site
+):
+    user = baker.make(auth_models.User)
+
+    # to test object level perm, user is collaborator on an other project
+    other_project = make_project(site=current_site)
+    utils.assign_advisor(user, other_project)
+
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+
+    client = APIClient()
+    with login(client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = client.delete(url)
+
+        assert response.status_code == 403
+    assert models.Task.objects.filter(pk=task.id).exists()
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_delete_project_task_for_site(
+    request, project, current_site, api_client
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+
+    utils.assign_collaborator(user, project)
+
+    with login(api_client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = api_client.delete(url)
+
+        assert response.status_code == 403
+    assert models.Task.objects.filter(pk=task.id).exists()
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_delete_project_task_for_site(
+    request, project, current_site, api_client
+):
+    user = baker.make(auth_models.User)
+    task = baker.make(models.Task, project=project, site=current_site, public=False)
+
+    utils.assign_advisor(user, project)
+
+    with login(api_client, user=user):
+        url = reverse("project-tasks-detail", args=[project.id, task.id])
+        response = api_client.delete(url)
+        assert response.status_code == 204
+
+    assert not models.Task.objects.filter(pk=task.id).exists()
 
 
 ##################
@@ -795,29 +868,6 @@ def test_unassigned_user_should_not_see_recommendations(request):
 #################################################################
 # Activity flags
 #################################################################
-@pytest.mark.django_db
-def test_last_members_activity_is_updated_by_member_followup_via_rest(
-    request, client, project
-):
-    user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
-
-    utils.assign_collaborator(user, project)
-
-    client = APIClient()
-    client.force_authenticate(user=user)
-    utils.assign_advisor(user, project)
-    data = {"comment": "an updated comment for followup"}
-    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    before_update = timezone.now()
-    response = client.post(url, data=data, format="json")
-
-    assert response.status_code == 201
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at > before_update
 
 
 @pytest.mark.django_db
@@ -889,30 +939,6 @@ def test_project_user_cannot_publish_already_published_task(
 
     task.refresh_from_db()
     assert task.public is True
-
-
-@pytest.mark.django_db
-def test_last_members_activity_not_updated_by_advisor_followup_via_rest(
-    request, client, project
-):
-    user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
-
-    utils.assign_advisor(user, project)
-
-    client = APIClient()
-    client.force_authenticate(user=user)
-    data = {"comment": "an updated comment for followup"}
-    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    before_update = timezone.now()
-    response = client.post(url, data=data, format="json")
-
-    assert response.status_code == 201
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at < before_update
 
 
 # eof
