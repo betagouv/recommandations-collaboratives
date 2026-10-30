@@ -40,6 +40,7 @@ from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_403_TEMPLATE_NAME
+from django.views.defaults import page_not_found as default_page_not_found
 from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 from notifications.signals import notify
@@ -70,6 +71,7 @@ from .forms import (
     UserPasswordFirstTimeSetupForm,
 )
 from .models import AdvisorAccessRequest
+from .rest import api_not_found
 from .utils import get_current_site_sender, make_new_site
 
 
@@ -557,6 +559,15 @@ def permission_denied(request, exception):
             },
         )
     )
+
+
+def page_not_found(request, exception):
+    # api drf answer before trying to render 404.html
+    if request.path_info.startswith("/api/"):
+        return api_not_found(request)
+
+    # renders 404.html with context processors enabled
+    return default_page_not_found(request, exception)
 
 
 class RequestLoginCodeNoStaffView(RequestLoginCodeView):

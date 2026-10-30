@@ -84,6 +84,7 @@ if settings.DEBUG:
     #    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 
 handler403 = "recoco.apps.home.views.permission_denied"
+handler404 = "recoco.apps.home.views.page_not_found"
 
 
 # eof

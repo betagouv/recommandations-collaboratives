@@ -4,7 +4,10 @@ from django.contrib.sites import models as sites_models
 from django.http import Http404
 from notifications import models as notifications_models
 from rest_framework import mixins, status, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
+from rest_framework.decorators import permission_classes as api_permission_classes
+from rest_framework.exceptions import NotFound
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -55,6 +58,13 @@ class SiteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = sites_models.Site.objects
     serializer_class = SiteSerializer
     permission_classes = [IsAuthenticated]
+
+
+# recreate drf answer to call it ourserlves
+@api_view(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"])
+@api_permission_classes([AllowAny])  # a 404 must not become a 401/403
+def api_not_found(request):
+    raise NotFound()
 
 
 # eof

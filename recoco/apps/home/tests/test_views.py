@@ -28,6 +28,7 @@ from pytest_django.asserts import (
     assertNotContains,
     assertRedirects,
 )
+from rest_framework.exceptions import NotFound
 
 from recoco.apps.home import models as home_models
 from recoco.apps.home.config import SIGNUP_USER_ID_SESSION_KEY
@@ -739,6 +740,33 @@ def test_403_sesame_other_user(client, current_site, project_ready):
         assert logged_in_user.email in str(
             response.content
         )  # no assertContains because it requires a success status_code
+
+
+@pytest.mark.django_db
+def test_404_on_api_is_drf_response_for_logged_in_user(client, current_site, accept):
+    with login(client):
+        response = client.get("/api/challenges/")
+
+    assert response.status_code == 404
+    assert response.data == {"detail": NotFound.default_detail}
+
+
+@pytest.mark.django_db
+def test_404_on_api_without_trailing_slash_redirects(client, current_site):
+    with login(client):
+        response = client.get("/api/challenges/definitions/survey")
+
+    assert response.status_code == 301
+    assert response.url == "/api/challenges/definitions/survey/"
+
+
+@pytest.mark.django_db
+def test_404_outside_api_renders_404_page(client, current_site):
+    with login(client):
+        response = client.get("/does-not-exist/")
+
+    assert response.status_code == 404
+    assert "404.html" in [t.name for t in response.templates]
 
 
 @pytest.mark.django_db
