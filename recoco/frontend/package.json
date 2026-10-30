@@ -57,6 +57,7 @@
     "js-cookie": "^3.0.7",
     "leaflet": "^1.9.1",
     "leaflet-control-geocoder": "^2.4.0",
+    "leaflet-fullscreen": "^1.0.2",
     "leaflet-providers": "^1.13.0",
     "leaflet.markercluster": "^1.5.3",
     "list.js": "^2.3.1",
