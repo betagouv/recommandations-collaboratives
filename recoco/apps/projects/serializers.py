@@ -25,7 +25,7 @@ from .models import (
     Topic,
     UserProjectStatus,
 )
-from .utils import assign_collaborator, assign_role
+from .utils import assign_collaborator, assign_role, set_owner
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -356,6 +356,27 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
         user = get_or_create_user_on_site(validated_data["email"], self.current_site)
 
         assign_role(user, self.project, validated_data["role"], self.current_site)
+
+        return validated_data
+
+
+class ProjectOwnerSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Make someone, given by email, the owner of a project"""
+
+    email = serializers.EmailField(max_length=150)
+
+    @property
+    def project(self) -> Project:
+        return self.context["project"]
+
+    def validate_email(self, value):
+        return value.lower()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = get_or_create_user_on_site(validated_data["email"], self.current_site)
+
+        set_owner(user, self.project)
 
         return validated_data
 

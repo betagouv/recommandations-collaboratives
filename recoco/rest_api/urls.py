@@ -143,6 +143,16 @@ api_urls = [
         projects_rest.ProjectMembershipDetail.as_view(),
         name="projects-members-detail",
     ),
+    path(
+        "projects/<int:pk>/members/<str:email>/<str:role>/",
+        projects_rest.ProjectMembershipRoleDetail.as_view(),
+        name="projects-members-role-detail",
+    ),
+    path(
+        "projects/<int:pk>/owner/",
+        projects_rest.ProjectOwnerDetail.as_view(),
+        name="projects-owner-detail",
+    ),
     # path(
     #     "projects/my_departments",
     #     projects_rest.ProjectDepartmentList.as_view(),

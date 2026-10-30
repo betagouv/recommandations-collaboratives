@@ -25,6 +25,7 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     CreateAPIView,
+    GenericAPIView,
     ListAPIView,
     RetrieveAPIView,
 )
@@ -68,6 +69,7 @@ from ..serializers import (
     ProjectLocationSerializer,
     ProjectMemberSerializer,
     ProjectMembershipSerializer,
+    ProjectOwnerSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
@@ -375,6 +377,33 @@ class ProjectMembershipRoleDetail(ProjectMembershipDetailMixin, APIView):
         remove_role(user, self.project, role, request.site)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProjectOwnerDetail(ProjectMembershipMixin, GenericAPIView):
+    """Change the owner of a project
+
+    `PUT` makes the person given by email, in the `email` field, the owner of
+    the project. As for the creation of a project, their account is created
+    if it does not exist yet, and added to the current site in any case.
+
+    The person is made a participant of the project if they are not one yet,
+    and the former owner remains a participant. The project phone number is
+    replaced by the one of the new owner, and the advisors and members of the
+    project are notified of the change. Giving the current owner is a no-op,
+    nobody being notified. The answer gives back the `email`.
+
+    The project has to be one of the current site, and the caller must be
+    staff for that site.
+    """
+
+    serializer_class = ProjectOwnerSerializer
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
 
 
 class ProjectList(ListAPIView):

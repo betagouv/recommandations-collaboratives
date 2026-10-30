@@ -11,6 +11,7 @@ created: <2021-09-13 lun. 15:38>
 import uuid
 from typing import TYPE_CHECKING
 
+from actstream import action
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -25,6 +26,7 @@ from notifications import models as notifications_models
 from notifications.signals import notify
 
 from recoco import utils as uv_utils
+from recoco import verbs
 
 from . import models
 
@@ -71,6 +73,45 @@ def assign_collaborator(user, project, is_owner=False):
     )
 
     return created
+
+
+def set_owner(user, project):
+    """Make someone the owner of a project, and tell the project team
+
+    The person is made a collaborator first if needed, and the former owner
+    remains a collaborator. Nothing happens if the person is already the
+    owner. Return whether the owner changed.
+    """
+    if project.owner == user:
+        return False
+
+    with transaction.atomic():
+        assign_collaborator(user, project)
+
+        members = models.ProjectMember.objects.filter(project=project)
+        members.update(is_owner=False)
+        members.filter(member=user).update(is_owner=True)
+
+        project.phone = user.profile.phone_no
+        project.save()
+
+    action.send(
+        sender=user,
+        verb=verbs.Project.NEW_OWNER,
+        action_object=project,
+        target=project,
+    )
+
+    notification = {
+        "sender": user,
+        "verb": verbs.Project.NEW_OWNER,
+        "action_object": project,
+        "target": project,
+    }
+    notify_advisors_of_project(project, notification)
+    notify_members_of_project(project, notification)
+
+    return True
 
 
 @transaction.atomic

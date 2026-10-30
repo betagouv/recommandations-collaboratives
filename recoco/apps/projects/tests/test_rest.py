@@ -1184,6 +1184,126 @@ def test_owner_is_not_removed_by_project_member_apis(
 
 
 ########################################################################
+# change the owner of a project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_use_project_owner_api(api_client, project, make_member):
+    owner = make_member(project, is_owner=True)
+    collaborator = make_member(project)
+
+    url = reverse("projects-owner-detail", args=[project.id])
+    data = {"email": collaborator.username}
+
+    # anonymous
+    assert api_client.put(url, data=data).status_code == 403
+
+    # authenticated, but not staff for the current site
+    api_client.force_authenticate(baker.make(auth_models.User))
+    assert api_client.put(url, data=data).status_code == 403
+
+    assert project.owner == owner
+
+
+@pytest.mark.django_db
+def test_owner_is_changed_by_project_owner_api(
+    current_site, api_client, staff_user, project, make_member
+):
+    former_owner = make_member(project, is_owner=True)
+    collaborator = make_member(project)
+    make_member(project, "SWITCHTENDER")
+
+    collaborator.profile.phone_no = "0102030405"
+    collaborator.profile.save()
+
+    api_client.force_authenticate(staff_user)
+
+    url = reverse("projects-owner-detail", args=[project.id])
+    response = api_client.put(url, data={"email": collaborator.username.upper()})
+
+    assert response.status_code == 200
+    assert response.data == {"email": collaborator.username}
+
+    assert project.owner == collaborator
+
+    # the former owner remains a participant
+    assert models.ProjectMember.objects.filter(
+        project=project, member=former_owner, is_owner=False
+    ).exists()
+
+    project.refresh_from_db()
+    assert project.phone == "0102030405"
+
+    # the advisor and both members are notified
+    assert (
+        notifications_models.Notification.objects.filter(
+            verb=verbs.Project.NEW_OWNER
+        ).count()
+        == 3
+    )
+
+
+@pytest.mark.django_db
+def test_unknown_owner_account_is_created_by_project_owner_api(
+    current_site, api_client, staff_user, project, make_member
+):
+    former_owner = make_member(project, is_owner=True)
+
+    api_client.force_authenticate(staff_user)
+
+    url = reverse("projects-owner-detail", args=[project.id])
+    response = api_client.put(url, data={"email": "jane@example.com"})
+
+    assert response.status_code == 200
+
+    owner = auth_models.User.objects.get(username="jane@example.com")
+    assert current_site in owner.profile.sites.all()
+
+    # the new owner is made a participant of the project
+    assert project.owner == owner
+    assert owner.has_perm("projects.use_tasks", project)
+
+    assert models.ProjectMember.objects.filter(
+        project=project, member=former_owner, is_owner=False
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_current_owner_is_a_noop_for_project_owner_api(
+    api_client, staff_user, project, make_member
+):
+    owner = make_member(project, is_owner=True)
+    make_member(project)
+
+    api_client.force_authenticate(staff_user)
+
+    url = reverse("projects-owner-detail", args=[project.id])
+    response = api_client.put(url, data={"email": owner.username})
+
+    assert response.status_code == 200
+    assert project.owner == owner
+    assert models.ProjectMember.objects.filter(project=project).count() == 2
+    assert not notifications_models.Notification.objects.exists()
+
+
+@pytest.mark.django_db
+def test_project_of_another_site_is_not_found_by_project_owner_api(
+    api_client, staff_user
+):
+    other_site = baker.make(sites_models.Site)
+    project = baker.make(models.Project, sites=[other_site])
+
+    api_client.force_authenticate(staff_user)
+
+    url = reverse("projects-owner-detail", args=[project.id])
+    response = api_client.put(url, data={"email": "jane@example.com"})
+
+    assert response.status_code == 404
+    assert not auth_models.User.objects.filter(username="jane@example.com").exists()
+
+
+########################################################################
 # the membership api never allows more than the project administration
 ########################################################################
 
@@ -1255,6 +1375,15 @@ MEMBERSHIP_ACTIONS = {
         lambda p, u: models.ProjectSwitchtender.objects.filter(
             project=p, switchtender=u
         ).exists(),
+    ),
+    "promote_as_owner": (
+        "COLLABORATOR",
+        lambda p, u: reverse("projects-project-promote-referent", args=[p.id, u.id]),
+        lambda c, p, u: c.put(
+            reverse("projects-owner-detail", args=[p.id]),
+            data={"email": u.username},
+        ),
+        lambda p, u: p.owner == u,
     ),
 }
 
