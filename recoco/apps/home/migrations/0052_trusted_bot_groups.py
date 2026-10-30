@@ -5,12 +5,12 @@ from django.db import migrations
 from recoco.utils import make_group_name_for_site
 
 
-def create_trusted_bots(apps, schema_editor):
+def create_trusted_bot_groups(apps, schema_editor):
     Site = apps.get_model("sites", "Site")
     Group = apps.get_model("auth", "Group")
     new_groups = []
     for site in Site.objects.all():
-        new_groups.append(Group(name=make_group_name_for_site("trusted_bots", site)))
+        new_groups.append(Group(name=make_group_name_for_site("trusted_bot", site)))
     Group.objects.bulk_create(new_groups)
 
 
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(
-            create_trusted_bots,
+            create_trusted_bot_groups,
             migrations.RunPython.noop,  # noop because the group could be used for other reasons than this new code
         )
     ]
