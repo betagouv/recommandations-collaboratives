@@ -131,7 +131,7 @@ def is_trusted_bot_for_site(user, site=None):
 
 
 def is_trusted_bot_for_any_site(user):
-    group_name_regex = r"\w*_trusted_bot"
+    group_name_regex = r"^\w*_trusted_bot$"
     return user.groups.filter(name__regex=group_name_regex).exists()
 
 
@@ -224,9 +224,9 @@ def get_admin_for_site(site=None):
     return auth_models.Group.objects.get(name=group_name).user_set.all()
 
 
-def get_trusted_bots_for_site(site=None):
+def get_trusted_bot_for_site(site=None):
     site = site or Site.objects.get_current()
-    group_name = make_group_name_for_site("trusted_bots", site)
+    group_name = make_group_name_for_site("trusted_bot", site)
     return auth_models.Group.objects.get(name=group_name).user_set.all()
 
 
