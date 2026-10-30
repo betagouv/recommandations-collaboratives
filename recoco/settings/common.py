@@ -140,6 +140,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "csp.middleware.CSPMiddleware",
     "recoco.apps.home.middlewares.EmbedMiddleware",
+    "recoco.apps.home.middlewares.ProConnectSilentLoginMiddleware",
     "recoco.apps.home.middlewares.SetEnableSesameCookieMiddleware",
     "recoco.apps.home.middlewares.PreviousActivityMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",

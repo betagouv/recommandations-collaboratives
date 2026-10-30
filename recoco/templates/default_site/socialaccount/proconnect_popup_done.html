@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% block title %}
+    Connexion ProConnect
+{% endblock title %}
+{% block js %}
+    {% vite_asset 'js/apps/auth.js' %}
+{% endblock js %}
+{% block content %}
+    <div class="fr-container fr-py-6w">
+        {% if user.is_authenticated %}
+            <div x-data="Auth" x-init="initProconnectPopupDone">
+                <h2 class="fr-mb-3v">Connexion réussie</h2>
+                <p>Vous pouvez fermer cette fenêtre et revenir sur {{ site.name }}.</p>
+            </div>
+        {% else %}
+            <h2 class="fr-mb-3v">Connexion non finalisée</h2>
+            <p>Vous pouvez fermer cette fenêtre et réessayer depuis {{ site.name }}.</p>
+        {% endif %}
+    </div>
+{% endblock content %}
