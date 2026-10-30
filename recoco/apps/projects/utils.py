@@ -222,6 +222,40 @@ def assign_role(user, project, role, site):
         raise ValueError(f"Unhandled invite role '{role}'")
 
 
+def get_roles(user, project, site):
+    """Return the invite roles someone holds on a project, for the given site"""
+    roles = []
+
+    if project.projectmember_set.filter(member=user).exists():
+        roles.append("COLLABORATOR")
+
+    switchtending = project.switchtender_sites.filter(
+        site=site, switchtender=user
+    ).first()
+    if switchtending:
+        roles.append("OBSERVER" if switchtending.is_observer else "SWITCHTENDER")
+
+    return roles
+
+
+@transaction.atomic
+def remove_role(user, project, role, site):
+    """Remove one invite role of someone on a project, keeping the others
+
+    Roles share permissions, hence those of the remaining roles are assigned
+    again once the given one is removed.
+    """
+    if role == "COLLABORATOR":
+        remove_collaborator(user, project)
+    elif role in ("SWITCHTENDER", "OBSERVER"):
+        remove_advisor(user, project, site)
+    else:
+        raise ValueError(f"Unhandled invite role '{role}'")
+
+    for remaining_role in get_roles(user, project, site):
+        assign_role(user, project, remaining_role, site)
+
+
 @transaction.atomic
 def change_role(user, project, role, site):
     """Make someone hold only the given invite role on a project

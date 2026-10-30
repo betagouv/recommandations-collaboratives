@@ -21,13 +21,11 @@ from .models import (
     Document,
     Note,
     Project,
-    ProjectMember,
     ProjectSite,
-    ProjectSwitchtender,
     Topic,
     UserProjectStatus,
 )
-from .utils import assign_collaborator, assign_role, change_role
+from .utils import assign_collaborator, assign_role
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -328,35 +326,16 @@ class NewProjectSerializer(ProjectSerializer):
         return project
 
 
-class ProjectMemberSerializer(serializers.ModelSerializer):
-    """A participant of a project"""
+class ProjectMemberSerializer(serializers.Serializer):
+    """Someone attached to a project, with the invite roles they hold on it"""
 
-    class Meta:
-        model = ProjectMember
-        fields = ["email", "first_name", "last_name", "is_owner"]
-
-    email = serializers.EmailField(source="member.email")
-    first_name = serializers.CharField(source="member.first_name")
-    last_name = serializers.CharField(source="member.last_name")
-
-
-class ProjectAdvisorSerializer(serializers.ModelSerializer):
-    """An advisor or an observer of a project"""
-
-    class Meta:
-        model = ProjectSwitchtender
-        fields = ["email", "first_name", "last_name", "is_observer"]
-
-    email = serializers.EmailField(source="switchtender.email")
-    first_name = serializers.CharField(source="switchtender.first_name")
-    last_name = serializers.CharField(source="switchtender.last_name")
-
-
-class ProjectMembersSerializer(serializers.Serializer):
-    """The participants, and the advisors and observers, of a project"""
-
-    members = ProjectMemberSerializer(many=True)
-    advisors = ProjectAdvisorSerializer(many=True)
+    email = serializers.EmailField(source="user.email")
+    first_name = serializers.CharField(source="user.first_name")
+    last_name = serializers.CharField(source="user.last_name")
+    roles = serializers.ListField(
+        child=serializers.ChoiceField(choices=Invite.INVITE_ROLES)
+    )
+    is_owner = serializers.BooleanField()
 
 
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
@@ -379,23 +358,6 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
         assign_role(user, self.project, validated_data["role"], self.current_site)
 
         return validated_data
-
-
-class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
-    """Change the role of someone on a project
-
-    The person keeps only the given role: any other role it holds on the
-    project, for the current site, is removed.
-    """
-
-    email = serializers.EmailField(read_only=True)
-
-    def update(self, instance, validated_data):
-        role = validated_data["role"]
-
-        change_role(instance, self.project, role, self.current_site)
-
-        return {"email": instance.email, "role": role}
 
 
 class ProjectForListSerializer(BaseSerializerMixin):

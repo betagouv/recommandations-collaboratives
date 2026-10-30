@@ -951,7 +951,7 @@ def test_advisor_is_attached_by_project_membership_api(
 
 
 ########################################################################
-# list, change and remove the members of a project
+# list the members of a project, and remove them or their roles
 ########################################################################
 
 
@@ -976,12 +976,15 @@ def make_member(current_site):
 
 @pytest.mark.django_db
 def test_project_members_are_listed_by_project_membership_api(
-    api_client, staff_user, project, make_member
+    current_site, api_client, staff_user, project, make_member
 ):
     owner = make_member(project, email="owner@example.com", is_owner=True)
     collaborator = make_member(project, email="jane@example.com")
     advisor = make_member(project, "SWITCHTENDER", email="john@example.com")
     observer = make_member(project, "OBSERVER", email="jim@example.com")
+
+    # someone holding two roles is listed once
+    utils.assign_role(collaborator, project, "SWITCHTENDER", current_site)
 
     # an advisor on another site is not listed
     other_site = baker.make(sites_models.Site)
@@ -992,40 +995,83 @@ def test_project_members_are_listed_by_project_membership_api(
     response = api_client.get(reverse("projects-members-list", args=[project.id]))
 
     assert response.status_code == 200
-    assert [(m["email"], m["is_owner"]) for m in response.data["members"]] == [
-        (owner.email, True),
-        (collaborator.email, False),
-    ]
-    assert [(a["email"], a["is_observer"]) for a in response.data["advisors"]] == [
-        (observer.email, True),
-        (advisor.email, False),
+    assert response.data[0] == {
+        "email": owner.email,
+        "first_name": owner.first_name,
+        "last_name": owner.last_name,
+        "roles": ["COLLABORATOR"],
+        "is_owner": True,
+    }
+    assert [(m["email"], m["roles"], m["is_owner"]) for m in response.data] == [
+        (owner.email, ["COLLABORATOR"], True),
+        (collaborator.email, ["COLLABORATOR", "SWITCHTENDER"], False),
+        (observer.email, ["OBSERVER"], False),
+        (advisor.email, ["SWITCHTENDER"], False),
     ]
 
 
 @pytest.mark.django_db
-def test_collaborator_is_made_advisor_by_project_member_detail_api(
+def test_collaborator_role_is_removed_by_project_member_role_api(
     api_client, staff_user, current_site, project, make_member
 ):
     collaborator = make_member(project, email="jane@example.com")
+    utils.assign_role(collaborator, project, "SWITCHTENDER", current_site)
 
     api_client.force_authenticate(staff_user)
 
     # the email of the url is case insensitive
-    url = reverse("projects-members-detail", args=[project.id, "JANE@example.com"])
-    response = api_client.patch(url, data={"role": "SWITCHTENDER"})
-
-    assert response.status_code == 200
-    assert response.data["role"] == "SWITCHTENDER"
-
-    assert not models.ProjectMember.objects.filter(
-        project=project, member=collaborator
-    ).exists()
-    switchtending = models.ProjectSwitchtender.objects.get(
-        project=project, switchtender=collaborator, site=current_site
+    url = reverse(
+        "projects-members-role-detail",
+        args=[project.id, "JANE@example.com", "COLLABORATOR"],
     )
-    assert switchtending.is_observer is False
+    response = api_client.delete(url)
+
+    assert response.status_code == 204
+
+    assert utils.get_roles(collaborator, project, current_site) == ["SWITCHTENDER"]
     # a permission shared by both roles is kept
     assert collaborator.has_perm("projects.manage_collaborators", project)
+
+
+@pytest.mark.django_db
+def test_advisor_role_is_removed_by_project_member_role_api(
+    api_client, staff_user, current_site, project, make_member
+):
+    collaborator = make_member(project)
+    utils.assign_role(collaborator, project, "OBSERVER", current_site)
+
+    api_client.force_authenticate(staff_user)
+
+    url = reverse(
+        "projects-members-role-detail",
+        args=[project.id, collaborator.username, "OBSERVER"],
+    )
+    response = api_client.delete(url)
+
+    assert response.status_code == 204
+
+    assert utils.get_roles(collaborator, project, current_site) == ["COLLABORATOR"]
+    # a permission shared by both roles is kept
+    assert collaborator.has_perm("projects.view_project", project)
+    # a permission of the removed role only is not
+    assert not collaborator.has_perm("projects.use_private_notes", project)
+
+
+@pytest.mark.django_db
+def test_role_not_held_is_reported_by_project_member_role_api(
+    api_client, staff_user, current_site, project, make_member
+):
+    advisor = make_member(project, "SWITCHTENDER")
+
+    api_client.force_authenticate(staff_user)
+
+    for role in ("COLLABORATOR", "OBSERVER", "UNKNOWN"):
+        url = reverse(
+            "projects-members-role-detail", args=[project.id, advisor.username, role]
+        )
+        assert api_client.delete(url).status_code == 404
+
+    assert utils.get_roles(advisor, project, current_site) == ["SWITCHTENDER"]
 
 
 @pytest.mark.django_db
@@ -1107,22 +1153,34 @@ def test_unknown_email_is_reported_by_project_member_detail_api(
 
 
 @pytest.mark.django_db
-def test_owner_is_neither_changed_nor_removed_by_project_member_detail_api(
-    api_client, staff_user, project, make_member
+def test_owner_is_not_removed_by_project_member_apis(
+    api_client, staff_user, current_site, project, make_member
 ):
     owner = make_member(project, is_owner=True)
+    utils.assign_role(owner, project, "SWITCHTENDER", current_site)
 
     api_client.force_authenticate(staff_user)
 
     url = reverse("projects-members-detail", args=[project.id, owner.username])
+    assert api_client.delete(url).status_code == 400
 
-    assert api_client.patch(url, data={"role": "OBSERVER"}).status_code == 400
+    url = reverse(
+        "projects-members-role-detail",
+        args=[project.id, owner.username, "COLLABORATOR"],
+    )
     assert api_client.delete(url).status_code == 400
 
     assert project.owner == owner
-    assert not models.ProjectSwitchtender.objects.filter(
-        project=project, switchtender=owner
-    ).exists()
+
+    # yet the owner can stop being an advisor
+    url = reverse(
+        "projects-members-role-detail",
+        args=[project.id, owner.username, "SWITCHTENDER"],
+    )
+    assert api_client.delete(url).status_code == 204
+
+    assert utils.get_roles(owner, project, current_site) == ["COLLABORATOR"]
+    assert owner.has_perm("projects.use_tasks", project)
 
 
 ########################################################################
@@ -1164,7 +1222,11 @@ MEMBERSHIP_ACTIONS = {
         lambda p, u: reverse(
             "projects-project-access-collectivity-delete", args=[p.id, u.username]
         ),
-        lambda c, url: c.delete(url),
+        lambda c, p, u: c.delete(
+            reverse(
+                "projects-members-role-detail", args=[p.id, u.username, "COLLABORATOR"]
+            )
+        ),
         lambda p, u: not models.ProjectMember.objects.filter(
             project=p, member=u
         ).exists(),
@@ -1174,7 +1236,11 @@ MEMBERSHIP_ACTIONS = {
         lambda p, u: reverse(
             "projects-project-access-advisor-delete", args=[p.id, u.username]
         ),
-        lambda c, url: c.delete(url),
+        lambda c, p, u: c.delete(
+            reverse(
+                "projects-members-role-detail", args=[p.id, u.username, "SWITCHTENDER"]
+            )
+        ),
         lambda p, u: not models.ProjectSwitchtender.objects.filter(
             project=p, switchtender=u
         ).exists(),
@@ -1182,7 +1248,10 @@ MEMBERSHIP_ACTIONS = {
     "promote_as_advisor": (
         "COLLABORATOR",
         lambda p, u: reverse("projects-project-promote-advisor", args=[p.id, u.id]),
-        lambda c, url: c.patch(url, data={"role": "SWITCHTENDER"}),
+        lambda c, p, u: c.post(
+            reverse("projects-members-list", args=[p.id]),
+            data={"email": u.username, "role": "SWITCHTENDER"},
+        ),
         lambda p, u: models.ProjectSwitchtender.objects.filter(
             project=p, switchtender=u
         ).exists(),
@@ -1201,10 +1270,7 @@ def is_membership_action_done(
     if via_api:
         if user:
             client.force_authenticate(user)
-        api_call(
-            client,
-            reverse("projects-members-detail", args=[project.id, member.username]),
-        )
+        api_call(client, project, member)
     else:
         if user:
             client.force_login(user)

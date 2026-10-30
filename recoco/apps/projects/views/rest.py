@@ -19,12 +19,12 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     CreateAPIView,
-    GenericAPIView,
     ListAPIView,
     RetrieveAPIView,
 )
@@ -33,6 +33,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
+from recoco.apps.invites.models import Invite
 from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
@@ -65,8 +66,7 @@ from ..serializers import (
     NewProjectSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
-    ProjectMembersSerializer,
-    ProjectMembershipRoleSerializer,
+    ProjectMemberSerializer,
     ProjectMembershipSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -74,7 +74,7 @@ from ..serializers import (
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
-from ..utils import remove_member
+from ..utils import get_roles, remove_member, remove_role
 
 ########################################################################
 # Project API
@@ -224,30 +224,30 @@ class ProjectMembershipMixin:
 class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
     """List or attach the participants, advisors and observers of a project
 
-    `GET` lists the people attached to the project, in two lists:
+    `GET` lists the people attached to the project, each one once, with an
+    `email`, a `first_name`, a `last_name`, the `roles` they hold on the
+    project, and an `is_owner` flag, true only for the owner of the project.
+    The owner comes first, the others being ordered by username.
 
-    - `members`: the participants, each one with an `email`, a `first_name`, a
-      `last_name` and an `is_owner` flag, true only for the owner of the
-      project, who comes first, the others being ordered by username;
-    - `advisors`: the advisors and observers of the current site, each one with
-      an `email`, a `first_name`, a `last_name` and an `is_observer` flag,
-      ordered by username.
-
-    Someone who is both participant and advisor is in both lists.
-
-    `POST` attaches someone to the project. The person is given by email, in
-    the `email` field: their account is created if it does not exist yet, and
-    added to the current site in any case. The `role` field says how they are
-    attached to the project:
+    The roles are the ones given to attach someone to the project:
 
     - `COLLABORATOR`: a participant, member of the project team;
     - `SWITCHTENDER`: an advisor, who follows the project for the site;
     - `OBSERVER`: an observer, an advisor who is only kept informed.
 
+    Someone can be both participant and advisor, or participant and observer,
+    but not both advisor and observer. Only the advisors and observers of the
+    current site are listed.
+
+    `POST` attaches someone to the project with the given `role`. The person
+    is given by email, in the `email` field: their account is created if it
+    does not exist yet, and added to the current site in any case.
+
     The attachment is immediate: unlike an invitation, no email is sent and
-    there is nothing to accept. Attaching someone who already holds the role
-    on this project is a no-op, and still answers a `201`. Attaching an advisor
-    as an observer, or the other way around, switches their role. The answer
+    there is nothing to accept. The role is added to the ones the person
+    already holds, except that attaching an advisor as an observer, or the
+    other way around, switches their role. Attaching someone who already holds
+    the role on this project is a no-op, and still answers a `201`. The answer
     gives back the `email` and the `role`.
 
     The project has to be one of the current site, and the caller must be
@@ -256,71 +256,123 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
 
     def get_serializer_class(self):
         if self.request.method == "GET":
-            return ProjectMembersSerializer
+            return ProjectMemberSerializer
         return ProjectMembershipSerializer
 
+    @extend_schema(responses=ProjectMemberSerializer(many=True))
     def get(self, request, *args, **kwargs):
-        members = self.project.projectmember_set.select_related("member")
-        advisors = self.project.switchtender_sites.on_site().select_related(
+        members = {}
+
+        for membership in self.project.projectmember_set.select_related("member"):
+            members[membership.member] = {
+                "user": membership.member,
+                "roles": ["COLLABORATOR"],
+                "is_owner": membership.is_owner,
+            }
+
+        switchtendings = self.project.switchtender_sites.on_site().select_related(
             "switchtender"
         )
+        for switchtending in switchtendings:
+            member = members.setdefault(
+                switchtending.switchtender,
+                {"user": switchtending.switchtender, "roles": [], "is_owner": False},
+            )
+            member["roles"].append(
+                "OBSERVER" if switchtending.is_observer else "SWITCHTENDER"
+            )
 
-        serializer = self.get_serializer(
-            {
-                "members": members.order_by("-is_owner", "member__username"),
-                "advisors": advisors.order_by("switchtender__username"),
-            }
+        members = sorted(
+            members.values(), key=lambda m: (not m["is_owner"], m["user"].username)
         )
+
+        serializer = self.get_serializer(members, many=True)
         return Response(serializer.data)
 
 
-class ProjectMembershipDetail(ProjectMembershipMixin, GenericAPIView):
-    """Change the role of a member of a project, or remove it from the project
+class ProjectMembershipDetailMixin(ProjectMembershipMixin):
+    """Give the member of the url, along with the roles they hold"""
 
-    The member is given by email, in the url.
+    def get_member(self) -> tuple[User, list[str]]:
+        user = get_object_or_404(User, username=self.kwargs["email"].lower())
 
-    `PATCH` changes their role, given in the `role` field, with the same values
-    as for attaching someone to the project. The member only keeps the given
-    role: someone both participant and advisor is no longer the other one.
+        roles = get_roles(user, self.project, self.request.site)
+        if not roles:
+            raise Http404
 
-    `DELETE` removes the member from the project, whatever their roles, and
-    deletes their notifications about the project.
+        return user, roles
 
-    In both cases, a `404` is answered if the person is not a member of the
-    project, and a `400` if they are the owner of the project, who cannot be
-    changed nor removed.
+    def is_owner(self, user) -> bool:
+        return self.project.projectmember_set.filter(
+            member=user, is_owner=True
+        ).exists()
+
+
+class ProjectMembershipDetail(ProjectMembershipDetailMixin, APIView):
+    """Remove a member from a project, whatever their roles
+
+    The member is given by email, in the url. Their notifications about the
+    project are deleted too.
+
+    A `404` is answered if the person is not a member of the project, and a
+    `400` if they are the owner of the project, who cannot be removed.
 
     The project has to be one of the current site, and the caller must be
     staff for that site.
     """
 
-    serializer_class = ProjectMembershipRoleSerializer
+    @extend_schema(responses={204: None})
+    def delete(self, request, *args, **kwargs):
+        user, _ = self.get_member()
 
-    def get_object(self) -> User:
-        user = get_object_or_404(User, username=self.kwargs["email"].lower())
-
-        members = self.project.projectmember_set.filter(member=user)
-        advisors = self.project.switchtender_sites.on_site().filter(switchtender=user)
-        if not (members.exists() or advisors.exists()):
-            raise Http404
-
-        if members.filter(is_owner=True).exists():
+        if self.is_owner(user):
             raise ValidationError(
-                {"email": "The owner of a project cannot be changed nor removed."}
+                {"email": "The owner of a project cannot be removed."}
             )
 
-        return user
-
-    def patch(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_object(), data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def delete(self, request, *args, **kwargs):
-        user = self.get_object()
-
         remove_member(user, self.project, request.site)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProjectMembershipRoleDetail(ProjectMembershipDetailMixin, APIView):
+    """Remove one role of a member of a project, keeping the others
+
+    The member is given by email, and the role by its value, in the url, with
+    the same values as for attaching someone to the project. Their
+    notifications about the project are deleted too.
+
+    A `404` is answered if the person does not hold the role on the project,
+    and a `400` if the role is `COLLABORATOR` and they are the owner of the
+    project, who cannot stop being a participant.
+
+    The project has to be one of the current site, and the caller must be
+    staff for that site.
+    """
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "role",
+                location=OpenApiParameter.PATH,
+                enum=[role for role, _ in Invite.INVITE_ROLES],
+            )
+        ],
+        responses={204: None},
+    )
+    def delete(self, request, *args, **kwargs):
+        user, roles = self.get_member()
+
+        role = self.kwargs["role"]
+        if role not in roles:
+            raise Http404
+
+        if role == "COLLABORATOR" and self.is_owner(user):
+            raise ValidationError(
+                {"role": "The owner of a project cannot stop being a participant."}
+            )
+
+        remove_role(user, self.project, role, request.site)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
