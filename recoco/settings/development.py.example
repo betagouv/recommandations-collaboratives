@@ -156,4 +156,7 @@ CONTENT_SECURITY_POLICY = {
   }
 }
 
+# Sentry (frontend) - public DSN of the "recoco front" project
+SENTRY_FRONTEND_DSN = "https://some-token@sentry.incubateur.net/261"
+
 # eof
