@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 import pluggy
 import pytest
 from django.contrib.auth import get_user_model
-from django.db import connection
 from django.db.models import Value
 from django.test import RequestFactory
 from django.urls import reverse
@@ -18,6 +17,7 @@ from .hooks import CrmSpec, NotificationSpec, ProjectSpec
 from .manager import get_site_plugin_manager
 from .middlewares import TenantPluginsMiddleware
 from .resolvers import get_enabled_plugins
+from .testing import current_search_path
 
 # --- Fixtures & helpers for get_site_plugin_manager ---
 
@@ -180,12 +180,6 @@ class TestGetSitePluginManager:
         assert scoped.list_name_plugin() == []
 
 
-def current_search_path():
-    with connection.cursor() as cursor:
-        cursor.execute("SHOW search_path")
-        return cursor.fetchone()[0]
-
-
 @pytest.mark.django_db
 class TestTenantPluginsMiddleware:
     """Ensure the Middleware enables the tenant's plugins for the request"""
@@ -238,28 +232,6 @@ class TestTenantPluginsMiddleware:
 
         assert seen["search_path"] == before
         assert current_search_path() == before
-
-
-# ---------------------------------------------------------------------------
-# Shared helpers for hook extension point tests
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def site_with_enabled_plugins(current_site):
-    """Factory: create a SiteConfiguration enabling the given plugin names."""
-
-    def _make(names):
-        return baker.make(
-            SiteConfiguration, site=current_site, enabled_plugins=list(names)
-        )
-
-    return _make
-
-
-@pytest.fixture
-def site_without_plugins(current_site):
-    return baker.make(SiteConfiguration, site=current_site, enabled_plugins=[])
 
 
 # ---------------------------------------------------------------------------

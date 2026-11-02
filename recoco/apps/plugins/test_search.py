@@ -10,25 +10,9 @@ from watson.models import SearchEntry
 
 from recoco.apps.projects.models import Project
 
-from .resolvers import set_enabled_plugins
 from .search import tenant_search, tenant_search_models
+from .testing import PLUGIN
 from .testing.plugin_testapp.models import Note
-
-PLUGIN = "plugin_testapp"
-
-
-@pytest.fixture
-def plugin_tables(db):
-    call_command("migrate_plugins", PLUGIN, verbosity=0, stdout=StringIO())
-
-
-@pytest.fixture
-def enabled_plugins():
-    def enable(*plugins):
-        set_enabled_plugins(list(plugins))
-
-    yield enable
-    set_enabled_plugins([])
 
 
 @pytest.fixture
