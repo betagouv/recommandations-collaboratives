@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.db import transaction
 from django.urls import reverse
@@ -199,6 +200,8 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
                     },
                 )
             except ApiException:
+                error_profile_ids.append(profile.id)
+            except ValidationError:
                 error_profile_ids.append(profile.id)
     return error_profile_ids
 
