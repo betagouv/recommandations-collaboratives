@@ -1,3 +1,6 @@
+// Sentry frontend
+import './utils/sentry';
+
 //Bootstrap librairie
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/custom-bootstrap.scss';
