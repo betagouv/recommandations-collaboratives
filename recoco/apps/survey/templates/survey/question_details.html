@@ -137,7 +137,10 @@
                                name="attachment"
                                value="{{ form.attachment.value }}" />
                         {% if form.attachment.value %}
-                            Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                            Actuellement :
+                            <a href="{{ form.attachment.value.url }}"
+                               target="_blank"
+                               title="{{ form.attachment.value }} - nouvelle fenêtre">{{ form.attachment.value }}</a>
                         {% endif %}
                     </div>
                 {% endif %}

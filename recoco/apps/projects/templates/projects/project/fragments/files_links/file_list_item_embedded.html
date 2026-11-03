@@ -16,7 +16,7 @@
                     {% endif %}
                 </a>
             </div>
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center" x-data>
                 {% if document.uploaded_by == user or can_administrate %}
                     <form class="fr-mr-2v"
                           method="post"
@@ -29,6 +29,20 @@
                         </button>
                     </form>
                 {% endif %}
+                <template x-if="$store.utils.isPreviewableFile('{{ document.filename|escapejs }}')">
+                    <a class="d-flex fr-mr-2v"
+                       href="{{ document.the_file.url }}"
+                       target="_blank"
+                       title="Prévisualiser le fichier - nouvelle fenêtre">
+                        <svg class="bi align-baseline fill-blue"
+                             width="20"
+                             height="20"
+                             aria-hidden="true">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye" />
+                        </svg>
+                        <span class="fr-sr-only">Prévisualiser le fichier</span>
+                    </a>
+                </template>
                 <a class="d-flex"
                    href="{{ document.the_file.url }}"
                    target="_new"

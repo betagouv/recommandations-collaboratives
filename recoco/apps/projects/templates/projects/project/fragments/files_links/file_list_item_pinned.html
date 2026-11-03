@@ -22,7 +22,7 @@
                     </div>
                 </a>
             </div>
-            <div class="d-flex align-items-center flex-column">
+            <div class="d-flex align-items-center flex-column" x-data>
                 {% if "manage_documents" in user_project_perms %}
                     <form method="post"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
@@ -31,6 +31,12 @@
                                 id="file-bookmark">Désépingler le fichier</button>
                     </form>
                 {% endif %}
+                <template x-if="$store.utils.isPreviewableFile('{{ document.filename|escapejs }}')">
+                    <a class="fr-btn fr-btn--tertiary-no-outline fr-icon-eye-line"
+                       href="{{ document.the_file.url }}"
+                       target="_blank"
+                       title="Prévisualiser le fichier - nouvelle fenêtre">Prévisualiser le fichier</a>
+                </template>
                 <a class="fr-btn fr-btn--tertiary-no-outline fr-icon-download-line"
                    href="{{ document.the_file.url }}"
                    target="_new"

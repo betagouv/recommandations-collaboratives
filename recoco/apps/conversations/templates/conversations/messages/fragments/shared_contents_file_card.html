@@ -1,6 +1,5 @@
 {% comment %}
 File card for shared contents panel.
-Displays file info with icon, name, extension and download button.
 Data comes from Alpine: file object in x-for loop
 {% endcomment %}
 <template x-if="file">
@@ -17,6 +16,12 @@ Data comes from Alpine: file object in x-for loop
             <span class="shared-contents-file-card__ext"
                   x-text="getFileExtension(file)"></span>
         </div>
+        <template x-if="$store.utils.isPreviewableFile(getFullFilename())">
+            <a class="shared-contents-file-card__preview-btn fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-eye-line"
+               :href="getFileUrl()"
+               target="_blank"
+               title="Prévisualiser le fichier - nouvelle fenêtre">Prévisualiser le fichier</a>
+        </template>
         <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm"
            :href="getFileUrl()"
            :download="getFullFilename()">Télécharger</a>
