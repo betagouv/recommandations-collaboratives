@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("projects", "0025_rename_accepted_task_visited"),
+        ("projects", "0021_task_refused_squashed_0025_rename_accepted_task_visited"),
     ]
 
     operations = [

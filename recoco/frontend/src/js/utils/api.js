@@ -38,25 +38,38 @@ instance.interceptors.response.use(
 export default instance;
 
 export function projectsUrl({
-  search = '',
+  searchText = '',
   departments = [],
-  lastActivity = 1460,
   limit = 2000,
   offset = 0,
   page = 1,
-  status = [],
+  myProjects = false,
+  status = [
+    'PRE_DRAFT',
+    'DRAFT',
+    'TO_PROCESS',
+    'STUCK',
+    'READY',
+    'IN_PROGRESS',
+    'DONE',
+    'REJECTED',
+  ],
+  extraParams = {},
 } = {}) {
   // if search with tags, make a different url
   let url;
-  if (search.includes('#')) {
-    search = search.substring(1);
+  if (searchText.includes('#')) {
+    searchText = searchText.substring(1);
   }
   const params = new URLSearchParams({
-    search,
-    last_activity: lastActivity,
+    search: searchText,
     limit,
     offset,
     page,
+  });
+
+  Object.entries(extraParams).forEach(([key, value]) => {
+    if (value) params.append(key, value);
   });
 
   url = '/api/projects/?' + params.toString();
@@ -69,6 +82,10 @@ export function projectsUrl({
     status = status.map((status) => `status=${status}`).join('&');
     url = url + '&' + status;
   }
+  if (myProjects) {
+    url = url + '&my_projects=true';
+  }
+
   return url;
 }
 
@@ -82,6 +99,16 @@ export function projectsProjectSitesUrl() {
 
 export function userProjectStatusUrl() {
   return '/api/userprojectstatus/';
+}
+
+// ACRA
+export function askRecommendationsUrl(projectId) {
+  return `/api/projects/${projectId}/tasks/acra/ask/`;
+}
+
+export function corecommendationsUrl(projectId, params) {
+  const qs = params && params.toString() ? `?${params.toString()}` : '';
+  return `/api/projects/${projectId}/tasks/acra/co-recommendations/${qs}`;
 }
 
 // Sites :
@@ -176,6 +203,10 @@ export function taskNotificationsUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/notifications/`;
 }
 
+export function publishTaskUrl(projectId, taskId) {
+  return `/api/projects/${projectId}/tasks/${taskId}/publish/`;
+}
+
 export function markTaskNotificationsAsReadUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/notifications/mark_all_as_read/`;
 }
@@ -205,16 +236,54 @@ export function resourcePreviewUrl(resourceId, taskId) {
   if (taskId) {
     return `/ressource/${resourceId}/embed?task_id=${taskId}`;
   }
-  return `/ressource/${resourceId}/embed/`;
+  return `/ressource/${resourceId}/embed`;
 }
 
 export function postExternalRessourceUrl() {
   return `/api/resources/import_from_uri/`;
 }
 
+export function resourcesUrl({
+  search = '',
+  category = [],
+  status = [],
+  limit = 50,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (limit) params.set('limit', limit);
+  if (offset) params.set('offset', offset);
+  // category is multi-value: ?category=1&category=2
+  if (category) {
+    category.forEach((c) => {
+      params.append('category', c);
+    });
+  }
+  // status is multi-value: ?status=0&status=2
+  if (status) {
+    status.forEach((s) => {
+      params.append('status', s);
+    });
+  }
+  const url = new URL('/api/resources/', window.location.origin);
+  const paramStr = params.toString();
+  if (paramStr) url.search = paramStr;
+  return url.toString();
+}
+
+export function resourceUrl(resourceId) {
+  return `/api/resources/${resourceId}/`;
+}
+
 // Regions :
 export function regionsUrl() {
   return `/api/regions/`;
+}
+
+// Communes :
+export function communesUrl() {
+  return `/api/communes/`;
 }
 
 // Challenges
@@ -242,14 +311,6 @@ export function editTaskUrl(taskId, next = null) {
 
 export function deleteTaskUrl(taskId) {
   return `/task/${taskId}/delete/`;
-}
-
-export function deleteTaskReminderUrl(taskId) {
-  return `/task/${taskId}/remind-delete/`;
-}
-
-export function editReminderUrl(taskId) {
-  return `/task/${taskId}/remind/`;
 }
 
 // Conversations

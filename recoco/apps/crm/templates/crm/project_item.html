@@ -1,14 +1,16 @@
-{% load static %}
-<li>
-    <a class="d-flex align-items-center"
-       href="{% url 'crm-project-details' project.pk %}">
-        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-        </svg>
-        {% if project.deleted %}
-            <span class="text-decoration-line-through">{{ project.name }}</span>
-        {% else %}
-            <span>{{ project.name }}</span>
-        {% endif %}
-    </a>
-</li>
+{% with origin_site=project.project_sites.origin.site %}
+    <li>
+        <a class="d-flex align-items-center"
+           {% if origin_site == request.site %}href="{% url 'crm-project-details' project.pk %}"{% endif %}>
+            {% if origin_site != request.site and origin_site.configuration.logo_small %}
+                <img class="crm-project-item__portal-logo fr-mr-2v"
+                     src="{{ origin_site.configuration.logo_small.url }}"
+                     alt="{{ origin_site.name }}"
+                     title="Dossier actif sur {{ origin_site.name }}">
+            {% else %}
+                <span class="fr-icon-folder-2-fill fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
+            {% endif %}
+            <span {% if project.deleted %}class="text-decoration-line-through"{% endif %}>{{ project.name }}</span>
+        </a>
+    </li>
+{% endwith %}

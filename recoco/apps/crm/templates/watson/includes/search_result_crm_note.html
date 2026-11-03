@@ -1,1 +1,58 @@
-{% include "crm/fragments/search_result_note.html" with note=obj %}
+<div class="crm-results__note position-relative">
+    <div class="fr-mb-1v">
+        <!--Note title-->
+        <span class="crm-results__note-title">
+            {% if obj.title %}
+                {{ obj.title }}
+            {% else %}
+                Note sans titre
+            {% endif %}
+        </span>
+        <!--Note type-->
+        <span>
+            {% if obj.kind == 0 %}
+                (appel téléphonique)
+            {% elif obj.kind == 1 %}
+                (email)
+            {% elif obj.kind == 2 %}
+                (test utilisateur)
+            {% endif %}
+        </span>
+        <!--Creator-->
+        <span>par {{ obj.created_by.get_full_name|default:obj.created_by.email }}</span>
+        <!--Date-->
+        <span>le
+            {% if obj.updated_on|date != obj.created_on|date %}
+                {{ obj.updated_on }}&nbsp;|&nbsp;{{ obj.created_on|date:"n" }} {{ obj.created_on|date:"N" }}
+            {% else %}
+                {{ obj.created_on }}
+            {% endif %}
+        </span>
+    </div>
+    <div class="crm-results__note-info position-relative">
+        <!--Content-->
+        <a href="{{ obj.get_absolute_url }}#note-{{ obj.pk }}"
+           class="stretched-link">
+            <article class="crm-results__note-wrapper">
+                <p>{{ obj.content_rendered|safe }}</p>
+            </article>
+        </a>
+    </div>
+    {% if obj.related.name or obj.related.get_full_name %}
+        <div class="crm-results__note-info">
+            <!--Note related-->
+            <a href="{{ obj.get_absolute_url }}#note-{{ obj.pk }}">
+                <span class="fr-mr-3v">
+                    {% if obj.related.name %}
+                        <span class="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                        <span>{{ obj.related.name }}</span>
+                    {% endif %}
+                    {% if obj.related.get_full_name %}
+                        <span class="fr-icon-user-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                        <span>{{ obj.related.get_full_name }}</span>
+                    {% endif %}
+                </span>
+            </a>
+        </div>
+    {% endif %}
+</div>

@@ -4,17 +4,10 @@ import _ from 'lodash';
 document.addEventListener('alpine:init', () => {
   Alpine.store('tasksView', {
     displayedTasks: [],
-    currentView: 'inline',
     async init() {
       try {
-        const tasksLoaded = await Alpine.store('tasksData').loadTasks();
-        for (const task of tasksLoaded) {
-          if (task.status != 0) {
-           this.currentView = 'kanban';
-          }
-        }
+        await Alpine.store('tasksData').loadTasks();
       } catch (error) {
-        //TODO sentry see this error occurs too often
         throw new Error('Error loading tasks while view initialization : ' + error);
       }
     },
@@ -46,33 +39,13 @@ document.addEventListener('alpine:init', () => {
     findFirst() {
       return this.displayedTasks[0];
     },
-    switchView() {
-      this.currentView === 'inline'
-        ? (this.currentView = 'kanban')
-        : (this.currentView = 'inline');
-    },
   });
 
   Alpine.store('taskModal', {
-    currentTask: null,
-
-    previewModalHandle: null,
     deleteModalHandle: null,
-    feedbackModalHandle: null,
-    feedbackModalStatus: null,
-
-    onPreviewClick(task) {
-      this.currentTask = task;
-      this.previewModalHandle.show();
-    },
     onDeleteClick(task) {
       this.currentTask = task;
       this.deleteModalHandle.show();
-    },
-    onFeedbackClick(task, status) {
-      this.currentTask = task;
-      this.feedbackModalStatus = status;
-      this.feedbackModalHandle.show();
     },
   });
 });

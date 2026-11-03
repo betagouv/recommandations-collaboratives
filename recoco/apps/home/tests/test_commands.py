@@ -7,21 +7,34 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-10 14:07:17 CEST
 """
 
+from datetime import datetime, timedelta
 from io import StringIO
+from unittest.mock import patch
 
 import pytest
+from actstream import action
+from actstream.models import Action
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.utils import timezone
+from freezegun import freeze_time
 from model_bakery import baker
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.crm.models import Note
+from recoco.apps.home.management.commands import cleanuporgs
+from recoco.apps.home.management.commands.update_verbs import (
+    Command as UpdateVerbCommand,
+)
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.home.utils import DELETION_ABSENT_FOR_DAYS
 from recoco.utils import get_group_for_site, is_staff_for_site
-
-from ..management.commands import cleanuporgs
 
 ########################################################################
 # cleanup command
@@ -97,7 +110,6 @@ def test_command_create_site_domain_already_exists(request):
     command_args = {
         "name": "New site",
         "domain": existing_site.domain,
-        "sender_email": "jdoe@example.org",
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example.org",
         "legal_address": "36 green street 75000 Paris",
@@ -116,7 +128,6 @@ def test_command_create_site_admin_user_doesnt_exists(request):
     command_args = {
         "name": "New site",
         "domain": existing_site.domain,
-        "sender_email": "jdoe@example.org",
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example.org",
         "legal_address": "36 green street 75000 Paris",
@@ -136,7 +147,6 @@ def test_command_create_site(request):
     command_args = {
         "name": "New site",
         "domain": "example2.org",
-        "sender_email": "jdoe@example2.org",
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example2.org",
         "legal_address": "36 green street 75000 Paris",
@@ -151,7 +161,6 @@ def test_command_create_site(request):
 
     new_site = Site.objects.get(domain=command_args["domain"])
     site_config = SiteConfiguration.objects.get(site=new_site)
-    assert site_config.sender_email == command_args["sender_email"]
     assert site_config.sender_name == command_args["sender_name"]
     assert site_config.contact_form_recipient == command_args["contact_form_recipient"]
     assert site_config.legal_address == command_args["legal_address"]
@@ -167,4 +176,223 @@ def test_command_create_site(request):
         assert advisor.has_perm("sites.list_projects", new_site)
 
 
-# # eof
+########################################################################
+# rgpd warning and deletions
+########################################################################
+
+
+@pytest.fixture()
+def user_to_not_warn():
+    user = baker.make(auth_models.User)
+    user.profile.previous_activity_at = datetime(2025, 12, 22)
+    user.profile.save()
+    return user
+
+
+@pytest.fixture()
+def user_to_warn_once(current_site):
+    user = baker.make(auth_models.User)
+    user.profile.previous_activity_site = current_site
+    user.profile.previous_activity_at = datetime(2023, 12, 22)
+    user.profile.save()
+    return user
+
+
+@pytest.fixture()
+def user_to_warn_twice(current_site):
+    user = baker.make(auth_models.User)
+    user.profile.previous_activity_site = current_site
+    user.profile.previous_activity_at = datetime(2023, 12, 22)
+    user.profile.nb_deletion_warnings = 1
+    user.profile.previous_deletion_warning_at = datetime(2024, 12, 22)
+    user.profile.save()
+    return user
+
+
+@pytest.fixture()
+def user_came_back(current_site):
+    user = baker.make(auth_models.User)
+    user.profile.previous_activity_at = datetime(2025, 12, 22)
+    user.profile.previous_activity_site = current_site
+    user.profile.nb_deletion_warnings = 1
+    user.profile.previous_deletion_warning_at = datetime(2024, 12, 22)
+    user.profile.save()
+    return user
+
+
+@pytest.fixture()
+def user_to_delete():
+    user = baker.make(auth_models.User)
+    user.profile.previous_activity_at = datetime(2023, 12, 22)
+    user.profile.nb_deletion_warnings = 2
+    user.profile.previous_deletion_warning_at = datetime(2024, 12, 22)
+    user.profile.save()
+    return user
+
+
+@pytest.mark.django_db
+def test_gdpr_command_increments_warnings(
+    user_to_not_warn, user_to_warn_once, user_to_warn_twice, mocker
+):
+    now = datetime.fromisoformat("2025-12-23T00:00:00+00:00")
+    patch = mocker.patch("recoco.apps.home.utils.send_email")
+    out = StringIO()
+    with freeze_time(now):
+        call_command("warn_delete_users", stdout=out)
+
+    assert patch.call_count == 2
+
+    user_to_not_warn.profile.refresh_from_db()
+    user_to_warn_once.profile.refresh_from_db()
+    user_to_warn_twice.profile.refresh_from_db()
+    assert user_to_not_warn.profile.nb_deletion_warnings == 0
+    assert user_to_not_warn.profile.previous_deletion_warning_at is None
+    assert user_to_warn_once.profile.nb_deletion_warnings == 1
+    assert user_to_warn_once.profile.previous_deletion_warning_at == now
+    assert user_to_warn_twice.profile.nb_deletion_warnings == 2
+    assert user_to_warn_twice.profile.previous_deletion_warning_at == now
+
+
+@pytest.mark.django_db
+@freeze_time("2025-12-23")
+def test_gdpr_command_forgets_warning_if_recent_activity(user_came_back, mocker):
+    patch = mocker.patch("recoco.apps.home.utils.send_email")
+    out = StringIO()
+    call_command("warn_delete_users", stdout=out)
+
+    assert patch.call_count == 0
+
+    user_came_back.profile.refresh_from_db()
+    assert user_came_back.profile.nb_deletion_warnings == 0
+    assert user_came_back.profile.previous_deletion_warning_at is None
+
+
+@pytest.mark.django_db
+def test_gdpr_command_dry_run_does_nothing(
+    user_to_not_warn, user_to_warn_once, user_to_warn_twice, mocker
+):
+    now = datetime.fromisoformat("2025-12-23T00:00:00+00:00")
+    patch = mocker.patch("recoco.apps.home.utils.send_email")
+    out = StringIO()
+    with freeze_time(now):
+        call_command("warn_delete_users", stdout=out, dry_run=True)
+
+    assert patch.call_count == 0
+
+    assert user_to_not_warn.profile.nb_deletion_warnings == 0
+    assert user_to_not_warn.profile.previous_deletion_warning_at is None
+    assert user_to_warn_once.profile.nb_deletion_warnings == 0
+    assert user_to_warn_once.profile.previous_deletion_warning_at is None
+    assert user_to_warn_twice.profile.nb_deletion_warnings == 1
+    assert user_to_warn_twice.profile.previous_deletion_warning_at != now
+
+
+@pytest.mark.django_db
+@freeze_time("2025-12-23")
+def test_gdpr_command_deletes(user_to_delete, mocker, current_site):
+    EmailAddress.objects.create(user_id=user_to_delete.id)
+    SocialAccount.objects.create(user_id=user_to_delete.id)
+    Note.objects.create(
+        related=user_to_delete, created_by=user_to_delete, site=current_site
+    )
+
+    patch = mocker.patch("recoco.apps.communication.api.send_email")
+    out = StringIO()
+    call_command("warn_delete_users", stdout=out)
+
+    assert patch.call_count == 0
+
+    user_to_delete.refresh_from_db()
+    user_to_delete.profile.refresh_from_db()
+
+    assert user_to_delete.first_name == ""
+    assert user_to_delete.last_name == "Utilisateur supprimé"
+    assert user_to_delete.email == f"{user_to_delete.id}@deleted.recoconseil.fr"
+    assert user_to_delete.username == f"{user_to_delete.id}@deleted.recoconseil.fr"
+    assert not user_to_delete.is_active
+    assert not user_to_delete.is_superuser
+    assert user_to_delete.last_login is None
+
+    assert user_to_delete.profile.phone_no == ""
+    assert user_to_delete.profile.previous_activity_at is None
+    assert user_to_delete.profile.previous_deletion_warning_at is None
+    assert user_to_delete.profile.previous_activity_site is None
+    assert user_to_delete.profile.nb_deletion_warnings == 0
+    assert user_to_delete.profile.deleted is not None
+
+    assert not EmailAddress.objects.filter(user_id=user_to_delete.id).exists()
+    assert not SocialAccount.objects.filter(user_id=user_to_delete.id).exists()
+    user_content_type = ContentType.objects.get_for_model(auth_models.User)
+    assert not Note.objects.filter(
+        content_type_id=user_content_type.id, object_id=user_to_delete.id
+    ).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.skip(reason="has side effects on other tests")
+def test_gdpr_command_update_verbs(current_site):
+    v1_old = "old v1"
+    v1_new = "new v1"
+    v2_old = "old v2"
+    v2_new = "new v2"
+    v3_still = "v3"
+
+    changes = [{"old": v1_old, "new": v1_new}, {"old": v2_old, "new": v2_new}]
+
+    action1_v1 = baker.make(Action, verb=v1_old, site=current_site)
+    action2_v1 = baker.make(Action, verb=v1_old, site=current_site)
+    baker.make(Action, verb=v3_still, site=current_site)
+
+    with patch("builtins.input", return_value="yes"):
+        cmd = UpdateVerbCommand()
+        cmd.update(changes)
+
+    assert not Action.objects.filter(verb=v1_old).exists()
+    action1_v1.refresh_from_db()
+    action2_v1.refresh_from_db()
+    assert action1_v1.verb == v1_new
+    assert action2_v1.verb == v1_new
+    assert (
+        Action.objects.filter(verb=v3_still).count() == 1
+    )  # does not touch actions that should not be impacted
+    Action.objects.all().delete()
+
+
+########################################################################
+# actions/trace auto deletion
+########################################################################
+
+
+def define_action_context():
+    user = baker.make(auth_models.User)
+    action.send(user, verb="recent")
+    other_site = baker.make(Site)
+    quite_old = timezone.now() - timedelta(days=(DELETION_ABSENT_FOR_DAYS - 5))
+    very_old = timezone.now() - timedelta(days=(DELETION_ABSENT_FOR_DAYS + 5))
+    with freeze_time(quite_old):
+        action.send(user, verb="quite old", site=other_site)
+    with freeze_time(very_old):
+        action.send(user, verb="very old")
+        action.send(user, verb="very old", site=other_site)
+    pass
+
+
+@pytest.mark.django_db
+@freeze_time("2025-12-23T00:00:00+00:00")
+def test_clean_action_dry_run_does_nothing():
+    define_action_context()
+    call_command("cleanup_action_history", dry_run=True)
+    assert Action.objects.count() == 4
+    assert Action.objects.filter(verb="very old").count() == 2
+
+
+@pytest.mark.django_db
+@freeze_time("2025-12-23T00:00:00+00:00")
+def test_clean_past_only():
+    define_action_context()
+    call_command("cleanup_action_history")
+    assert Action.objects.count() == 2
+    assert Action.objects.filter(verb="very old").count() == 0
+
+
+# eof

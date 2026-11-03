@@ -1,4 +1,14 @@
 .user-card {
+  &__name {
+    color: var(--light-neutral-grey-200, #3a3a3a);
+    font-weight: 700;
+    line-height: 24px;
+  }
+  &__org-name {
+    color: var(--light-text-mention-grey, #666);
+    font-weight: 700;
+    line-height: 21px;
+  }
   .user-card-popup {
     display: none;
 
@@ -20,10 +30,5 @@
   }
   .user-card-popup[data-show] {
     display: block;
-  }
-  &__org-name {
-    color: var(--light-text-mention-grey, #666);
-    font-style: italic;
-    font-weight: 400;
   }
 }

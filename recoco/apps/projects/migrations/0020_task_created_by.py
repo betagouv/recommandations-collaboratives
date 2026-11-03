@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("projects", "0019_task_accepted"),
+        ("projects", "0014_project_emails_squashed_0019_task_accepted"),
     ]
 
     operations = [

@@ -1,0 +1,129 @@
+.correct-p {
+  margin-bottom: 0px;
+}
+
+// Pill style to match departments selector
+.multi-select__container.multi-select--pill {
+  border: solid 1px #e5e5e5;
+  border-radius: 20px;
+  background-color: white;
+
+  &.multi-select--open {
+    outline: #0d6efd auto 1px;
+    border-radius: 20px;
+  }
+
+  .multi-select__input {
+    padding: 5px 15px;
+    min-width: 200px;
+    color: #161616;
+    font-weight: 400;
+
+    &::placeholder {
+      color: #161616;
+      font-weight: 400;
+    }
+  }
+
+  .border-left {
+    border-left: none;
+  }
+}
+
+.multi-select--pill svg {
+  color: #666666;
+}
+
+.border-left {
+  border-left: 1px solid var(--light-border-default-grey, #e5e5e5);
+}
+
+.little-img {
+  width: 20px;
+  height: 20px;
+}
+
+.hover-background:hover {
+  background-color: transparent !important;
+}
+.specific-height-2p5rem {
+  height: 2.5rem;
+}
+
+.color-gray-400 {
+  color: var(--color-grey-400, #b3b3b3);
+}
+
+.max-h-80 {
+  max-height: 12rem;
+}
+
+.selected-item-list-item {
+  background-color: #e8edff;
+  color: #0063cb;
+  border: #0063cb 1px solid;
+}
+
+@media screen and (max-height: 720px) {
+  .max-h-80 {
+    max-height: 10rem;
+  }
+}
+@media screen and (max-height: 665px) {
+  .max-h-80 {
+    max-height: 8rem;
+  }
+}
+
+.multi-select {
+  &__container {
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+
+    &.multi-select--open {
+      outline: #0d6efd auto 1px;
+    }
+  }
+
+  &__input {
+    // bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0
+    background-color: transparent;
+    padding: 0.25rem 0.5rem;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    height: 100%;
+    width: 100%;
+    color: var(--text-mention-grey, #666666);
+    display: flex;
+    flex-wrap: wrap;
+
+    &:focus,
+    &:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  &__selected-item {
+    margin-left: 0.25rem;
+    .selected-items {
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 0.8rem;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 0 0.25rem;
+    }
+  }
+
+  &__dropdown-icon {
+    display: flex;
+    border-left: 1px solid var(--light-border-default-grey, #e5e5e5);
+    color: var(--text-default-grey, #3a3a3a);
+    margin-left: auto;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    align-items: center;
+  }
+}

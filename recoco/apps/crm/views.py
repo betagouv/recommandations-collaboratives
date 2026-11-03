@@ -10,70 +10,130 @@ from collections import Counter, OrderedDict, defaultdict
 from datetime import datetime, timedelta
 
 from actstream import action
-from actstream.models import Action, actor_stream, target_stream
+from actstream.models import Action
 from allauth.account.models import EmailAddress
-from allauth.account.utils import (
-    filter_users_by_email,
-    send_email_confirmation,
-    setup_user_email,
-)
+from allauth.account.utils import filter_users_by_email, setup_user_email
 from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.contrib.sites.models import Site
-from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
+from django.core.exceptions import BadRequest
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import (
+    BooleanField,
+    Case,
+    CharField,
     Count,
+    Exists,
     ExpressionWrapper,
     F,
     FloatField,
     Func,
     Max,
     OuterRef,
+    Prefetch,
     Q,
     Subquery,
     Value,
+    When,
 )
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import UpdateView
-from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
-from notifications import notify
 from watson import search as watson
 
 from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
+from recoco.apps.conversations.models import Message, RecommendationNode
+from recoco.apps.crm import filters, forms, models
+from recoco.apps.crm.forms import SiteConfigurationForm
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
+from recoco.apps.home.adapters import send_confirmation_email
+from recoco.apps.home.utils import (
+    MAX_ACTIVITY_DISPLAY,
+    deactivate_user,
+    reactivate_user,
+)
 from recoco.apps.onboarding import utils as onboarding_utils
-from recoco.apps.projects.models import Project, Topic
+from recoco.apps.plugins.manager import get_plugin_manager, get_site_plugin_manager
+from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
+from recoco.apps.projects.models import (
+    Document,
+    Project,
+    ProjectMember,
+    ProjectSite,
+    ProjectSwitchtender,
+    Topic,
+)
+from recoco.apps.projects.templatetags.projects_extra import (
+    is_admin_for_current_site,
+    is_staff_for_current_site,
+)
 from recoco.apps.reminders import models as reminders_models
+from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
+    AuthenticatedFeed,
+    check_if_advisor,
     get_group_for_site,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
 )
 
-from . import filters, forms, models
-from .forms import SiteConfigurationForm
+
+def site_projects_action_stream(site):
+    ctype = ContentType.objects.get_for_model(Project)
+
+    actions = exclude_disabled_plugin_objects(
+        Action.objects.filter(site=site),
+        "actor_content_type",
+        "action_object_content_type",
+        "target_content_type",
+    )
+    return (
+        actions.filter(
+            Q(target_content_type=ctype)
+            | Q(action_object_content_type=ctype)
+            | Q(actor_content_type=ctype)
+            | Q(verb=verbs.User.ADVISOR_REQUEST)
+            | Q(verb=verbs.User.ADVISOR_REJECTED)
+            | Q(verb=verbs.User.ADVISOR_ACCEPTED)
+        )
+        .order_by("-timestamp")
+        # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
+        .prefetch_related(
+            GenericPrefetch("actor", [User.objects.all()]),
+            "action_object",  # todo GenericPrefetch list querysets of relevant objects
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to not silently miss projects
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
+        )
+    )
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -91,19 +151,15 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        ctype = ContentType.objects.get_for_model(Project)
-        context["projects_stream"] = (
-            Action.objects.filter(site=self.request.site)
-            .filter(
-                Q(target_content_type=ctype)
-                | Q(action_object_content_type=ctype)
-                | Q(actor_content_type=ctype)
-            )
+        context["site_action_stream"] = site_projects_action_stream(
+            self.request.site
+        ).exclude(verb=verbs.User.LOGIN)[:3]
+        context["login_stream"] = (
+            Action.objects.filter(site=self.request.site, verb=verbs.User.LOGIN)
             .order_by("-timestamp")
-            # TODO: https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
-            .prefetch_related("actor", "action_object", "target")[:100]
+            .prefetch_related(GenericPrefetch("actor", [User.objects.all()]))
+            .filter()[:50]
         )
-
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
             .filter(site=self.request.site)
@@ -161,6 +217,77 @@ def crm_search(request):
 
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
+        # Used to remove duplicate project also found in ProjectAnnotation
+        project_ids = {
+            entry.object.pk
+            for entry in search_results
+            if isinstance(entry.object, Project)
+        }
+        search_results = [
+            entry
+            for entry in search_results
+            if not (
+                isinstance(entry.object, models.ProjectAnnotations)
+                and entry.object.project_id in project_ids
+            )
+        ]
+
+        grouped_search_results = OrderedDict(
+            (
+                (
+                    "projects",
+                    {"label": "dossier", "items": []},
+                ),
+                (
+                    "users",
+                    {
+                        "label": "utilisateur",
+                        "items": [],
+                    },
+                ),
+                (
+                    "organizations",
+                    {
+                        "label": "organisation",
+                        "items": [],
+                    },
+                ),
+                ("notes", {"label": "note", "items": []}),
+            )
+        )
+
+        is_empty_result = not search_results
+
+        # Count of Orga CRM note
+        organization_ct = ContentType.objects.get_for_model(Organization)
+
+        for entry in search_results:
+            obj = entry.object
+            if isinstance(obj, (Project, models.ProjectAnnotations)):
+                grouped_search_results["projects"]["items"].append(entry)
+            elif isinstance(obj, User):
+                grouped_search_results["users"]["items"].append(entry)
+            elif isinstance(obj, Organization):
+                org_user_ids = User.objects.filter(
+                    profile__in=obj.registered_profiles.all(),
+                    profile__sites=site,
+                ).values("id")
+                obj.members_count = org_user_ids.count()
+                obj.projects_count = (
+                    Project.on_site.filter(
+                        Q(members__in=org_user_ids) | Q(switchtenders__in=org_user_ids)
+                    )
+                    .distinct()
+                    .count()
+                )
+                obj.notes_count = models.Note.on_site.filter(
+                    object_id=obj.pk,
+                    content_type=organization_ct,
+                ).count()
+                grouped_search_results["organizations"]["items"].append(entry)
+            elif isinstance(obj, models.Note):
+                grouped_search_results["notes"]["items"].append(entry)
+
     return render(request, "crm/search_results.html", locals())
 
 
@@ -181,6 +308,12 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
 
     def get_object(self, queryset=None):
         return self.request.site.configuration
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pm = get_plugin_manager()
+        context["registered_plugins"] = {name for name, _ in pm.list_name_plugin()}
+        return context
 
     def form_valid(self, form):
         # Invalidate cache for CRISP token
@@ -275,16 +408,56 @@ def get_queryset_for_site_organizations(site):
 def organization_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
+    selected_departments = request.GET.getlist("departments")
+
     # organization from addressbook current site or w/ user on site
-    qs = get_queryset_for_site_organizations(request.site)
+    qs = get_queryset_for_site_organizations(request.site).annotate(
+        members_count=Coalesce(
+            Subquery(
+                home_models.UserProfile.objects.filter(
+                    sites=request.site, organization_id=OuterRef("pk")
+                )
+                .values("organization_id")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            ),
+            0,
+        ),
+        projects_count=Coalesce(
+            Subquery(
+                Project.on_site.filter(
+                    Q(switchtenders__profile__organization=OuterRef("pk")),
+                    # Q(
+                    #     switchtenders__profile__sites=request.site
+                    # ),  # should I add this line to do as in details ?
+                    # | Q(commune__department__organizations=OuterRef("pk"))
+                )
+                .order_by()
+                .values("switchtenders__profile__organization")
+                # .distinct()
+                # .annotate(v=Value(1))
+                # .values("v")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            ),
+            0,
+        ),  # uncomment upside to count also unfollowed projects
+    )
 
     organizations = filters.OrganizationFilter(
         request.GET,
         queryset=qs.order_by("name"),
     )
 
+    paginator = Paginator(organizations.qs, 25)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
     # required by default on crm
     search_form = forms.CRMSearchForm()
+
+    # consumed once after a merge to clear the persisted org selection client-side
+    just_merged = request.session.pop("org_merge_done", False)
 
     return render(request, "crm/organization_list.html", locals())
 
@@ -327,6 +500,8 @@ def organization_merge(request):
             update_contacts(orgs)
             update_profiles(orgs)
             merge_organizations_with_name(orgs, name)
+        # one-shot flag telling the list page to clear the persisted selection
+        request.session["org_merge_done"] = True
         return redirect(reverse("crm-organization-list"))
 
     merge_form = forms.CRMOrganizationMergeForm(request.GET)
@@ -339,9 +514,30 @@ def organization_merge(request):
     if not ids:
         return redirect(reverse("crm-organization-list"))
     organizations = [get_object_or_404(qs, pk=id) for id in ids]
-    departments = geomatics.Department.objects.filter(organizations__in=organizations)
+
+    # per-organization summary used for the recap cards
+    org_summaries = []
+    for organization in organizations:
+        members = User.objects.filter(
+            profile__in=organization.registered_profiles.all()
+        )
+        advised_projects = Project.on_site.filter(switchtenders__in=members).distinct()
+        org_summaries.append(
+            {
+                "organization": organization,
+                "members_count": members.count(),
+                "projects_count": advised_projects.count(),
+                "departments": organization.departments.all(),
+            }
+        )
+
+    # aggregated elements that will be attached to the merged organization
+    departments = geomatics.Department.objects.filter(
+        organizations__in=organizations
+    ).distinct()
     profiles = home_models.UserProfile.objects.filter(organization__in=organizations)
     contacts = addressbook_models.Contact.objects.filter(organization__in=organizations)
+    projects = Project.on_site.filter(switchtenders__profile__in=profiles).distinct()
 
     # first request confirmation for merging
     return render(request, "crm/organization_merge.html", locals())
@@ -373,12 +569,12 @@ def merge_organizations_with_name(orgs, name):
     # update old sites in new organization
     sites = [s for s in Site.objects.filter(organizations__in=old_orgs)]
     new_org.sites.add(*sites)
-    # update new organization name
-    new_org.name = name
-    new_org.save()
     # delete old orgs
     old_ids = [o.id for o in old_orgs]
     addressbook_models.Organization.objects.filter(id__in=old_ids).delete()
+    # update new organization name
+    new_org.name = name
+    new_org.save()
 
 
 @login_required
@@ -388,39 +584,61 @@ def organization_details(request, organization_id):
     qs = get_queryset_for_site_organizations(request.site)
     organization = get_object_or_404(qs, pk=organization_id)
 
-    participants = User.objects.filter(
-        profile__in=organization.registered_profiles.all()
+    participants_everywhere = User.objects.filter(
+        profile__organization=organization
+    )  # clean if we don't need to have their projects anymore
+    participants = participants_everywhere.filter(profile__sites=request.site)
+
+    members_stats = participants.aggregate(
+        last_activity=Max("profile__previous_activity_at"),
+        last_login=Max("last_login"),
+    )
+    last_members_activity_at = members_stats["last_activity"]
+    last_members_login_at = members_stats["last_login"]
+
+    next_members_reminder = (
+        reminders_models.Reminder.on_site.filter(
+            project__projectmember__member__in=participants, sent_on=None
+        )
+        .order_by("deadline")
+        .first()
     )
 
-    advised_projects = Project.on_site.filter(switchtenders__in=participants)
+    advised_projects = (
+        Project.on_site.filter(switchtenders__in=participants_everywhere)
+        .annotate(
+            is_current_site=Subquery(
+                Exists(
+                    ProjectSite.objects.filter(
+                        project=OuterRef("pk"), site=request.site.id
+                    )
+                )
+            )
+        )
+        .distinct()
+    )
 
     org_departments = organization.departments.all()
-
-    unadvised_projects = Project.on_site.filter(
-        commune__department__in=org_departments
-    ).exclude(switchtenders__in=participants)
 
     participant_ids = list(participants.values_list("id", flat=True))
 
     user_ct = ContentType.objects.get_for_model(User)
 
     actions = (
-        Action.objects.filter(site=request.site)
-        .filter(
-            actor_content_type=user_ct,
-            actor_object_id__in=participant_ids,
+        exclude_disabled_plugin_objects(
+            Action.objects.filter(
+                site=request.site,
+                actor_content_type=user_ct,
+                actor_object_id__in=participant_ids,
+            ),
+            "action_object_content_type",
+            "target_content_type",
         )
         .prefetch_related("actor", "action_object", "target")
-        .order_by("-timestamp")
+        .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
-
-    unread_notifications = (
-        notifications_models.Notification.on_site.unread()
-        .filter(recipient=request.user, public=False)
-        .filter(target_content_type=organization_ct, target_object_id=organization.pk)
-    )
 
     org_notes = (
         models.Note.on_site.filter(
@@ -445,8 +663,6 @@ def organization_details(request, organization_id):
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
 
-    search_form = forms.CRMSearchForm()
-
     return render(request, "crm/organization_details.html", locals())
 
 
@@ -459,13 +675,57 @@ def organization_details(request, organization_id):
 def user_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered users
-    users = filters.UserFilter(
-        request.GET,
-        queryset=User.objects.filter(profile__sites=request.site).prefetch_related(
-            "profile__organization"
-        ),
+    site = request.site
+    advisor_group_name = make_group_name_for_site("advisor", site)
+    staff_group_name = make_group_name_for_site("staff", site)
+    admin_group_name = make_group_name_for_site("admin", site)
+    selected_departments = request.GET.getlist("departments")
+
+    base_qs = (
+        User.objects.filter(profile__sites=site, profile__deleted__isnull=True)
+        .prefetch_related("profile__organization")
+        .annotate(
+            projects_count=(
+                Subquery(
+                    Project.objects.filter(
+                        Q(
+                            pk__in=Subquery(
+                                ProjectMember.objects.filter(
+                                    member_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                        | Q(
+                            pk__in=Subquery(
+                                ProjectSwitchtender.objects.filter(
+                                    switchtender_id=OuterRef(OuterRef("id"))
+                                ).values("project_id")
+                            )
+                        )
+                    )
+                    .distinct()
+                    .annotate(count=Func(F("id"), function="Count"))
+                    .values("count")
+                )
+            ),
+            is_advisor=Exists(
+                Group.objects.filter(name=advisor_group_name, user=OuterRef("pk"))
+            ),
+            is_staff_member=Exists(
+                Group.objects.filter(name=staff_group_name, user=OuterRef("pk"))
+            ),
+            is_admin=Exists(
+                Group.objects.filter(name=admin_group_name, user=OuterRef("pk"))
+            ),
+        )
+        .order_by("-date_joined")
     )
+
+    users = filters.UserFilter(request.GET, queryset=base_qs)
+
+    paginator = Paginator(users.qs, 25)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -486,6 +746,8 @@ def user_update(request, user_id=None):
     if request.method == "POST":
         form = forms.CRMProfileForm(request.POST, instance=profile)
         if form.is_valid():
+            if crm_user.profile.deleted:
+                form.add_error(None, "Cannot update a deleted user")
             with transaction.atomic():
                 username = form.cleaned_data.get("username")
                 email_changed = username != crm_user.username
@@ -495,11 +757,14 @@ def user_update(request, user_id=None):
                         # a user with the new mail already exist
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
-                            error_msg = mark_safe(  # noqa: S308
-                                f'L\'utilisateur <a href="{user_link}">'
-                                f"{users[0].first_name} {users[0].last_name}</a>'"
-                                " utilise déjà cette adresse email."
-                            )  # nosec
+                            error_msg = format_html(
+                                'L\'utilisateur <a href="{}">'
+                                "{} {}</a>'"
+                                " utilise déjà cette adresse email.",
+                                user_link,
+                                users[0].first_name,
+                                users[0].last_name,
+                            )
                             form.add_error(
                                 "username", django_forms.ValidationError(error_msg)
                             )
@@ -534,7 +799,7 @@ def user_update(request, user_id=None):
                     )
                     if email_changed:
                         setup_user_email(request, crm_user, [])
-                        send_email_confirmation(request, crm_user, signup=True)
+                        send_confirmation_email(request, crm_user)
 
                     messages.success(request, success_message)
                     return redirect(reverse("crm-user-details", args=[crm_user.id]))
@@ -561,11 +826,7 @@ def user_deactivate(request, user_id=None):
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
-        crm_user.is_active = False
-        crm_user.save()
-        profile = crm_user.profile
-        profile.deleted = timezone.now()
-        profile.save()
+        deactivate_user(crm_user)
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
@@ -581,11 +842,9 @@ def user_reactivate(request, user_id=None):
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
-        crm_user.is_active = True
-        crm_user.save()
-        profile = crm_user.profile
-        profile.deleted = None
-        profile.save()
+        if crm_user.profile.deleted:
+            raise BadRequest("Cannot reactivate a deleted user")
+        reactivate_user(crm_user)
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
@@ -636,6 +895,49 @@ def user_unset_advisor(request, user_id=None):
     return render(request, "crm/user_unset_advisor.html", locals())
 
 
+def rich_project_relations(relations, model, site_id):
+    relations = (
+        relations.prefetch_related(
+            Prefetch(
+                "project",
+                Project._base_manager.select_related("commune")
+                .with_perf_prefetch("origin_site", "next_reminder", "owner")
+                .annotate(
+                    is_current_site=Subquery(
+                        Exists(
+                            ProjectSite.objects.filter(
+                                project=OuterRef("pk"), site=site_id
+                            )
+                        )
+                    ),
+                ),
+            ),
+            "project__project_sites__site",
+        )
+        .annotate(
+            is_deleted=ExpressionWrapper(
+                ~Q(project__deleted=None), output_field=BooleanField()
+            ),
+            is_origin_current_site=Exists(
+                ProjectSite.objects.filter(
+                    project=OuterRef("project_id"),
+                    site=site_id,
+                    is_origin=True,
+                )
+            ),
+            is_current_site=Exists(
+                ProjectSite.objects.filter(project=OuterRef("project_id"), site=site_id)
+            ),
+        )
+        .order_by(
+            "is_deleted",
+            "-is_origin_current_site",
+            "-is_current_site",
+        )
+    )
+    return relations
+
+
 @login_required
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -649,9 +951,46 @@ def user_details(request, user_id):
     )
 
     group_name = make_group_name_for_site("advisor", request.site)
-    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
+    crm_user_is_advisor = check_if_advisor(crm_user)
+    crm_user_is_staff = is_staff_for_current_site(crm_user)
+    crm_user_is_admin = is_admin_for_current_site(crm_user)
 
-    actions = actor_stream(crm_user)
+    actions = (
+        exclude_disabled_plugin_objects(
+            crm_user.actor_actions.exclude(
+                verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+            )
+            | crm_user.action_object_actions.all(),
+            "action_object_content_type",
+            "target_content_type",
+        )
+        .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
+        .select_related("action_object_content_type", "target_content_type")
+        .prefetch_related(
+            GenericPrefetch(
+                "actor",
+                [
+                    User.objects.prefetch_related(
+                        Prefetch(
+                            "profile",
+                            home_models.UserProfile.all.select_related(
+                                "organization", "organization__group"
+                            ),
+                        )
+                    )
+                ],
+            ),
+            "action_object",
+            GenericPrefetch(
+                "target",
+                [
+                    # _base_manager to actually have all projects for rendering
+                    Project._base_manager.select_related("commune"),
+                    Site.objects.all(),
+                ],
+            ),
+        )
+    )
 
     user_ct = ContentType.objects.get_for_model(User)
 
@@ -662,11 +1001,41 @@ def user_details(request, user_id):
         action_object_content_type=user_ct, action_object_object_id=crm_user.pk
     ).mark_all_as_read()
 
-    all_notes = models.Note.on_site.filter(
-        object_id=crm_user.pk, content_type=user_ct
-    ).order_by("-updated_on")
+    all_notes = (
+        models.Note.on_site.filter(object_id=crm_user.pk, content_type=user_ct)
+        .select_related("content_type", "created_by")
+        .prefetch_related(
+            Prefetch(
+                "created_by__profile",
+                queryset=home_models.UserProfile.all.select_related(
+                    "organization", "organization__group"
+                ),
+            ),
+            "tags",
+        )
+        .order_by("-updated_on")
+    )
     sticky_notes = all_notes.filter(sticky=True)
     notes = all_notes.exclude(sticky=True)
+
+    if not crm_user_is_advisor and not crm_user.is_staff:
+        user_project_ids = crm_user.projectmember_set.values_list(
+            "project_id", flat=True
+        )
+        next_user_reminder = (
+            reminders_models.Reminder.on_site.filter(
+                project_id__in=user_project_ids, sent_on=None
+            )
+            .order_by("deadline")
+            .first()
+        )
+
+    user_memberships = rich_project_relations(
+        crm_user.projectmember_set, ProjectMember, request.site.id
+    )
+    user_switchtendings = rich_project_relations(
+        crm_user.projects_switchtended_per_site, ProjectSwitchtender, request.site.id
+    )
 
     search_form = forms.CRMSearchForm()
 
@@ -782,8 +1151,18 @@ def project_list(request):
         .order_by("name")
     )
 
+    plugin_columns = get_site_plugin_manager(request).hook.crm_project_list_columns(
+        request=request
+    )
+
+    plugin_filters = get_site_plugin_manager(request).hook.crm_project_list_filters(
+        request=request
+    )
+
     context = {
         "regions": list(RegionSerializer(region_queryset, many=True).data),
+        "plugin_columns": plugin_columns,
+        "plugin_filters": plugin_filters,
     }
 
     return render(request, "crm/project_list.html", context)
@@ -799,11 +1178,22 @@ def project_details(request, project_id):
 
     site_origin = project.project_sites.get(is_origin=True)
 
-    actions = target_stream(project)
+    project_ct = ContentType.objects.get_for_model(Project)
 
     user_ct = ContentType.objects.get_for_model(User)
 
-    project_ct = ContentType.objects.get_for_model(Project)
+    actions = Action.objects.filter(
+        site=request.site, target_content_type=project_ct, target_object_id=project.pk
+    )[:MAX_ACTIVITY_DISPLAY]
+
+    conversation_stats = {
+        "messages_count": Message.not_deleted.filter(project=project).count(),
+        "participants_count": project.members.count() + project.switchtenders.count(),
+        "recommendations_count": RecommendationNode.objects.filter(
+            message__project=project, message__deleted=None
+        ).count(),
+        "documents_count": Document.objects.filter(project=project).count(),
+    }
 
     participants = project.members.all()
     participant_ids = list(participants.values_list("id", flat=True))
@@ -815,6 +1205,10 @@ def project_details(request, project_id):
     project_notes = models.Note.on_site.filter(
         object_id=project.pk, content_type=project_ct
     ).order_by("-updated_on")
+
+    project_creation_request = project.project_creation_requests.filter(
+        project=project
+    ).first()
 
     sticky_notes = project_notes.filter(sticky=True)
 
@@ -839,6 +1233,13 @@ def project_update(request, project_id=None):
             if "statistics" in form.cleaned_data:
                 project.exclude_stats = not form.cleaned_data["statistics"]
             project.save()
+            next_url = request.POST.get("next", "")
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return redirect(next_url)
     else:
         form = forms.CRMProjectForm(
             initial={
@@ -900,6 +1301,28 @@ def project_toggle_annotation(request, project_id=None):
 
     url = reverse("crm-project-details", args=[project.id])
     return redirect(url)
+
+
+########################################################################
+# resources
+########################################################################
+
+
+@login_required
+def resource_list(request):
+    # has_perm_or_403(request.user, "use_crm", request.site)
+    has_perm_or_403(request.user, "manage_resources", request.site)
+
+    departments = list(geomatics.Department.objects.values("code", "name"))
+
+    categories = list(Category.on_site.values("id", "name").order_by("name"))
+
+    context = {
+        "departments": departments,
+        "categories": categories,
+    }
+
+    return render(request, "crm/resource_list.html", context)
 
 
 def handle_create_note_for_object(
@@ -979,7 +1402,6 @@ def create_note_for_organization(request, organization_id):
 
 def notify_note_creation(request, note, target):
     """Notify crm users of new note creation"""
-    # TODO only create action stream not emails
     action.send(
         request.user,
         verb=verbs.CRM.NOTE_CREATED,
@@ -987,18 +1409,6 @@ def notify_note_creation(request, note, target):
         target=target,
     )
     return
-    crm_users = get_users_with_perms(
-        request.site, only_with_perms_in=["use_crm"]
-    ).exclude(pk=request.user.pk)
-
-    notify.send(
-        sender=request.user,
-        recipient=crm_users,
-        verb=verbs.CRM.NOTE_CREATED,
-        action_object=note,
-        target=target,
-        public=False,
-    )
 
 
 def update_note_for_object(request, note, return_view_name):
@@ -1089,22 +1499,14 @@ def crm_list_recommendation_without_resources(request):
     return render(request, "crm/reco_without_resources.html", locals())
 
 
-def make_low_reach_project_query(request):
-    site_config = request.site_config
-
-    return (
+def make_low_reach_project_query(
+    request, days=15, status_filter="all", mine_only=False, search_q=""
+):
+    qs = (
         Project.on_site.filter(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
         )
-        .exclude(exclude_stats=True)
-        .prefetch_related(
-            "tasks",
-            "notes",
-            "switchtenders__profile__organization",
-            "crm_annotations__tags",
-        )
-        .select_related("commune")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1122,26 +1524,143 @@ def make_low_reach_project_query(request):
             reco_read_ratio=ExpressionWrapper(
                 Cast(F("reco_read"), FloatField()) / F("reco_total") * Value(100.0),
                 output_field=FloatField(),
-            ),  # Pc of unread reco
+            ),
             last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
             last_public_msg_at=Max(
                 "notes__created_on",
                 filter=Q(notes__public=True, notes__created_by__in=F("members__id")),
             ),
+            has_task_status=Exists(
+                Task.objects.filter(
+                    project=OuterRef("pk"),
+                    public=True,
+                ).exclude(status=Task.PROPOSED)
+            ),
+            has_impact_tags=Exists(
+                models.ProjectAnnotations.objects.filter(
+                    project=OuterRef("pk"),
+                    site=request.site,
+                    tags__isnull=False,
+                )
+            ),
         )
-        .exclude(reco_read_ratio__gte=99.9)  # Not interested if everything was read
-        .exclude(
-            last_reco_at__lte=datetime.now()
-            - timedelta(days=site_config.reminder_interval)
+    )
+
+    # last member activity in days. days == 0 means "Tout", ie no time limit
+    if days:
+        cutoff_date = datetime.now() - timedelta(days=days)
+        qs = qs.filter(last_members_activity_at__lte=cutoff_date)
+
+    # The status filters are independent dimensions:
+    # - "no_reaction" is engagement-based (no public message, no task status
+    #   other than "proposé", no impact tag),
+    # - "zero_read" and "low_read" only depend on the number of read
+    #   recommendations, regardless of any engagement,
+    # - "all" is the union of the three filters above (the default).
+    # A projet has engagement if a member posted a public message, if at least
+    # one task has a status other than "proposé", or if it has an impact tag.
+    has_engagement = (
+        Q(last_public_msg_at__isnull=False)
+        | Q(has_task_status=True)
+        | Q(has_impact_tags=True)
+    )
+    # A project barely read its recommendations if none were read, or if only
+    # one was read but there are more than 2 recommendations in total.
+    barely_read = Q(reco_read=0) | Q(reco_read=1, reco_total__gt=2)
+
+    # Single source of truth for the displayed status badge, following the same
+    # priority as the HTML table and the CSV export: "0 reco lue" > "recos non
+    # lues" > "aucune réaction". Consumed by both the template and the CSV via
+    # LOW_REACH_STATUS_OPTIONS, so the status is computed once and only read
+    # afterwards.
+    qs = qs.annotate(
+        status_key=Case(
+            When(reco_read=0, then=Value("zero_read")),
+            When(barely_read, then=Value("low_read")),
+            When(~has_engagement, then=Value("no_reaction")),
+            default=Value(None),
+            output_field=CharField(),
         )
-        .order_by(
-            "reco_read_ratio",
-            "last_members_activity_at",
-            "last_reco_at",
-            "last_public_msg_at",
+    )
+    qs = (
+        qs.filter(status_key__isnull=False)
+        if status_filter == "all"
+        else qs.filter(status_key__in=["low_read", "zero_read"])
+        if status_filter == "low_read"
+        else qs.filter(status_key=status_filter)
+    )
+
+    if mine_only:
+        qs = qs.filter(switchtenders=request.user)
+
+    if search_q:
+        qs = qs.filter(
+            Q(name__icontains=search_q)
+            | Q(commune__name__icontains=search_q)
+            | Q(members__profile__organization__name__icontains=search_q)
         )
+
+    return (
+        qs.select_related("commune")
+        .prefetch_related(
+            "tasks",
+            "notes",
+            "switchtenders__profile__organization",
+            "crm_annotations__tags",
+        )
+        .with_perf_prefetch("owner")
+        .order_by("-last_members_activity_at")
         .distinct()
     )
+
+
+# Status filters offered on the low-reach page, in display order. Drives both the
+# selected badge and the <select> options in the template, so labels/titles live
+# in one place.
+LOW_REACH_STATUS_OPTIONS = [
+    {
+        "value": "all",
+        "label": "Tous",
+        "title": "Tous les dossiers à relancer",
+        "variant": "info",
+    },
+    {
+        "value": "no_reaction",
+        "label": "Aucune réaction",
+        "title": "Pas de statut sur recommandation, de message du demandeur ou de tag d'impact",
+        "variant": "info",
+    },
+    {
+        "value": "zero_read",
+        "label": "Recos non lues",
+        "label_filter": "0 reco lue",
+        "title": "Aucune recommandation n'a été lue",
+        "variant": "warning",
+    },
+    {
+        "value": "low_read",
+        "label": "Recos non lues",
+        "title": "Aucune ou une seule recommandation a été lue",
+        "variant": "warning",
+    },
+]
+
+
+def _parse_low_reach_params(request):
+    """Extract and validate filter params from request GET for low-reach views."""
+    try:
+        days = int(request.GET.get("days", 15))
+    except ValueError:
+        days = 15
+
+    status_filter = request.GET.get("status", "all")
+    if status_filter not in [opt["value"] for opt in LOW_REACH_STATUS_OPTIONS]:
+        status_filter = "all"
+
+    mine_only = bool(request.GET.get("mine"))
+    search_q = request.GET.get("q", "").strip()
+
+    return days, status_filter, mine_only, search_q
 
 
 @login_required
@@ -1149,11 +1668,65 @@ def crm_list_projects_with_low_reach(request):
     """List projects that don't get a good impact"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    search_form = forms.CRMSearchForm()
+    days, status_filter, mine_only, search_q = _parse_low_reach_params(request)
 
-    low_reach_projects = make_low_reach_project_query(request)
+    low_reach_projects = make_low_reach_project_query(
+        request,
+        days=days,
+        status_filter=status_filter,
+        mine_only=mine_only,
+        search_q=search_q,
+    )
 
-    return render(request, "crm/projects_low_reach.html", locals())
+    paginator = Paginator(low_reach_projects, 25)
+    total_count = paginator.count
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "crm/projects_low_reach.html",
+        {
+            "low_reach_projects": page_obj.object_list,
+            "page_obj": page_obj,
+            "total_count": total_count,
+            "days": days,
+            "status_filter": status_filter,
+            "status_options": LOW_REACH_STATUS_OPTIONS,
+            "mine_only": mine_only,
+            "search_q": search_q,
+        },
+    )
+
+
+def _referent_csv_fields(owner):
+    """Referent columns for the low-reach CSV export, keyed by fieldname."""
+    if not owner:
+        # empty columns
+        return dict.fromkeys(
+            (
+                "referent_prenom",
+                "referent_nom",
+                "referent_organisation",
+                "referent_telephone",
+                "referent_email",
+                "referent_fonction",
+            ),
+            "",
+        )
+
+    profile = getattr(owner, "profile", None)
+    organization = profile.organization if profile else None
+    return {
+        "referent_prenom": owner.first_name,
+        "referent_nom": owner.last_name,
+        "referent_organisation": organization.name if organization else "",
+        "referent_telephone": (
+            profile.phone_no.as_international if profile and profile.phone_no else ""
+        ),
+        "referent_email": owner.email,
+        "referent_fonction": profile.organization_position if profile else "",
+    }
 
 
 @login_required
@@ -1161,54 +1734,66 @@ def crm_projects_with_low_reach_as_csv(request):
     """Export projects that don't get a good impact in CSV"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    low_reach_projects = make_low_reach_project_query(request)
+    days, status_filter, mine_only, search_q = _parse_low_reach_params(request)
 
-    today = datetime.today().date()
-
-    content_disposition = (
-        f'attachment; filename="projets-a-faible-repondant-{today}.csv"'
+    low_reach_projects = make_low_reach_project_query(
+        request,
+        days=days,
+        status_filter=status_filter,
+        mine_only=mine_only,
+        search_q=search_q,
     )
+
+    timestamp = datetime.today().strftime("%Y-%m-%d-%H%M%S")
+
+    content_disposition = f'attachment; filename="projets-a-relancer-{timestamp}.csv"'
+
     response = HttpResponse(
         content_type="text/csv",
-        headers={
-            "Content-Disposition": content_disposition,
-        },
+        headers={"Content-Disposition": content_disposition},
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "name",
-            "location",
-            "insee",
-            "inactive_since",
-            "advisors",
-            "reco_access_pc",
-            "reco_read",
-            "reco_total",
-            "last_member_activity",
-            "last_reco_at",
-            "last_public_msg_at",
-        ]
-    )
+    fieldnames = [
+        "nom_dossier",
+        "commune",
+        "insee",
+        "conseillers",
+        "recos_lues",
+        "recos_total",
+        "derniere_activite",
+        "derniere_reco",
+        "statut",
+        "referent_prenom",
+        "referent_nom",
+        "referent_organisation",
+        "referent_telephone",
+        "referent_email",
+        "referent_fonction",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
+
+    # Uppercase labels keyed by the status_key annotation computed in the query.
+    status_labels = {
+        opt["value"]: opt["label"].upper() for opt in LOW_REACH_STATUS_OPTIONS
+    }
 
     for project in low_reach_projects:
         writer.writerow(
-            [
-                project.name,
-                project.commune.name,
-                project.commune.insee,
-                project.inactive_since,
-                ",".join(
-                    [advisor.get_full_name() for advisor in project.switchtenders.all()]
+            {
+                "nom_dossier": project.name,
+                "commune": project.commune.name,
+                "insee": project.commune.insee,
+                "conseillers": ", ".join(
+                    a.get_full_name() for a in project.switchtenders.all()
                 ),
-                project.reco_read_ratio,
-                project.reco_read,
-                project.reco_total,
-                project.last_members_activity_at,
-                project.last_reco_at,
-                project.last_public_msg_at,
-            ]
+                "recos_lues": project.reco_read,
+                "recos_total": project.reco_total,
+                "derniere_activite": project.last_members_activity_at,
+                "derniere_reco": project.last_reco_at or "",
+                "statut": status_labels.get(project.status_key, ""),
+                **_referent_csv_fields(project.owner),
+            }
         )
 
     return response
@@ -1321,28 +1906,27 @@ def crm_list_topics_as_csv(request):
         },
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "topic",
-            "usage_count",
-            "usage_count_by_project",
-            "usage_count_by_task",
-            "project_ids",
-            "reco_ids",
-        ]
-    )
+    fieldnames = [
+        "topic",
+        "usage_count",
+        "usage_count_by_project",
+        "usage_count_by_task",
+        "project_ids",
+        "reco_ids",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for name, usage in topics.items():
         writer.writerow(
-            [
-                name,
-                usage[0],
-                usage[1],
-                usage[2],
-                [project.pk for project in usage[3]],
-                [task.pk for task in usage[4]],
-            ]
+            {
+                "topic": name,
+                "usage_count": usage[0],
+                "usage_count_by_project": usage[1],
+                "usage_count_by_task": usage[2],
+                "project_ids": [project.pk for project in usage[3]],
+                "reco_ids": [task.pk for task in usage[4]],
+            }
         )
 
     return response
@@ -1394,25 +1978,24 @@ def project_list_by_tags_as_csv(request):
         },
     )
 
-    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow(
-        [
-            "tag",
-            "usage_count",
-            "project_ids",
-            "project_names",
-        ]
-    )
+    fieldnames = [
+        "tag",
+        "usage_count",
+        "project_ids",
+        "project_names",
+    ]
+    writer = csv.DictWriter(response, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
     for tag in tags:
         projects = Project.on_site.filter(tags__name=tag.name).order_by("name")
         writer.writerow(
-            [
-                tag.name,
-                tag.project__count,
-                list(projects.values_list(flat=True)),
-                ", ".join([f'"{p.name}"' for p in projects]),
-            ]
+            {
+                "tag": tag.name,
+                "usage_count": tag.project__count,
+                "project_ids": list(projects.values_list(flat=True)),
+                "project_names": ", ".join([f'"{p.name}"' for p in projects]),
+            }
         )
 
     return response
@@ -1424,16 +2007,8 @@ def projects_activity_feed(request):
 
     ctype = ContentType.objects.get_for_model(Project)
 
-    actions = (
-        Action.objects.filter(site=request.site)
-        .filter(
-            Q(target_content_type=ctype)
-            | Q(action_object_content_type=ctype)
-            | Q(actor_content_type=ctype)
-        )
-        .order_by("-timestamp")
-        .prefetch_related("actor", "action_object", "target")[:500]
-    )
+    # arbitrary enough
+    actions = site_projects_action_stream(request.site)[:500]
 
     search_form = forms.CRMSearchForm()
 
@@ -1494,10 +2069,13 @@ def project_site_handover(request, project_id):
 ########################################################################
 
 
-class LatestNotesFeed(Feed):
+class LatestNotesFeed(AuthenticatedFeed):
     title = "Dernières notes de CRM"
     link = "/crm/feed"
     description = "Dernières notes"
+
+    def has_permission(self, request):
+        return has_perm(request.user, "sites.use_crm", request.site)
 
     def items(self):
         return models.Note.on_site.order_by("-updated_on", "-created_on")[:20]

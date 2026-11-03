@@ -7,10 +7,11 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 17:56:10 CEST
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 import pytest
 import reversion
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import transaction
@@ -22,13 +23,14 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from reversion.models import Version
 
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.demarches_simplifiees import models as ds_models
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.hitcount.models import Hit, HitCount
 from recoco.apps.projects import models as projects_models
+from recoco.apps.resources import models
+from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import login
-
-from .. import models
 
 ########################################################################
 # resources
@@ -144,9 +146,9 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     ).make()
 
     url = reverse("resources-resource-search")
-    url = f"{url}?limit_area=true&query=resource"
+    url = f"{url}?limit_areas=f{departments[0]}&query=resource"
 
-    membership = baker.make(projects_models.ProjectMember)
+    membership = Recipe(projects_models.ProjectMember).make()
     with login(client, user=membership.member):
         Recipe(
             projects_models.Project,
@@ -309,6 +311,175 @@ def test_resource_list_contains_only_published(current_site, client):
 
 
 #
+# duplication
+
+
+@pytest.mark.django_db
+def test_duplication_creates_new_resource(request, client, current_site):
+    old_resource = Recipe(
+        models.Resource,
+        status=models.Resource.PUBLISHED,
+        sites=[get_current_site(request), Recipe(Site).make()],
+        title="A Nice title",
+        expires_on=date(2022, 12, 12),
+        created_by=Recipe(User).make(),
+        imported_from="https://toto.com",
+        category=Recipe(resources_models.Category).make(),
+        subtitle="sous-titre",
+        summary="ceci est un résumé",
+        content="ceci est un contenu",
+        support_orga="Organisation porteuse",
+    ).make()
+    old_resource.tags.set("tag1 tag2")
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        response = client.post(url, follow=True)
+        assert response.status_code == 200
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        assert models.Resource.objects.count() == 2
+
+        new_resource = models.Resource.objects.exclude(id=old_resource.id).first()
+
+        assert (
+            last_url
+            == f"{reverse('resources-resource-update', args=[new_resource.id])}?is_duplicate=true"
+        )
+
+        assert new_resource.site_origin == current_site
+        assert new_resource.status == models.Resource.DRAFT
+        assert new_resource.expires_on is None
+        assert new_resource.created_by == user
+        assert new_resource.imported_from == old_resource.imported_from
+        assert new_resource.category == old_resource.category
+        assert new_resource.title == old_resource.title
+        assert new_resource.subtitle == old_resource.subtitle
+        assert new_resource.summary == old_resource.summary
+        assert new_resource.content == old_resource.content
+        assert new_resource.support_orga == old_resource.support_orga
+
+        assert list(new_resource.tags.all()) == list(old_resource.tags.all())
+        assert list(new_resource.sites.all()) == [current_site]
+
+
+@pytest.mark.django_db
+def test_duplication_creates_new_ds_resource_mapping(request, client, current_site):
+    old_resource = Recipe(
+        models.Resource,
+        status=models.Resource.PUBLISHED,
+        sites=[current_site],
+        title="A Nice title",
+        created_by=baker.make(User),
+        category=baker.make(resources_models.Category),
+    ).make()
+    dep = Recipe(geomatics.Department).make()
+    ds_resource = Recipe(
+        ds_models.DSResource,
+        name="initial_name",
+        schema='{"field": "this is a json"}',
+        resource=old_resource,
+    ).make()
+    ds_resource.departments.set([dep])
+    ds_mapping = Recipe(
+        ds_models.DSMapping,
+        ds_resource=ds_resource,
+        site=current_site,
+        mapping='{"other": "json file"}',
+    ).make()
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.post(url, follow=True)
+        assert response.status_code == 200
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        assert models.Resource.objects.count() == 2
+
+        new_resource = models.Resource.objects.exclude(id=old_resource.id).first()
+
+        assert (
+            last_url
+            == f"{reverse('resources-resource-update', args=[new_resource.id])}?is_duplicate=true"
+        )
+
+        assert ds_models.DSResource.objects.filter(resource=new_resource).count() == 1
+        new_ds_resource = ds_models.DSResource.objects.filter(
+            resource=new_resource
+        ).first()
+        assert new_ds_resource is not None
+        assert new_ds_resource.schema == ds_resource.schema
+        assert ds_resource.name in new_ds_resource.name
+        assert set(new_ds_resource.departments.all()) == set(
+            ds_resource.departments.all()
+        )
+
+        assert (
+            ds_models.DSMapping.objects.filter(ds_resource=new_ds_resource).count() == 1
+        )
+        new_mapping = ds_models.DSMapping.objects.filter(
+            ds_resource=new_ds_resource
+        ).first()
+        assert new_mapping.mapping == ds_mapping.mapping
+        assert new_mapping.site == ds_mapping.site
+        assert new_mapping.ds_resource == new_ds_resource
+
+
+@pytest.mark.django_db
+def test_duplication_needs_permission(request, client, current_site):
+    old_resource = Recipe(
+        models.Resource,
+        status=models.Resource.PUBLISHED,
+        sites=[get_current_site(request)],
+        title="A Nice title",
+    ).make()
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client):
+        response = client.post(url, follow=True)
+        assert response.status_code == 403
+        assert models.Resource.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_duplication_not_available_across_sites(request, client):
+    """Regression test (IDOR): DuplicateResourceView looks up the resource to
+    copy via the unscoped default manager, so a manager on site A can clone a
+    draft resource that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant6.example.com")
+    old_resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.DRAFT,
+    ).make()
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, follow=True)
+
+    assert response.status_code == 404
+    assert models.Resource.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_duplicate_resource_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to duplicate a resource
+    that only belongs to site B into site A."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+
+    url = reverse("resources-resource-duplicate", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert models.Resource.objects.count() == 1
+
+
+#
 # details
 
 
@@ -328,7 +499,7 @@ def test_public_resource_detail_available_for_all_users(request, client):
 
 
 @pytest.mark.django_db
-def test_draft_resource_visible_to_any_authenticated_user(request, client):
+def test_draft_resource_not_visible_to_common_authenticated_user(request, client):
     site = get_current_site(request)
     resource = Recipe(
         models.Resource, sites=[site], status=models.Resource.DRAFT
@@ -341,7 +512,63 @@ def test_draft_resource_visible_to_any_authenticated_user(request, client):
 
     with login(client):
         response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_draft_resource_visible_to_resource_manager(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource, sites=[site], status=models.Resource.DRAFT
+    ).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_resource_detail_not_visible_across_sites(request, client):
+    other_site = Site.objects.create(domain="other.example.com", name="other")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    response = client.get(url)
+    assert response.status_code == 404
+
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_resource_detail_not_visible_on_non_default_site(request, client, settings):
+    """A resource is only visible on the site(s) it is linked to. Since the
+    resource here is only linked to `other_site`, requesting it while the
+    current site is still the default one must 404, even though the
+    resource itself is published.
+    """
+    other_site = Site.objects.create(
+        domain="other-tenant.example.com", name="other tenant"
+    )
+    settings.ALLOWED_HOSTS = [*settings.ALLOWED_HOSTS, other_site.domain]
+
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+    response = client.get(url)
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -378,7 +605,7 @@ def test_resource_detail_contacts_to_display(request, client):
         status=models.Resource.PUBLISHED,
     ).make()
 
-    contact = baker.make(Contact)
+    contact = Recipe(Contact).make()
 
     url = reverse("resources-resource-detail", args=[resource.id])
 
@@ -393,6 +620,28 @@ def test_resource_detail_contacts_to_display(request, client):
 
         response = client.get(url)
         assert response.context["contacts_to_display"] == [contact.id]
+
+
+@pytest.mark.django_db
+def test_resource_detail_ds_prefill_button(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+    Recipe(
+        ds_models.DSResource,
+        resource=resource,
+        schema={"number": 42},
+    ).make()
+    Recipe(Task, resource=resource).make()
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["resource"].has_dsresource
 
 
 #
@@ -415,7 +664,7 @@ def test_create_resource_available_for_authorized_users(client):
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-create"')
+    assertContains(response, 'form id="form-resource"')
 
 
 @pytest.mark.resource_create
@@ -428,6 +677,7 @@ def test_create_new_resource_and_redirect(request, client):
         "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
+        "support_orga": "Big Brother",
     }
 
     with login(client, groups=["example_com_staff"]):
@@ -467,15 +717,38 @@ def test_update_resource_available_for_staff(request, client):
         response = client.get(url)
 
     assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-update"')
+    assertContains(response, 'form id="form-resource"')
+
+
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_not_available_across_sites(request, client):
+    """Regression test (IDOR): resource_update looks up Resource via the
+    unscoped default manager, guarded only by manage_resources.
+    A manager on site A can open (and, on submit, silently
+    clone via make_clone()) a draft that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant2.example.com")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        site_origin=other_site,
+        status=models.Resource.DRAFT,
+    ).make()
+
+    url = reverse("resources-resource-update", args=[resource.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
 
 
 @pytest.mark.resource_update
 @pytest.mark.django_db
 def test_update_resource_from_origin_site_and_redirect(request, client):
-    resource = baker.make(models.Resource)
     current_site = get_current_site(request)
+    resource = baker.make(models.Resource, sites=[current_site])
     resource.site_origin = current_site
+    resource.sites.add(current_site)
     resource.save()
 
     previous_update = resource.updated_on
@@ -489,6 +762,7 @@ def test_update_resource_from_origin_site_and_redirect(request, client):
         "summary": "a summary",
         "tags": "#tag",
         "content": "this is some updated content",
+        "support_orga": "New Big Brother",
     }
 
     with login(client, groups=["example_com_staff"]):
@@ -529,9 +803,9 @@ def test_update_resource_from_non_origin_site_does_not_duplicate_with_get(
 @pytest.mark.resource_update
 @pytest.mark.django_db
 def test_update_resource_from_non_origin_site_with_invalid_form(request, client):
-    original_resource = baker.make(models.Resource)
+    original_resource = Recipe(models.Resource).make()
     current_site = get_current_site(request)
-    other_site = baker.make(Site)
+    other_site = Recipe(Site).make()
 
     original_resource.sites.add(current_site, other_site)
     original_resource.site_origin = other_site
@@ -621,6 +895,42 @@ def test_update_resource_from_non_origin_site_and_redirect(request, client):
     assert new_resource.site_origin == current_site
 
 
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to edit a resource that
+    only belongs to site B, even though `sites.manage_resources` is granted
+    at the site level."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+    original_content = resource.content
+
+    url = reverse("resources-resource-update", args=[resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+    data = {
+        "title": "hacked title",
+        "subtitle": "a sub title",
+        "status": 0,
+        "summary": "a summary",
+        "tags": "#tag",
+        "content": "cross tenant content injection",
+        "support_orga": "Attacker Corp",
+    }
+
+    with login(client, groups=["example_com_staff"], username="test2"):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 404
+
+    resource.refresh_from_db()
+    assert resource.content == original_content
+
+
 ########################################################################
 # delete
 ########################################################################
@@ -700,6 +1010,30 @@ def test_delete_resource_non_shared_and_redirect(client, request):
     assert resource.deleted is not None
 
 
+@pytest.mark.resource_delete
+@pytest.mark.django_db
+def test_delete_resource_cross_tenant_is_forbidden(client, request):
+    """A resource manager on site A must not be able to delete a resource
+    that only belongs to site B."""
+    other_site = baker.make(Site)
+    resource = baker.make(models.Resource, sites=[other_site])
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+    with login(client, groups=["example_com_staff"], username="test2"):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    resource.refresh_from_db()
+    assert resource.deleted is None
+    assert other_site in resource.sites.all()
+
+
 #
 # history
 @pytest.mark.django_db
@@ -755,6 +1089,41 @@ def test_resource_history_creates_revision(request, client):
 
 
 @pytest.mark.django_db
+def test_resource_history_not_available_across_sites(request, client):
+    """Regression test (IDOR): ResourceHistoryCompareView uses the unscoped
+    default manager, so a manager on site A can view the revision history of
+    a resource that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant3.example.com")
+    resource = Recipe(models.Resource, sites=[other_site]).make()
+    url = reverse("resources-resource-history", args=[resource.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_resource_history_restore_not_available_across_sites(request, client):
+    """Regression test (IDOR): ResourceHistoryRestoreView uses the unscoped
+    default manager, so a manager on site A can restore a revision of a
+    resource that only belongs to site B."""
+    other_site = Site.objects.create(domain="other-tenant4.example.com")
+    resource = Recipe(models.Resource, title="first", sites=[other_site]).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+    with transaction.atomic(), reversion.create_revision():
+        resource.title = "hello"
+        resource.save()
+
+    version = Version.objects.get_for_object(resource).last()
+
+    url = reverse("resources-resource-history-restore", args=[resource.id, version.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_resource_history_reversion_available_for_authorized_user(request, client):
     resource = Recipe(
         models.Resource,
@@ -782,6 +1151,32 @@ def test_resource_history_reversion_available_for_authorized_user(request, clien
 
     assert resource.title == "first"
     assert Version.objects.get_for_object(resource).count() == 3
+
+
+@pytest.mark.django_db
+def test_resource_history_restore_cross_tenant_is_forbidden(request, client):
+    """A resource manager on site A must not be able to revert a revision on
+    a resource that only belongs to site B."""
+    other_site = baker.make(Site)
+    resource = Recipe(models.Resource, title="first", sites=[other_site]).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.title = "hello"
+        resource.save()
+
+    version = Version.objects.get_for_object(resource).last()
+
+    url = reverse("resources-resource-history-restore", args=[resource.id, version.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    resource.refresh_from_db()
+    assert resource.title == "hello"
 
 
 ########################################################################
@@ -863,6 +1258,60 @@ def test_search_resources_by_category(request):
 
 
 @pytest.mark.django_db
+def test_bookmark_create_not_available_across_sites(request, client):
+    """Regression test (IDOR): create_bookmark looks up Resource via the
+    unscoped default manager, so any authenticated user can bookmark (and
+    thus read) a resource that only belongs to another site."""
+    other_site = Site.objects.create(domain="other-tenant5.example.com")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_bookmark_create_not_available_for_draft_resource(current_site, client):
+    """Regression test (IDOR): create_bookmark did not check the resource
+    status/permissions, so any authenticated user could bookmark (and thus
+    read the title of) a draft resource they should not be able to see."""
+    resource = Recipe(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_bookmark_create_available_for_draft_resource_with_manage_permission(
+    current_site, client
+):
+    resource = Recipe(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client, is_staff=True, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_user_has_access_to_page_for_bookmark_with_notes(request, client):
     resource = Recipe(
         models.Resource,
@@ -903,13 +1352,15 @@ def test_user_bookmarks_a_resource(request, client):
 
 @pytest.mark.django_db
 def test_user_refresh_bookmark_of_a_resource(request, client):
+    site = get_current_site(request)
     with login(client) as user:
         bookmark = Recipe(
             models.Bookmark,
-            site=get_current_site(request),
+            site=site,
             created_by=user,
             deleted=datetime.now(),
             resource__status=models.Resource.PUBLISHED,
+            resource__sites=[site],
         ).make()
         url = reverse("resources-bookmark-create", args=[bookmark.resource_id])
         data = {"comments": "some nice comments"}
@@ -926,12 +1377,14 @@ def test_user_refresh_bookmark_of_a_resource(request, client):
 
 @pytest.mark.django_db
 def test_user_deletes_a_personal_bookmark(request, client):
+    site = get_current_site(request)
     with login(client) as user:
         bookmark = Recipe(
             models.Bookmark,
-            site=get_current_site(request),
+            site=site,
             created_by=user,
             resource__status=models.Resource.PUBLISHED,
+            resource__sites=[site],
         ).make()
         url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
         response = client.post(url)
@@ -944,10 +1397,12 @@ def test_user_deletes_a_personal_bookmark(request, client):
 
 @pytest.mark.django_db
 def test_user_cannot_delete_someone_else_bookmark(request, client):
+    site = get_current_site(request)
     bookmark = Recipe(
         models.Bookmark,
         resource__status=models.Resource.PUBLISHED,
-        site=get_current_site(request),
+        resource__sites=[site],
+        site=site,
     ).make()
     url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
 
@@ -1018,6 +1473,61 @@ def test_deleted_bookmark_honors_multisite(request):
 
 
 @pytest.mark.django_db
+def test_embedded_resource_detail_view_404_for_draft_resource(client, request):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    response = client.get(
+        reverse("resources-resource-detail-embeded", args=[resource.id])
+    )
+    assert response.status_code == 404
+
+    with login(client):
+        response = client.get(
+            reverse("resources-resource-detail-embeded", args=[resource.id])
+        )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_view_returns_draft_to_resource_manager(
+    client, request
+):
+    """Regression test: the "Pousse Reco" draft preview iframes the embed
+    view for any user with manage_resources (see ResourceViewSet.get_queryset
+    and resource_short_element.html). It must not blanket-404 on drafts."""
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+    ).make()
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(
+            reverse("resources-resource-detail-embeded", args=[resource.id])
+        )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_view_404_across_sites(client, request):
+    other_site = Site.objects.create(domain="other2.example.com", name="other2")
+    resource = Recipe(
+        models.Resource,
+        sites=[other_site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    response = client.get(
+        reverse("resources-resource-detail-embeded", args=[resource.id])
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_embedded_resource_detail_view_with_task_context(client, request):
     resource = Recipe(
         models.Resource,
@@ -1066,6 +1576,64 @@ def test_embedded_resource_detail_contacts_to_display(request, client):
 
         response = client.get(url)
         assert response.context["contacts_to_display"] == [contact.id]
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_ds_prefill_button(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+    Recipe(
+        ds_models.DSResource,
+        resource=resource,
+        schema={"number": 42},
+    ).make()
+    task = Recipe(Task, resource=resource).make()
+
+    url = f"{reverse('resources-resource-detail-embeded', args=[resource.id])}?task_id={task.id}"
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["resource"].has_dsresource
+        assert reverse("projects-task-ds-prefill", args=(task.id,)) in str(
+            response.content
+        )
+
+
+@pytest.mark.django_db
+def test_staff_can_access_feed(client, current_site, staff_user):
+    public_resources = baker.make(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.PUBLISHED,
+        _fill_optional=["title"],
+        _quantity=2,
+    )
+    draft_resource = baker.make(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.DRAFT,
+        _fill_optional=["title"],
+    )
+    review_resource = baker.make(
+        models.Resource,
+        status=models.Resource.TO_REVIEW,
+        sites=[current_site],
+        _fill_optional=["title"],
+    )
+
+    client.force_login(staff_user)
+
+    response = client.get(reverse("resources-feed"))
+
+    assert response.status_code == 200
+    for resource in public_resources:
+        assert resource.title in response.text
+    assert review_resource.title not in response.text
+    assert draft_resource.title not in response.text
 
 
 # eof

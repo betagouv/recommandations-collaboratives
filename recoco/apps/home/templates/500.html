@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}
+    Un problème technique est survenu
+{% endblock title %}
+{% block og_title %}
+    Un problème technique est survenu
+{% endblock og_title %}
+{% block content %}
+    {% include "home/fragments/content_500.html" with title_text="Houston, on a un problème !" technical_info_text="Si l'équipe technique vous demande, c'est une erreur 500." %}
+{% endblock content %}

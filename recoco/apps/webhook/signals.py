@@ -4,6 +4,8 @@ from django_webhook.models import Webhook
 from django_webhook.signals import SignalListener
 from taggit.models import TaggedItem
 
+from recoco.apps.home.models import UserProfile
+from recoco.apps.home.serializers import UserWebhookSerializer
 from recoco.apps.projects.models import Project
 from recoco.apps.projects.serializers import ProjectSerializer
 from recoco.apps.survey.models import Answer
@@ -24,7 +26,13 @@ class WebhookSignalListener(SignalListener):
             return []
         if isinstance(instance, Task):
             return [instance.site.id]
-
+        # todo should not be necessary after #2124 as grist will have the info directly from project update
+        if isinstance(instance, UserProfile):
+            return list(
+                instance.user.projectmember_set.filter(is_owner=True)
+                .prefetch_related("project")
+                .values_list("project__sites", flat=True)
+            )
         return []
 
     def find_webhooks(self, topic: str, instance: Any) -> list[tuple[int, str]]:
@@ -51,5 +59,10 @@ class WebhookSignalListener(SignalListener):
                 return ProjectSerializer(project, **kwargs).data
         if isinstance(instance, Task):
             return TaskWebhookSerializer(instance, **kwargs).data
+        if isinstance(instance, Task):
+            return TaskWebhookSerializer(instance, **kwargs).data
+        # todo should not be necessary after #2124 as grist will have the info directly from project update
+        if isinstance(instance, UserProfile):
+            return UserWebhookSerializer(instance.user, **kwargs).data
 
         return {}

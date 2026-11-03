@@ -1,8 +1,3 @@
-/* AlpineJS */
-[x-cloak] {
-  display: none !important;
-}
-
 .onboarding-response-form label {
   font-family: 'Marianne';
   font-style: normal;
@@ -106,7 +101,6 @@
   z-index: 100;
 
   width: max-content;
-  right: 0px;
   top: 80%;
 
   background-color: white;
@@ -116,6 +110,11 @@
     0px 1px 4px rgba(0, 0, 0, 0.23);
 
   overflow: hidden;
+}
+
+.common-dropdown__top-menu {
+  top: auto;
+  bottom: 100%;
 }
 
 .common-dropdown.show {
@@ -186,8 +185,8 @@
 }
 
 .border-grey-light {
-  border: 1px solid #E5E5E5;
-  border-color: #E5E5E5 !important;
+  border: 1px solid #e5e5e5;
+  border-color: #e5e5e5 !important;
 }
 
 .border-blue {

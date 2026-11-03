@@ -8,12 +8,15 @@ created: 2021-11-15 14:44:55 CET
 """
 
 from actstream.managers import ActionManager
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
@@ -34,6 +37,7 @@ from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+from recoco.utils import render_markdown
 
 from . import apps
 
@@ -42,6 +46,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.moderate_projects",
         "sites.list_projects",
         "sites.delete_projects",
+        "sites.see_deleted_projects",
         "sites.manage_resources",
         "sites.use_crm",
         "sites.use_addressbook",
@@ -51,7 +56,12 @@ SITE_GROUP_PERMISSIONS = {
         "sites.manage_surveys",
         "sites.manage_configuration",
     ),
-    "advisor": ("sites.list_projects", "sites.use_addressbook"),
+    "advisor": (
+        "sites.list_projects",
+        "sites.use_addressbook",
+        "sites.change_addressbook",
+        "sites.manage_resources",
+    ),
 }
 
 
@@ -73,29 +83,53 @@ class SiteActionManager(CurrentSiteManager, ActionManager):
     pass
 
 
-class UserProfileManager(models.Manager):
+class ManagerWithAddressValidationStatus(models.Manager):
+    # annotates with email validation status
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                email_validated=Exists(
+                    EmailAddress.objects.filter(
+                        user_id=OuterRef("user_id"), verified=True
+                    )
+                )
+            )
+        )
+
+
+class UserProfileManager(ManagerWithAddressValidationStatus):
     """Manager for active UserProfile"""
 
+    use_in_migrations = True
+
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+        return (
+            super()
+            .get_queryset()
+            .filter(deleted=None, disabled=None)
+            .exclude(user__username="AnonymousUser")
+        )
 
 
-class UserProfileOnSiteManager(CurrentSiteManager, UserProfileManager):
+class UserProfileOnSiteManager(CurrentSiteManager, ManagerWithAddressValidationStatus):
     """Manager for active UserProfile on the current site"""
 
     pass
 
 
-class DeletedUserProfileManager(models.Manager):
+class DeletedUserProfileManager(ManagerWithAddressValidationStatus):
     """Manager for deleted UserProfile"""
 
     def get_queryset(self):
-        return super().get_queryset().exclude(deleted=None)
+        return super().get_queryset().exclude(deleted=None, disabled=None)
 
 
 class UserProfile(models.Model):
     """Represents the profile of a user"""
 
+    all = ManagerWithAddressValidationStatus()
     objects = UserProfileManager()
     on_site = UserProfileOnSiteManager()
     deleted_objects = DeletedUserProfileManager()
@@ -122,13 +156,33 @@ class UserProfile(models.Model):
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
 
-    previous_login_at = models.DateTimeField(null=True, blank=True)
+    previous_activity_at = models.DateTimeField(null=True, blank=True)
+
+    previous_deletion_warning_at = models.DateTimeField(null=True, blank=True)
+
+    previous_activity_site = models.ForeignKey(
+        Site,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Dernier site consulté",
+        related_name="users_previous_activity",
+    )
+
+    nb_deletion_warnings = models.IntegerField(default=0)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    disabled = models.DateTimeField(null=True, blank=True)
+
+    login_with_code = models.BooleanField(default=False)
+
+    requires_2fa = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "profil utilisateur"
         verbose_name_plural = "profils utilisateurs"
+        base_manager_name = "all"  # used for related fields querysets
 
     def __str__(self):
         return f"<UserProfile: {self.user.username}>"
@@ -151,40 +205,90 @@ class SiteConfiguration(models.Model):
         help_text="Question présentées lors de la saisine",
     )
 
-    sender_email = models.EmailField(
-        verbose_name="Adresse de contact affichée dans les emails automatiques"
-    )
     sender_name = models.CharField(
-        verbose_name="Expéditeur des emails automatiques",
-        help_text="Nom du service affiché comme expéditeur des emails",
+        verbose_name="Nom de l'expéditeur des e-mails automatiques",
+        help_text="Nom du service affiché comme expéditeur des e-mails",
         max_length=30,
     )
     contact_form_recipient = models.EmailField(
-        verbose_name="Adresse de contact affichée sur le site"
+        verbose_name="E-mail de contact affiché sur le site et dans les e-mails automatiques",
+        help_text="Format attendu : nom@domaine.fr",
     )
     legal_address = models.CharField(
-        verbose_name="Adresse postale",
-        help_text="L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales.",
+        verbose_name="Adresse postale complète",
+        help_text="L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales. Format attendu : numéro et libellé de rue, code postal et commune",
         null=True,
         blank=True,
         max_length=100,
     )
     legal_owner = models.CharField(
-        verbose_name="Entité responsable légalement du service",
+        verbose_name="Entité légalement responsable du service",
+        help_text="Par exemple : Cerema",
         null=True,
         blank=True,
         max_length=100,
     )
-    description = models.TextField(
-        verbose_name="Description du service",
-        help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
+
+    legal_owner_name = models.CharField(
+        verbose_name="Représentant ou représentante légale",
+        help_text="Prénom, NOM, fonction",
+        null=True,
+        blank=True,
+        max_length=100,
+    )
+
+    legal_phone_no = PhoneNumberField(
+        verbose_name="Numéro de téléphone de l'organisation",
+        help_text="Format attendu : +33102030405",
         null=True,
         blank=True,
     )
 
+    # FIXME: CMS should manage this field
+    description = models.TextField(
+        verbose_name="Description du service",
+        help_text="Description de 1 à 3 phrases.\n"
+        "Par exemple : UrbanVitaliz est un service gratuit du Cerema et du Ministère de la Transition Écologique. Il oriente les collectivités dans leurs projets de réhabilitation de fonciers à l’abandon (friches industrielles, ferroviaires, d'activité, d'habitation etc), en associant les acteurs publics locaux.",
+        null=True,
+        blank=True,
+    )
+
+    # FIXME: CMS should manage this field
+    target_audience = models.CharField(
+        verbose_name="Bénéficiaires du service",
+        help_text="Exemple : agents et élus de collectivités, d'association ou d'entreprises porteuses d'une projet de réhabilitation de friche, agents de l'Etat et autres établissements publics",
+        null=True,
+        blank=True,
+        max_length=150,
+    )
+
+    dpo_contact_email = models.EmailField(
+        verbose_name="Adresse e-mail du DPO",
+        help_text="Format attendu : nom@domaine.fr",
+        null=True,
+        blank=True,
+    )
+
+    # FIXME: CMS should manage this field
+    gdpr_purposes = models.TextField(
+        verbose_name="Finalités du traitement des données",
+        help_text="Par exemple :\n"
+        "- principalement, le suivi et l’accompagnement des demandeurs (essentiellement collectivités mais aussi associations, entreprises ou particuliers) dans leurs projets de réhabilitation de friche ;\n"
+        "- l’orientation de ces demandeurs vers les bons dispositifs, interlocuteurs et financements en fonction de leur situation ;\n"
+        "- la réalisation d’études quantitatives et d’analyses sur les demandes déposées et les recommandations émises, permettant d’évaluer les besoins des demandeurs, et d’améliorer les accompagnements dispensés.",
+        null=True,
+        blank=True,
+    )
+
+    def gdpr_purposes_rendered(self):
+        """Return gdpr_purposes as markdown"""
+        return render_markdown(self.gdpr_purposes)
+
+    # FIXME: CMS should manage this field
     main_topic = models.CharField(
         verbose_name="Thématique principale",
-        help_text="Décrivez le plus brièvement possible la thématique de ce portail",
+        help_text="Décrivez le plus brièvement possible la thématique de ce portail. \n"
+        "Par exemple: Revitalisation des friches",
         null=True,
         blank=True,
     )
@@ -202,6 +306,9 @@ class SiteConfiguration(models.Model):
     def logo_small_upload_path(self, filename):
         return self._logo_upload_path(filename, prefix="small")
 
+    def favicon_upload_path(self, filename):
+        return self._logo_upload_path(filename, prefix="favicon")
+
     def _logo_upload_path(self, filename, prefix=None):
         if prefix:
             prefix = f"{prefix}-"
@@ -210,7 +317,7 @@ class SiteConfiguration(models.Model):
 
     logo_large = models.ImageField(
         verbose_name="Logo complet",
-        help_text="Utilisé par exemple pour la barre de navigation. Format rectangulaire recommandé, avec un fond transparent (png)",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : rectangulaire horizontal.",
         null=True,
         blank=True,
         upload_to=logo_large_upload_path,
@@ -218,18 +325,26 @@ class SiteConfiguration(models.Model):
 
     logo_small = models.ImageField(
         verbose_name="Logo réduit",
-        help_text="Utilisé en cas de manque d'espace. Format carré recommandé, avec un fond transparent (png)",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : carré, sans texte.",
         null=True,
         blank=True,
         upload_to=logo_small_upload_path,
     )
 
     email_logo = models.ImageField(
-        verbose_name="Logo utilisé pour les emails automatiques",
-        help_text="Format rectangulaire recommandé, avec un fond transparent (png)",
+        verbose_name="Logo dans les e-mails automatiques",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : rectangulaire horizontal.",
         null=True,
         blank=True,
         upload_to=logo_email_upload_path,
+    )
+
+    favicon = models.ImageField(
+        verbose_name="Favicon",
+        help_text="Format supporté : PNG avec fond transparent. Format recommandé : carré, sans texte. Taille maximum : 192 * 192 px.",
+        null=True,
+        blank=True,
+        upload_to=favicon_upload_path,
     )
 
     crm_available_tags = TaggableManager(
@@ -244,7 +359,7 @@ class SiteConfiguration(models.Model):
     reminder_interval = models.IntegerField(
         default=6 * 7,
         verbose_name="Fréquence des emails de rappel",
-        help_text="en jours",
+        help_text="En jours",
     )
 
     accept_handover = models.BooleanField(
@@ -252,8 +367,39 @@ class SiteConfiguration(models.Model):
         verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
 
+    enabled_plugins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Liste des plugins activés sur ce portail",
+    )
+
+    embed_allowed_origins = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Liste des origines (ex: https://exemple.gouv.fr) autorisées à "
+            "intégrer ce portail dans une iframe (embed). Admin uniquement."
+        ),
+    )
+
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
+
+    def clean(self):
+        super().clean()
+        from recoco.apps.plugins.manager import get_plugin_manager
+
+        installed = {name for name, _ in get_plugin_manager().list_name_plugin()}
+        unknown = [name for name in self.enabled_plugins if name not in installed]
+        if unknown:
+            raise ValidationError(
+                {
+                    "enabled_plugins": (
+                        f"Plugins inconnus : {', '.join(map(str, unknown))}. "
+                        f"Plugins installés : {', '.join(sorted(installed)) or 'aucun'}."
+                    )
+                }
+            )
 
 
 @receiver(post_save, sender=auth_models.User)

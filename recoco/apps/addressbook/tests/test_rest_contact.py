@@ -84,7 +84,7 @@ def test_staff_user_can_create_contact(api_client, current_site, staff_user):
 
 
 @pytest.mark.django_db
-def test_can_not_create_contact_with_wrong_organization(
+def test_can_not_create_contact_with_organization_from_other_site(
     api_client, staff_user, current_site
 ):
     other_site = baker.make(Site)

@@ -1,17 +1,10 @@
 {% load survey %}
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% load projects_extra %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/survey_grid.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/survey-grid.css.js' %}
     {% vite_asset 'js/apps/projectKnowledge.js' %}
-    <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous">
-    </script>
 {% endblock js %}
 <div class="container-fluid knowledge">
     <div class="row">
@@ -35,7 +28,8 @@
                             {% endfor %}
                             {% for question_set in session.survey.question_sets.all %}
                                 {% question_set_completion session question_set as qs_completion %}
-                                {% if qs_completion == 0 %}
+                                {% question_set_visible session question_set as qs_visible %}
+                                {% if qs_completion == 0 and qs_visible %}
                                     <li>
                                         <a class="fr-link"
                                            href="#{{ session.survey.site.id }}_{{ question_set.id }}">{{ question_set.heading }}</a>
@@ -134,7 +128,8 @@
                         <!-- Show other QS not yet started -->
                         {% for question_set in session.survey.question_sets.all %}
                             {% question_set_completion session question_set as qs_completion %}
-                            {% if qs_completion == 0 %}
+                            {% question_set_visible session question_set as qs_visible %}
+                            {% if qs_completion == 0 and qs_visible %}
                                 <div class="col-12 col-xl-6 col-md-6 masonry-item">
                                     <div class="position-relative">
                                         <div class="invisible-anchor-high"

@@ -29,7 +29,7 @@ class TaskRecommendationForm(forms.ModelForm):
 
     class Meta:
         model = models.TaskRecommendation
-        fields = ["condition", "resource", "text", "departments"]
+        fields = ["condition_tags", "resource", "text", "departments"]
 
 
 class TaskFollowupForm(forms.ModelForm):
@@ -96,7 +96,6 @@ class PushTypeActionForm(forms.Form):
     )
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)
-    next = forms.CharField(required=False)
     project = forms.ModelChoiceField(
         queryset=projects_models.Project.objects.none(),
         empty_label="(Veuillez sélectionner un dossier)",
@@ -127,53 +126,17 @@ class CreateActionWithoutResourceForm(CreateActionBaseForm):
 
 
 class CreateActionWithResourceForm(CreateActionBaseForm):
-    resource = (
-        forms.ModelChoiceField(
-            queryset=resources_models.Resource.objects.exclude(
-                status=resources_models.Resource.DRAFT
-            ).with_ds_annotations()
-        ),
+    resource = forms.ModelChoiceField(
+        queryset=resources_models.Resource.on_site.exclude(
+            status=resources_models.Resource.DRAFT
+        ).with_ds_annotations()
     )
 
     content = forms.CharField(required=False)
 
-    def clean_resource(self):
-        resource = self.cleaned_data["resource"]
-
-        try:
-            resource = (
-                resources_models.Resource.on_site.exclude(
-                    status=resources_models.Resource.DRAFT
-                )
-                .with_ds_annotations()
-                .get(pk=resource.pk)
-            )
-        except resources_models.Resource.DoesNotExist:
-            self.add_error(field="resource", error="Cette ressource n'existe pas")
-            raise
-
-        return resource
-
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public", "resource", "contact"]
-
-
-class CreateTaskForm(forms.ModelForm):
-    """Form new project task creation"""
-
-    # TODO seems to not be used any more
-
-    content = MarkdownxFormField(required=False)
-
-    class Meta:
-        model = models.Task
-        fields = [
-            "intent",
-            "content",
-            "public",
-            "resource",
-        ]
 
 
 class UpdateTaskForm(forms.ModelForm):
@@ -181,7 +144,6 @@ class UpdateTaskForm(forms.ModelForm):
 
     content = MarkdownxFormField(required=False)
     topic_name = forms.CharField(required=False)
-    next = forms.CharField(required=False)
 
     class Meta:
         model = models.Task

@@ -1,15 +1,9 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
-<div x-data="Task({id:{{ task.id }}, public:Boolean(`{{ task.public }}`), topic:{name :`{{ task.topic }}` == `None` ? null : `{{ task.topic }}`}, intent:`{{ task.intent }}`, resource:`{{ task.resource }}`, ds_folder:`{{ task.ds_folder }}`, comments_count:Number(`{{ task.comments_count }}`), content:`{{ task.content }}`, created_by:{ email : `{{ task.created_by.email }}`, first_name: `{{ task.created_by.first_name }}`, last_name: `{{ task.created_by.last_name }}`, is_active: Boolean(`{{ task.created_by.is_active }}`), profile : {organization: { name: `{{ task.created_by.profile.organization.name }}` }}}  })"
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
+<div x-data="Task({id:{{ task.id }}, public:Boolean(`{{ task.public }}`), topic:{name :`{{ task.topic }}` == `None` ? null : `{{ task.topic }}`}, intent:`{{ task.intent }}`, resource:`{{ task.resource }}`, comments_count:Number(`{{ task.comments_count }}`), content:`{{ task.content }}`, created_by:{ email : `{{ task.created_by.email }}`, first_name: `{{ task.created_by.first_name }}`, last_name: `{{ task.created_by.last_name }}`, is_active: Boolean(`{{ task.created_by.is_active }}`), profile : {organization: { name: `{{ task.created_by.profile.organization.name }}` }}}  })"
      :class="`border${getTaskColor(currentTask)}`"
      class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item hover-shadow hover-border-blue transition-all"
      :id="currentTask.id">
@@ -41,37 +35,21 @@
         </div>
         <template x-if="currentTask.resource">
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
+            <!-- DS integration -->
+            <hr class="fr-mt-3w">
+            {% if task.resource.has_dsresource %}
+                <div>
+                    <h4 class="fw-bolder">
+                        <img height="31px"
+                             width="32px"
+                             src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                             alt="Pictogramme Démarche numérique">
+                        Pré-créer un dossier sur Démarche numérique
+                    </h4>
+                    {% include "conversations/messages/dn_button.html" with task_id=task.id small_text=True %}
+                </div>
+            {% endif %}
         </template>
-
-        <!-- DS integration -->
         <hr class="fr-mt-3w">
-        {% if task.ds_folder and task.ds_folder.prefilled_count > 0 %}
-            <div>
-                <h4 class="fw-bolder">
-                    <img height="31px"
-                         width="32px"
-                         src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
-                         alt="Pictogramme Démarches Simplifiées">
-                    Pré-créer un dossier sur Demarches-simplifiees.fr
-                </h4>
-                <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                    En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
-                    <br>
-                    {% if task.ds_folder.prefilled_count > 1 %}
-                        {{ task.ds_folder.prefilled_count }} champs seront pré-remplis avec les informations déjà renseignées ici.
-                    {% else %}
-                        1 champ sera pré-rempli avec les informations déjà renseignées ici.
-                    {% endif %}
-                </p>
-                <a class="fr-btn fr-btn--secondary fr-btn--sm"
-                   @click.stop=""
-                   href="{{ task.ds_folder.dossier_url }}"
-                   target="_blank">Aller sur Demarches-simplifiees.fr
-                </a>
-            </div>
-        {% endif %}
-
-        <hr class="fr-mt-3w">
-
     </div>
 </div>

@@ -1,3 +1,5 @@
+import importlib
+
 from django.urls import path
 from notifications import views as notifications_views
 from rest_framework import routers
@@ -10,16 +12,12 @@ from recoco.apps.home import rest as home_rest
 from recoco.apps.projects.views import rest as projects_rest
 from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.views import rest as survey_rest
+from recoco.apps.tasks.views import acra_proxy as tasks_acra_proxy
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
 
 router = routers.DefaultRouter()
 
-router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-    tasks_rest.TaskFollowupViewSet,
-    basename="project-tasks-followups",
-)
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
     tasks_rest.TaskViewSet,
@@ -125,6 +123,21 @@ api_urls = [
         projects_rest.ProjectList.as_view(),
         name="projects-list",
     ),
+    path(
+        "projects/create/",
+        projects_rest.ProjectCreate.as_view(),
+        name="projects-create",
+    ),
+    path(
+        "projects/<int:pk>/members/",
+        projects_rest.ProjectMembershipList.as_view(),
+        name="projects-members-list",
+    ),
+    path(
+        "projects/<int:pk>/members/<str:email>/",
+        projects_rest.ProjectMembershipDetail.as_view(),
+        name="projects-members-detail",
+    ),
     # path(
     #     "projects/my_departments",
     #     projects_rest.ProjectDepartmentList.as_view(),
@@ -175,6 +188,19 @@ auth_urls = [
     ),
 ]
 
+acra_tasks_urls = [
+    path(
+        "projects/<int:project_id>/tasks/acra/ask/",
+        tasks_acra_proxy.AcraAskView.as_view(),
+        name="tasks-acra-ask",
+    ),
+    path(
+        "projects/<int:project_id>/tasks/acra/co-recommendations/",
+        tasks_acra_proxy.AcraCoRecommendationsView.as_view(),
+        name="tasks-acra-co-recommendations",
+    ),
+]
+
 survey_urls = [
     path(
         "survey/sessions/",
@@ -193,4 +219,36 @@ survey_urls = [
     ),
 ]
 
-urlpatterns = router.urls + api_urls + auth_urls + survey_urls
+
+def _collect_plugin_rest_urls(pm=None):
+    """Plugin REST routes, each plugin behind a PluginURLResolver so they only
+    resolve on the tenants that have the plugin enabled.
+
+    No namespace is added: plugin REST url names stay global, as before.
+    """
+    from recoco.apps.plugins.manager import get_plugin_manager
+    from recoco.apps.plugins.resolvers import PluginURLResolver
+
+    urls = []
+    if pm is None:
+        pm = get_plugin_manager()
+    for name, plugin in pm.list_name_plugin():
+        rest_mod_name = getattr(plugin, "rest_urls_module", None)
+        if not rest_mod_name:
+            continue
+        try:
+            mod = importlib.import_module(rest_mod_name)
+        except ImportError:
+            continue
+        urls.append(PluginURLResolver(name, "", mod))
+    return urls
+
+
+urlpatterns = (
+    router.urls
+    + api_urls
+    + auth_urls
+    + acra_tasks_urls
+    + survey_urls
+    + _collect_plugin_rest_urls()
+)

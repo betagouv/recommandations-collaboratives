@@ -5,40 +5,39 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-06-27 08:06:10 CEST
 """
 
+import re
+
+import sentry_sdk
 from actstream import action
-from allauth.account.signals import user_logged_in as allauth_user_logged_in
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
-from django.contrib.auth.models import update_last_login
+from allauth.mfa.models import Authenticator
+from allauth.mfa.signals import authenticator_added, authenticator_removed
+from django.contrib.auth.models import Group, User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
+from django.db.models import Exists, OuterRef, Subquery, Value
+from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
-from magicauth.signals import user_logged_in as magicauth_user_logged_in
 
 from recoco import verbs
+from recoco.apps.home.models import UserProfile
 from recoco.apps.projects.utils import refresh_user_projects_in_session
-
-
-def log_connection_on_user_login(sender, user, request, **kwargs):
-    action.send(user, verb=verbs.User.LOGIN)
 
 
 @receiver(user_logged_in)
 def update_login_fields(sender, user, request, **kwargs):
-    profile = user.profile
-    profile.previous_login_at = user.last_login
-    profile.save(update_fields=["previous_login_at"])
-
     refresh_user_projects_in_session(request, user)
 
-    # Call the original django handler
-    update_last_login(sender, user, **kwargs)
+    if getattr(request.resolver_match, "app_name", None) != "hijack":
+        if not user.is_staff:
+            action.send(user, verb=verbs.User.LOGIN)
 
-    # Add the current site so that the user can access all the features
-    user.profile.sites.add(get_current_site(request))
+        # Call the original django handler
+        update_last_login(sender, user, **kwargs)
 
+        # Add the current site so that the user can access all the features
+        user.profile.sites.add(get_current_site(request))
 
-allauth_user_logged_in.connect(log_connection_on_user_login)
-magicauth_user_logged_in.connect(log_connection_on_user_login)
 
 user_logged_in.disconnect(update_last_login, dispatch_uid="update_last_login")
 
@@ -46,6 +45,88 @@ user_logged_in.disconnect(update_last_login, dispatch_uid="update_last_login")
 @receiver(allauth_user_signed_up)
 def post_signup_workflow(sender, request, user, **kwargs):
     pass
+
+
+@receiver(pre_save, sender=UserProfile)
+def watch_organisation_to_understand_mystery(instance: UserProfile, **kwargs):
+    previous = UserProfile.objects.filter(id=instance.id).first()
+    if previous and previous.organization == instance.organization:
+        return
+
+    if getattr(instance.organization, "id", None) == 781:
+        text = (
+            f"User {instance.user.id} was assigned to mysterious organization 'Mairie'"
+        )
+        sentry_sdk.capture_exception(Exception(text))
+        print(text)
+
+
+@receiver(m2m_changed, sender=User.groups.through)
+def ensure_2fa_requirement(sender, instance, **kwargs):
+    signal_action = kwargs.get("action")  # add/remove/clear
+    reverse = kwargs["reverse"]  # change made from group.users not user.groups
+    requires_2fa = Value(False)
+
+    # user.groups.clear: the user is the only one affected so we only update them
+    if signal_action == "post_clear" and not reverse:
+        instance.profile.requires_2fa = False
+        instance.profile.save()
+        return
+
+    user_profile_qs = UserProfile.objects.none()
+    group_regex = r".*(staff|admin|advisor)$"
+
+    # user.groups.add/remove and group.users.add/remove:
+    # we compute requirement after the change, no matter reverse or not
+    if signal_action in ["post_add", "post_remove"]:
+        user_profile_qs = (
+            UserProfile.objects.filter(user=instance)
+            if not reverse
+            else UserProfile.objects.filter(user_id__in=kwargs["pk_set"])
+        )
+        requires_2fa = Exists(
+            Subquery(
+                Group.objects.filter(user=OuterRef("user_id"), name__regex=group_regex)
+            )
+        )
+
+    # group.users.clear: no user has this group any longer but they can be in other groups that require 2fa
+    # so we recompute them all
+    # We need to do that prior to the clear, otherwise the related user pool is lost
+    if (
+        signal_action == "pre_clear"
+        and reverse
+        and re.match(group_regex, instance.name)
+    ):
+        user_profile_qs = UserProfile.objects.filter(user__groups=instance)
+        requires_2fa = Exists(
+            Subquery(
+                Group.objects.filter(
+                    user=OuterRef("user_id"), name__regex=group_regex
+                ).exclude(pk=instance.pk)
+            )
+        )
+
+    has_totp = Exists(
+        Subquery(Authenticator.objects.filter(type="totp", user_id=OuterRef("user_id")))
+    )
+
+    user_profile_qs.update(requires_2fa=requires_2fa)
+    user_profile_qs.filter(requires_2fa=True).update(login_with_code=~has_totp)
+
+
+@receiver(authenticator_added, sender=Authenticator)
+def no_double_2fa(sender, request, user, authenticator, **kwargs):
+    if user.profile.login_with_code:
+        user.profile.login_with_code = False
+        user.profile.save()
+
+
+@receiver(authenticator_removed, sender=Authenticator)
+def ensure_staff_2fa(sender, request, user, authenticator, **kwargs):
+    if user.profile.requires_2fa and not user.profile.login_with_code:
+        user.profile.login_with_code = True
+        user.profile.save()
 
 
 # eof

@@ -50,7 +50,7 @@ export const ContactCardExtension = Node.create({
 
   // Produce the HTML to export from tiptap
   renderHTML({ HTMLAttributes }) {
-    const contact = { HTMLAttributes };
+    const contact = HTMLAttributes;
     //   id: HTMLAttributes.id,
     //   first_name: HTMLAttributes.firstName,
     //   last_name: HTMLAttributes.lastName,
@@ -72,7 +72,7 @@ export const ContactCardExtension = Node.create({
       [
         'div',
         {
-          class: 'contact-card-light position-relativefr-p-3v bg-white',
+          class: 'contact-card-light position-relative fr-p-3v bg-white',
         },
         [
           'div',
@@ -217,8 +217,10 @@ export const ContactCardExtension = Node.create({
           event.stopPropagation();
 
           // Remove the contact card from the editor
-          if (getPos !== undefined) {
-            const pos = getPos();
+          // getPos() peut renvoyer undefined depuis tiptap v3 (noeud détaché)
+          const pos = getPos();
+
+          if (pos !== undefined) {
             const nodeSize = node.nodeSize;
 
             // Delete the entire node

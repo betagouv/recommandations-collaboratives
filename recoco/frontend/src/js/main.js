@@ -1,9 +1,21 @@
+// Sentry frontend
+import './utils/sentry';
+
 //Bootstrap librairie
 // import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/main.scss';
+import '../css/custom-bootstrap.scss';
 import '@gouvfr/dsfr/dist/dsfr.min.css';
 import '@gouvfr/dsfr/dist/utility/utility.min.css';
 import '@gouvfr/dsfr/dist/dsfr.module.min';
+
+// Specific styles
+import '../css/specificStyle.scss';
+
+// DSFR custom
+import '../css/DSFR/custom-dsfr.scss';
+import '../css/DSFR/marianne.css';
+// Tooltips
+import 'tippy.js/dist/tippy.css';
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
@@ -14,15 +26,17 @@ import './store/utils';
 import './store/editor';
 import './store/djangoData';
 import './store/app';
+import './store/onLeaveAlert';
+import './store/crisp';
 
 //Global reused component
 import './components/Notification';
 import './components/Editor';
 import './components/FieldValidator';
 import './components/Toast';
+import './components/Crisp';
 
 //Global CSS
-import '../css/dsfr-custom.css';
 import '../css/buttons.css';
 import '../css/input.css';
 import '../css/typography.css';
@@ -32,7 +46,6 @@ import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
 import '../css/custom-icon.css';
-import '../css/main.css';
 
 //Layouts CSS
 import '../css/layouts/stack.css';
@@ -56,6 +69,7 @@ import {
   trackOpenRessource,
   trackSeeMoreParticipants,
   trackCopyContactEmail,
+  trackClickFillFolderDemarcheNumerique,
 } from './utils/trackingMatomo';
 
 window.trackCopyContactEmail = trackCopyContactEmail;
@@ -65,3 +79,4 @@ window.trackScrollDepth = trackScrollDepth;
 window.trackReplyToMessage = trackReplyToMessage;
 window.trackOpenRessource = trackOpenRessource;
 window.trackSeeMoreParticipants = trackSeeMoreParticipants;
+window.trackClickFillFolderDemarcheNumerique = trackClickFillFolderDemarcheNumerique;

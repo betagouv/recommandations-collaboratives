@@ -1,0 +1,43 @@
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/banner-project-status.css.js' %}
+{% endblock js %}
+{% if project.inactive_since %}
+    <div class="project-banner project-banner--paused">
+        <p class="fr-mb-0">
+        {% spaceless %} {# many span so that spaceless has intented effect #}
+            Ce dossier a été mis en pause
+            {% if project.set_inactive_by %}
+                par <strong><span> {{ project.set_inactive_by.first_name }} {{ project.set_inactive_by.last_name }}</span>
+                {% if project.set_inactive_by.profile.organization %}<span> ({{ project.set_inactive_by.profile.organization }})</span>{% endif %}</strong>
+            {% else %}
+              <span>automatiquement pour inactivité du demandeur</span>
+            {% endif %}<span>.</span>
+        {% endspaceless %}
+        </p>
+        <form id="admin-activate-project"
+              method="post"
+              action="{% url 'projects-project-set-active' project.pk %}">
+            {% csrf_token %}
+            <button class="project-banner__btn project-banner__btn--white">Réactiver le dossier</button>
+        </form>
+    </div>
+{% elif project.status == 'REJECTED' %}
+    <div class="project-banner project-banner--rejected">
+        <p class="fr-mb-0">Ce dossier a été rejeté à la modération, il n'est pas actif.</p>
+    </div>
+{% elif project.status == 'DRAFT' %}
+    <div class="project-banner project-banner--draft">
+        <p class="fr-mb-0">
+            Ce dossier est en attente de validation. Vous pouvez le <a href="{% url 'projects-moderation-list' %}">valider ici.</a>
+        </p>
+    </div>
+{% elif project.status == 'PRE_DRAFT' %}
+    <div class="project-banner project-banner--predraft">
+        <p class="fr-mb-0">Ce dossier est incomplet : son dépôt n'a pas été finalisé, il n'est pas actif.</p>
+    </div>
+{% elif project.deleted %}
+    <div class="project-banner project-banner--deleted">
+        <p class="fr-mb-0">Ce dossier a été supprimé.</p>
+    </div>
+{% endif %}

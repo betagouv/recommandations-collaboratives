@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load cookie_consent_tags %}
+{% load static %}
+{% block title %}
+  Gestion de la double authentification
+{% endblock title %}
+{% block og_title %}
+  Gestion de la double authentification
+{% endblock og_title %}
+{% block js %}
+  {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
+{% block content %}
+  <div class="fr-container fr-container--fluid fr-my-md-14v">
+    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+      <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+        <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-py-10v fr-py-md-14v">
+          <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+              <form class="form" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="fr-btn" role="submit">Enregistrer</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+
+{# todo make pretty, adjust if view name changes #}

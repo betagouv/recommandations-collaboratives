@@ -1,7 +1,7 @@
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src "css/header/menu-burger.scss" %}" rel="stylesheet" type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/header-menu-burger.css.js' %}
+{% endblock js %}
 <button class="fr-btn fr-btn--tertiary fr-icon-menu-fill fr-mr-2w menu-burger__btn"
         data-fr-opened="false"
         aria-controls="fr-modal-menu">Menu</button>
@@ -22,7 +22,9 @@
             <div class="fr-modal__content correct-margin">
                 <ul class="fr-menu__list">
                     <li>
-                        <a class="responsive-header__element-mobile fr-nav__link" href="{% url 'account_login' %}" {% if 'login' in url_name %}aria-current="page"{% endif %}>
+                        <a class="responsive-header__element-mobile fr-nav__link"
+                           href="{% url 'account_login' %}"
+                           {% if 'login' in url_name %}aria-current="page"{% endif %}>
                             <span class="align-middle">Se connecter</span>
                         </a>
                     </li>

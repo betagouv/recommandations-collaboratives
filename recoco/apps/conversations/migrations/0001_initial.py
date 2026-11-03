@@ -13,7 +13,10 @@ class Migration(migrations.Migration):
     dependencies = [
         ("addressbook", "0013_alter_organization_name"),
         ("contenttypes", "0002_remove_content_type_name"),
-        ("projects", "0113_projectcreationrequest_uuid"),
+        (
+            "projects",
+            "0113_projectcreationrequest_uuid_squashed_0114_project_last_manual_reactivation",
+        ),
         ("tasks", "0006_taskfollowup_contact_alter_task_contact"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

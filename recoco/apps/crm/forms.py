@@ -1,8 +1,9 @@
+import nh3
 from django import forms
 from django.contrib.sites import models as sites_models
 from django.utils.safestring import mark_safe
 from markdownx.fields import MarkdownxFormField
-from taggit.forms import TagWidget
+from taggit.forms import TagField, TagWidget
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home import models as home_models
@@ -10,10 +11,17 @@ from recoco.apps.home import models as home_models
 from . import models
 
 
+class FixDisabledTagField(TagField):
+    def clean(self, value):
+        if self.disabled:
+            return value
+        return super().clean(value)
+
+
 class SiteConfigurationForm(forms.ModelForm):
-    crm_available_tags = forms.CharField(
-        max_length=255,
+    crm_available_tags = FixDisabledTagField(
         required=False,
+        disabled=True,
         widget=TagWidget(
             attrs={
                 "class": "form-control",
@@ -30,25 +38,45 @@ class SiteConfigurationForm(forms.ModelForm):
         ),
     )
 
+    required_fields = [
+        "main_topic",
+        "description",
+        "legal_owner",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in self.required_fields:
+            self.fields[name].required = True
+
     class Meta:
         model = home_models.SiteConfiguration
 
         fields = [
-            "sender_email",
             "sender_name",
             "contact_form_recipient",
             "legal_address",
             "legal_owner",
+            "legal_owner_name",
+            "legal_phone_no",
             "description",
+            "target_audience",
+            "dpo_contact_email",
+            "gdpr_purposes",
             "main_topic",
             "logo_large",
             "logo_small",
             "email_logo",
+            "favicon",
             "crm_available_tags",
             "reminder_interval",
             "accept_handover",
             "crisp_token",
         ]
+
+    def clean_gdpr_purposes(self):
+        com = self.cleaned_data["gdpr_purposes"]
+        return nh3.clean(com)
 
 
 class CRMProfileForm(forms.ModelForm):

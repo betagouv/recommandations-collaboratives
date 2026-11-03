@@ -1,0 +1,8 @@
+<!-- Recommendation card in shared contents panel -->
+<!-- djlint:off -->
+<div x-data='TaskCardPanel(reco)'
+    x-effect="syncTask()"
+    data-test-id="shared-contents-reco-card">
+    <!-- djlint:on -->
+    {% include "conversations/messages/fragments/recommendation_card_content.html" %}
+</div>

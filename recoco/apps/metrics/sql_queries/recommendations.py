@@ -7,7 +7,7 @@ from ..utils import display_value, hash_field
 
 def get_queryset() -> QuerySet:
     return (
-        Task.objects.exclude(project__exclude_stats=True)
+        Task.objects.exclude(Q(project__exclude_stats=True) | Q(public=False))
         .order_by("created_on")
         .annotate(
             hash=hash_field("id", salt="task"),

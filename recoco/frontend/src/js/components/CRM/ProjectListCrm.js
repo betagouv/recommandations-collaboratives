@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import api, { projectsUrl } from '../../utils/api';
 import { ToastType } from '../../models/toastType';
+import { ProjectStatus } from '../../models/projectStatus.enum';
 
 Alpine.data('ProjectListCrm', (departments, regions) => ({
   dataLoaded: false,
@@ -14,6 +15,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     searchText: '',
     searchDepartment: [],
     searchStatus: [],
+    pluginFilters: {},
   },
   searchText: '',
   pagination: {
@@ -21,51 +23,59 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     limit: 20,
     total: 0,
   },
+  ProjectStatus,
   options: [
     {
       value: 'PRE_DRAFT',
-      text: 'Incomplet',
-      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      text: ProjectStatus.PRE_DRAFT.text,
+      color: ProjectStatus.PRE_DRAFT.color,
+      tooltip:
+        "Le déposant n'est pas allé jusqu'au bout du dépôt de sa demande",
+      dataTestId: 'status-pre-draft',
     },
     {
       value: 'DRAFT',
-      text: 'A modérer',
-      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.DRAFT.text,
+      color: ProjectStatus.DRAFT.color,
+      tooltip: 'En attente de validation ou refus de votre part',
     },
     {
       value: 'TO_PROCESS',
-      text: 'A traiter',
-      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.TO_PROCESS.text,
+      color:  ProjectStatus.TO_PROCESS.color,
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'READY',
-      text: 'En attente',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.READY.text,
+      color: ProjectStatus.READY.color,
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'IN_PROGRESS',
-      text: 'En cours',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.IN_PROGRESS.text,
+      color:  ProjectStatus.IN_PROGRESS.color,
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'DONE',
-      text: 'Traité',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.DONE.text,
+      color: ProjectStatus.DONE.color,
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'STUCK',
-      text: 'Conseil interrompu',
-      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.STUCK.text,
+      color:  ProjectStatus.STUCK.color,
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'REJECTED',
-      text: 'Rejeté',
-      color: 'fr-badge--error fr-badge fr-badge--no-icon font-size-10px',
+      text:ProjectStatus.REJECTED.text,
+      color:  ProjectStatus.REJECTED.color,
+      tooltip: "Dossier refusé à l'étape de la modération",
     },
-  ],
+  ].map(opt => {return {...opt, color: `${opt.color} fr-badge fr-badge--no-icon font-size-10px`}}),
   displayProjectIndex: false,
   async init() {
     const projectsResponse = await this.getProjects();
@@ -87,6 +97,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.projectsTotal = projects.count;
     this.pagination.total = Math.ceil(projects.count / this.pagination.limit);
   },
+
   async saveSelectedDepartment(event) {
     if (!event.detail) return;
 
@@ -94,6 +105,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+
   async saveSelectedStatus(event) {
     if (!event.detail) return;
 
@@ -101,10 +113,12 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+
   async onSearch() {
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+
   async handleProjectSearch() {
     try {
       return await this.getProjects({
@@ -115,12 +129,26 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
         status: this.backendSearch.searchStatus,
       });
     } catch (error) {
-      this.showToast(
-        `Erreur lors de la recherche des projets`,
-        ToastType.error
-      );
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la recherche des projets`,
+        type: ToastType.error,
+      });
       throw new Error(`Error while searching projects`, error);
     }
+  },
+
+  /**
+   * PLUGINS: hook filter function trigger by plugin filter
+   */
+  async savePluginFilter(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.pluginFilters = {
+      ...this.backendSearch.pluginFilters,
+      ...event.detail,
+    };
+    const projects = await this.handleProjectSearch();
+    this.updateProjectListAndPagination(projects);
   },
 
   /************************
@@ -137,19 +165,6 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.projectsToDisplay = [...this.projects[pageNumber - 1]];
     this.pagination.currentPage = pageNumber;
   },
-  async handleChangePage(pageNumber) {
-    const projects = await api.get(
-      projectsUrl({
-        limit: this.pagination.limit,
-        offset: 0,
-        page: 1,
-        search: this.backendSearch.searchText,
-        departments: this.backendSearch.searchDepartment,
-      })
-    );
-    this.projects.push(...projects.data.results);
-    this.pagination.currentPage = pageNumber;
-  },
 
   /************************
    * CRUD functions
@@ -161,17 +176,18 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
           limit: this.pagination.limit,
           offset: offset,
           page: page,
-          search: this.backendSearch.searchText,
+          searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
           status: this.backendSearch.searchStatus,
+          extraParams: this.backendSearch.pluginFilters,
         })
       );
       return response.data;
     } catch (error) {
-      this.showToast(
-        `Erreur lors de la récupération des projets de la page ${page}`,
-        ToastType.error
-      );
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la récupération des projets de la page ${page}`,
+        type: ToastType.error,
+      });
       throw new Error(`Error while getting projects from page ${page}`, error);
     }
   },
@@ -206,16 +222,16 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       this.projectsToDisplay = [
         ...this.projects[this.pagination.currentPage - 1],
       ];
-      this.showToast(
-        this.getToastMessage(projectToUpdate, data),
-        ToastType.success
-      );
+      this.$store.app.displayToastMessage({
+        message: this.getToastMessage(projectToUpdate, data),
+        type: ToastType.success,
+      });
     } catch (error) {
-      this.showToast(
-        'Erreur lors de la mise à jour des paramètres du projet',
-        ToastType.error
-      );
-      throw new Error('Error while updating project param', error);
+      this.$store.app.displayToastMessage({
+        message: 'Erreur lors de la mise à jour des paramètres du projet',
+        type: ToastType.error,
+      });
+      throw new Error(`Error while updating project param`, error);
     }
   },
 
@@ -237,61 +253,22 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       }
     }
   },
-  showToast(message, type) {
-    this.$store.app.notification.message = message;
-    this.$store.app.notification.timeout = 5000;
-    this.$store.app.notification.isOpen = true;
-    this.$store.app.notification.type = type || ToastType.error;
-  },
 
   /*******************
    * Display functions
    ********************/
   projectsCountLabel() {
-    if (this.projectsTotal > 0) {
-      return `${this.projectsTotal} résultat${this.projectsTotal > 1 ? 's' : ''}`;
-    } else {
+    if (this.projectsTotal === 0) {
       return 'Aucun résultat';
     }
-  },
-  projectStatusLabel(status) {
-    switch (status) {
-      case 'PRE_DRAFT':
-        return 'Incomplet';
-      case 'DRAFT':
-        return 'A modérer';
-      case 'TO_PROCESS':
-        return 'A traiter';
-      case 'READY':
-        return 'En attente';
-      case 'IN_PROGRESS':
-        return 'En cours';
-      case 'DONE':
-        return 'Traité';
-      case 'STUCK':
-        return 'Bloqué';
-      case 'REJECTED':
-        return 'Rejeté';
-      default:
-        return status;
+    const plural = this.projectsTotal > 1 ? 's' : '';
+    if (this.projectsTotal > this.pagination.limit) {
+      return `${this.projectsToDisplay.length} sur ${this.projectsTotal} résultat${plural}`;
     }
+    return `${this.projectsTotal} résultat${plural}`;
   },
-  projectStatusColor(status) {
-    switch (status) {
-      case 'PRE_DRAFT':
-      case 'DRAFT':
-        return 'fr-badge--new';
-      case 'TO_PROCESS':
-      case 'STUCK':
-        return 'fr-badge--info';
-      case 'READY':
-      case 'IN_PROGRESS':
-      case 'DONE':
-        return 'fr-badge--success-lighter';
-      case 'REJECTED':
-        return 'fr-badge--error';
-      default:
-        return 'fr-badge--white';
-    }
+  projectTooltip(project) {
+    return this.options.find((option) => option.value === project.status)
+      .tooltip;
   },
 }));

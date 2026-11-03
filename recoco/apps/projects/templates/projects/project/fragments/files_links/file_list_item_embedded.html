@@ -1,11 +1,5 @@
 {% load static %}
 {% load humanize %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/files_links/file_list_item.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% if document %}
     <div class="fr-mb-2w">
         <div class="border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between bg-white ">

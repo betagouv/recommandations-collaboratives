@@ -1,12 +1,16 @@
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 import pytest
+from actstream import models as action_models
 from django.contrib.auth import models as auth
 from django.urls import reverse
 from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import models as notifications_models
+from notifications.signals import notify
 
+from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.models import Department
 from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
@@ -162,6 +166,13 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
 
     project = Recipe(Project, sites=[current_site], name="My project").make()
     baker.make(ProjectMember, project=project, member=owner, is_owner=True)
+    notify.send(
+        sender=owner,
+        verb=verbs.Project.SUBMITTED_BY,
+        action_object=project,
+        target=project,
+        recipient=owner,  # unrealistic but ok for the test
+    )
 
     updated_on_before = project.updated_on
     url = reverse("projects-moderation-project-refuse", args=[project.id])
@@ -182,6 +193,10 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
     assert project.updated_on > updated_on_before
 
     assert response.status_code == 302
+    assert project.action_object_actions.count() == 1
+    assert notifications_models.Notification.objects.count() == 1
+    assert notifications_models.Notification.objects.filter(unread=True).count() == 0
+    assert notifications_models.Notification.objects.filter(emailed=False).count() == 0
 
     mock_make_project_digest.assert_called_once_with(
         project=project,
@@ -242,30 +257,29 @@ class TestProjectModerationAdvisorRefuse:
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_not_found(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.post(
-            reverse("projects-moderation-advisor-refuse", args=[999])
-        )
-        assert response.status_code == 404
+        with login(client):
+            response = client.post(
+                reverse("projects-moderation-advisor-refuse", args=[999])
+            )
+            assert response.status_code == 404
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=False))
     def test_not_moderator(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.post(
-            reverse("projects-moderation-advisor-refuse", args=[999])
-        )
-        assert response.status_code == 403
+        with login(client):
+            response = client.post(
+                reverse("projects-moderation-advisor-refuse", args=[999])
+            )
+            assert response.status_code == 403
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_get_not_allowed(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.get(reverse("projects-moderation-advisor-refuse", args=[999]))
-        assert response.status_code == 405
+        with login(client):
+            response = client.get(
+                reverse("projects-moderation-advisor-refuse", args=[999])
+            )
+            assert response.status_code == 405
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
@@ -273,7 +287,6 @@ class TestProjectModerationAdvisorRefuse:
         baker.make(SiteConfiguration, site=current_site)
 
         moderator = baker.make(auth.User)
-        client.force_login(moderator)
 
         dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         dept_33 = baker.make(Department, code="33", name="Gironde")
@@ -290,16 +303,17 @@ class TestProjectModerationAdvisorRefuse:
         )
         advisor_access_request.departments.add(dept_64)
 
-        with patch("recoco.apps.projects.views.send_email") as mock_send_email:
-            response = client.post(
-                reverse(
-                    "projects-moderation-advisor-refuse",
-                    args=[advisor_access_request.pk],
+        with login(client, user=moderator):
+            with patch("recoco.apps.projects.views.send_email") as mock_send_email:
+                response = client.post(
+                    reverse(
+                        "projects-moderation-advisor-refuse",
+                        args=[advisor_access_request.pk],
+                    )
                 )
-            )
 
-        assert response.status_code == 302
-        assert response.url == "/projects/moderation/"
+                assert response.status_code == 302
+                assert response.url == "/projects/moderation/"
 
         advisor_access_request.refresh_from_db()
         assert advisor_access_request.status == "REJECTED"
@@ -322,6 +336,12 @@ class TestProjectModerationAdvisorRefuse:
                 "message": "My comment",
             },
         )
+        assert (
+            action_models.Action.objects.filter(
+                verb=verbs.User.ADVISOR_REJECTED
+            ).count()
+            == 1
+        )
 
 
 class TestProjectModerationAdvisorAccept:
@@ -337,37 +357,33 @@ class TestProjectModerationAdvisorAccept:
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_not_found(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.post(
-            reverse("projects-moderation-advisor-accept", args=[999])
-        )
-        assert response.status_code == 404
+        with login(client):
+            response = client.post(
+                reverse("projects-moderation-advisor-accept", args=[999])
+            )
+            assert response.status_code == 404
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=False))
     def test_not_moderator(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.post(
-            reverse("projects-moderation-advisor-accept", args=[999])
-        )
-        assert response.status_code == 403
+        with login(client):
+            response = client.post(
+                reverse("projects-moderation-advisor-accept", args=[999])
+            )
+            assert response.status_code == 403
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_get_not_allowed(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.get(reverse("projects-moderation-advisor-accept", args=[999]))
-        assert response.status_code == 405
+        with login(client):
+            response = client.get(
+                reverse("projects-moderation-advisor-accept", args=[999])
+            )
+            assert response.status_code == 405
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_post_request(self, client, current_site):
-        moderator = baker.make(auth.User)
-        client.force_login(moderator)
-
         dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         dept_33 = baker.make(Department, code="33", name="Gironde")
 
@@ -383,16 +399,17 @@ class TestProjectModerationAdvisorAccept:
         )
         advisor_access_request.departments.add(dept_64)
 
-        with patch("recoco.apps.projects.views.send_email") as mock_send_email:
-            response = client.post(
-                reverse(
-                    "projects-moderation-advisor-accept",
-                    args=[advisor_access_request.pk],
+        with login(client):  # as moderar thanks to the mock
+            with patch("recoco.apps.projects.views.send_email") as mock_send_email:
+                response = client.post(
+                    reverse(
+                        "projects-moderation-advisor-accept",
+                        args=[advisor_access_request.pk],
+                    )
                 )
-            )
 
-        assert response.status_code == 302
-        assert response.url == "/projects/moderation/"
+            assert response.status_code == 302
+            assert response.url == "/projects/moderation/"
 
         user.refresh_from_db()
         assert list(user.profile.departments.values_list("code", flat=True)) == [
@@ -413,7 +430,19 @@ class TestProjectModerationAdvisorAccept:
             ],
             params={
                 "message": "My comment",
+                "dashboard_url": ANY,
             },
+        )
+        assert (
+            mock_send_email.mock_calls[0]
+            .kwargs["params"]["dashboard_url"]
+            .startswith("https://example.com/projects/?sesame=")
+        )
+        assert (
+            action_models.Action.objects.filter(
+                verb=verbs.User.ADVISOR_ACCEPTED
+            ).count()
+            == 1
         )
 
 
@@ -430,36 +459,34 @@ class TestProjectModerationAdvisorModify:
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_not_found(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.post(
-            reverse("projects-moderation-advisor-modify", args=[999])
-        )
-        assert response.status_code == 404
+        with login(client):
+            response = client.post(
+                reverse("projects-moderation-advisor-modify", args=[999])
+            )
+            assert response.status_code == 404
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=False))
     def test_not_moderator(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.post(
-            reverse("projects-moderation-advisor-modify", args=[999])
-        )
-        assert response.status_code == 403
+        with login(client):
+            response = client.post(
+                reverse("projects-moderation-advisor-modify", args=[999])
+            )
+            assert response.status_code == 403
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_get_not_allowed(self, client):
-        user = baker.make(auth.User)
-        client.force_login(user)
-        response = client.get(reverse("projects-moderation-advisor-modify", args=[999]))
-        assert response.status_code == 405
+        with login(client):
+            response = client.get(
+                reverse("projects-moderation-advisor-modify", args=[999])
+            )
+            assert response.status_code == 405
 
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_post_request(self, client, current_site):
         moderator = baker.make(auth.User)
-        client.force_login(moderator)
 
         dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         dept_33 = baker.make(Department, code="33", name="Gironde")
@@ -472,15 +499,18 @@ class TestProjectModerationAdvisorModify:
         )
         advisor_access_request.departments.add(dept_64)
 
-        response = client.post(
-            reverse(
-                "projects-moderation-advisor-modify",
-                args=[advisor_access_request.pk],
+        with login(client, user=moderator):
+            response = client.post(
+                reverse(
+                    "projects-moderation-advisor-modify",
+                    args=[advisor_access_request.pk],
+                )
             )
-        )
 
-        assert response.status_code == 302
-        assert response.url == f"/advisor-access-request/{advisor_access_request.pk}/"
+            assert response.status_code == 302
+            assert (
+                response.url == f"/advisor-access-request/{advisor_access_request.pk}/"
+            )
 
         advisor_access_request.refresh_from_db()
         assert advisor_access_request.status == "PENDING"

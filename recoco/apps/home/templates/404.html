@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}
+    Page introuvable
+{% endblock title %}
+{% block og_title %}
+    Page introuvable
+{% endblock og_title %}
+{% block content %}
+    {% include "home/fragments/content_404.html" with title_text="Oups, il n'y a rien à voir ici !" technical_info_text="Si l'équipe technique vous demande, c'est une erreur 404." %}
+{% endblock content %}

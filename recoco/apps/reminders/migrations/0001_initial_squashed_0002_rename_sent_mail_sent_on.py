@@ -5,11 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("reminders", "0001_initial"),
-        ("reminders", "0002_rename_sent_mail_sent_on"),
-    ]
-
     dependencies = []
 
     operations = [

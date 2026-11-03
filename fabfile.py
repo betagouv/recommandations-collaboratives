@@ -28,19 +28,6 @@ PACKAGE = f"recoco-{recoco.__version__}.tar.gz"
 
 
 @task
-def upgrade(cnx, site=None):
-    """Upgrade requirements to last version on server for site"""
-    if site not in ["production", "development"]:
-        print("Usage: fab upgrade --site={production,development} --hosts=...")
-        return
-    cnx.put(
-        "./requirements.txt",
-        remote=f"./recoco-{site}/requirements.txt",
-    )
-    cnx.run(f"cd recoco-{site} " "&& ./.venv/bin/uv pip install -r requirements.txt")
-
-
-@task
 def setup(cnx, site=None):
     """Setup a server with the minimum for deploying"""
     if site not in ["production", "development"]:
@@ -148,7 +135,7 @@ def load_prod_db_to_staging(cnx, site=None):
 
     cnx.run("./load_prod_dump_to_db.sh")
 
-    cnx.run(f"cd recoco-{site}/multisites" "&& git pull")
+    cnx.run(f"cd recoco-{site}/multisites&& git pull")
 
     cnx.run(
         f"cd recoco-{site} "

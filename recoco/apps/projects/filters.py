@@ -7,7 +7,9 @@ from django.db.models.functions import Cast
 from django.utils import timezone
 from rest_framework.filters import BaseFilterBackend
 
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects.models import Project
+from recoco.utils import has_perm
 
 
 class ProjectActivityFilter(BaseFilterBackend):
@@ -31,6 +33,7 @@ class ProjectActivityFilter(BaseFilterBackend):
                 queryset.annotate(
                     recent_actions_count=Subquery(
                         Action.objects.filter(
+                            site=request.site,
                             target_content_type_id=project_ct.pk,
                             target_object_id=Cast(OuterRef("pk"), CharField()),
                             timestamp__gte=from_ts,
@@ -64,4 +67,49 @@ class ProjectSiteStatusFilter(BaseFilterBackend):
         project_site_status = request.GET.getlist("status", None)
         if project_site_status:
             queryset = queryset.filter(project_site_status__in=project_site_status)
+        return queryset
+
+
+def request_hide_deleted_projects(request):
+    # TODO should not be necessary after #2122
+    return not (
+        request.GET.get("with-deleted", None)
+        and has_perm(request.user, "see_deleted_projects", request.site)
+    )
+
+
+class DefaultNoDeletedFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if request_hide_deleted_projects(request):
+            queryset = queryset.filter(deleted=None)
+        return queryset
+
+
+class ProjectAssignedToUserFilter(BaseFilterBackend):
+    """Restrict to projects the current user is positioned on (switchtender).
+
+    The filter is enabled by the mere presence of the `my_projects` query
+    parameter (e.g. `?my_projects=true`). To disable it, omit the parameter.
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        my_projects = request.GET.get("my_projects", None)
+        if my_projects:
+            queryset = queryset.filter(
+                switchtender_sites__switchtender=request.user,
+                switchtender_sites__site=request.site,
+            ).distinct()
+        return queryset
+
+
+class PluginLookupsFilter(BaseFilterBackend):
+    """Apply the lookups returned by the crm_project_list_filter_lookups hook"""
+
+    def filter_queryset(self, request, queryset, view):
+        lookups = {}
+        pm = get_site_plugin_manager(request)
+        for p_lookups in pm.hook.crm_project_list_filter_lookups(request=request):
+            lookups.update(p_lookups)
+        if lookups:
+            queryset = queryset.filter(**lookups)
         return queryset

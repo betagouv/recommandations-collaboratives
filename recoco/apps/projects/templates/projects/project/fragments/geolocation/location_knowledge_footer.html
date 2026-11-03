@@ -1,7 +1,7 @@
 {% load static %}
 {% load l10n %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 <div class="card-text map">
     <div class="d-flex gap-1 text-muted">
         <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
@@ -20,7 +20,7 @@
                 <a class="fr-ml-1v fr-text--xs fr-mb-0"
                    href="https://www.google.com/maps/search/?api=1&query={{ project.location_y|unlocalize }}%2C{{ project.location_x|unlocalize }}"
                    target="_blank"
-                   rel="noopener noreferrer">Voir sur Google Maps</a>
+                   rel="noopener noreferrer">Voir sur Google Maps <span class="visually-hidden">Nouvelle fenêtre</span></a>
             </div>
         </div>
         {% if request.user in project.members.all or 'change_location' in user_project_perms %}

@@ -49,7 +49,7 @@ class SessionResultsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView
         return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
-class SessionDoneView(LoginRequiredMixin, PermissionRequiredMixin, RedirectView):
+class SessionDoneView(LoginRequiredMixin, RedirectView):
     permanent = False
     query_string = True
     pattern_name = "projects-project-detail-knowledge"
@@ -58,10 +58,6 @@ class SessionDoneView(LoginRequiredMixin, PermissionRequiredMixin, RedirectView)
         session = get_object_or_404(models.Session, pk=kwargs["session_id"])
         project = get_object_or_404(projects_models.Project, pk=session.project.id)
         return super().get_redirect_url(*args, project_id=project.id)
-
-    def has_permission(self):
-        object = self.get_object()
-        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
 #####

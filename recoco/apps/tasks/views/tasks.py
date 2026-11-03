@@ -19,8 +19,8 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.demarches_simplifiees.services import create_ds_prefill_link
 from recoco.apps.projects import models as project_models
-from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
     can_administrate_project,
     reactivate_if_necessary,
@@ -116,17 +116,6 @@ def create_task(request):
             else:
                 action.top()
 
-            # Check if we have a file or link
-            document_form = DocumentUploadForm(request.POST, request.FILES)
-            if document_form.is_valid():
-                if document_form.cleaned_data["the_file"]:
-                    document = document_form.save(commit=False)
-                    document.attached_object = action
-                    document.site = request.site
-                    document.uploaded_by = request.user
-                    document.project = action.project
-                    document.save()
-
             # Notify other switchtenders
             signals.action_created.send(
                 sender=create_task,
@@ -135,16 +124,13 @@ def create_task(request):
                 user=request.user,
             )
 
-            # Redirect to `action-inline` if we're coming
-            # from `action-inline` after create
-            if (
-                type_form.cleaned_data["next"]
-                and type_form.cleaned_data["next"] != "None"
-            ):
-                return redirect(type_form.cleaned_data["next"])
+            conversation_url = reverse(
+                "projects-project-detail-conversations", args=[project.id]
+            )
+            if not action.public:
+                conversation_url += "#drafts"
+            return redirect(conversation_url)
 
-            next_url = reverse("projects-project-detail-actions", args=[project.id])
-            return redirect(next_url)
     else:
         type_form = PushTypeActionForm(request.user, request.GET)
 
@@ -171,7 +157,8 @@ def visit_task(request, task_id):
     if task.resource:
         return redirect(reverse("resources-resource-detail", args=[task.resource.pk]))
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    url = f"{reverse('projects-project-detail-conversations', args=[task.project_id])}#action-{task.pk}"
+    return redirect(url)
 
 
 @login_required
@@ -202,7 +189,9 @@ def toggle_done_task(request, task_id):
             )
         task.save()
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project_id])
+    )
 
 
 @login_required
@@ -219,7 +208,9 @@ def refuse_task(request, task_id):
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project_id])
+    )
 
 
 @login_required
@@ -236,7 +227,9 @@ def already_done_task(request, task_id):
             sender=already_done_task, task=task, project=task.project, user=request.user
         )
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project_id])
+    )
 
 
 @login_required
@@ -256,7 +249,7 @@ def sort_task(request, task_id, order):
     task.save()
 
     return redirect(
-        reverse("projects-project-detail-actions", args=[task.project_id])
+        reverse("projects-project-detail-conversations", args=[task.project_id])
         + f"#action-{task.id}"
     )
 
@@ -291,16 +284,6 @@ def update_task(request, task_id=None):
             instance.project.updated_on = instance.updated_on
             instance.project.save()
 
-            document_form = DocumentUploadForm(request.POST, request.FILES)
-            if document_form.is_valid():
-                if document_form.cleaned_data["the_file"]:
-                    document = document_form.save(commit=False)
-                    document.attached_object = instance
-                    document.site = request.site
-                    document.uploaded_by = request.user
-                    document.project = instance.project
-                    document.save()
-
             # If we are going public, notify
             if was_public is False and instance.public is True:
                 signals.action_created.send(
@@ -310,24 +293,41 @@ def update_task(request, task_id=None):
                     user=request.user,
                 )
 
-            # Redirect to `action-inline` if we're coming
-            # from `action-inline` after create
-            if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
-                return redirect(form.cleaned_data["next"])
-
             return redirect(
-                reverse("projects-project-detail-actions", args=[task.project_id])
+                reverse("projects-project-detail-conversations", args=[task.project_id])
             )
     else:
         initial = {
             "topic_name": task.topic.name if task.topic else None,
-            "next": request.GET.get("next"),
         }
         form = UpdateTaskForm(instance=task, initial=initial)
-        document_form = DocumentUploadForm()
         # Initialize preserved_content for template compatibility
         preserved_content = ""
     return render(request, "tasks/tasks/task_update.html", locals())
+
+
+@login_required
+@require_http_methods(["GET"])
+def task_generate_ds_prefill(request, task_id):
+    """Generates a link to a prefilled ds demande and redirect to it"""
+
+    # fetches task to check permission
+    try:
+        task = models.Task.objects.select_related("project__commune__department").get(
+            id=task_id
+        )
+    except models.Task.DoesNotExist:
+        return
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
+
+    url = create_ds_prefill_link(task_id)
+    if not url:
+        messages.error(
+            request,
+            "Cette recommandation n'est pas compatible avec le pré-remplissage sur démarche numérique.",
+        )
+        url = task.get_absolute_url()
+    return redirect(url)
 
 
 ########
@@ -344,7 +344,7 @@ def task_recommendation_list(request):
     recommendations = (
         models.TaskRecommendation.on_site.all()
         .select_related("resource__category")
-        .prefetch_related("departments")
+        .prefetch_related("departments", "condition_tags")
     )
 
     return render(request, "tasks/tasks/recommendation_list.html", locals())
@@ -475,8 +475,22 @@ def presuggest_task(request, project_id):
 
 
 @login_required
+def exploration_ia_task(request, project_id):
+    """Exploration IA task"""
+    project = get_object_or_404(
+        project_models.Project, sites=request.site, pk=project_id
+    )
+    project_tags = list(project.tags.values("name"))
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
+
+    return render(request, "tasks/tasks/exploration_ia.html", locals())
+
+
+@login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
+
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
@@ -484,7 +498,7 @@ def delete_task(request, task_id=None):
         task.deleted = timezone.now()
         task.save()
 
-    next_url = reverse("projects-project-detail-actions", args=[task.project_id])
+    next_url = reverse("projects-project-detail-conversations", args=[task.project_id])
     return redirect(next_url)
 
 
@@ -507,7 +521,9 @@ def followup_task(request, task_id=None):
             # update activity flags and states
             reactivate_if_necessary(task.project, request.user)
 
-    return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
+    return redirect(
+        reverse("projects-project-detail-conversations", args=[task.project.id])
+    )
 
 
 @login_required
@@ -529,7 +545,8 @@ def followup_task_update(request, followup_id=None):
 
             return redirect(
                 reverse(
-                    "projects-project-detail-actions", args=[followup.task.project.id]
+                    "projects-project-detail-conversations",
+                    args=[followup.task.project.id],
                 )
                 + f"#action-{followup.task.id}"
             )

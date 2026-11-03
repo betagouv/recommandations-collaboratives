@@ -6,13 +6,18 @@ from allauth.account.forms import (
     ResetPasswordKeyForm,
     SignupForm,
 )
+from allauth.mfa.models import Authenticator
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
+from django.urls import reverse
 
 from recoco.apps.geomatics.models import Department
 
+from .config import SIGNUP_USER_ID_SESSION_KEY
 from .models import SiteConfiguration
 
 
@@ -41,6 +46,26 @@ class UVSignupForm(SignupForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+
+    def custom_signup(self, request, user):
+        super().custom_signup(request, user)
+        # sets up session data to prefill advisor access request form
+        request.session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
+
+    def try_save(self, request):
+        # we finish access request for this site after user login so we need to setup session
+        if self.account_already_exists:
+            user = User.objects.get(email=self.cleaned_data.get("email"))
+            if not user.profile.sites.filter(id=request.site.id).exists():
+                next_url = reverse("advisor-access-request")
+                login = reverse("account_login")
+                url = f"{login}?next={next_url}"
+                resp = redirect(url)
+                request.session[SIGNUP_USER_ID_SESSION_KEY] = user.pk
+                return user, resp
+            # else case handled in parent try_save
+
+        return super().try_save(request)
 
 
 class UVLoginForm(LoginForm):
@@ -86,7 +111,8 @@ class ContactForm(forms.Form):
 
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
         if user.is_authenticated:
             del self.fields["name"]
@@ -165,7 +191,6 @@ class SiteCreateForm(forms.ModelForm):
         fields = [
             "name",
             "subdomain",
-            "sender_email",
             "sender_name",
             "contact_form_recipient",
             "legal_address",
@@ -175,3 +200,42 @@ class SiteCreateForm(forms.ModelForm):
     subdomain = forms.CharField(
         label="Sous-domaine recoconseil. Ex: bidule si bidule.recoconseil.fr"
     )
+
+
+class TwoFaConfigForm(forms.Form):
+    two_fa_mode = forms.ChoiceField(
+        label="Quelle double authentification",
+        help_text="La double authentification par application externe est plus sécurisée",
+        choices=[
+            ("totp", "Application externe"),
+            ("login_with_code", "Envoi d'un code par mail"),
+            ("none", "Aucun"),
+        ],
+        widget=forms.RadioSelect,
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        if user.is_authenticated and user.profile.requires_2fa:
+            self.fields["two_fa_mode"].choices = [
+                c for c in self.fields["two_fa_mode"].choices if c[0] != "none"
+            ]
+        if user.profile.login_with_code:
+            self.fields["two_fa_mode"].initial = "login_with_code"
+        if Authenticator.objects.filter(
+            type=Authenticator.Type.TOTP, user=user
+        ).exists():
+            self.fields["two_fa_mode"].initial = "totp"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if (
+            self.user.is_authenticated
+            and self.user.profile.requires_2fa
+            and self.data.get("two_fa_mode") == "none"
+        ):
+            self.add_error(
+                "two_fa_mode", "Sélectionnez un mode de double authentification"
+            )
+        return cleaned_data

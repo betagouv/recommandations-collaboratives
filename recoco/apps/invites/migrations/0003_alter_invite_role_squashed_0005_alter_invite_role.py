@@ -4,12 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("invites", "0003_alter_invite_role"),
-        ("invites", "0004_alter_invite_unique_together"),
-        ("invites", "0005_alter_invite_role"),
-    ]
-
     dependencies = [
         ("invites", "0002_auto_20220505_0957"),
     ]

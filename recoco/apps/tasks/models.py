@@ -17,16 +17,17 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-from markdownx.utils import markdownify
 from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
-from tagging.models import TaggedItem
+from tagging.models import TaggedItem  # remains necessary for survey-related code
 from tagging.registry import register as tagging_register
+from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources
+from recoco.utils import render_markdown, truncate_string
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -146,7 +147,7 @@ class Task(OrderedModel):
     project = models.ForeignKey(
         projects_models.Project, on_delete=models.CASCADE, related_name="tasks"
     )
-    public = models.BooleanField(default=False, blank=True)
+    public = models.BooleanField(default=False, blank=True)  # public=False means draft
     priority = models.PositiveIntegerField(
         default=1000,
         blank=True,
@@ -185,12 +186,12 @@ class Task(OrderedModel):
     intent = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Intention"
     )
-    content = models.TextField(default="", verbose_name="Contenu")
+    content = models.TextField(default="", verbose_name="Contenu", blank=True)
 
     @property
     def content_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.content)
+        return render_markdown(self.content)
 
     deadline = models.DateField(null=True, blank=True)
 
@@ -235,7 +236,7 @@ class Task(OrderedModel):
 
     def get_absolute_url(self):
         return (
-            reverse("projects-project-detail-actions", args=[self.project.id])
+            reverse("projects-project-detail-conversations", args=[self.project.id])
             + f"#action-{self.pk}"
         )
 
@@ -292,7 +293,7 @@ class TaskFollowup(models.Model):
     @property
     def comment_rendered(self):
         """Return comment as markdown"""
-        return markdownify(self.comment)
+        return render_markdown(self.comment)
 
     def __str__(self):  # pragma: nocover
         return f"TaskFollowup{self.id}"
@@ -302,11 +303,7 @@ class TaskFollowup(models.Model):
         return self.task.feed_label()
 
     def get_absolute_url(self):
-        task = self.task
-        return (
-            reverse("projects-project-detail-actions", args=[task.project.id])
-            + f"#action-{task.pk}"
-        )
+        return self.task.get_absolute_url()
 
 
 class TaskFollowupRsvp(models.Model):
@@ -358,17 +355,18 @@ class TaskRecommendation(models.Model):
         blank=True,
         verbose_name="Départements concernés",
     )
+    condition_tags = TaggableManager(blank=True)
 
     def trigged_by(self):
         from recoco.apps.survey import models as survey_models
 
         triggers = {}
-        for tag in self.condition_tags:
+        for tag in self.condition_tags.all():
             triggers[tag] = TaggedItem.objects.get_by_model(
                 survey_models.Choice.objects.prefetch_related(
                     "question__question_set"
                 ).select_related("question"),
-                tag,
+                tag.name,
             )
 
         return triggers
@@ -377,23 +375,7 @@ class TaskRecommendation(models.Model):
         return f"{self.resource.title} - {self.text}"
 
 
-tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
-
-
-########################################################################
-# helpers / utils
-########################################################################
-
-
-def truncate_string(s, max_length):
-    """Truncate given string to max_length"""
-    if len(s) <= max_length:
-        return s
-    sub = s[:max_length]
-    if s[max_length] != " ":
-        # we are truncating last word, rewind to its begining
-        sub = sub[: sub.rfind(" ")]
-    return f"{sub}…"
+tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags_tagging")
 
 
 # eof

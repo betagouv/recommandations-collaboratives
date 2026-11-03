@@ -24,28 +24,21 @@ Example usage in parent:
 {% include "tools/contacts/contact_card.html" is_django_data=True contact=myContactInParent %}
 
 {% endcomment %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% load guardian_tags %}
 {% block js %}
+    {% vite_asset 'js/styles/contact-card.css.js' %}
+    {% vite_asset 'js/styles/contact-search-contact-modal.css.js' %}
     {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-    <link href="{% sass_src 'css/tools/contact/search-contact-modal.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% block content %}
     {% if user.is_authenticated %}
-        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% endif %}
-    <div x-data="User()">
+    <div x-data="User()" data-test-id="contact-card-component">
         <template x-if="typeof contact !== 'undefined' && contact">
-            <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
+            <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %} {% if full_width %}contact-card-light{% endif %}"
                  :class="{'active': isOpenDeleteContact}"
                  data-test-id="contact-card">
                 <div class="contact-card__firstline-container">

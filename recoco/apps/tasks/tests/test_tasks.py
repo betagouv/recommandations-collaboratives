@@ -4,6 +4,7 @@
 Tests for project application, tasks
 
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
+authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
@@ -14,8 +15,8 @@ from unittest.mock import ANY, patch
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -35,6 +36,39 @@ from recoco.utils import login
 from .. import models
 
 ########################################################################
+# Content sanitization
+########################################################################
+
+
+@pytest.mark.django_db
+def test_task_content_rendered_strips_embedded_script_tags(current_site, project):
+    task = baker.make(
+        models.Task,
+        project=project,
+        site=current_site,
+        content="<script>alert(document.cookie)</script>",
+    )
+
+    assert "<script>" not in task.content_rendered
+    assert "alert(document.cookie)" not in task.content_rendered
+
+
+@pytest.mark.django_db
+def test_task_followup_comment_rendered_strips_embedded_script_tags(
+    current_site, project
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    followup = baker.make(
+        models.TaskFollowup,
+        task=task,
+        comment="<script>alert(document.cookie)</script>",
+    )
+
+    assert "<script>" not in followup.comment_rendered
+    assert "alert(document.cookie)" not in followup.comment_rendered
+
+
+########################################################################
 # Task Recommendation
 ########################################################################
 
@@ -49,6 +83,18 @@ def test_task_recommendation_list_not_available_for_non_staff(client):
 
 @pytest.mark.django_db
 def test_task_recommendation_list_available_for_staff(client):
+    url = reverse("projects-task-recommendation-list")
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_recommendation_list(client, current_site):
+    tr = baker.make(models.TaskRecommendation, site=current_site)
+    tr.condition_tags.add("test")
+
     url = reverse("projects-task-recommendation-list")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
@@ -561,29 +607,6 @@ def test_update_task_with_existing_topic(request, client):
     assert response.status_code == 302
 
 
-@pytest.mark.django_db
-def test_update_task_with_document(request, client):
-    task = Recipe(models.Task, site=get_current_site(request)).make()
-
-    with login(client) as user:
-        utils.assign_advisor(user, task.project)
-
-        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
-        response = client.post(
-            reverse("projects-update-task", args=[task.id]),
-            data={"the_file": png},
-        )
-
-    assert response.status_code == 302
-
-    document = project_models.Document.objects.first()
-    assert document
-
-    task = models.Task.on_site.first()
-    assert task.document.first() == document
-
-
 #
 # delete
 
@@ -613,6 +636,30 @@ def test_delete_task_from_project_and_redirect(request, client, project_ready):
     task = models.Task.deleted_on_site.get(id=task.id)
     assert task.deleted
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_delete_task_from_project_and_redirect_from_referer_url(
+    request, client, project_ready
+):
+    current_site = get_current_site(request)
+
+    task = Recipe(models.Task, project=project_ready, site=current_site).make()
+    conv_url = reverse("projects-project-detail-conversations", args=[project_ready.pk])
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project, current_site)
+        response = client.post(
+            reverse(
+                "projects-delete-task",
+                args=[task.id],
+            ),
+            headers={"REFERER": conv_url},
+        )
+    task = models.Task.deleted_on_site.get(id=task.id)
+    assert task.deleted
+    assert response.status_code == 302
+    assert response.url == conv_url
 
 
 ########################################################################
@@ -951,6 +998,28 @@ def test_create_new_action_with_existing_topic(request, client, project_ready):
 
 
 @pytest.mark.django_db
+def test_create_new_action_without_resource_default_push_type(
+    request, client, project_ready
+):
+    content = "My Content"
+
+    with login(client) as user:
+        utils.assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-task"),
+            data={
+                "project": project_ready.pk,
+                "push_type": "single",
+                "public": True,
+                "content": content,
+            },
+        )
+    assert not models.Task.on_site.exists()
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_create_new_action_without_resource(request, client, project_ready):
     intent = "My Intent"
     content = "My Content"
@@ -975,34 +1044,6 @@ def test_create_new_action_without_resource(request, client, project_ready):
     assert task.intent == intent
     assert task.resource is None
     assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_create_new_action_with_document(request, client, project_ready):
-    intent = "My Intent"
-    content = "My Content"
-
-    with login(client, groups=["example_com_advisor"]) as user:
-        utils.assign_advisor(user, project_ready)
-        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
-        response = client.post(
-            reverse("projects-create-task"),
-            data={
-                "project": project_ready.pk,
-                "push_type": "noresource",
-                "public": True,
-                "intent": intent,
-                "content": content,
-                "the_file": png,
-            },
-        )
-
-    assert response.status_code == 302
-
-    document = project_models.Document.objects.first()
-    assert document
-    assert document.attached_object
 
 
 @pytest.mark.django_db
@@ -1041,6 +1082,41 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
     assert task.resource == resource
     assert task.contact == contact
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_new_action_with_single_resource_other_site(
+    request, client, project_ready, current_site
+):
+    other_site = baker.make(Site)
+    resource = Recipe(
+        resources.Resource,
+        sites=[other_site],
+        status=resources.Resource.PUBLISHED,
+    ).make()
+
+    intent = "My Intent"
+    content = "My Content"
+
+    contact = baker.make(Contact, site=current_site)
+
+    with login(client) as user:
+        utils.assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-task"),
+            data={
+                "project": project_ready.pk,
+                "push_type": "single",
+                "public": True,
+                "resource": resource.pk,
+                "intent": intent,
+                "content": content,
+                "contact": contact.pk,
+            },
+        )
+    assert not models.Task.on_site.exists()
+    assert response.status_code != 500
 
 
 @pytest.mark.django_db
@@ -1282,10 +1358,10 @@ def test_task_status_change_is_traced_when_a_followup_issued(
 
     assert response.status_code == 200
 
-    assert Action.objects.count() == 1
-    action = Action.objects.first()
+    for a in Action.objects.all():
+        print(a)
 
-    assert action.verb == "a classé la recommandation comme «en cours»"
+    assert Action.objects.filter(verb=verbs.Recommendation.IN_PROGRESS).count() == 1
 
 
 @pytest.mark.django_db

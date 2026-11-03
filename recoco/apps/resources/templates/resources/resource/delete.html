@@ -7,12 +7,10 @@
 {% block og_title %}
     Supprimer {{ resource.title }}
 {% endblock og_title %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+{% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -67,6 +65,8 @@
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="button red filled fr-mt-2v">Oui, je supprime cette ressource</button>
+                <a class="button fr-mt-2v fr-ml-2v"
+                   href="{% url 'crm-resource-list' %}">Annuler</a>
             </form>
         </div>
     </div>

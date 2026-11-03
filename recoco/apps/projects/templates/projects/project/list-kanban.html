@@ -3,25 +3,13 @@
 {% load humanize %}
 {% load notifications_tags %}
 {% load gravatar %}
-{% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/kanban.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/board.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/projects-board.css.js' %}
     {% vite_asset 'js/apps/boardProjects.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite_asset 'js/styles/kanban.css.js' %}
+    {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
 {% endblock js %}
 {% block title %}
     Tableau de bord administrateur {{ block.super }}
@@ -46,7 +34,7 @@
             {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
-        <template x-if="isViewInitialized && projectList.length == 0">
+        <template x-if="isViewInitialized && boards.every(b => b.projects.length === 0 && !b.isLoading)">
             <div class="fr-notice fr-notice--info fr-my-8w">
                 <div class="fr-container">
                     <div class="fr-notice__body">
@@ -61,7 +49,7 @@
                 </div>
             </div>
         </template>
-        <template x-if="isViewInitialized && projectList.length > 0">
+        <template x-if="isViewInitialized && boards.some(b => b.projects.length > 0)">
             <div x-cloak class="d-flex">
                 <div class="flex-grow-1 kanban-container">
                     <div class="fr-py-3w md-py-8">
@@ -73,30 +61,31 @@
                                          :data-test-id="`board-targetable-${index}`">
                                         <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
                                             <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
+                                            <p x-text="board.totalCount"
+                                               class="kanban-column__project-count fr-m-0"
+                                               title="Nombre total de dossiers dans la colonne"></p>
                                         </div>
-                                        <div class="kanban-column__content">
+                                        <div class="kanban-column__content"
+                                             @scroll="onColumnScroll($event, board)">
                                             <div class="fr-px-2v fr-py-1v fr-pb-1v h-100 d-flex flex-column">
                                                 <template x-if="column(board.code).length === 0">
                                                     <div class="drag-targetable fr-py-2v h-100"
                                                          @dragover="onDragOver(event, null)"
-                                                         @drop="onDrop(event, board.code, null)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
                                                 </template>
                                                 <!-- Task Template -->
                                                 <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
                                                     <div :id="t.id"
-                                                         x-show="((t.is_observer || t.is_switchtender) && isDisplayingOnlyUserProjects) || !isDisplayingOnlyUserProjects"
                                                          class="drag-targetable kanban-card-container"
                                                          data-cy="card-project"
                                                          @dragover="onDragOver(event)"
-                                                         @drop="onDrop(event, board.code, t.uuid)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragstart="onDragStart(event, t.id)"
                                                          @dragend="onDragEnd(event)">
                                                         <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
                                                             <div class="kanban-card rounded fr-p-4v w-100 position-relative"
@@ -114,8 +103,7 @@
                                                                     <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-danger"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                                 </template>
                                                                 <div class="kanban-card__project-container fr-mb-2v">
-                                                                    <span class="kanban-card__project-name project-link"
-                                                                          x-text="truncate(t.name)"></span>
+                                                                    <span class="kanban-card__project-name project-link" x-text="t.name"></span>
                                                                     <template x-if="t.owner?.profile?.organization">
                                                                         <span class="kanban-card__project-organization"
                                                                               x-text="t.owner.profile.organization.name"></span>
@@ -197,12 +185,18 @@
                                                 <template x-if="column(board.code).length > 0">
                                                     <div class="drag-targetable fr-py-2v flex-grow-1"
                                                          @dragover="onDragOver(event, null)"
-                                                         @drop="onDrop(event, board.code, null)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
+                                                </template>
+                                                <!-- Loading indicator -->
+                                                <template x-if="board.isLoading">
+                                                    <div class="text-center fr-py-2v">
+                                                        <div class="spinner-border spinner-border-sm" role="status">
+                                                            <span class="visually-hidden">Chargement...</span>
+                                                        </div>
+                                                    </div>
                                                 </template>
                                             </div>
                                         </div>

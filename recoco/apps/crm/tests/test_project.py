@@ -30,106 +30,12 @@ def test_crm_project_list_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_crm_project_list_contains_site_projects(request, client):
-    site = get_current_site(request)
-    expected = baker.make(projects_models.Project, sites=[site])
-    other = baker.make(site_models.Site)
-    unexpected = baker.make(projects_models.Project, sites=[other])
-
+def test_crm_project_list_available_for_staff(client):
     url = reverse("crm-project-list")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[expected.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertNotContains(response, unexpected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_active_ones(request, client):
-    site = get_current_site(request)
-    active = baker.make(projects_models.Project, sites=[site])
-    inactive = baker.make(
-        projects_models.Project,
-        deleted=timezone.now(),
-        sites=[site],
-    )
-
-    url = reverse("crm-project-list")
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[active.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[inactive.id])
-    assertNotContains(response, unexpected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_inactive_ones(request, client):
-    site = get_current_site(request)
-    active = baker.make(projects_models.Project, sites=[site])
-    inactive = baker.make(
-        projects_models.Project,
-        deleted=timezone.now(),
-        sites=[site],
-    )
-
-    url = reverse("crm-project-list") + "?inactive=True"
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    unexpected = reverse("crm-project-details", args=[active.id])
-    assertNotContains(response, unexpected)
-    expected = reverse("crm-project-details", args=[inactive.id])
-    assertContains(response, expected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_by_project_name(request, client):
-    site = get_current_site(request)
-    expected = baker.make(projects_models.Project, sites=[site], name="expected")
-    unexpected = baker.make(projects_models.Project, sites=[site], name="unexpected")
-
-    url = reverse("crm-project-list") + f"?query={expected.name}"
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[expected.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertNotContains(response, unexpected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_by_commune_name(request, client):
-    site = get_current_site(request)
-    expected = baker.make(
-        projects_models.Project, sites=[site], commune__name="recherchée"
-    )
-    unexpected = baker.make(
-        projects_models.Project, sites=[site], commune__name="ignorée"
-    )
-
-    url = reverse("crm-project-list") + f"?query={expected.commune.name}"
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[expected.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertNotContains(response, unexpected)
 
 
 ########################################################################
@@ -220,6 +126,46 @@ def test_crm_project_update_property_muted(request, client):
 
     updated = projects_models.Project.objects.first()
     assert updated.muted is True
+
+
+# redirection
+
+
+def _setup_project_update_redirection(client, current_site, next_url):
+    project = baker.make(projects_models.Project, sites=[current_site])
+
+    url = reverse("crm-project-update", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        data = {"statistics": False}
+        if next_url:
+            data["next"] = next_url
+        return client.post(url, data=data)
+
+
+@pytest.mark.django_db
+def test_crm_project_update_redirects_to_safe_next(request, client, current_site):
+    safe_next = reverse("crm-list-projects-low-reach")
+    response = _setup_project_update_redirection(client, current_site, safe_next)
+
+    assertRedirects(response, safe_next, fetch_redirect_response=False)
+
+
+@pytest.mark.django_db
+def test_crm_project_update_ignores_unsafe_next(request, client, current_site):
+    unsafe_next = "https://evil.example/steal"
+    response = _setup_project_update_redirection(client, current_site, unsafe_next)
+
+    # No redirect: page is re-rendered (200) instead of jumping off-site.
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_project_update_without_next_renders_page(request, client, current_site):
+    response = _setup_project_update_redirection(client, current_site, None)
+
+    # No redirect: page is re-rendered (200)
+    assert response.status_code == 200
 
 
 #
@@ -464,6 +410,8 @@ def test_crm_project_handover_is_reachable(request, client, project):
 @pytest.mark.django_db
 def test_crm_project_handover(request, client, project):
     url = reverse("crm-project-handover", args=[project.id])
+    project.submitted_by = baker.make(auth_models.User)
+    project.save(update_fields=("submitted_by",))
     other_site = baker.make(
         site_models.Site, name="other site", configuration__accept_handover=True
     )
@@ -495,6 +443,8 @@ def test_crm_project_handover_on_existing_site(request, client, project):
 @pytest.mark.django_db
 def test_crm_project_handover_fills_sent_by_from_info(request, client, project):
     current_site = get_current_site(request)
+    project.submitted_by = baker.make(auth_models.User)
+    project.save(update_fields=("submitted_by",))
     url = reverse("crm-project-handover", args=[project.id])
     other_site = baker.make(
         site_models.Site, name="other site", configuration__accept_handover=True

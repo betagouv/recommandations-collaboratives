@@ -3,6 +3,20 @@ import GeocoderBAN from './geocoderBAN';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-providers';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
+const markerSettings = {
+  iconSize: [18, 22],
+  iconAnchor: [9, 22],
+  popupAnchor: [0, -22],
+};
+
+const ICONS = {
+  default: createMarkerIcon('realisation-marker', null, markerSettings),
+  focused: createMarkerIcon('realisation-marker is-focused', null, markerSettings),
+};
 
 function mapLayerStyles(className) {
   return {
@@ -120,6 +134,16 @@ function initMapLayer(lat, lng, zoom) {
       maxZoom: 21,
       attribution:
         '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }
+  );
+}
+
+function initPlanIGNLayer() {
+  return L.tileLayer(
+    ignServiceURL('GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2', 'essentiels', 'image/png'),
+    {
+      maxZoom: 19,
+      attribution: 'IGN-F/Géoportail',
     }
   );
 }
@@ -280,8 +304,16 @@ function addLayerParcels(map, geoData) {
   L.control.layers(null, overlayMap).addTo(map);
 }
 
-function createMarkerIcon(className, title) {
-  return L.divIcon({ className: `map-marker ${className}`, title });
+function createMarkerIcon(className, title, options = {}) {
+  return L.divIcon({ className: `map-marker ${className}`, title, ...options });
+}
+
+function createMarkerClusterGroup(options = {}) {
+  return L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 50,
+    ...options,
+  });
 }
 
 function markerPopupTemplate({
@@ -324,6 +356,18 @@ function markerPopupTemplate({
 	`;
 }
 
+function setMarkerFocus(previousMarker, clickedMarker) {
+  if (previousMarker) {
+    previousMarker.setIcon(ICONS.default);
+    previousMarker.setZIndexOffset(0);
+  }
+
+  if (clickedMarker) {
+    clickedMarker.setIcon(ICONS.focused);
+    clickedMarker.setZIndexOffset(1000);
+  }
+}
+
 function mapOptions({ interactive, zoom }) {
   return {
     dragging: interactive,
@@ -336,9 +380,14 @@ function mapOptions({ interactive, zoom }) {
   };
 }
 
+function toggleGreyFilter(map) {
+  map.getPane('tilePane').classList.toggle('basemap-grayscale');
+}
+
 export default {
   makeMap,
   initMapLayer,
+  initPlanIGNLayer,
   initSatelliteLayer,
   initMarkerLayer,
   initMapLayers,
@@ -351,5 +400,9 @@ export default {
   getDefaultLatLngForMap,
   getDefaultLatLngForLayers,
   createMarkerIcon,
+  createMarkerClusterGroup,
   markerPopupTemplate,
+  setMarkerFocus,
+  ICONS,
+  toggleGreyFilter
 };

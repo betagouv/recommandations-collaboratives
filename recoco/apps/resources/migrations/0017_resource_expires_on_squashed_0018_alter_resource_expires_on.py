@@ -4,11 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("resources", "0017_resource_expires_on"),
-        ("resources", "0018_alter_resource_expires_on"),
-    ]
-
     dependencies = [
         ("resources", "0016_auto_20210809_1230"),
     ]

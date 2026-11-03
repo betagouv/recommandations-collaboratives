@@ -15,10 +15,12 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import models as notifications_models
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertRedirects
 
@@ -238,12 +240,16 @@ def test_promote_referent_prevent_cross_site_promotion(request, client):
 def test_promote_referent_available_for_advisor(request, client):
     site = get_current_site(request)
     project = Recipe(models.Project, sites=[site]).make()
+    project.project_sites.filter(site=site).update(is_origin=True)
 
     crm_user = baker.make(auth_models.User)
     profile = crm_user.profile
     profile.sites.add(site)
     profile.phone_no = "555-1234"
     profile.save()
+
+    advisor = baker.make(auth_models.User)
+    assign_advisor(advisor, project, site)
 
     powner = baker.make(projects_models.ProjectMember, project=project, is_owner=False)
     pmember = baker.make(
@@ -264,6 +270,91 @@ def test_promote_referent_available_for_advisor(request, client):
     # project phone number is updated to current owner one's
     project.refresh_from_db()
     assert project.phone == pmember.member.profile.phone_no
+    assert (
+        notifications_models.Notification.objects.filter(
+            verb=verbs.Project.NEW_OWNER
+        ).count()
+        == 3  # one for advisor and one for each member
+    )
+
+
+########################################################################
+# promote collaborator advisor
+########################################################################
+
+
+@pytest.mark.django_db
+def test_promote_advisor_not_available_is_post_only(request, client):
+    url = reverse("projects-project-promote-advisor", args=[0, 0])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_promote_advisor_not_available_for_unprivileged_users(request, client, project):
+    crm_user = baker.make(auth_models.User)
+    crm_user.profile.sites.add(project.sites.first())
+
+    baker.make(
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    )
+
+    url = reverse("projects-project-promote-advisor", args=[project.id, crm_user.id])
+    with login(client):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_promote_advisor_prevent_cross_site_promotion(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+
+    other = baker.make(site_models.Site)
+    crm_user = baker.make(auth_models.User)
+    crm_user.profile.sites.add(other)
+
+    baker.make(
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    )
+
+    url = reverse("projects-project-promote-advisor", args=[project.id, crm_user.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_promote_advisor_affects(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+    project.project_sites.filter(site=site).update(is_origin=True)
+
+    crm_user = baker.make(auth_models.User)
+    profile = crm_user.profile
+    profile.sites.add(site)
+    profile.save()
+
+    advisor = baker.make(auth_models.User)
+    assign_advisor(advisor, project, site)
+
+    baker.make(
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    )
+
+    url = reverse("projects-project-promote-advisor", args=[project.id, crm_user.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    crm_user.refresh_from_db()
+
+    assert response.status_code == 302
+    assert not project.members.filter(pk=crm_user.id).exists()
+    assert project.switchtenders.filter(pk=crm_user.id).exists()
 
 
 #####################################################################
@@ -695,18 +786,47 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker, proje
 
 
 @pytest.mark.django_db
+def test_revoke_invite_cross_project_is_forbidden(request, client, project):
+    """A manage_collaborators grant on one project must not let you revoke
+    (delete) an invite that belongs to a different project"""
+    other_project = Recipe(
+        projects_models.Project, sites=[get_current_site(request)]
+    ).make()
+
+    invite = baker.make(
+        invites_models.Invite,
+        site=get_current_site(request),
+        project=other_project,
+        role="COLLABORATOR",
+        email="invited@party.com",
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+
+        url = reverse(
+            "projects-project-access-revoke-invite",
+            args=[project.id, invite.pk],
+        )
+        response = client.post(url)
+
+    assert response.status_code == 404
+    assert invites_models.Invite.objects.filter(pk=invite.pk).exists()
+
+
+@pytest.mark.django_db
 def test_set_project_active_date_is_saved(client, project_ready, current_site):
-    project_ready.inactive_since = datetime(2024, 1, 1)
+    project_ready.inactive_since = timezone.make_aware(datetime(2024, 1, 1))
     project_ready.save()
 
-    date = datetime(2024, 1, 16)
     url = reverse("projects-project-set-active", args=[project_ready.id])
     with login(client, is_staff=True, groups=["example_com_staff"]):
         with freeze_time("2024-01-16"):
+            expected_date = timezone.now()
             client.post(url)
 
     project_ready.refresh_from_db()
-    assert project_ready.last_manual_reactivation.astimezone() == date.astimezone()
+    assert project_ready.last_manual_reactivation == expected_date
     assert project_ready.inactive_since is None
     assert project_ready.inactive_reason is None
 

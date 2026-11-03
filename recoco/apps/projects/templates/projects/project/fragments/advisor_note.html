@@ -1,7 +1,7 @@
 {% load static %}
 {% load guardian_tags %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 {% if project.advisors_note %}
     <div class="advisor-item h-100">
         {% include "projects/project/fragments/information_card.html" with is_advisor_note=True full_width=True full_height=True project=project is_editable=True title="Note interne aux conseillers" description=project.advisors_note_rendered updated_on=project.advisors_note_on card_user=project.advisors_note_by %}

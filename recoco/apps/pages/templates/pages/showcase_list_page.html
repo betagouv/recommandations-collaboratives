@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'pages/css/pages/showcase_list.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
-
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/pages-showcase-list.css.js' %}
+{% endblock js %}
 {% block content %}
     <h1 class="fr-mt-2w fr-ml-2v">{{ page.title }}</h1>
     <div class="showcase-gallery">

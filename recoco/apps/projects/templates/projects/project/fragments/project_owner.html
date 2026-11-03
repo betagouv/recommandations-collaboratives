@@ -1,18 +1,12 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/project_owner.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 {% if project.owner %}
     <div class="d-flex align-items-start fr-mb-2v">
         <span class="fr-mr-2v d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center font-size-12px">
                 <img class="rounded-circle fr-mr-2v"
                      src="{% gravatar_url project.owner.email size=16 %}"
                      alt="{{ action.actor }}">
@@ -23,7 +17,7 @@
                 </strong>
             </div>
         </span>
-        <span class="project-card__orgname fw-light specific-color-666">
+        <span class="project-card__orgname fw-light specific-color-666 font-size-12px">
             {{ project.owner.profile.organization.name|default:project.org_name }}
         </span>
         {% if 'use_crm' in user_site_perms %}
@@ -34,6 +28,24 @@
                 </svg>
             </a>
         {% endif %}
+    </div>
+{% elif project.status == 'PRE_DRAFT' %}
+    <div class="d-flex flex-column align-items-start fr-mb-2v">
+        <span class="fr-mr-2v d-flex align-items-center font-size-12px">
+            <img class="rounded-circle fr-mr-2v"
+                 src="{% gravatar_url project_creation_request.email size=24 %}"
+                 alt="{{ action.actor }}">
+            <strong class="text-nowrap project-card__projectowner">{{ project_creation_request.email }}</strong>
+        </span>
+        <div class="fr-notice fr-notice--warning fr-mt-2v">
+            <div class="fr-container">
+                <div class="fr-notice__body">
+                    <p>
+                        <span class="fr-notice__title font-size-12px">Cet utilisateur n'a pas encore créé son compte.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 {% else %}
     <div class="d-flex flex-column align-items-start fr-mb-2v">

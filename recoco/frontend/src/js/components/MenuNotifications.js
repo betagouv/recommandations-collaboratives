@@ -16,10 +16,36 @@ function MenuNotifications(notificationNumber, listNofification) {
     initNewNotification(notificationIndex) {
       this.isNotificationShown[notificationIndex] = true;
     },
-    async clickConsummeNotificationAndRedirect(notificationId, targetUrl) {
-      await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
-      // redirect to the notification target
-      window.open(`${window.location.origin}${targetUrl}`, '_blank');
+    async clickConsummeNotificationAndRedirect(
+      event,
+      notificationId,
+      targetUrl,
+      { conversationContext } = { conversationContext: false }
+    ) {
+      // Logic when user want to open it in another window
+      const isModifierClick =
+        event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1;
+
+      if (isModifierClick) {
+        if (!conversationContext) {
+          api
+            .patch(notificationsMarkAsReadByIdUrl(notificationId), {})
+            .catch(() => {});
+        }
+        return;
+      }
+
+      event.preventDefault();
+      if (!conversationContext) {
+        try {
+          await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
+        } catch (e) {
+          this.showToast(
+            'Erreur lors de la mise à jour de la notification. Merci de réessayer plus tard.'
+          );
+        }
+      }
+      window.location.href = `${window.location.origin}${targetUrl}`;
     },
     getNotificationLink(targetUrl) {
       return `${window.location.origin}${targetUrl}`;

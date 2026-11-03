@@ -10,22 +10,31 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
+from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
+from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import ListAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+)
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
+from recoco.apps.api_keys.authentication import ServiceAPIKeyAllowedMixin
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
     VectorSearchFilter,
@@ -40,36 +49,95 @@ from recoco.utils import (
     get_group_for_site,
     has_perm,
     has_perm_or_403,
+    is_staff_for_site,
 )
 
 from .. import models, signals
-from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
+from ..filters import (
+    DefaultNoDeletedFilter,
+    DepartmentsFilter,
+    PluginLookupsFilter,
+    ProjectActivityFilter,
+    ProjectAssignedToUserFilter,
+    ProjectSiteStatusFilter,
+)
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
+    NewProjectSerializer,
+    ProjectAdvisorSerializer,
     ProjectForListSerializer,
+    ProjectLocationSerializer,
+    ProjectMemberSerializer,
+    ProjectMembershipRoleSerializer,
+    ProjectMembershipSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
+from ..utils import remove_member
 
 ########################################################################
 # Project API
 ########################################################################
 
 
-class ProjectDetail(APIView):
+class CanModerateProjectsOnSite(permissions.BasePermission):
+    """Allow users who can moderate projects on the current site"""
+
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.moderate_projects", request.site)
+
+
+class IsStaffForSite(permissions.BasePermission):
+    """Allow the staff of the current site"""
+
+    def has_permission(self, request, view):
+        return is_staff_for_site(request.user, request.site)
+
+
+class ProjectDetail(
+    ServiceAPIKeyAllowedMixin, RetrieveAPIView
+):  # NB : interfaces are not completely respected due to legacy, cf #2077
     """Retrieve a project"""
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProjectSerializer
+    # todo filter should not be necessary after cleaning recoco_sync 2122
+    filter_backends = [DefaultNoDeletedFilter]
 
     def get_object(self, pk):
         try:
-            return models.Project.on_site.with_site_status().get(pk=pk)
+            return (
+                (
+                    self.filter_queryset(self.get_queryset()).prefetch_related(
+                        Prefetch(
+                            "switchtenders",
+                            User.objects.select_related(
+                                "profile",
+                                "profile__organization",
+                                "profile__organization__group",
+                            ),
+                        ),
+                        "project_sites",
+                        "tags",
+                        "project_creation_requests",
+                        "topics",
+                    )
+                )
+                .with_perf_prefetch("owner")
+                .get(pk=pk)
+            )
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
+
+    def get_queryset(self):
+        # todo all_on_site should not be necessary after cleaning recoco_sync 2122
+        return models.Project.all_on_site.with_site_status().select_related(
+            "commune__department__region",
+        )
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
@@ -82,22 +150,182 @@ class ProjectDetail(APIView):
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
-        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
-            request.user, "projects.change_location", p
-        )  # need at least one write perm
+
+        # The minimal perm required to allow a PATCH
+        has_perm_or_403(request.user, "projects.change_location", p)
         context = {"request": request, "view": self, "format": format}
-        serializer = UserProjectSerializer(
+
+        # Only advisors/observers hold `change_project` (and, together with
+        # it, `use_project_tags` -> see `ADVISOR_PERMISSIONS`).
+        # Collaborators, draft or not, only hold `change_location`.
+        write_serializer_class = (
+            UserProjectSerializer
+            if has_perm(request.user, "projects.change_project", p)
+            else ProjectLocationSerializer
+        )
+        write_serializer = write_serializer_class(
             p, context=context, data=request.data, partial=True
         )
-        if serializer.is_valid():
+        if write_serializer.is_valid():
             # old = copy(p)
-            serializer.save()
+            write_serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
             #     )
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(UserProjectSerializer(p, context=context).data)
+        return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectCreate(ServiceAPIKeyAllowedMixin, CreateAPIView):
+    """Create a project on the current site
+
+    The project is submitted on behalf of its owner by the authenticated
+    caller, and skips moderation: it is created already validated, and no one
+    is notified of its submission.
+
+    Two fields differ from the other project endpoints:
+
+    - `insee`: the commune is given as an INSEE code rather than as a primary
+      key, since that is what identifies a commune unambiguously for an API
+      client. An unknown code is rejected with a `400`.
+    - `owner_email`: the owner is given as an email address. If no account
+      exists for it, one is created and added to the current site; the user is
+      then assigned to the project as its owner.
+
+    Both are write-only: the created project is returned with its full
+    `commune` representation, and without the owner email.
+
+    The `status` of the project on the current site can be given, and defaults
+    to `TO_PROCESS`, which is the status of a project that has been validated
+    but not yet processed.
+
+    The caller must be allowed to moderate projects on the current site.
+    """
+
+    permission_classes = [permissions.IsAuthenticated, CanModerateProjectsOnSite]
+    serializer_class = NewProjectSerializer
+
+
+class ProjectMembershipMixin:
+    """Give the project of the url to the membership views and serializers"""
+
+    # restricted to staff, so that it never allows someone the project
+    # administration refuses, cf. test_project_membership_api_never_allows_more
+    permission_classes = [permissions.IsAuthenticated, IsStaffForSite]
+
+    @cached_property
+    def project(self) -> models.Project:
+        return get_object_or_404(models.Project.on_site, pk=self.kwargs["pk"])
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["project"] = self.project
+        return context
+
+
+class ProjectMembershipList(
+    ProjectMembershipMixin, ServiceAPIKeyAllowedMixin, CreateAPIView
+):
+    """List or attach the participants, advisors and observers of a project
+
+    `GET` lists the people attached to the project, in two lists:
+
+    - `members`: the participants, each one with an `email`, a `first_name`, a
+      `last_name` and an `is_owner` flag, only set for the owner of the project;
+    - `advisors`: the advisors and observers of the current site, each one with
+      an `email`, a `first_name`, a `last_name` and an `is_observer` flag.
+
+    Someone who is both participant and advisor is in both lists.
+
+    `POST` attaches someone to the project. The person is given by email, in
+    the `email` field, and its account is created if it does not exist yet.
+    The `role` field says how it is attached to the project:
+
+    - `COLLABORATOR`: a participant, member of the project team;
+    - `SWITCHTENDER`: an advisor, who follows the project for the site;
+    - `OBSERVER`: an observer, an advisor who is only kept informed.
+
+    The attachment is immediate: unlike an invitation, no email is sent and
+    there is nothing to accept. Attaching someone who already holds the role
+    on this project is a no-op, and still answers a `201`. Attaching an advisor
+    as an observer, or the other way around, switches their role.
+
+    The project has to be one of the current site, and the caller must be
+    allowed to moderate projects on that site.
+    """
+
+    serializer_class = ProjectMembershipSerializer
+
+    def get(self, request, *args, **kwargs):
+        members = self.project.projectmember_set.select_related("member")
+        advisors = self.project.switchtender_sites.on_site().select_related(
+            "switchtender"
+        )
+
+        return Response(
+            {
+                "members": ProjectMemberSerializer(
+                    members.order_by("-is_owner", "member__username"), many=True
+                ).data,
+                "advisors": ProjectAdvisorSerializer(
+                    advisors.order_by("switchtender__username"), many=True
+                ).data,
+            }
+        )
+
+
+class ProjectMembershipDetail(
+    ProjectMembershipMixin, ServiceAPIKeyAllowedMixin, GenericAPIView
+):
+    """Change the role of a member of a project, or remove it from the project
+
+    The member is given by email, in the url.
+
+    `PATCH` changes its role, given in the `role` field, with the same values
+    as for attaching someone to the project. The member only keeps the given
+    role: someone both participant and advisor is no longer the other one.
+
+    `DELETE` removes the member from the project, whatever its roles, and
+    deletes its notifications about the project.
+
+    In both cases, a `404` is answered if the person is not a member of the
+    project, and a `400` if it is the owner of the project, who cannot be
+    changed nor removed.
+
+    The project has to be one of the current site, and the caller must be
+    staff for that site.
+    """
+
+    serializer_class = ProjectMembershipRoleSerializer
+
+    def get_object(self) -> User:
+        user = get_object_or_404(User, username=self.kwargs["email"].lower())
+
+        members = self.project.projectmember_set.filter(member=user)
+        advisors = self.project.switchtender_sites.on_site().filter(switchtender=user)
+        if not (members.exists() or advisors.exists()):
+            raise Http404
+
+        if members.filter(is_owner=True).exists():
+            raise ValidationError(
+                {"email": "The owner of a project cannot be changed nor removed."}
+            )
+
+        return user
+
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object(), data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+
+        remove_member(user, self.project, request.site)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectList(ListAPIView):
@@ -112,11 +340,16 @@ class ProjectList(ListAPIView):
         DepartmentsFilter,
         ProjectActivityFilter,
         ProjectSiteStatusFilter,
+        ProjectAssignedToUserFilter,
+        PluginLookupsFilter,
+        # todo filter should not be necessary after cleaning recoco_sync 2122
+        DefaultNoDeletedFilter,
     ]
 
     def get_queryset(self):
         return (
-            models.Project.on_site.for_user(self.request.user)
+            # todo all_on_site should not be necessary after cleaning recoco_sync 2122
+            models.Project.all_on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
             .annotate(
                 project_site_status=Subquery(
@@ -125,16 +358,50 @@ class ProjectList(ListAPIView):
                     ).values("status")
                 )
             )
+        )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        pm = get_site_plugin_manager(self.request)
+        extra_fields = []
+        for fields in pm.hook.crm_project_list_extra_serializer_fields(
+            request=self.request
+        ):
+            extra_fields.extend(fields)
+        context["plugin_extra_fields"] = extra_fields
+        return context
+
+    def list(self, request, *args, **kwargs):
+        queryset = (
+            self.filter_queryset(self.get_queryset())
             .prefetch_related(
-                "commune__department",
-                "switchtenders__profile__organization",
+                Prefetch(
+                    "switchtenders",
+                    User.objects.select_related(
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
+                    ),
+                ),
                 "project_sites",
                 "tags",
+                "topics",
+                "members",
+                "project_creation_requests",
+            )
+            .with_perf_prefetch("owner")
+            .select_related(
+                "commune__department__region",
             )
         )
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        # Apply plugin queryset annotations (e.g. realisations_count)
+        pm = get_site_plugin_manager(request)
+        plugin_annotations = {}
+        for p_annotations in pm.hook.crm_project_list_annotations(request=request):
+            plugin_annotations.update(p_annotations)
+        if plugin_annotations:
+            queryset = queryset.annotate(**plugin_annotations)
 
         # Paginate the queryset
         page = self.paginate_queryset(queryset)
@@ -530,9 +797,11 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
     def get_queryset(self):
         qs = models.ProjectSite.objects.filter(site=self.request.site)
 
+        if not has_perm(self.request.user, "list_projects", self.request.site):
+            # from PROJECTSITE_STATES
+            qs = qs.exclude(status="TO_PROCESS")
         if not has_perm(self.request.user, "moderate_projects", self.request.site):
-            qs = qs.exclude(status__in=["DRAFT", "PROPOSED"])
-
+            qs = qs.exclude(status__in=["DRAFT", "PRE_DRAFT"])
         return qs
 
     def list(self, request):

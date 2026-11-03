@@ -133,11 +133,11 @@ async function fetchParcelsIgn(insee) {
 }
 
 async function fetchGeolocationByAddress(address, commune) {
-  if (address.length < 3) {
+  if (!address || address.length < 3) {
     return;
   }
   const apiEndpoint = `${API_ADRESSE}/search?`;
-  const searchParams = { q: address, limit: 10 }; // TODO
+  const searchParams = { q: address, limit: 10 };
   if (commune) {
     const { name, insee, postal } = commune;
     searchParams['city'] = name ?? undefined;

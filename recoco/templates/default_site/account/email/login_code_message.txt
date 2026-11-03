@@ -1,0 +1,11 @@
+{% extends "account/email/base_message.txt" %}
+{% load i18n %}
+
+{% block content %}Votre code pour vous connecter à {{ current_site.name }} est le :
+
+{{ code }}
+
+Vous pouvez le copier-coller sur le site {{ current_site.name }}. Il est valable pendant 1h.
+Si vous n'avez pas demandé à vous connecter sur le site, vous pouvez simplement ignorer cet email.
+
+Bonne journée,{% endblock content %}

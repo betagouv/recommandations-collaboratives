@@ -1,15 +1,10 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/kanban.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/pageInvitation.js' %}
+    {% vite_asset 'js/styles/kanban.css.js' %}
 {% endblock js %}
 {% block title %}
     {{ request.site.name }} - Invitation à rejoindre le dossier {{ invite.project.name }}

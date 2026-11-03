@@ -46,13 +46,6 @@ function Tutorial(challengeCode) {
         steps: this.steps,
       });
 
-      if (
-        this.showTuto &&
-        this.challengeCode == 'time-filter-tutorial-on-kanban'
-      ) {
-        this.handleStartTour();
-      }
-
       this.tour.oncomplete(async () => {
         this.acquireChallenge(this.challengeCode);
       });

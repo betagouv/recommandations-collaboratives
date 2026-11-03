@@ -47,3 +47,200 @@
 .fr-icon-tools-line::before {
   mask-image: url(../assets/tools-line.svg);
 }
+
+.fr-icon-double-check-line::after,
+.fr-icon-double-check-line::before {
+  mask-image: url(../assets/check-double-line.svg);
+}
+
+.fr-icon-list-check-line::after,
+.fr-icon-list-check-line::before {
+  mask-image: url(../assets/list-check.svg);
+}
+
+.fr-icon-contact-book-line::after,
+.fr-icon-contact-book-line::before {
+  mask-image: url(../assets/contacts-book-line.svg);
+}
+
+.fr-icon-calendar-line::after,
+.fr-icon-calendar-line::before {
+  mask-image: url(../assets/calendar.svg);
+}
+
+.fr-icon-answer-arrow-line::after,
+.fr-icon-answer-arrow-line::before {
+  mask-image: url(../assets/answer-arrows.svg);
+}
+
+.fr-icon-answer-delete::after,
+.fr-icon-answer-delete::before {
+  mask-image: url(../assets/delete.svg);
+}
+
+.fr-icon-send-message::after,
+.fr-icon-send-message::before {
+  mask-image: url(../assets/send-message-paper-plan.svg);
+}
+
+.fr-icon-attention::after,
+.fr-icon-attention::before {
+  mask-image: url(../assets/attention-indicator.svg);
+}
+
+.fr-icon-chat-1-line::after,
+.fr-icon-chat-1-line::before {
+  mask-image: url(../assets/chat-1-line.svg);
+}
+
+.fr-icon-reply-line::after,
+.fr-icon-reply-line::before {
+  mask-image: url(../assets/reply-line.svg);
+}
+
+.fr-icon-target-line::after,
+.fr-icon-target-line::before {
+  mask-image: url(../assets/target.svg);
+}
+
+.fr-icon-building-line::after,
+.fr-icon-building-line::before {
+  mask-image: url(../assets/building.svg);
+}
+
+.fr-icon-file-copy-2-line::after,
+.fr-icon-file-copy-2-line::before {
+  mask-image: url(../assets/file-copy-2-line.svg);
+}
+
+.fr-icon-magic-fill::after,
+.fr-icon-magic-fill::before {
+  mask-image: url(../assets/magic-fill.svg);
+}
+
+.fr-icon-pushpin-line::after,
+.fr-icon-pushpin-line::before {
+  mask-image: url(../assets/pushpin-line.svg);
+}
+
+.fr-icon-hat-and-glasses::after,
+.fr-icon-hat-and-glasses::before {
+  mask-image: url(../assets/hat-and-glasses.svg);
+}
+
+.fr-icon-mail::after,
+.fr-icon-mail::before {
+  mask-image: url(../assets/mail.svg);
+}
+
+.fr-icon-people::after,
+.fr-icon-people::before {
+  mask-image: url(../assets/people.svg);
+}
+
+.fr-icon-link::after,
+.fr-icon-link::before {
+  mask-image: url(../assets/link.svg);
+}
+
+.fr-icon-right-arrow::after,
+.fr-icon-right-arrow::before {
+  mask-image: url(../assets/right-arrow.svg);
+}
+
+.fr-icon-book::after,
+.fr-icon-book::before {
+  mask-image: url(../assets/book.svg);
+}
+
+.fr-icon-group::after,
+.fr-icon-group::before {
+  mask-image: url(../assets/group.svg);
+}
+
+.fr-icon-file::after,
+.fr-icon-file::before {
+  mask-image: url(../assets/file.svg);
+}
+
+.fr-icon-books::after,
+.fr-icon-books::before {
+  mask-image: url(../assets/books.svg);
+}
+
+.fr-icon-settings::after,
+.fr-icon-settings::before {
+  mask-image: url(../assets/settings.svg);
+}
+
+.fr-icon-article::after,
+.fr-icon-article::before {
+  mask-image: url(../assets/article.svg);
+}
+
+.fr-icon-swap-lines::after,
+.fr-icon-swap-lines::before {
+  mask-image: url(../assets/swap-lines.svg);
+}
+
+.fr-icon-questionnaire::after,
+.fr-icon-questionnaire::before {
+  mask-image: url(../assets/questionnaire.svg);
+}
+
+.fr-icon-fingerprint::after,
+.fr-icon-fingerprint::before {
+  mask-image: url(../assets/fingerprint.svg);
+}
+
+.fr-icon-check-line::after,
+.fr-icon-check-line::before {
+  mask-image: url(../assets/check-line.svg);
+}
+
+.fr-icon-hammer-line::after,
+.fr-icon-hammer-line::before {
+  mask-image: url(../assets/hammer-line.svg);
+}
+
+/* icon without mask - can have multiple colors */
+
+.fr-icon-file-color::after,
+.fr-icon-file-color::before {
+  background-color: transparent;
+  background-image: url(../assets/file-color.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-mail-with-hints::after,
+.fr-icon-mail-with-hints::before {
+  background-color: transparent;
+  background-image: url(../assets/mail-with-hints.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-mockup-with-images::after,
+.fr-icon-mockup-with-images::before {
+  background-color: transparent;
+  background-image: url(../assets/mockup-with-images.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-justice-scale::after,
+.fr-icon-justice-scale::before {
+  background-color: transparent;
+  background-image: url(../assets/justice-scale.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.fr-icon-system::after,
+.fr-icon-system::before {
+  background-color: transparent;
+  background-image: url(../assets/system.svg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}

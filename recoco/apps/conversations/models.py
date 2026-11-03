@@ -5,14 +5,12 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
 from django.urls import reverse
 from django.utils.http import urlencode
-from markdownx.utils import markdownify
 from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
 
-from recoco.apps.addressbook import models as addressbook_models
-from recoco.apps.projects import models as projects_models
-from recoco.apps.tasks import models as tasks_models
+from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
+from recoco.utils import render_markdown
 
 
 class MessageNotDeletedManager(models.Manager):
@@ -25,7 +23,7 @@ class Message(TimeStampedModel):
     not_deleted = MessageNotDeletedManager()
 
     project = models.ForeignKey(
-        projects_models.Project,
+        "projects.Project",
         on_delete=models.CASCADE,
         related_name="public_messages",
     )
@@ -78,6 +76,19 @@ class Node(PolymorphicModel):
         raise NotImplementedError()
 
 
+def visible_nodes(nodes):
+    """Drop the nodes of plugins the current tenant has not enabled."""
+    return exclude_disabled_plugin_objects(nodes, "polymorphic_ctype")
+
+
+def exclude_plugin_only_messages(messages):
+    """Drop the messages made only of nodes of plugins the current tenant has
+    not enabled: they would show up empty.
+    """
+    nodes = Node.objects.non_polymorphic().filter(message=models.OuterRef("pk"))
+    return messages.exclude(models.Exists(nodes) & ~models.Exists(visible_nodes(nodes)))
+
+
 class MarkdownTextMixin(models.Model):
     text = models.TextField()
 
@@ -93,7 +104,7 @@ class MarkdownNode(Node, MarkdownTextMixin):
 
 
 class RecommendationNode(Node, MarkdownTextMixin):
-    recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
+    recommendation = models.ForeignKey("tasks.Task", on_delete=models.CASCADE)
     count_label = "recommandation"
 
     def get_digest_recap(self):
@@ -101,24 +112,24 @@ class RecommendationNode(Node, MarkdownTextMixin):
 
         if self.recommendation.resource is None:
             res = res | {
-                "text": markdownify(self.text),
+                "text": render_markdown(self.text),
                 "title": self.recommendation.intent,
             }
         else:
             res = res | {
                 "title": self.recommendation.resource.title,
                 "subtitle": self.recommendation.resource.subtitle,
-                "text": markdownify(self.text),
+                "text": render_markdown(self.text),
             }
         return res
 
 
 class ContactNode(Node):
-    contact = models.ForeignKey(addressbook_models.Contact, on_delete=models.CASCADE)
+    contact = models.ForeignKey("addressbook.Contact", on_delete=models.CASCADE)
     count_label = "contact"
 
     def get_digest_recap(self):
-        c: addressbook_models.Contact = self.contact
+        c = self.contact
         return {
             "type": "contact",
             "first_name": c.first_name,
@@ -132,7 +143,7 @@ class ContactNode(Node):
 
 
 class DocumentNode(Node):
-    document = models.ForeignKey(projects_models.Document, on_delete=models.CASCADE)
+    document = models.ForeignKey("projects.Document", on_delete=models.CASCADE)
     count_label = "document"
 
     def save(self, **kwargs):
@@ -148,5 +159,11 @@ class DocumentNode(Node):
             super().delete(**kwargs)
 
     def get_digest_recap(self):
-        d: projects_models.Document = self.document
+        d = self.document
         return {"type": "document", "name": d.filename()}
+
+
+# Core nodes standing for an object of their own (with a count_label and a
+# digest recap). Plugin nodes are deliberately left out: digest templates only
+# know these.
+OBJECT_NODE_TYPES = (RecommendationNode, ContactNode, DocumentNode)

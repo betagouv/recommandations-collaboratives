@@ -1,0 +1,34 @@
+{% comment %}
+    This NEW layout is used to display the form for the account signup.
+
+    Parameters:
+        - title (str): main title of the page
+        - legend (str): legend below title
+        - fallback_actions (boolean): display bottom part or layout
+
+{% endcomment %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/layout-form.css.js' %}
+{% endblock js %}
+{% block breadcrumbs %}
+{% endblock breadcrumbs %}
+<div class="layout-form__container">
+    <h1 class="layout-form__title">{{ title }}</h1>
+    <p class="layout-form__legend">
+        {{ legend }}
+    </p>
+    <!-- Main actions -->
+    <div class="layout-form__container-form layout-form__container-form--bg-blue">
+        {% block main_form %}
+        {% endblock main_form %}
+    </div>
+    {% if fallback_actions %}
+        <!-- Fallback actions -->
+        <div class="layout-form__container-fallback">
+            {% block fallback_actions %}
+                {% include "account/fragments/no_account_action.html" %}
+            {% endblock fallback_actions %}
+        </div>
+    {% endif %}
+</div>

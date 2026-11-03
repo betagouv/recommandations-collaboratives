@@ -14,16 +14,50 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
-from django.conf import settings
+import nh3
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth
+from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
+from django.contrib.syndication.views import Feed
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
-from django.http import HttpResponseBadRequest
-from sesame.tokens import create_token
+from django.http import HttpResponse, HttpResponseBadRequest
+from markdownx.utils import markdownify
+from sesame.utils import get_parameters
+
+# nh3's default allowlist is narrower than what our markdown pipeline
+# legitimately emits (MARKDOWNX_MARKDOWN_EXTENSIONS in settings/common.py):
+# it drops `target`/`referrerpolicy` on links (undoing
+# markdown_link_attr_modifier's new-tab/no-referrer config), and `id`/`class`
+# (breaking footnote anchors and code-block language classes). None of these
+# are XSS vectors once tags/handlers are stripped, so widen the allowlist
+# rather than let nh3.clean() silently mangle valid output.
+_MARKDOWN_ALLOWED_ATTRIBUTES = {
+    tag: attrs | {"id", "class"} for tag, attrs in nh3.ALLOWED_ATTRIBUTES.items()
+}
+for _tag in nh3.ALLOWED_TAGS:
+    _MARKDOWN_ALLOWED_ATTRIBUTES.setdefault(_tag, {"id", "class"})
+_MARKDOWN_ALLOWED_ATTRIBUTES["a"] = _MARKDOWN_ALLOWED_ATTRIBUTES["a"] | {
+    "target",
+    "title",
+    "referrerpolicy",
+}
+_MARKDOWN_ALLOWED_ATTRIBUTES["th"] = _MARKDOWN_ALLOWED_ATTRIBUTES["th"] | {"style"}
+_MARKDOWN_ALLOWED_ATTRIBUTES["td"] = _MARKDOWN_ALLOWED_ATTRIBUTES["td"] | {"style"}
+
+
+def render_markdown(text):
+    """Render markdown to HTML, stripping any embedded/unsafe HTML.
+
+    `markdownx.utils.markdownify` passes raw HTML embedded in the source
+    straight through, so its output is never safe to render with `|safe`
+    on its own -- always sanitize it here first.
+    """
+    return nh3.clean(markdownify(text or ""), attributes=_MARKDOWN_ALLOWED_ATTRIBUTES)
 
 
 def make_site_slug(site: Site):
@@ -109,6 +143,15 @@ def check_if_advisor(user, site=None):
     return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
 
 
+def is_sensitive_account(user, site=None):
+    return (
+        user.is_staff
+        | user.is_superuser
+        | is_staff_for_site(user)
+        | is_admin_for_site(user)
+    )
+
+
 def build_absolute_url(path, auto_login_user=None, site=None):
     """
     Where we can't use request,
@@ -125,26 +168,14 @@ def build_absolute_url(path, auto_login_user=None, site=None):
 
     if auto_login_user:
         # Check if the account is sensitive and should not allow autologin
-        sensitive_account = (
-            auto_login_user.is_staff
-            | auto_login_user.is_superuser
-            | is_staff_for_site(auto_login_user)
-            | is_admin_for_site(auto_login_user)
-        )
-
-        if not sensitive_account:
+        if not is_sensitive_account(auto_login_user):
             parsed_url = urlparse(url)
             params = parse_qs(parsed_url.query)
 
             url = urlunparse(
                 parsed_url._replace(
                     query=urlencode(
-                        params
-                        | {
-                            getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
-                                create_token(user=auto_login_user)
-                            ]
-                        },
+                        params | get_parameters(auto_login_user),
                         doseq=True,
                     )
                 )
@@ -167,9 +198,72 @@ def assign_site_admin(site, user):
     staff_group.user_set.add(user)
 
 
+def get_staff_for_site(site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("staff", site)
+    return auth_models.Group.objects.get(name=group_name).user_set.all()
+
+
+def get_admin_for_site(site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("admin", site)
+    return auth_models.Group.objects.get(name=group_name).user_set.all()
+
+
+def truncate_string(s, max_length):
+    """Truncate given string to max_length"""
+    if len(s) <= max_length:
+        return s
+    sub = s[:max_length]
+    if s[max_length] != " ":
+        # we are truncating last word, rewind to its begining
+        sub = sub[: sub.rfind(" ")]
+    return f"{sub}…"
+
+
+class AuthenticatedFeed(Feed):
+    permission_required = None
+
+    def guard_permission_required_use(self):
+        # code from django.contrib.auth.mixins.PermissionRequiredMixin
+        if self.permission_required is not None:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} should not be defined here. "
+                "You need to define has_permission method"
+            )
+
+    def __init__(self):
+        self.guard_permission_required_use()
+        super().__init__()
+
+    def has_permission(self, request):
+        return True
+
+    def __call__(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # TODO use this if BasicAuth is ok ? https://djangosnippets.org/snippets/813/
+            return HttpResponse(status=401)
+        if not self.has_permission(request):
+            return HttpResponse(status=403)
+        else:
+            return super().__call__(request, *args, **kwargs)
+
+
 ########################################################################
 # Test helpers
 ########################################################################
+
+
+def confirm_mail(user):
+    """tool for testing"""
+    EmailAddress.objects.get_or_create(
+        user=user, email=user.email, verified=True, primary=True
+    )
+
+
+def check_email_verified(user):
+    """tool for testing"""
+    return EmailAddress.objects.filter(user=user, verified=True).exists()
 
 
 @contextmanager
@@ -179,10 +273,13 @@ def login(
     user=None,
     groups=None,
     username="test",
-    email="test@example.com",
+    email=None,
+    email_verified=True,
 ):
     """Create a user and sign her into the application"""
     groups = groups or []
+    if email is None:
+        email = username + "@example.com"
     if not user:
         user = auth.User.objects.create_user(
             username=username, email=email, is_staff=is_staff
@@ -190,6 +287,8 @@ def login(
     for name in groups:
         group = auth.Group.objects.get(name=name)
         group.user_set.add(user)
+    if email_verified:
+        confirm_mail(user)
     client.force_login(user)
     yield user
 
@@ -244,6 +343,33 @@ class RunSQLFile(migrations.RunSQL):
             hints=hints,
             elidable=elidable,
         )
+
+
+def sanitize_text_field_historic_data(
+    model, field_name: str, db_alias: str, batch_size: int = 500
+):
+    """Retroactively run nh3.clean() over every non-empty value of
+    `field_name` on `model`, saving only the rows whose value actually
+    changes. Meant to be called from data migrations that apply, to
+    historic data, a sanitization that was added to a form/serializer
+    """
+    to_update = []
+    queryset = (
+        model.objects.using(db_alias)
+        .exclude(**{field_name: None})
+        .exclude(**{field_name: ""})
+    )
+    for obj in queryset.iterator():
+        value = getattr(obj, field_name)
+        cleaned = nh3.clean(value)
+        if cleaned != value:
+            setattr(obj, field_name, cleaned)
+            to_update.append(obj)
+        if len(to_update) >= batch_size:
+            model.objects.using(db_alias).bulk_update(to_update, [field_name])
+            to_update = []
+    if to_update:
+        model.objects.using(db_alias).bulk_update(to_update, [field_name])
 
 
 def strip_accents(input: str) -> str:

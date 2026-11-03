@@ -6,15 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("resources", "0001_initial"),
-        ("resources", "0002_auto_20210621_1640"),
-        ("resources", "0003_auto_20210621_1701"),
-        ("resources", "0004_auto_20210621_1708"),
-        ("resources", "0005_alter_category_color"),
-        ("resources", "0006_alter_resource_category"),
-    ]
-
     dependencies = []
 
     operations = [

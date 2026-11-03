@@ -1,0 +1,1313 @@
+Plugin System
+#############
+
+Recoco supports tenant-specific plugins: independent Python packages that add
+UI, logic, and database tables to the portals that enable them, without
+affecting the others.
+
+.. contents:: Table of Contents
+   :local:
+   :depth: 2
+
+
+Architecture Overview
+=====================
+
+.. code-block:: text
+
+    ┌─────────────────────────────────────────────┐
+    │               Recoco Core                   │
+    │  (public schema, shared across all tenants) │
+    └────────────────────┬────────────────────────┘
+                         │ pluggy hooks
+           ┌─────────────┴──────────────┐
+           ▼                            ▼
+    ┌──────────────────┐        ┌──────────────────┐
+    │ plugin_mi_depafi │        │   plugin_giphy   │
+    │ (plugin_mi_depafi│        │  (plugin_giphy   │
+    │      schema)     │        │     schema)      │
+    └──────────────────┘        └──────────────────┘
+
+    runtime search_path (static): public, plugin_mi_depafi, plugin_giphy
+
+Four mechanisms work together:
+
+- **pluggy** - defines a formal hook contract between the core and plugins.
+- **PostgreSQL schemas** - each plugin gets its own schema, named after its
+  app label and shared by all tenants; the ``public`` schema holds core data.
+- **Row-level site scoping** - plugin models subclass ``PluginModel`` and
+  carry a ``site`` foreign key, like core models do.
+- **PluginURLResolver** - routes are only exposed to the tenants that have the
+  plugin enabled.
+
+
+Plugin Package Structure
+========================
+
+A plugin is a standard Python package, typically named ``plugin_<name>``,
+with an entry point that registers it with the core.
+
+.. code-block:: text
+
+    plugin_giphy/              ← package root (contains pyproject.toml)
+    ├── pyproject.toml
+    └── plugin_giphy/          ← Django app
+        ├── __init__.py
+        ├── apps.py
+        ├── plugin.py          ← pluggy hook implementations
+        ├── models.py
+        ├── views.py
+        ├── urls.py
+        ├── templates/
+        │   └── plugin_giphy/
+        │       └── search.html
+        └── migrations/
+            └── 0001_initial.py
+
+
+``pyproject.toml``
+------------------
+
+The entry point under ``recoco.plugins`` is what the core uses to discover
+the plugin automatically at startup.
+
+.. code-block:: toml
+
+    [build-system]
+    requires = ["hatchling"]
+    build-backend = "hatchling.build"
+
+    [project]
+    name = "plugin-giphy"
+    version = "0.1.0"
+    requires-python = ">=3.11"
+    dependencies = ["django>=4.2"]
+
+    [project.entry-points."recoco.plugins"]
+    plugin_giphy = "plugin_giphy.plugin:GiphyPlugin"
+
+    [tool.hatch.build.targets.wheel]
+    packages = ["plugin_giphy"]
+
+
+``apps.py``
+-----------
+
+The ``AppConfig.name`` must match the top-level package name exactly so that
+Django can resolve migrations and models correctly.
+
+.. code-block:: python
+
+    from django.apps import AppConfig
+
+    class PluginGiphyConfig(AppConfig):
+        default_auto_field = "django.db.models.BigAutoField"
+        name = "plugin_giphy"
+
+The entry point name, the package name and the app label must be the same
+``plugin_<name>``: a plugin is enabled by name (``enabled_plugins``, hooks,
+URLs), while its schema, search and objects in core tables are found by app
+label. Two system checks enforce it:
+
+- ``plugins.E002``: the plugin name does not start with ``plugin_`` (its
+  tables would go to ``public`` and it would be handled as a core app);
+- ``plugins.E003``: the app label differs from the plugin name (don't set a
+  custom ``label`` on the ``AppConfig``).
+
+
+Defining a Hook Specification
+==============================
+
+Hook specifications live in ``recoco/apps/plugins/hooks.py``.  They declare
+the *contract* - name, parameters, and return-value semantics - that every
+plugin implementation must follow.
+
+Each spec class subclasses ``HookSpec``. Subclassing is enough to register
+it: ``all_specs()`` returns every ``HookSpec`` subclass, and ``manager.py``
+passes each of them to ``pm.add_hookspecs()``. There is no need to touch
+``manager.py`` when adding a new spec class.
+
+Hook spec classes are organized by domain. ``ProjectSpec`` is the canonical
+home for project-related hooks; ``ResourceSpec`` for resource-related hooks:
+
+.. code-block:: python
+
+    # recoco/apps/plugins/hooks.py
+    import pluggy
+
+    hookspec = pluggy.HookspecMarker("recoco")
+
+
+    class HookSpec:
+        """Base class for hook specification namespaces."""
+
+
+    def all_specs():
+        return HookSpec.__subclasses__()
+
+
+    class ProjectSpec(HookSpec):
+        @hookspec
+        def project_tab_entries(self):
+            """Return a list of (url_name, label) tuples to add as project tabs.
+
+            Each plugin that implements this hook contributes one or more
+            entries.  The core collects all results with::
+
+                pm.hook.project_tab_entries()
+
+            which returns a list of lists (one per registered plugin).
+            """
+
+
+    class ResourceSpec(HookSpec):
+        @hookspec
+        def resource_sidebar_panels(self, resource, request):
+            """Return an HTML string to inject into the resource detail right sidebar.
+
+            Each plugin renders its own fragment and returns the HTML string.
+            The core collects all results and renders them in order::
+
+                pm.hook.resource_sidebar_panels(resource=resource, request=request)
+
+            which returns a list of HTML strings (one per registered plugin).
+            """
+
+Anatomy of a hookspec decorator
+---------------------------------
+
+``@hookspec`` supports several keyword arguments that change call semantics:
+
+``firstresult=True``
+    Stop calling further plugins as soon as one returns a non-``None`` value.
+    Useful for hooks that should be *overridden* rather than *aggregated*
+    (e.g. a single renderer or a permission gate).
+
+``historic=True``
+    Replay the hook call for late-registered plugins (plugins added after the
+    hook was already called).  Useful during app initialisation.
+
+``warn_on_impl``
+    Emit a warning whenever a plugin implements this hook.  Handy for
+    deprecating a hook without removing it.
+
+Example - adding a new hookspec
+---------------------------------
+
+Suppose you want every enabled plugin to be able to inject extra context into
+the project-detail view.  Add the spec to ``ProjectSpec``:
+
+.. code-block:: python
+
+    # recoco/apps/plugins/hooks.py
+    class ProjectSpec(HookSpec):
+        @hookspec
+        def project_tab_entries(self):
+            """Return a list of (url_name, label) tuples to add as project tabs."""
+
+        @hookspec
+        def project_detail_extra_context(self, request, project):
+            """Return a dict of extra template context for the project-detail view.
+
+            Each plugin returns a dict; the core merges all dicts together::
+
+                extra = {}
+                for ctx in pm.hook.project_detail_extra_context(
+                    request=request, project=project
+                ):
+                    extra.update(ctx)
+            """
+
+Then call it in the core view:
+
+.. code-block:: python
+
+    # recoco/apps/projects/views.py
+    from recoco.apps.plugins.manager import get_site_plugin_manager
+
+    def project_detail(request, pk):
+        project = get_object_or_404(Project, pk=pk)
+        pm = get_site_plugin_manager(request=request)
+
+        extra_context = {}
+        for ctx in pm.hook.project_detail_extra_context(
+            request=request, project=project
+        ):
+            extra_context.update(ctx)
+
+        return render(request, "projects/detail.html", {
+            "project": project,
+            **extra_context,
+        })
+
+Hook Implementation (``plugin.py``)
+------------------------------------
+
+Plugins implement hooks defined by the core using ``pluggy``.
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    import pluggy
+
+    hookimpl = pluggy.HookimplMarker("recoco")
+
+    class GiphyPlugin:
+        urls_module = "plugin_giphy.urls"
+
+        @hookimpl
+        def project_tab_entries(self):
+            """Inject a "Giphy" tab on every project page."""
+            return ("plugin_giphy:search", "Giphy")
+
+        @hookimpl
+        def project_detail_extra_context(self, request, project):
+            """Add trending GIFs to the project-detail context."""
+            return {"trending_gifs": ["https://example.com/1.gif"]}
+
+
+Available Hooks
+================
+
+The core ships with several hook specification namespaces, defined in
+``recoco/apps/plugins/hooks.py``. Each ``@hookspec``-decorated method has a
+full docstring with its return contract and an example - the list below is
+a quick index.
+
+``ProjectSpec``
+---------------
+
+``project_tab_entries()``
+    Add a tab to the project detail page navigation. Returns
+    ``(url_name, label)``.
+
+``project_overview_sidebar_blocks(project, request)``
+    Inject an HTML fragment into the project overview right sidebar, right
+    below the project info block (name, organization, commune, tags). The
+    rendering order of blocks from several plugins is not guaranteed. The
+    returned string must be wrapped with ``mark_safe()``. The page is visible
+    to anyone allowed to view the project, not only staff: check
+    ``request.user`` before exposing sensitive data, and return ``None`` to
+    render nothing.
+
+``ResourceSpec``
+----------------
+
+``resource_sidebar_panels(resource, request)``
+    Inject an HTML fragment into the resource detail right sidebar.
+
+``ConversationSpec``
+---------------------
+
+``conversation_message_node_html(request, project)``
+    Return Alpine ``<template x-if="node.type == '...'">`` fragments
+    handling custom message node types in the conversation feed.
+
+``conversation_extra_html(request, project)``
+    Return HTML injected once into the conversation page - page-level
+    assets (``<script>`` / ``{% vite_asset %}``) and globally-mounted UI
+    such as modals.
+
+See `Conversation Hooks & JS Integration`_ below for a worked example.
+
+``DigestSpec``
+-------------
+
+``send_digests_for_staff_users(site, user, dry_run)``
+    Called once per staff user in ``senddigests``, before the standard digest
+    loop. Implementations must query ``user.notifications(manager="on_site").unsent()``
+    filtered to the verbs they own, send their email, then call
+    ``notifications.mark_as_sent()`` to prevent double-delivery. Return the
+    count of notifications consumed (0 if nothing was sent).
+
+    The hook is called via the site-scoped plugin manager, so only plugins
+    enabled for the current site are invoked.
+
+    Example::
+
+        @hookimpl
+        def send_digests_for_staff_users(self, site, user, dry_run):
+            from .digests import send_my_digest
+            return send_my_digest(site, user, dry_run)
+
+``NotificationSpec``
+--------------------
+
+``notification_project_verbs()``
+    Return a list of notification verb strings (see ``recoco.verbs``) to add
+    to ``show_project_verb_list`` - the notifications shown grouped under a
+    project in the notifications UI.
+
+    The hook is called via the site-scoped plugin manager from
+    ``unread_notifications_processor`` (``recoco/apps/projects/context_processors.py``),
+    so only plugins enabled for the current site contribute their verbs.
+
+    Example::
+
+        @hookimpl
+        def notification_project_verbs(self):
+            return [PluginVerbs.GIPHY_ADDED]
+
+``CrmSpec``
+-----------
+
+``crm_navigation_tabs(request)``
+    Add a tab to the CRM navigation. Returns a dict with ``label``,
+    ``url_name``, ``tab_key`` and ``index``. Builtin CRM tabs use indexes
+    0, 10, 20, 30, 40, 50 (Accueil, Dossiers, Utilisateurs, Organisations,
+    Ressources, Paramètres). Rendered with the ``plugin_tabs`` template tag,
+    see `Navigation Tabs Template Tag`_.
+
+``crm_project_list_annotations(request)``
+    Add queryset annotations (e.g. ``Count(...)``) to the CRM project list,
+    avoiding N+1 queries.
+
+``crm_project_list_extra_serializer_fields(request)``
+    Expose annotated fields (declared via ``crm_project_list_annotations``)
+    in the REST list response.
+
+``crm_project_list_columns(request)``
+    Add a column to the CRM project list table. Returns a dict with
+    ``header``, ``cell_html`` and an optional ``col_class``.
+
+See `CRM Project List Extension Example`_ below for how the three
+``crm_project_list_*`` hooks work together.
+
+``HeaderSpec``
+--------------
+
+``main_navigation_tabs(request)``
+    Add an entry to the main header navigation
+    (``header/menu-top-secondary.html``). Returns a dict with ``label``,
+    ``url_name`` and ``index``. Unlike ``crm_navigation_tabs``, there is no
+    ``tab_key``: the entry is marked active when the current view name
+    equals ``url_name``.
+
+    The header currently exposes a single insertion slot, right after
+    "Ressources": only entries whose ``index`` is strictly between 40 and
+    50 are rendered.
+
+    Example::
+
+        @hookimpl
+        def main_navigation_tabs(self, request):
+            return {
+                "label": "Giphy",
+                "url_name": "plugin_giphy:search",
+                "index": 45,
+            }
+
+
+Navigation Tabs Template Tag
+============================
+
+Navigation hooks (``crm_navigation_tabs``, ``main_navigation_tabs``) are
+rendered with the generic ``plugin_tabs`` tag from
+``recoco/apps/plugins/templatetags/plugins_extra.py``:
+
+.. code-block:: django
+
+    {% load plugins_extra %}
+
+    {% plugin_tabs "crm_navigation_tabs" 10 20 as plugin_tabs %}
+    {% for tab in plugin_tabs %}
+        <a href="{{ tab.url }}"
+           {% if tab.active %}aria-current="page"{% endif %}>{{ tab.label }}</a>
+    {% endfor %}
+
+``{% plugin_tabs "<hook_name>" min_index max_index as tabs %}``
+
+- calls the hook named ``hook_name`` on the site-scoped plugin manager, so
+  only plugins enabled for the current site contribute;
+- keeps only the tabs whose ``index`` is strictly between ``min_index`` and
+  ``max_index``, sorted by ``index``. Call the tag once between each pair of
+  adjacent builtin tabs so that a plugin can pick its position with its
+  ``index`` (e.g. ``25`` to land between the builtin tabs 20 and 30);
+- adds two keys to each tab dict: ``url`` (``reverse(url_name)``) and
+  ``active`` (``True`` when the current view name equals ``url_name``);
+- silently drops tabs whose ``url_name`` cannot be reversed (e.g. the owning
+  plugin is disabled on the current tenant);
+- raises ``TemplateSyntaxError`` if ``hook_name`` is not a declared hook.
+
+
+CRM Project List Extension Example
+====================================
+
+The three ``crm_project_list_*`` hooks work together to add a column to the
+CRM project list without N+1 queries:
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    from django.db.models import Count
+
+    class GiphyPlugin:
+        ...
+
+        @hookimpl
+        def crm_project_list_annotations(self, request):
+            """Annotate the queryset so the count is computed in SQL."""
+            return {"giphy_searches_count": Count("giphysearch")}
+
+        @hookimpl
+        def crm_project_list_extra_serializer_fields(self, request):
+            """Expose the annotation in the REST payload."""
+            return ["giphy_searches_count"]
+
+        @hookimpl
+        def crm_project_list_columns(self, request):
+            """Render the column header and cell."""
+            return {
+                "header": "Recherches Giphy",
+                "cell_html": '<td x-text="project.giphy_searches_count"></td>',
+                "col_class": "col--small",
+            }
+
+- ``crm_project_list_annotations`` adds the queryset annotation.
+- ``crm_project_list_extra_serializer_fields`` exposes it in the REST
+  payload consumed by the Alpine table.
+- ``crm_project_list_columns`` renders the ``<th>``/``<td>`` pair;
+  ``project`` is in scope for ``cell_html`` Alpine expressions
+  (``x-text``, ``:href``, etc.).
+
+
+Conversation Hooks & JS Integration
+====================================
+
+The conversation feed (project detail → "Échanges") can be extended with
+custom message node types - for example, a plugin that lets users share a
+GIF inline in the discussion.
+
+Two hooks work together on the Python side:
+
+``conversation_message_node_html(request, project)``
+    Returns an Alpine ``<template x-if="node.type == '...'">`` fragment. It
+    is rendered inside the ``x-for="node in element.nodes"`` loop of every
+    message, so the ``node`` variable is in scope.
+
+``conversation_extra_html(request, project)``
+    Returns HTML rendered once, outside the message loop. Use it to load the
+    plugin's JS bundle (``{% vite_asset %}``) and to mount any page-level UI
+    (e.g. a modal) that the JS below opens on demand.
+
+Python side
+-----------
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    from django.template.loader import render_to_string
+
+    class GiphyPlugin:
+        ...
+
+        @hookimpl
+        def conversation_message_node_html(self, request, project):
+            return '''
+            <template x-if="node.type == 'GiphyNode'">
+                <img :src="node.data.url" class="fr-responsive-img" />
+            </template>
+            '''
+
+        @hookimpl
+        def conversation_extra_html(self, request, project):
+            return render_to_string("plugin_giphy/conversation_extra.html")
+
+.. code-block:: html+django
+
+    {# plugin_giphy/templates/plugin_giphy/conversation_extra.html #}
+    {% load django_vite %}
+    {% vite_asset 'js/plugins/giphyConversation.js' %}
+
+    <dialog id="giphy-modal" class="fr-modal" x-data="GiphyModal">
+      <!-- ... GIF picker markup ... -->
+    </dialog>
+
+JS side: window events
+-----------------------
+
+The conversation feed communicates with plugin JS exclusively through
+``window`` ``CustomEvent``\ s - plugin bundles never need direct access to
+the ``Conversations`` Alpine component.
+
+``task:done`` *(dispatched by the core)*
+    Fired when a user marks a task as done from the conversation feed.
+
+    .. code-block:: javascript
+
+        window.dispatchEvent(new CustomEvent('task:done', {
+          detail: { task, projectId, resourceId },
+        }));
+
+    A plugin can listen for this to offer a follow-up action - e.g. "share
+    a celebratory GIF for this task".
+
+``plugin-message-create-request`` *(dispatched by a plugin)*
+    Ask the core to post a new conversation message containing
+    plugin-defined nodes. The core POSTs the ``nodes`` to the conversation's
+    messages endpoint and appends the result to the feed.
+
+    .. code-block:: javascript
+
+        window.dispatchEvent(new CustomEvent('plugin-message-create-request', {
+          detail: { nodes: [{ type: 'GiphyNode', data: { url: gifUrl } }] },
+        }));
+
+``plugin-message-created`` *(dispatched by the core)*
+    Fired after a ``plugin-message-create-request`` succeeds. Use it to
+    close the plugin's modal or reset its state.
+
+Putting it together
+--------------------
+
+.. code-block:: javascript
+
+    // plugin_giphy/js/giphyConversation.js
+    import Alpine from 'alpinejs';
+
+    Alpine.data('GiphyModal', () => ({
+      open: false,
+
+      init() {
+        window.addEventListener('task:done', () => {
+          this.open = true;
+        });
+        window.addEventListener('plugin-message-created', () => {
+          this.open = false;
+        });
+      },
+
+      selectGif(gifUrl) {
+        window.dispatchEvent(new CustomEvent('plugin-message-create-request', {
+          detail: { nodes: [{ type: 'GiphyNode', data: { url: gifUrl } }] },
+        }));
+      },
+    }));
+
+
+Database Isolation
+==================
+
+Each plugin gets its own PostgreSQL schema, named after its app label and
+shared by all tenants. Plugin models are
+created there and can safely reference core models in the ``public`` schema
+via foreign keys.
+
+Plugin models subclass ``PluginModel``
+--------------------------------------
+
+Every concrete model of a ``plugin_*`` app must subclass
+``recoco.apps.plugins.models.PluginModel``. This abstract base scopes rows by
+site, following the same convention as core models (e.g. ``Task``):
+
+- ``site``: a required ``ForeignKey`` to ``django.contrib.sites.models.Site``.
+- ``objects``: an **unscoped** default manager. It comes first so that it is
+  the model's ``_default_manager``, which is what watson, the admin and
+  generic relations use.
+- ``on_site``: a ``CurrentSiteManager``, filtered on the current site.
+
+.. code-block:: python
+
+    # plugin_giphy/models.py
+    from django.db import models
+    from recoco.apps.plugins.models import PluginModel
+    from recoco.apps.projects.models import Project
+
+    class GiphySearch(PluginModel):
+        project = models.ForeignKey(Project, on_delete=models.CASCADE)
+        query = models.CharField(max_length=255)
+
+Rules for plugin code:
+
+- **Set ``site`` on creation**: from ``request.site`` in views, or from the
+  parent object for child rows (e.g. a photo takes its realisation's site).
+  Don't derive it from a project: a project can be shared by several sites.
+- **Query through ``on_site``** (or filter on ``site`` explicitly) wherever
+  tenant data is exposed: views, REST API, filters, digests, commands.
+  ``objects`` returns rows of every site. Filtering on the project's sites
+  (``project__project_sites__site``) is not enough: a project shared by two
+  sites would show the rows created on the other one.
+- **Build ``on_site`` querysets at request time**: ``Model.on_site.all()``
+  resolves ``SITE_ID`` when it is called, so a queryset created at import time
+  (e.g. ``PrimaryKeyRelatedField(queryset=Model.on_site.all())`` on a
+  serializer, or a form field declared on the class) stays bound to the
+  default site. Override ``get_queryset()`` or set it in ``__init__``.
+- **Annotations on core models**: filter the related rows on the site too,
+  e.g. ``Count("realisations", filter=Q(realisations__site=request.site))``.
+- **Don't name a field ``site``**: the name is taken by ``PluginModel``. Use
+  e.g. ``location`` for a free-text place.
+- **Per-project data is per site**: a "profile" model attached to a core
+  project should be unique per ``(project, site)``, not a ``OneToOneField``.
+
+The ``plugins.E001`` system check enforces the base class. It reports every
+model of a ``plugin_*`` app that does not subclass ``PluginModel``, except:
+
+- abstract, proxy and unmanaged models, and auto-created many-to-many tables;
+- multi-table inheritance children (e.g. ``RealisationNode(Node)``), whose
+  primary key comes from the parent table.
+
+.. code-block:: text
+
+    plugin_giphy.GiphySearch: (plugins.E001) Plugin model plugin_giphy.GiphySearch must subclass PluginModel.
+
+.. note::
+
+   Plugin migrations must be run with the ``migrate_plugins`` command, not the
+   standard ``migrate`` command. A plain ``migrate`` skips the operations of
+   ``plugin_*`` apps (see `Migration Mechanics`_).
+
+.. code-block:: bash
+
+    python manage.py migrate_plugins               # every installed plugin
+    python manage.py migrate_plugins plugin_giphy  # a single plugin
+
+
+Migration Mechanics
+===================
+
+Understanding how migrations are split between the public schema and plugin
+schemas is essential for anyone working on the plugin system or debugging
+migration issues.
+
+The contract
+------------
+
+There are two categories of migration:
+
+- **Core migrations** : all apps whose ``app_label`` does *not* start with
+  ``plugin_``.  These belong to the ``public`` schema and are applied by the
+  standard ``manage.py migrate`` command.
+- **Plugin migrations** : apps whose ``app_label`` starts with ``plugin_``.
+  Each plugin gets its own schema, named after its app label (e.g.
+  ``plugin_giphy``), shared by every tenant. It is applied by
+  ``manage.py migrate_plugins`` for every installed plugin, whether or not
+  a tenant enables it.
+
+The contract is enforced by ``PluginRouter`` in
+``recoco/apps/plugins/routers.py``:
+
+.. code-block:: python
+
+    class PluginRouter:
+        is_plugin_operation = False   # class-level flag, set by migrate_plugins
+
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
+            if is_plugin_label(app_label):
+                return self.is_plugin_operation   # only allowed in plugin mode
+            return not self.is_plugin_operation   # core only allowed in normal mode
+
+When ``is_plugin_operation`` is ``False`` (the default, i.e. a normal
+``migrate`` run):
+
+- Core migrations → **allowed** ✓
+- Plugin migrations → **blocked** ✗
+
+When ``is_plugin_operation`` is ``True`` (set by ``migrate_plugins``):
+
+- Core migrations → **blocked** ✗
+- Plugin migrations → **allowed** ✓
+
+How ``allow_migrate`` is enforced (per operation, not per migration)
+--------------------------------------------------------------------
+
+A critical implementation detail: Django's migration *executor* does **not**
+call ``allow_migrate`` before applying an individual migration.  It is called
+instead by each **operation** inside the migration : ``CreateModel``,
+``AddField``, ``RunSQL``, ``RunPython``, etc. immediately before executing
+any SQL.  If ``allow_migrate`` returns ``False`` the operation is silently
+skipped but the migration **is still recorded** in ``django_migrations``.
+
+This means that even if a core migration ends up in the plugin's execution
+plan (because it is a declared dependency of a plugin migration), its SQL
+will never touch the plugin schema. The tables of core models live in
+``public`` and are visible from the plugin schema via ``search_path`` : no
+copy is created per plugin.
+
+It also means that a plain ``migrate`` records plugin migrations as applied
+in ``public.django_migrations`` without creating any table. This is why each
+plugin schema has its own ``django_migrations`` table.
+
+
+The ``django_migrations`` ghost-entry mechanism
+-----------------------------------------------
+
+Django's migration planner reads ``django_migrations`` to decide which
+migrations still need to run.  Without intervention, an empty plugin
+``django_migrations`` table would cause Django to include every core migration
+in the plan. Not to execute them (the per-operation guard prevents that) but
+to process them as no-ops, recording them one by one.  On a project with
+hundreds of migrations this produces hundreds of ``Applying auth.0001...``
+lines and a slow first run.
+
+``migrate_plugins`` solves this with a single INSERT before running any plugin
+migration:
+
+.. code-block:: sql
+
+    INSERT INTO "<schema>".django_migrations (app, name, applied)
+    SELECT app, name, applied
+    FROM public.django_migrations
+    WHERE app NOT LIKE 'plugin\_%'
+      AND NOT EXISTS (
+        SELECT 1 FROM "<schema>".django_migrations existing
+        WHERE existing.app = public.django_migrations.app
+          AND existing.name = public.django_migrations.name
+      )
+
+These are called **ghost entries**: records copied from the public schema that
+tell Django "this core migration has already been accounted for : do not
+include it in the plugin plan." Migrations of other plugins are not copied.
+
+Why ghost entries are INSERT-only (no DELETE on rollback)
+---------------------------------------------------------
+
+A ghost entry for a core migration means *"do not re-apply this here"*.  That
+statement remains true even if the core migration is later rolled back in
+``public``.  The plugin schema never ran that migration's SQL; rolling it back
+in ``public`` changes the shared schema (which the plugin sees through
+``search_path``), but it does not create any obligation for the plugin's
+``django_migrations`` bookkeeping.
+
+Deleting ghost entries on rollback would introduce a spurious inconsistency:
+``django_migrations`` would show a plugin migration as applied while its core
+dependency ghost was gone, causing ``check_consistent_history`` to raise
+``InconsistentMigrationHistory`` on the next run.
+
+Keeping stale ghosts avoids this problem and is semantically correct: the
+ghost just continues to say "don't try to run this core migration in the
+plugin schema", which is the right answer before and after any public rollback.
+
+``migrate_plugins`` execution flow
+-----------------------------------
+
+Putting it all together, here is what happens when you run:
+
+.. code-block:: bash
+
+    python manage.py migrate_plugins plugin_giphy
+
+Without an app label, the steps below run for every installed ``plugin_*``
+app. With one, the app must be an installed plugin; an optional migration
+name can follow, as with ``migrate``.
+
+1. **Router flag** : ``PluginRouter.is_plugin_operation = True``.
+   From this point on ``allow_migrate`` blocks core migrations and permits
+   plugin migrations.
+
+2. **Create the schema** : ``CREATE SCHEMA IF NOT EXISTS plugin_giphy``.
+
+3. **Create** ``django_migrations`` **in the plugin schema** : ``search_path``
+   is temporarily set to *only* the plugin schema so that
+   ``MigrationRecorder.ensure_schema()`` creates the table there rather than
+   picking up ``public.django_migrations``.
+
+4. **Ghost entry sync** : the INSERT above copies all core migration records
+   from ``public.django_migrations`` into the plugin table.  Any core
+   migration already present (from a previous run) is left untouched.
+
+5. **Run plugin migrations** : ``search_path`` is set to
+   ``plugin_giphy, public`` and ``call_command("migrate", "plugin_giphy")``
+   is called.  Django sees all core migrations as applied (from the ghost
+   entries) and only executes the plugin's own unapplied migrations.  Tables
+   created by plugin migrations land in ``plugin_giphy``; ForeignKeys to core
+   models resolve through ``public`` via ``search_path``.
+
+6. **Cleanup** : ``is_plugin_operation`` is reset to ``False`` and the
+   runtime ``search_path`` is restored (``set_plugin_search_path``) in a
+   ``finally`` block.
+
+The command is safe to re-run.
+
+Runtime ``search_path``
+-----------------------
+
+At runtime the ``search_path`` is static: ``public`` first (so core tables and
+``public.django_migrations`` always win), then every installed plugin schema.
+It does not depend on the tenant, and nothing switches it per request.
+
+``PluginsConfig.ready()`` connects a ``connection_created`` receiver
+(``set_plugin_search_path_on_connection`` in ``recoco/apps/plugins/utils.py``)
+that runs ``SET search_path TO public, <plugin schemas>`` on every new
+PostgreSQL connection. Every connection Django opens gets it: web requests,
+Celery tasks, management commands, ``shell`` and tests. It is done there
+rather than in settings because ``DATABASES`` is defined per environment and
+plugin apps are added to ``INSTALLED_APPS`` after the common settings.
+
+``RESET search_path`` would go back to the database default (``public``
+only), so code that changes the ``search_path`` (like ``migrate_plugins``)
+restores it with ``set_plugin_search_path(connection)`` instead.
+
+.. note::
+
+   This is a session setting: it does not survive a connection pooler in
+   transaction mode (e.g. PgBouncer ``pool_mode = transaction``).
+
+Tenant isolation is therefore done by the application:
+``TenantPluginsMiddleware`` (and ``tenant_context`` for commands)
+only enables the tenant's plugins for hooks and URLs, and plugin querysets
+must be scoped with ``on_site`` or an explicit ``site`` filter.
+
+Search (watson)
+---------------
+
+Plugin models can be registered with watson like core models. There is a
+single index for all tenants, so ``buildwatson`` needs no tenant handling, but
+a search that can return plugin objects must be scoped:
+
+- ``tenant_search(search_text, models=None, ...)``
+  (``recoco/apps/plugins/search.py``) wraps ``watson.search``. Plugin models
+  of a plugin that is not enabled for the tenant are dropped, and the others
+  are restricted to the current site (``on_site``). Core models are passed
+  through unchanged.
+- ``tenant_search_models(models)`` does the same on a ``models`` list, for
+  code that calls watson itself.
+- ``watson.filter(queryset, ...)`` is already safe: pass an ``on_site``
+  queryset.
+
+Use ``tenant_search`` whenever ``models`` is omitted (every registered model)
+or contains plugin models. Note that ``watson.search`` with an empty
+``models`` list searches every model; ``tenant_search`` returns no results
+instead when everything was filtered out.
+
+Plugin objects in core tables
+-----------------------------
+
+Some core tables are shared by every tenant and can point to plugin objects:
+conversation nodes (a plugin ``Node`` subclass), actstream actions and
+notifications (generic relations). Where the plugin is disabled, these rows
+must not show up: their URLs don't reverse there and their data belongs to
+another tenant's feature. ``recoco/apps/plugins/utils.py`` provides:
+
+- ``get_disabled_plugin_app_labels()`` and ``is_disabled_plugin_model(model)``;
+- ``exclude_disabled_plugin_objects(queryset, *content_type_fields)``: drops
+  the rows whose content type fields point to a model of a disabled plugin.
+  A null content type (e.g. an action without target) is kept.
+
+.. code-block:: python
+
+    actions = exclude_disabled_plugin_objects(
+        project.target_actions.all(),
+        "action_object_content_type",
+        "target_content_type",
+    )
+
+The core already applies it to the project and CRM activity streams and to
+unread notifications. For conversations (``recoco/apps/conversations``):
+
+- ``visible_nodes(nodes)`` drops the nodes of disabled plugins, and
+  ``exclude_plugin_only_messages(messages)`` drops the messages made only of
+  such nodes. The messages API uses both, and refuses to create a disabled
+  plugin's node or to edit a message holding hidden nodes.
+- Message email digests leave out the same nodes and messages. Plugin nodes
+  of enabled plugins are counted as part of their message and are never the
+  digest's highlighted object: the email template only knows the core
+  objects (recommendation, contact, document), so a plugin node's
+  ``count_label`` and ``get_digest_recap()`` are not used there.
+
+Any new core code that lists such rows must filter them the same way.
+
+Plugin management commands
+--------------------------
+
+Outside a request, nothing sets the tenant: a command that works on one
+tenant must wrap its whole run in ``tenant_context(site)``. It sets both the
+current site (``SITE_ID``, used by ``on_site`` managers,
+``Site.objects.get_current()`` and the signal handlers that rely on it) and
+the tenant's enabled plugins (hooks, URLs, the filters above), which a
+request gets from its middlewares. Setting only one of them mixes two
+tenants. Contexts nest and are restored on exit, so a command can loop over
+sites.
+
+.. code-block:: python
+
+    from django.contrib.sites.models import Site
+    from django.core.management.base import BaseCommand
+
+    from recoco.apps.plugins.context import tenant_context
+
+
+    class Command(BaseCommand):
+        def handle(self, **options):
+            for site in Site.objects.all():
+                with tenant_context(site):
+                    for realisation in Realisation.on_site.all():
+                        ...
+
+``tenant_plugins_context(site_config)`` only sets the enabled plugins, for
+code where the site is already current.
+
+
+URL Routing
+===========
+
+Plugin routes are automatically discovered from the plugin manager and
+wrapped in a ``PluginURLResolver`` that only exposes them to tenants with
+the plugin enabled. No manual registration in the core ``urls.py`` is needed.
+
+``urls.py`` (plugin side)
+--------------------------
+
+The plugin must declare ``app_name`` for namespacing.
+
+.. code-block:: python
+
+    # plugin_giphy/urls.py
+    from django.urls import path
+    from . import views
+
+    app_name = "plugin_giphy"
+
+    urlpatterns = [
+        path("search/", views.search, name="search"),
+    ]
+
+Resulting URL
+-------------
+
+Routes are mounted automatically at the root.
+
+.. code-block:: text
+
+    /projects/23/giphy/search/   →  plugin_giphy:search
+
+
+.. note::
+
+   If a plugin is not listed in the tenant's ``enabled_plugins``, its routes
+   return 404 and ``{% url "plugin_giphy:search" %}`` raises ``NoReverseMatch``.
+
+
+Complete Example
+================
+
+Below is a minimal end-to-end walkthrough: a Giphy search view accessible
+from a project dashboard.
+
+1. View
+-------
+
+.. code-block:: python
+
+    # plugin_giphy/views.py
+    from django.shortcuts import render
+
+    def search(request):
+        query = request.GET.get("q", "")
+        # In a real plugin this would call the Giphy API
+        results = [{"title": query, "url": "https://example.com/giphy.gif"}] if query else []
+        return render(request, "plugin_giphy/search.html", {"query": query, "results": results})
+
+2. Template
+-----------
+
+Plugin templates live inside the plugin package and are picked up
+automatically by Django's template loader (the plugin must be in
+``INSTALLED_APPS``).
+
+.. code-block:: html+django
+
+    {# plugin_giphy/templates/plugin_giphy/search.html #}
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h2>Giphy Search</h2>
+
+    <form method="get">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search...">
+      <button type="submit">Search</button>
+    </form>
+
+    {% if results %}
+      <ul>
+        {% for gif in results %}
+          <li><img src="{{ gif.url }}" alt="{{ gif.title }}"></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% endblock %}
+
+3. Link from a core template
+-----------------------------
+
+Use the namespaced URL. If the plugin is disabled for this tenant the tag
+raises ``NoReverseMatch``, so guard it with a check on ``enabled_plugins``:
+
+.. code-block:: html+django
+
+    {% if "plugin_giphy" in request.site_config.enabled_plugins %}
+      <a href="{% url 'plugin_giphy:search' %}">Search Giphy</a>
+    {% endif %}
+
+
+REST API
+========
+
+Plugins can expose their own DRF API endpoints under the core ``/api/`` prefix
+without touching ``recoco/rest_api/urls.py``.
+
+Declare a ``rest_urls_module`` attribute on the plugin class pointing to a
+module that contains a standard ``urlpatterns`` list:
+
+.. code-block:: python
+
+    # plugin_giphy/plugin.py
+    class GiphyPlugin:
+        urls_module = "plugin_giphy.urls"
+        rest_urls_module = "plugin_giphy.rest_urls"   # ← new
+
+.. code-block:: python
+
+    # plugin_giphy/rest_urls.py
+    from django.urls import path
+    from .rest_api import GiphySearchAPIView
+
+    urlpatterns = [
+        path("giphy/search/", GiphySearchAPIView.as_view(), name="plugin-giphy-search"),
+    ]
+
+The core's ``recoco/rest_api/urls.py`` discovers all installed plugins that
+carry ``rest_urls_module`` at import time and appends their patterns to the
+global ``urlpatterns``.  The resulting endpoint is served under ``/api/``:
+
+.. code-block:: text
+
+    /api/giphy/search/   →  GiphySearchAPIView
+
+Like the plugin's page URLs, the patterns are wrapped in a
+``PluginURLResolver``: they only resolve (and reverse) on tenants that have
+the plugin enabled, elsewhere the API answers 404. No namespace is added, so
+REST URL names stay global and must be unique, e.g. prefixed with the plugin
+name.
+
+
+Frontend (Vite / Alpine)
+========================
+
+Plugins can ship their own JavaScript - including yarn dependencies - without
+modifying the core frontend's ``package.json`` or ``vite.config.js``.
+
+Plugin package layout
+---------------------
+
+Add a ``package.json`` at the plugin repo root.  The ``recocoPlugin.viteEntries``
+field maps Vite entry names to JS file paths relative to the **plugin package
+directory**:
+
+.. code-block:: json
+
+    {
+      "name": "plugin-giphy",
+      "private": true,
+      "recocoPlugin": {
+        "viteEntries": {
+          "giphySearch": "js/giphySearch.js"
+        }
+      },
+      "dependencies": {
+        "some-yarn-lib": "^1.0.0"
+      }
+    }
+
+Install the plugin's own yarn deps once:
+
+.. code-block:: bash
+
+    cd /path/to/plugin-giphy
+    yarn install
+
+Writing the Alpine controller
+-----------------------------
+
+Place the entry file at the path declared in ``viteEntries``.  Register Alpine
+data objects with ``Alpine.data()``:
+
+.. code-block:: javascript
+
+    // plugin_giphy/js/giphySearch.js
+    import Alpine from 'alpinejs';
+    import htmx from 'htmx.org';
+
+    window.htmx = htmx;   // make htmx available to HTMX-powered templates
+
+    function GiphySearch() {
+      return {
+        query: '',
+        results: [],
+        async search() { /* ... */ },
+      };
+    }
+
+    Alpine.data('GiphySearch', GiphySearch);
+
+The plugin entry can import packages from its own ``node_modules/`` (Node's
+module resolution walks up the directory tree and finds them there).
+
+Core frontend packages (Alpine, htmx, Leaflet, lodash) are a special case:
+the plugin sources live *outside* ``recoco/frontend/``, so walking up the
+directory tree never reaches the core's ``node_modules/``.  They resolve
+because they are listed in ``resolve.dedupe`` in the core
+``vite.config.js``, which forces Vite to resolve them from the core
+frontend root regardless of the importer's location:
+
+.. code-block:: javascript
+
+    // recoco/frontend/vite.config.js
+    resolve: {
+      dedupe: ['alpinejs', 'htmx.org', 'leaflet', 'lodash'],
+    }
+
+Beyond fixing resolution, ``dedupe`` guarantees the plugin bundle shares the
+**same module instance** as the core.  This matters: ``Alpine.data()`` calls
+from a plugin must register on the Alpine instance started by ``main.js`` -
+a second bundled copy of Alpine would register components that never mount.
+The same applies to Leaflet plugins (e.g. ``leaflet.markercluster``) that
+attach to the shared ``L`` object.
+
+.. warning::
+
+   Do **not** declare core packages (``alpinejs``, ``leaflet``, etc.) as
+   dependencies in the plugin's ``package.json`` - that would bundle a
+   duplicate instance and silently break ``Alpine.data()`` registration.
+   Only list packages the core does not ship (e.g.
+   ``leaflet.markercluster``).  If a plugin needs another *core* package not
+   yet in the list above, add it to ``resolve.dedupe`` in the core
+   ``vite.config.js``.
+
+Importing core JS modules (``@core`` alias)
+---------------------------------------------
+
+The core ``vite.config.js`` defines an ``@core`` alias pointing at
+``recoco/frontend/src/``. Plugin entry files can import core utilities,
+stores, and components directly instead of duplicating them:
+
+.. code-block:: javascript
+
+    // plugin_giphy/js/giphyConversation.js
+    import { STATUSES, isStatus } from '@core/utils/taskStatus';
+
+This keeps plugin code in sync with core behaviour (e.g. task status enums)
+without adding a dependency between yarn packages.
+
+Generating Vite entry proxies
+------------------------------
+
+Before building or starting the Vite dev server, run:
+
+.. code-block:: bash
+
+    python manage.py collect_plugin_vite_entries
+
+This command:
+
+1. Discovers all installed plugins that declare ``vite_entries`` on their
+   plugin class (matching the keys in ``package.json`` ``recocoPlugin.viteEntries``).
+2. Writes a thin proxy file for each entry into
+   ``recoco/frontend/src/js/plugins/`` - e.g.
+   ``src/js/plugins/giphySearch.js`` containing::
+
+       import '/abs/path/to/plugin_giphy/js/giphySearch.js';
+
+3. Writes ``recoco/frontend/plugin-entries.json`` mapping entry name →
+   proxy path relative to the Vite source root.
+
+Both generated artefacts are gitignored; they must be regenerated whenever a
+plugin is installed or removed.
+
+The core ``vite.config.js`` reads ``plugin-entries.json`` at build time and
+adds the proxy files as named Vite inputs automatically - no manual edits
+required.
+
+Loading the bundle in a template
+----------------------------------
+
+Use ``{% vite_asset %}`` with the proxy path (always under ``js/plugins/``):
+
+.. code-block:: html+django
+
+    {% block js %}
+        {{ block.super }}
+        {% vite_asset 'js/plugins/giphySearch.js' %}
+    {% endblock js %}
+
+The manifest key that ``django-vite`` looks up is the path relative to the
+Vite ``root`` (``src/``), i.e. ``js/plugins/giphySearch.js``.
+
+Summary of the full workflow
+-----------------------------
+
+.. code-block:: text
+
+    ┌───────────────────────────────────────────────────────────────┐
+    │ Plugin repo                                                   │
+    │  package.json  →  recocoPlugin.viteEntries                   │
+    │  plugin.py     →  vite_entries = {"giphySearch": "js/..."}   │
+    │  js/giphySearch.js  (Alpine controller, own yarn deps)        │
+    └────────────────────────────┬──────────────────────────────────┘
+                                 │  python manage.py collect_plugin_vite_entries
+                                 ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │ Core repo  (recoco/frontend/)                                 │
+    │  plugin-entries.json              (gitignored, generated)    │
+    │  src/js/plugins/giphySearch.js    (gitignored, proxy file)   │
+    │  vite.config.js  reads plugin-entries.json automatically     │
+    └───────────────────────────────────────────────────────────────┘
+                                 │  yarn build / yarn dev
+                                 ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │ Output                                                        │
+    │  dist/  contains the built plugin bundle                      │
+    │  {% vite_asset 'js/plugins/giphySearch.js' %}                │
+    └───────────────────────────────────────────────────────────────┘
+
+
+Activation
+==========
+
+Plugins are activated per tenant through the ``SiteConfiguration`` admin:
+
+1. Install the plugin package into the dev environment::
+
+    uv pip install -e ./plugins/plugin_giphy
+
+2. Add ``plugin_giphy`` to ``INSTALLED_APPS`` in the relevant settings file (ie. ``development.py``).
+
+3. Create the plugin schema and run plugin migrations::
+
+    python manage.py migrate_plugins plugin_giphy
+
+4. If the plugin ships JavaScript, install its yarn deps and generate Vite proxies::
+
+    cd /path/to/plugin-giphy && yarn install
+    cd /path/to/recoco && python manage.py collect_plugin_vite_entries
+
+5. Rebuild the frontend (only when deploying)::
+
+    cd recoco/frontend && yarn build
+
+6. In the Django admin, edit the ``SiteConfiguration`` for the target site
+   and add ``"plugin_giphy"`` to the ``enabled_plugins`` JSON list. Only
+   installed plugin names are accepted (``SiteConfiguration.clean()``); a
+   site still listing an uninstalled plugin can't be saved until the entry is
+   removed.
+
+On the next request, the middleware enables the plugin for that tenant: its
+hooks are called and the ``PluginURLResolver`` exposes its routes, only for
+tenants that have it enabled. The plugin tables are already reachable through
+the static ``search_path``.
+
+
+Testing
+=======
+
+Core tests (``recoco.settings.testing``) leave out every third-party
+``plugin_*`` app, even when a local ``development.py`` installs one: they
+only use the test plugin ``recoco.apps.plugins.testing.plugin_testapp``,
+whose tables are created with ``migrate_plugins`` in the tests that need
+them.
+
+A plugin's own tests run from the recoco root with the development settings,
+where the plugin is installed::
+
+    uv run pytest recoco/apps/plugins/                       # core plugin tests
+    uv run pytest --create-db ../plugin-giphy/plugin_giphy/ \
+        --ds=recoco.settings.development                     # plugin tests

@@ -4,11 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("home", "0033_siteconfiguration_main_topic"),
-        ("home", "0034_siteconfiguration_crisp_token"),
-    ]
-
     dependencies = [
         ("home", "0032_siteconfiguration_accept_handover_and_more"),
     ]

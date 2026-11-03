@@ -5,20 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("survey", "0019_auto_20210823_1513"),
-        ("survey", "0020_alter_questionset_deleted"),
-        ("survey", "0021_question_comment_title"),
-        ("survey", "0022_alter_questionset_subheading"),
-        ("survey", "0023_choice_priority"),
-        ("survey", "0024_questionset_color"),
-        ("survey", "0025_choice_conclusion"),
-        ("survey", "0026_auto_20210921_1606"),
-        ("survey", "0027_alter_answer_attachment"),
-        ("survey", "0028_auto_20211011_1308"),
-        ("survey", "0029_answer_choices"),
-    ]
-
     dependencies = [
         ("survey", "0018_alter_session_project"),
     ]

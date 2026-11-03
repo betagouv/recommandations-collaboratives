@@ -50,3 +50,13 @@ docker/docker-compose.local.yml
 
 # local scripts
 scripts/*_local.py
+recoco/frontend/.env.*
+recoco/frontend/cypress/downloads
+recoco/frontend/plugin-entries.json
+recoco/frontend/src/js/plugins/
+
+# plugins
+/plugins
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

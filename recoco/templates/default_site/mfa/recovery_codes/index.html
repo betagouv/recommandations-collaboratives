@@ -26,6 +26,9 @@
                             {% endif %}
                             {% url 'mfa_generate_recovery_codes' as generate_url %}
                             <a href="{{ generate_url }}" class="fr-btn fr-btn--secondary">{% translate "Generate new codes" %}</a>
+                            <div class="fr-mt-4w">
+                              <a href="{% url "mfa_index" %}" class="fr-link fr-mt-4w">Revenir à la configuration de la double authentification</a>
+                            </div>
                         </div>
                     </div>
                 </div>

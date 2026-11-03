@@ -3,13 +3,15 @@
 {% load gravatar %}
 {% load django_vite %}
 {% load projects_extra %}
+{% load plugins_extra %}
 {% load invites_tags %}
+{% load waffle_tags %}
 {% block js %}
     {% vite_asset 'js/apps/menuTop.js' %}
 {% endblock js %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}
-        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
     {% endif %}
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
@@ -24,7 +26,7 @@
                {% endif %}">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
-            <li class="navigation__item-dashboard d-flex">
+            <li class="navigation__item-dashboard d-flex navigation__item--border-right">
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
                     <span class="fr-ml-1v align-middle no-wrap">Tous les dossiers</span></a>
@@ -32,7 +34,7 @@
         {% endif %}
         <!-- Projects -->
         {% if user.is_authenticated %}
-            <li class="navigation__item-projects"
+            <li class="navigation__item-projects navigation__item--border-right"
                 x-data="ExpandableMenuHandler"
                 @click.outside="toggle">
                 <button class="fr-select item-projects__button-open"
@@ -41,12 +43,17 @@
                         aria-controls="project_list"
                         :disabled="displayedProjectList.length == 0">
                     {% if project %}
-                        <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.owner.profile.organization.name|default:project.org_name }}</span></span>
+                        <span class="list-project__project-name no-underline"
+                              title="{{ project.name }} {{ project.owner.profile.organization.name|default:project.org_name }}">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.owner.profile.organization.name|default:project.org_name }}</span></span>
                     {% else %}
                         <template x-if="currentProject">
-                            <div>
-                                <span class="no-underline" x-text="currentProject.commune.name"></span>
-                                <span class="list-project__project-name" x-text='currentProject.name'></span>
+                            <div class="text-ellipsis"
+                                 :title="`${currentProject.name} ${currentProject.org_name}`">
+                                <span class="list-project__project-name no-underline"
+                                      x-text='currentProject.name'></span>
+                                <span class="list-project__project-org-name_title no-underline"
+                                      x-text="currentProject.org_name"></span>
+                                {% comment %} <span class="no-underline" x-text="currentProject.commune.name"></span> {% endcomment %}
                             </div>
                         </template>
                         <template x-if="!currentProject">
@@ -61,7 +68,7 @@
                         </template>
                     {% endif %}
                 </button>
-                <div class="fr-collapse fr-menu" id="project_list">
+                <div class="fr-collapse fr-menu list-project__container" id="project_list">
                     <ul x-data="{search:''}"class="fr-menu__list list-project">
                         {% comment %} <li class="list-project__search-container">
                                 <input type="search" class="fr-input" placeholder="Rechercher votre dossier" @input.debounce.400ms="onSearch()" x-model="search">
@@ -99,11 +106,13 @@
                                 </a>
                             </div>
                         </template>
-                        {% if not is_switchtender %}
-                            <a class="fr-btn justify-content-center w-100"
-                               data-test-id="create-project"
-                               href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
-                        {% endif %}
+                        {% flag "enable_submit_new_project" %}
+                            {% if not is_switchtender %}
+                                <a class="fr-btn justify-content-center w-100"
+                                data-test-id="create-project"
+                                href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
+                            {% endif %}
+                        {% endflag %}
                     </ul>
                 </div>
             </li>
@@ -132,14 +141,35 @@
         {% include "header/menu-top-secondary-left.html" %}
         <!-- Ressources -->
         <li class="navigation__item-resource responsive-header__element-not-mobile"
-            style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
+            style="{% if 'ressource' in request.path and not 'crm' in request.path %}activated{% endif %}">
             <a href="{% url 'resources-resource-search' %}"
-               class="fr-link {% if url_name == 'resources-resource-search' %}active{% endif %}"
+               class="fr-link {% if 'ressource' in request.path and not 'crm' in request.path %}active{% endif %}"
                data-test-id="link-ressources">
                 <span class="fr-mx-1v align-middle">Ressources</span>
             </a>
         </li>
+        {% if "use_crm" in user_site_perms %}
+            <!-- CRM -->
+            <li class="navigation__item-resource responsive-header__element-not-mobile"
+                style="{% if 'crm' in request.path %}activated{% endif %}">
+                <a href="{% url 'crm-site-dashboard' %}"
+                   class="fr-link {% if 'crm' in request.path %}active{% endif %}">
+                    <span class="fr-mx-1v align-middle">Admin</span>
+                </a>
+            </li>
+        {% endif %}
+        {% plugin_tabs "main_navigation_tabs" 40 50 as tabs %}
+        {% for tab in tabs %}
+            <li class="navigation__item responsive-header__element-not-mobile"
+                style="{% if tab.active %}activated{% endif %}">
+                <a href="{{ tab.url }}"
+                class="fr-link {% if tab.active %}active{% endif %}"
+                {% if tab.active %}aria-current="page"{% endif %}>
+                    <span class="fr-mx-1v align-middle">{{ tab.label }}</span>
+                </a>
+            </li>
+        {% endfor %}
         {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
-        {% include "header/menu-top-secondary-right.html" %}
+        {% comment %} {% include "header/menu-top-secondary-right.html" %} {% endcomment %}
     </ul>
 {% endwith %}

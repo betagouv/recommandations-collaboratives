@@ -1,8 +1,4 @@
 /* used to be able to use position sticky on children */
-[x-cloak] {
-  display: none;
-}
-
 .project-map-container {
   position: relative;
   height: 260px;

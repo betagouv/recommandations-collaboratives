@@ -1,15 +1,13 @@
 {% load static %}
-{% load sass_tags %}
 {% load guardian_tags %}
 {% load waffle_tags %}
 {% load projects_extra %}
+{% load plugins_extra %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load crm_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 {% block js %}
+    {% vite_asset 'js/styles/marianne.css.js' %}
     {% vite_asset 'js/apps/CRM/crmNavigation.js' %}
 {% endblock js %}
 <div class="crm-navigation d-flex justify-content-between">
@@ -27,9 +25,7 @@
                        name="segmented-control-dashboard"
                        @click="window.location='{% url 'crm-site-dashboard' %}'">
                 <label class="fr-label" for="segmented-control-dashboard">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-dashboard"
-                       href="{% url 'crm-site-dashboard' %}">Tableau de bord</a>
+                    <a class="stretched-link" href="{% url 'crm-site-dashboard' %}">Accueil</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
@@ -41,11 +37,23 @@
                        name="segmented-control-project"
                        @click="window.location='{% url 'crm-project-list' %}'">
                 <label class="fr-label" for="segmented-control-projects">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-projects"
-                       href="{% url 'crm-project-list' %}">Dossiers</a>
+                    <a class="stretched-link" href="{% url 'crm-project-list' %}">Dossiers</a>
                 </label>
             </div>
+            {% plugin_tabs "crm_navigation_tabs" 10 20 as plugin_tabs_after_dossiers %}
+            {% for tab in plugin_tabs_after_dossiers %}
+                <div class="fr-segmented__element">
+                    <input value="{{ tab.tab_key }}"
+                           type="radio"
+                           {% if tab.tab_key in request.resolver_match.app_names %}checked{% endif %}
+                           id="segmented-control-{{ tab.tab_key }}"
+                           name="segmented-control-{{ tab.tab_key }}"
+                           @click="window.location='{{ tab.url }}'">
+                    <label class="fr-label" for="segmented-control-{{ tab.tab_key }}">
+                        <a class="stretched-link" href="{{ tab.url }}">{{ tab.label }}</a>
+                    </label>
+                </div>
+            {% endfor %}
             <div class="fr-segmented__element">
                 <input value="users"
                        type="radio"
@@ -55,9 +63,7 @@
                        name="segmented-control-project"
                        @click="window.location='{% url 'crm-user-list' %}'">
                 <label class="fr-label" for="segmented-control-users">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-users"
-                       href="{% url 'crm-user-list' %}">Utilisateurs</a>
+                    <a class="stretched-link" href="{% url 'crm-user-list' %}">Utilisateurs</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
@@ -69,44 +75,50 @@
                        name="segmented-control-project"
                        @click="window.location='{% url 'crm-organization-list' %}'">
                 <label class="fr-label" for="segmented-control-organizations">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-organizations"
-                       href="{% url 'crm-organization-list' %}">Organisations</a>
+                    <a class="stretched-link" href="{% url 'crm-organization-list' %}">Organisations</a>
                 </label>
             </div>
             {% comment %} <div class="fr-segmented__element">
-                <input value="resources" type="radio" {% if resources %}checked{% endif %} aria-checked="{% if resources %}true{% else %}false{% endif %}" id="segmented-control-resources" name="segmented-control-project" @click="window.location='{% url 'crm-resource-list' %}'">
-                <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link" data-test-id="project-navigation-resources" href="{% url 'crm-resource-list' %}">Ressources</a>
-                </label>
-            </div> {% endcomment %}
-            {% comment %} <div class="fr-segmented__element">
-                <input value="overview" type="radio" {% if overview %}checked{% endif %} aria-checked="{% if overview %}true{% else %}false{% endif %}" id="segmented-control-overview" name="segmented-control-project" @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link" data-test-id="project-navigation-overview" href="#">Statistiques</a>
-                </label>
-            </div> {% endcomment %}
-            {% comment %} <div class="fr-segmented__element">
-                <input value="overview" type="radio" {% if overview %}checked{% endif %} aria-checked="{% if overview %}true{% else %}false{% endif %}" id="segmented-control-overview" name="segmented-control-project" @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link" data-test-id="project-navigation-overview" href="#">Activité</a>
+                <input value="resources" type="radio" {% if resources %}checked{% endif %} aria-checked="{% if resources %}true{% else %}false{% endif %}" id="segmented-control-resources" name="segmented-control-project" @click="window.location='{% url 'resources-resource-search' %}'">
+                <label class="fr-label" for="segmented-control-resources">
+                    <a class="stretched-link" href="{% url 'resources-resource-search' %}">Ressources</a>
                 </label>
             </div> {% endcomment %}
             <div class="fr-segmented__element">
-                <input value="overview"
+                <input value="resources"
                        type="radio"
-                       {% if site_configuration %}checked{% endif %}
-                       aria-checked="{% if site_configuration %}true{% else %}false{% endif %}"
-                       id="segmented-control-site-configuration"
-                       name="segmented-control-site-configuration"
-                       @click="window.location='{% url 'crm-site-configuration' %}'">
-                <label class="fr-label" for="segmented-control-site-configuration">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-site-configuration"
-                       href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
+                       {% if resources %}checked{% endif %}
+                       aria-checked="{% if resources %}true{% else %}false{% endif %}"
+                       id="segmented-control-resources"
+                       name="segmented-control-project"
+                       @click="window.location='{% url 'crm-resource-list' %}'">
+                <label class="fr-label" for="segmented-control-resources">
+                    <a class="stretched-link" href="{% url 'crm-resource-list' %}">Ressources</a>
                 </label>
             </div>
+            {% if "manage_configuration" in user_site_perms %}
+                <div class="fr-segmented__element">
+                    <input value="overview"
+                        type="radio"
+                        {% if site_configuration %}checked{% endif %}
+                        aria-checked="{% if site_configuration %}true{% else %}false{% endif %}"
+                        id="segmented-control-site-configuration"
+                        name="segmented-control-site-configuration"
+                        @click="window.location='{% url 'crm-site-configuration' %}'">
+                    <label class="fr-label" for="segmented-control-site-configuration">
+                        <a class="stretched-link" href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
+                    </label>
+                </div>
+            {% endif %}
         </div>
     </fieldset>
-    {% include "crm/fragments/general_search_input.html" %}
+    <div class="flex-grow-1">
+        <form method="get"
+              action="{% url 'crm-search' %}"
+              class="d-flex align-items-center justify-content-end">
+            <div class="d-flex align-items-center position-relative {{ width_class|default:"w-75" }}">
+                {% include "projects/project/fragments/search_bar.html" %}
+            </div>
+        </form>
+    </div>
 </div>

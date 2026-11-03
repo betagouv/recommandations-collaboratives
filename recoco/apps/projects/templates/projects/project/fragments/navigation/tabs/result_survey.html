@@ -1,0 +1,32 @@
+{% comment %}
+    Parameter:
+        - label (string): label to display in project navigation
+{% endcomment %}
+{% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
+    <div class="fr-segmented__element"
+         :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage==2}">
+        <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage==2">
+            {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+        </template>
+        <input value="survey"
+               type="radio"
+               {% if state_of_play %}checked{% endif %}
+               aria-checked="{% if state_of_play %}true{% else %}false{% endif %}"
+               id="segmented-control-survey"
+               name="segmented-control-project"
+               @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}';">
+        <label class="fr-label" for="segmented-control-survey">
+            <a class="stretched-link"
+               data-test-id="project-navigation-knowledge"
+               @click="$store.tutorialsEvents.isTutorialForProjectPageTwoCompleted=true;"
+               href="{% url 'projects-project-detail-knowledge' project.pk %}">{{ label |default:"État des lieux" }}
+                {% comment %} TODO
+                           <span class="fr-text--sm text-ease">({{ project.survey.completion }}%)</span>
+                {% endcomment %}
+            </a>
+        </label>
+        <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage==2">
+            {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="4" rect_y="5" rect_width="94" rect_height="28" view_box_size="0 0 100 100" %}
+        </template>
+    </div>
+{% endif %}

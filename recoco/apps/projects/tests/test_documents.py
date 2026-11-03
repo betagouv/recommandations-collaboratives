@@ -7,6 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-05-31 10:11:56 CEST
 """
 
+import re
+
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
@@ -17,9 +19,10 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
-from recoco.apps.projects.utils import assign_collaborator
+from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
 
+from ...conversations import models as conversation_models
 from .. import models
 
 
@@ -55,6 +58,140 @@ def test_draft_project_documents_not_available_for_owner(
 
 
 @pytest.mark.django_db
+def test_private_document_is_displayed_in_project_documents_page_for_advisor(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    user = baker.make(auth_models.User)
+    assign_advisor(user, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=user,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    with login(client, user=user):
+        response = client.get(
+            reverse("projects-project-detail-documents", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            > 0
+        )
+
+
+@pytest.mark.django_db
+def test_private_document_is_not_displayed_in_project_documents_page_for_collaborators(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    advisor = baker.make(auth_models.User)
+    assign_advisor(advisor, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=advisor,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    member = baker.make(auth_models.User)
+    assign_collaborator(member, project_ready)
+    with login(client, user=member):
+        response = client.get(
+            reverse("projects-project-detail-documents", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            == 0
+        )
+
+
+@pytest.mark.django_db
+def test_private_document_is_given_for_conversations_panel_for_advisor(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    user = baker.make(auth_models.User)
+    assign_advisor(user, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=user,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    with login(client, user=user):
+        response = client.get(
+            reverse("projects-project-detail-conversations", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            > 0
+        )
+
+
+@pytest.mark.django_db
+def test_private_document_is_not_given_for_conversations_panel_for_collaborators(
+    request, client, project_ready
+):
+    uploaded_file = SimpleUploadedFile(
+        "private-project-document.txt",
+        b"private document content",
+        content_type="text/plain",
+    )
+    # an advisor uploads doc
+    advisor = baker.make(auth_models.User)
+    assign_advisor(advisor, project_ready)
+    models.Document.objects.create(
+        project=project_ready,
+        site=project_ready.sites.first(),
+        uploaded_by=advisor,
+        the_file=uploaded_file,
+        private=True,
+    )
+
+    # a collaborator displays the docs
+    member = baker.make(auth_models.User)
+    assign_collaborator(member, project_ready)
+    with login(client, user=member):
+        response = client.get(
+            reverse("projects-project-detail-conversations", args=[project_ready.id])
+        )
+
+        assert response.status_code == 200
+        # regex because when tests are run several times, names ar suffixed and not recognized with plain contains
+        assert (
+            len(re.findall(r"private-project-document.*\.txt", str(response.content)))
+            == 0
+        )
+
+
+@pytest.mark.django_db
 def test_upload_document_not_available_for_non_logged_users(client, request, project):
     url = reverse("projects-documents-upload-document", args=[project.id])
     response = client.get(url)
@@ -62,9 +199,10 @@ def test_upload_document_not_available_for_non_logged_users(client, request, pro
 
 
 @pytest.mark.django_db
-def test_upload_file_available_for_project_collaborators(client, request, project):
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+def test_upload_file_available_for_project_collaborators(
+    client, request, project, good_file
+):
+    data = {"description": "this is some content", "the_file": good_file}
 
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
@@ -73,11 +211,28 @@ def test_upload_file_available_for_project_collaborators(client, request, projec
 
     assert response.status_code == 302
 
-    document = models.Document.objects.all()[0]
+    document = models.Document.objects.first()
     assert document.project == project
     assert document.description == data["description"]
     assert document.uploaded_by == user
+    assert not document.private
     assert document.the_file is not None
+
+    msg = conversation_models.Message.objects.first()
+    assert msg.posted_by == user
+    assert msg.nodes.first().document == document
+
+
+@pytest.mark.django_db
+def test_upload_file_rejects_executables(client, request, project, malicious_file):
+    data = {"description": "this is some content", "the_file": malicious_file}
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        url = reverse("projects-documents-upload-document", args=[project.id])
+        client.post(url, data=data)
+
+    assert not models.Document.objects.exists()
 
 
 @pytest.mark.django_db
@@ -96,9 +251,8 @@ def test_upload_document_is_either_link_or_file(client, request, project):
 
 
 @pytest.mark.django_db
-def test_upload_file_does_not_trigger_notifications(client, request, project):
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+def test_upload_file_trigger_msg_trace_notif(client, request, project, good_file):
+    data = {"description": "this is some content", "the_file": good_file}
 
     other_user = baker.make(auth_models.User)
 
@@ -113,10 +267,12 @@ def test_upload_file_does_not_trigger_notifications(client, request, project):
     assert response.status_code == 302
 
     document = models.Document.objects.all()[0]
+    msg = document.documentnode_set.first().message
 
-    assert action_object_stream(document).count() == 1
+    assert action_object_stream(msg).count() == 1
+    assert action_object_stream(document).count() == 0
     assert user.notifications.count() == 0
-    assert other_user.notifications.count() == 0
+    assert other_user.notifications.count() == 1
 
 
 @pytest.mark.django_db
@@ -169,6 +325,107 @@ def test_delete_document_not_available_for_others(client, request, project):
 
     assert response.status_code == 403
     document = models.Document.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_delete_document_cross_project_is_forbidden(request, client, project):
+    """A collaborator managing documents on their own project must not be
+    able to delete a document belonging to a different, unrelated project,
+    even one they uploaded themselves."""
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+
+        document = baker.make(
+            models.Document,
+            uploaded_by=user,
+            project=other_project,
+            the_link="http://yo",
+            site=get_current_site(request),
+        )
+
+        url = reverse(
+            "projects-documents-delete-document", args=[project.id, document.id]
+        )
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    document.refresh_from_db()
+    assert document.deleted is None
+
+
+@pytest.mark.django_db
+def test_pin_document_cross_project_is_forbidden(request, client, project):
+    """A collaborator managing documents on their own project must not be
+    able to pin/unpin a document belonging to a different, unrelated
+    project."""
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    document = baker.make(
+        models.Document,
+        project=other_project,
+        the_link="http://yo",
+        site=get_current_site(request),
+        uploaded_by__username="other",
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+
+        url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    document.refresh_from_db()
+    assert document.pinned is False
+
+
+@pytest.mark.django_db
+def test_delete_document_permission_checked_before_document_lookup(
+    request, client, project
+):
+    """Permission check must run before the document lookup, otherwise a user
+    with no rights on the project could tell from the status code (403 vs
+    404) whether a given document id belongs to another project or not"""
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    document = baker.make(
+        models.Document,
+        project=other_project,
+        the_link="http://yo",
+        site=get_current_site(request),
+        uploaded_by__username="other",
+    )
+
+    with login(client):
+        url = reverse(
+            "projects-documents-delete-document", args=[project.id, document.id]
+        )
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_pin_document_permission_checked_before_document_lookup(
+    request, client, project
+):
+    """same oracle check as above^, for pin/unpin"""
+    other_project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    document = baker.make(
+        models.Document,
+        project=other_project,
+        the_link="http://yo",
+        site=get_current_site(request),
+        uploaded_by__username="other",
+    )
+
+    with login(client):
+        url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
+        response = client.post(url)
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db

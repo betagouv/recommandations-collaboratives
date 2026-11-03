@@ -1,16 +1,45 @@
+import nh3
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
+from django.db import transaction
 from notifications import models as notifications_models
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
+from recoco.apps.geomatics.models import Commune
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
+from recoco.apps.invites.models import Invite
 from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
-from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
+from .models import (
+    Document,
+    Note,
+    Project,
+    ProjectMember,
+    ProjectSite,
+    ProjectSwitchtender,
+    Topic,
+    UserProjectStatus,
+)
+from .utils import assign_collaborator, assign_role, change_role
+
+
+class TopicSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Topic
+
+        fields = ["name"]
+
+
+class TopicListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.name
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,7 +62,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class NewDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ["the_file", "the_link", "description", "id"]
+        fields = ["the_file", "the_link", "description", "id", "private"]
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):
@@ -78,14 +107,23 @@ class ProjectSerializer(
             "advisors_note",
             "exclude_stats",
             "muted",
+            "deleted",
+            "topics",
+            "orga_owner",
+        ]
+
+        read_only_fields = [
+            "exclude_stats",
+            "muted",
+            "deleted",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
     tags = TagListSerializerField()
+    project_sites = InlineProjectSiteSerializer(read_only=True, many=True)
+    commune = CommuneSerializer(read_only=True)
 
     recommendation_count = serializers.SerializerMethodField()
-
-    project_sites = InlineProjectSiteSerializer(read_only=True, many=True)
 
     def get_recommendation_count(self, obj):
         return task_models.Task.on_site.published().filter(project=obj).count()
@@ -99,8 +137,6 @@ class ProjectSerializer(
 
     def get_private_message_count(self, obj):
         return Note.on_site.private().filter(project=obj).count()
-
-    commune = CommuneSerializer(read_only=True)
 
     latitude = serializers.SerializerMethodField()
 
@@ -120,15 +156,36 @@ class ProjectSerializer(
         ):
             return obj.advisors_note
 
-    exclude_stats = serializers.SerializerMethodField()
+    topics = TopicListingField(read_only=True, many=True)
 
-    def get_exclude_stats(self, obj):
-        return obj.exclude_stats
+    orga_owner = SerializerMethodField()
 
-    muted = serializers.SerializerMethodField()
+    def get_orga_owner(self, obj):
+        return (
+            obj.owner.profile.organization.name
+            if obj.owner and obj.owner.profile.organization
+            else ""
+        )
 
-    def get_muted(self, obj):
-        return obj.muted
+    def validate_description(self, value):
+        return nh3.clean(value)
+
+
+class ProjectLocationSerializer(BaseSerializerMixin, serializers.ModelSerializer):
+    """Restricted write serializer for the Project PATCH endpoint.
+
+    Used for callers who only hold `projects.change_location` (any project
+    collaborator, draft or not -> see `COLLABORATOR_DRAFT_PERMISSIONS`/
+    `COLLABORATOR_PERMISSIONS`) so that only `location` is writable.
+    `name`/`description`/`tags`/etc. stay reserved for advisors, who hold
+    `projects.change_project`/`projects.use_project_tags`, matching the
+    classic (non-REST) views.
+    """
+
+    class Meta:
+        model = Project
+        fields = ["id", "location"]
+        read_only_fields = ["id"]
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -196,6 +253,144 @@ class UserProjectSerializer(ProjectSerializer):
         }
 
 
+def get_or_create_user_on_site(email: str, site: Site) -> User:
+    """Return the user of given email, creating its account if needed"""
+    user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
+    user.profile.sites.add(site)
+
+    return user
+
+
+class NewProjectSerializer(ProjectSerializer):
+    """Create an already validated project, on the current site"""
+
+    class Meta(ProjectSerializer.Meta):
+        fields = ProjectSerializer.Meta.fields + ["insee", "owner_email"]
+        read_only_fields = ProjectSerializer.Meta.read_only_fields + [
+            "created_on",
+            "updated_on",
+            "inactive_since",
+            "is_diagnostic_done",
+        ]
+
+    insee = serializers.CharField(max_length=5, write_only=True)
+    owner_email = serializers.EmailField(max_length=150, write_only=True)
+
+    description = serializers.CharField(required=True)
+    tags = TagListSerializerField(required=False)
+
+    # read only on the parent serializer, since it belongs to the project site
+    status = serializers.ChoiceField(
+        choices=ProjectSite.PROJECTSITE_STATES,
+        required=False,
+        default="TO_PROCESS",
+    )
+
+    def validate_owner_email(self, value):
+        return value.lower()
+
+    def validate(self, data):
+        insee = data["insee"]
+
+        commune = Commune.get_by_insee_code(insee)
+        if commune is None:
+            raise serializers.ValidationError(
+                {"insee": f"No commune found for insee code '{insee}'."}
+            )
+
+        # commune is read only on the parent serializer, it is only writable
+        # here, through the insee code
+        data["commune"] = commune
+
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data.pop("insee")
+        owner_email = validated_data.pop("owner_email")
+        # status is not a field of the project, but of its site
+        status = validated_data.pop("status")
+
+        # the caller submits the project on behalf of its owner,
+        # cf. onboarding.views.prefill_project_submit
+        validated_data["submitted_by"] = self.current_user
+
+        project = super().create(validated_data)
+
+        # the project skips moderation, it is created already validated
+        project.project_sites.create(
+            site=self.current_site, status=status, is_origin=True
+        )
+
+        owner = get_or_create_user_on_site(owner_email, self.current_site)
+        assign_collaborator(owner, project, is_owner=True)
+
+        return project
+
+
+class ProjectMemberSerializer(serializers.ModelSerializer):
+    """A participant of a project"""
+
+    class Meta:
+        model = ProjectMember
+        fields = ["email", "first_name", "last_name", "is_owner"]
+
+    email = serializers.EmailField(source="member.email")
+    first_name = serializers.CharField(source="member.first_name")
+    last_name = serializers.CharField(source="member.last_name")
+
+
+class ProjectAdvisorSerializer(serializers.ModelSerializer):
+    """An advisor or an observer of a project"""
+
+    class Meta:
+        model = ProjectSwitchtender
+        fields = ["email", "first_name", "last_name", "is_observer"]
+
+    email = serializers.EmailField(source="switchtender.email")
+    first_name = serializers.CharField(source="switchtender.first_name")
+    last_name = serializers.CharField(source="switchtender.last_name")
+
+
+class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Attach someone, given by email, to a project with the given role"""
+
+    email = serializers.EmailField(max_length=150)
+    role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
+
+    @property
+    def project(self) -> Project:
+        return self.context["project"]
+
+    def validate_email(self, value):
+        return value.lower()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = get_or_create_user_on_site(validated_data["email"], self.current_site)
+
+        assign_role(user, self.project, validated_data["role"], self.current_site)
+
+        return validated_data
+
+
+class ProjectMembershipRoleSerializer(ProjectMembershipSerializer):
+    """Change the role of someone on a project
+
+    The person keeps only the given role: any other role it holds on the
+    project, for the current site, is removed.
+    """
+
+    email = serializers.EmailField(read_only=True)
+
+    def update(self, instance, validated_data):
+        role = validated_data["role"]
+
+        change_role(instance, self.project, role, self.current_site)
+
+        return {"email": instance.email, "role": role}
+
+
 class ProjectForListSerializer(BaseSerializerMixin):
     class Meta:
         model = Project
@@ -207,7 +402,7 @@ class ProjectForListSerializer(BaseSerializerMixin):
         commune = data.commune
         commune_data = format_commune(commune)
 
-        return {
+        result = {
             "id": data.id,
             "name": data.name,
             "description": data.description,
@@ -226,16 +421,23 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
-            "advisors_note": (
-                data.advisors_note
-                if self.current_user
-                and self.current_user.has_perm("projects.use_private_notes", data)
-                else None
-            ),
             "owner": format_owner(data),
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,
+            "advisors_note": data.advisors_note,
+            "deleted": data.deleted,
+            "topics": [t.name for t in data.topics.all()],
+            "orga_owner": (
+                data.owner.profile.organization.name
+                if data.owner and data.owner.profile.organization
+                else ""
+            ),
         }
+
+        for field_name in self.context.get("plugin_extra_fields", []):
+            result[field_name] = getattr(data, field_name, None)
+
+        return result
 
 
 class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
@@ -354,13 +556,6 @@ def format_sites(project):
         }
         for ps in project.project_sites.all()
     ]
-
-
-class TopicSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Topic
-
-        fields = ["name"]
 
 
 # eof

@@ -1,0 +1,16 @@
+{% extends "layouts/error_page.html" %}
+{% load static %}
+{% block content %}
+    <p class="fr-text--lead fr-mb-3w">
+        La page que vous cherchez n'existe pas ou a été déplacée. Veuillez nous excuser pour la gêne occasionnée.
+    </p>
+{% endblock content %}
+{% block buttons %}
+    <li>
+        <a class="fr-btn fr-btn--icon-left fr-icon-home-4-line fr-mr-3w"
+           href="{% url 'home' %}">Retour à l'accueil</a>
+    </li>
+{% endblock buttons %}
+{% block image %}
+    <img src="{% static 'svg/files-missing.svg' %}" alt="">
+{% endblock image %}

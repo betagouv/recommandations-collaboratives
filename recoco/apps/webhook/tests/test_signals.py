@@ -141,6 +141,11 @@ def serialized_project(project, organization):
         "is_diagnostic_done": False,
         "status": "READY",
         "advisors_note": None,
+        "exclude_stats": False,
+        "muted": False,
+        "deleted": None,
+        "orga_owner": "",
+        "topics": [],
     }
 
 

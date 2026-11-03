@@ -1,0 +1,28 @@
+{% comment %}
+    Parameter:
+        - label (string): label to display in project navigation
+{% endcomment %}
+<div class="fr-segmented__element"
+     {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
+    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-files-links" %}
+    <input value="filesLinks"
+           type="radio"
+           {% if files_links %}checked{% endif %}
+           aria-checked="{% if files_links %}true{% else %}false{% endif %}"
+           {% if 'manage_documents' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-documents' project.pk %}'" {% else %} disabled {% endif %}
+           id="segmented-control-files"
+           name="segmented-control-project">
+    <label class="fr-label" for="segmented-control-files">
+        <a class="stretched-link"
+           data-test-id="project-navigation-documents"
+           href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">{{ label |default:"Fichiers" }}
+            {% if 'manage_documents' in user_project_perms %}
+                {% if active_project_document_notifications_count %}
+                    <span class="badge text-bg-danger" data-test-id="badge-tab-new-file">{{ active_project_document_notifications_count }}</span>
+                {% endif %}
+            {% else %}
+                <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+            {% endif %}
+        </a>
+    </label>
+</div>

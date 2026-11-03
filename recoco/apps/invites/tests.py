@@ -8,6 +8,8 @@ created: 2022-04-20 10:11:56 CEST
 """
 
 import pytest
+from actstream import models as action_models
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -22,6 +24,7 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import has_perm, login
 
+from ... import verbs
 from . import api, models
 
 
@@ -258,6 +261,28 @@ def test_accept_invite_matches_existing_account(request, client, project):
 
 
 @pytest.mark.django_db
+def test_accept_invite_validates_email(request, client, project):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    with login(
+        client,
+        email="invited@here.tld",
+        username="invited@here.tld",
+        email_verified=False,
+    ) as user:
+        invite = Recipe(
+            models.Invite, project=project, site=current_site, email=user.email
+        ).make()
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+        assert response.status_code == 302
+        assert EmailAddress.objects.get(user=user, email=user.email).verified
+        invite = models.Invite.on_site.get(pk=invite.pk)
+        assert invite.accepted_on is not None
+
+
+@pytest.mark.django_db
 def test_accept_invite_as_switchtender_triggers_notification(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -307,6 +332,64 @@ def test_accept_invite_as_team_member_triggers_notification(request, client, pro
 
     assert response.status_code == 302
     assert membership.member.notifications.count() == 1
+
+
+@pytest.mark.django_db
+def test_accept_invite_as_team_member_triggers_action_trace(request, client, project):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    membership = baker.make(
+        projects_models.ProjectMember, member__is_staff=False, is_owner=True
+    )
+
+    project.projectmember_set.add(membership)
+
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
+        invite = Recipe(
+            models.Invite,
+            project=project,
+            site=current_site,
+            email=user.email,
+            role="COLLABORATOR",
+        ).make()
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert (
+        action_models.Action.objects.filter(
+            verb=verbs.Project.JOINED_BY_INVITATION
+        ).count()
+        == 1
+    )
+
+
+@pytest.mark.django_db
+def test_accept_invite_as_owner_triggers_specific_action_trace(
+    request, client, project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
+        assign_collaborator(user, project, is_owner=True)
+        invite = Recipe(
+            models.Invite,
+            project=project,
+            site=current_site,
+            email=user.email,
+            role="COLLABORATOR",
+        ).make()
+
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert (
+        action_models.Action.objects.filter(verb=verbs.Project.JOINED_OWNER).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
@@ -526,6 +609,9 @@ def test_anonymous_accepts_invite_as_switchtender(request, client, project):
         "last_name": "Last",
         "organization": "Some Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     url = reverse("invites-invite-accept", args=[invite.pk])
@@ -546,6 +632,8 @@ def test_anonymous_accepts_invite_as_switchtender(request, client, project):
     assert current_site in user.profile.sites.all()
     assert has_perm(user, "view_project", invite.project)
 
+    assert EmailAddress.objects.get(user=user, email=user.email).verified
+
 
 @pytest.mark.django_db
 def test_anonymous_accepts_invite_as_collaborator(request, client, project):
@@ -564,6 +652,9 @@ def test_anonymous_accepts_invite_as_collaborator(request, client, project):
         "last_name": "Last",
         "organization": "Some Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     url = reverse("invites-invite-accept", args=[invite.pk])
@@ -583,6 +674,8 @@ def test_anonymous_accepts_invite_as_collaborator(request, client, project):
     assert user.profile.organization_position == data["position"]
     assert current_site in user.profile.sites.all()
     assert has_perm(user, "view_project", invite.project)
+
+    assert EmailAddress.objects.get(user=user, email=user.email).verified
 
 
 @pytest.mark.django_db
@@ -604,6 +697,9 @@ def test_accepting_invitation_assigns_organization_to_current_site(
         "last_name": "Last",
         "organization": "New Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     url = reverse("invites-invite-accept", args=[invite.pk])
@@ -634,6 +730,9 @@ def test_accepting_invitation_updates_organization_with_current_site(
         "last_name": "Last",
         "organization": "New Organization",
         "position": "Doing Stuff",
+        "phone_no": "0102030405",
+        "password": "Recoco2000",
+        "password_confirm": "Recoco2000",
     }
 
     baker.make(addressbook_models.Organization, name=data["organization"])
@@ -712,7 +811,7 @@ def test_refuse_invite_returns_to_details_if_get(request, client):
 
 
 @pytest.mark.django_db
-def test_reufse_invite_matches_existing_account(request, client, project):
+def test_refuse_invite_matches_existing_account(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client, email="invited@here.tld", username="invited@here.tld") as user:
@@ -725,6 +824,32 @@ def test_reufse_invite_matches_existing_account(request, client, project):
     assert response.status_code == 302
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.refused_on is not None
+
+
+@pytest.mark.django_db
+def test_refuse_invite_with_existing_account_deos_not_validate_email(
+    request, client, project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    with login(
+        client,
+        email="invited@here.tld",
+        username="invited@here.tld",
+        email_verified=False,
+    ) as user:
+        invite = Recipe(
+            models.Invite, project=project, site=current_site, email=user.email
+        ).make()
+        url = reverse("invites-invite-refuse", args=[invite.pk])
+        response = client.post(url)
+
+        assert response.status_code == 302
+        invite = models.Invite.on_site.get(pk=invite.pk)
+        assert invite.refused_on is not None
+
+        email_address = EmailAddress.objects.filter(user=user, email=user.email)
+        assert not email_address or not email_address.verified
 
 
 @pytest.mark.django_db

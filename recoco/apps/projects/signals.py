@@ -31,6 +31,7 @@ from .utils import (
 
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
+project_rejected = django.dispatch.Signal()
 
 # not using default signal but our own for easier processing
 project_userprojectstatus_updated = django.dispatch.Signal()
@@ -40,18 +41,33 @@ project_observer_joined = django.dispatch.Signal()
 project_switchtender_leaved = django.dispatch.Signal()
 
 project_member_joined = django.dispatch.Signal()
+project_owner_joined = django.dispatch.Signal()
 
 document_uploaded = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
 def log_project_submitted(sender, site, submitter, project, **kwargs):
-    action.send(
-        sender=submitter,
-        verb=verbs.Project.SUBMITTED_BY,
-        action_object=project,
-        target=project,
-    )
+    if project.submitted_by == project.owner:
+        action.send(
+            sender=project.submitted_by,
+            verb=verbs.Project.SUBMITTED_BY,
+            action_object=project,
+            target=project,
+        )
+    else:
+        action.send(
+            sender=project.submitted_by,
+            verb=verbs.Project.SUBMITTED_BY_ADVISOR,
+            action_object=project,
+            target=project,
+        )
+        action.send(
+            sender=project.submitted_by,
+            verb=verbs.Project.INVITATION_OWNER,
+            action_object=project.owner,
+            target=project,
+        )
 
 
 @receiver(project_submitted)
@@ -59,13 +75,22 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
     recipients = get_project_moderators(site)
 
     # Notify project moderators
-    notify.send(
-        sender=submitter,
-        recipient=recipients,
-        verb=verbs.Project.SUBMITTED_BY,
-        action_object=project,
-        target=project,
-    )
+    if project.submitted_by == project.owner:
+        notify.send(
+            sender=project.submitted_by,
+            recipient=recipients,
+            verb=verbs.Project.SUBMITTED_BY,
+            action_object=project,
+            target=project,
+        )
+    else:
+        notify.send(
+            sender=project.submitted_by,
+            recipient=recipients,
+            verb=verbs.Project.SUBMITTED_BY_ADVISOR,
+            action_object=project,
+            target=project,
+        )
 
 
 @receiver(project_validated)
@@ -92,6 +117,27 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
         action_object=project,
         target=project,
     )
+
+
+@receiver(project_rejected)
+def log_project_rejected(sender, site, moderator, project, **kwargs):
+    action.send(
+        sender=moderator,
+        verb=verbs.Project.REJECTED_BY,
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_rejected)
+def unnotify_project_submitted_on_rejection(site, project, **kwargs):
+    project_ct = ContentType.objects.get_for_model(project)
+    notifications_models.Notification.objects.filter(
+        action_object_content_type=project_ct.pk,
+        action_object_object_id=project.pk,
+        site=site,
+        verb=verbs.Project.SUBMITTED_BY,
+    ).update(emailed=True, unread=False)
 
 
 @receiver(
@@ -190,7 +236,17 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
 def log_project_member_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb=verbs.Project.JOINED,
+        verb=verbs.Project.JOINED_BY_INVITATION,
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_owner_joined)
+def log_project_owner_joined(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb=verbs.Project.JOINED_OWNER,
         action_object=project,
         target=project,
     )
@@ -203,7 +259,7 @@ def notify_project_member_joined(sender, project, **kwargs):
 
     notification = {
         "sender": sender,
-        "verb": verbs.Project.JOINED,
+        "verb": verbs.Project.JOINED_BY_INVITATION,
         "action_object": project,
         "target": project,
     }
@@ -332,13 +388,31 @@ def project_document_uploaded(sender, instance, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
+    verb = (
+        verbs.Document.ADDED_ADVISOR_FILE
+        if instance.private
+        else verbs.Document.ADDED_FILE
+        if instance.the_file
+        else verbs.Document.ADDED_LINK
+    )
+
     # Add a trace
     action.send(
         instance.uploaded_by,
-        verb=verbs.Document.ADDED,
+        verb=verb,
         action_object=instance,
         target=project,
     )
+
+    if instance.private:
+        notification = {
+            "sender": instance.uploaded_by,
+            "verb": verbs.Document.ADDED_ADVISOR_FILE,
+            "action_object": instance,
+            "target": project,
+        }
+
+        notify_advisors_of_project(project, notification, exclude=instance.uploaded_by)
 
 
 ################################################################

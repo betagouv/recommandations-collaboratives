@@ -9,12 +9,13 @@ created: 2022-01-24 22:39:27 CEST
 
 import logging
 
-from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
 from recoco.apps.communication import digests
+from recoco.apps.plugins.context import tenant_context
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects import models as project_models
 from recoco.utils import get_group_for_site
 
@@ -44,12 +45,16 @@ class Command(BaseCommand):
 
     def send_email_digests(self, dry_run, user_id):
         for site in Site.objects.all():
-            with settings.SITE_ID.override(site.pk):
+            # Digests call plugin hooks and may reverse plugin URLs
+            with tenant_context(site):
                 logger.info(f"\n#### Sending digests for site <{site.domain}> ####\n")
                 self.send_email_digests_for_site(site, dry_run, user_id)
 
     def send_email_digests_for_site(self, site, dry_run, user_id):
         advisor_group = get_group_for_site("advisor", site, create=True)
+        staff_group = get_group_for_site("staff", site, create=True)
+
+        pm = get_site_plugin_manager(site=site)
 
         # only send emails to active users and those actually linked to the current site
         user_qs = auth_models.User.objects
@@ -78,6 +83,18 @@ class Command(BaseCommand):
                         logger.info(
                             f"Sent new reco digest for {user} on {project.name}"
                         )
+
+        # Plugin digests for staff users (run first so they can consume
+        # notifications before the standard digest loop sees them)
+        logger.info("** Sending plugin digests for staff **")
+        for user in user_qs.filter(groups__in=[staff_group]):
+            for count in pm.hook.send_digests_for_staff_users(
+                site=site, user=user, dry_run=dry_run
+            ):
+                if count:
+                    logger.info(
+                        f"Plugin sent staff digest ({count} notifications) for {user}"
+                    )
 
         # Digests for non switchtenders
         logger.info("** Sending general digests **")

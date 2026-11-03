@@ -1,6 +1,6 @@
-<div x-data="{document: null}"
+<div x-data="{ document: null, currentDocumentId: null, }"
      x-show="document"
-     x-effect="document = await getDocumentById(node.document_id)"
+     x-effect="if (node.document_id !== currentDocumentId) { currentDocumentId = node.document_id; document = await getDocumentById(node.document_id); }"
      class="document-item">
     <template x-if="document">
         <div class="document-item__content">
@@ -13,7 +13,7 @@
             </div>
             <div class="document-item__actions-container">
                 <template x-if="document.uploaded_by == {{ request.user.id }} || $store.djangoData.canManageDocuments">
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-delete-line"></button>
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-delete-line fr-mr-1v"></button>
                 </template>
                 <a class="fr-btn fr-btn--sm fr-btn--tertiary"
                    :href="document.the_file"

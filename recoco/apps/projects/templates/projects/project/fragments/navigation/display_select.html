@@ -1,5 +1,3 @@
-{% load sass_tags %}
-
 {% with request.resolver_match.url_name as url_name %}
     <fieldset class="fr-segmented fr-segmented--sm">
         <legend class="fr-segmented__legend inline text-nowrap">Vue :</legend>
@@ -15,17 +13,6 @@
                     <a href="{% url "projects-project-list" %}">Tableau</a>
                 </label>
             </div>
-            {% comment %} <div class="fr-segmented__element">
-                <input value="list"
-                       {% if url_name == 'projects-project-list-advisor' %}checked{% endif %}
-                       type="radio"
-                       id="list-display"
-                       name="display-select-radio"
-                       @click="window.location.href='{% url "projects-project-list-advisor" %}'">
-                <label class="fr-label" for="list-display">
-                    <a href="{% url "projects-project-list-advisor" %}">Liste</a>
-                </label>
-            </div> {% endcomment %}
             <div class="fr-segmented__element">
                 <input value="map"
                        {% if url_name == 'projects-project-list-map' %}checked{% endif %}

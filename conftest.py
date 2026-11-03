@@ -1,18 +1,24 @@
 # global personal configuration of pytest
+from datetime import timedelta
+
+import puremagic
 import pytest
+from cookie_consent.cache import delete_cache
+from cookie_consent.models import Cookie, CookieGroup
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
+from model_bakery.recipe import Recipe, related
 from rest_framework.test import APIClient
 
-from recoco.apps.projects.models import Project
+from recoco.apps.projects.models import Project, ProjectSite
 
 
-# -- Global Fixtures
 @pytest.fixture(scope="session", autouse=True)
 def setup_db(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
@@ -42,9 +48,18 @@ def current_site():
 def staff_user(current_site):
     staff = baker.make(User)
     staff.profile.sites.add(current_site)
-    gstaff = Group.objects.get(name="example_com_staff")
+    gstaff, _ = Group.objects.get_or_create(name="example_com_staff")
     staff.groups.add(gstaff)
     return staff
+
+
+@pytest.fixture
+def admin_user(current_site):
+    admin = baker.make(User)
+    admin.profile.sites.add(current_site)
+    gadmin, _ = Group.objects.get_or_create(name="example_com_admin")
+    admin.groups.add(gadmin)
+    return admin
 
 
 # -- Project Fixtures
@@ -67,6 +82,20 @@ def make_project(request):
         return project
 
     return _make_project
+
+
+@pytest.fixture
+def project_recipe(current_site):
+    project_site = Recipe(
+        ProjectSite, site=current_site, is_origin=True, status="READY"
+    )
+    project = Recipe(
+        Project,
+        description="Super description",
+        location="SomeWhere",
+        project_sites=related(project_site),
+    )
+    yield project
 
 
 @pytest.fixture
@@ -103,6 +132,41 @@ def project_editor(project_ready):
     assign_perm("projects.view_public_notes", project_editor, project_ready)
     assign_perm("projects.use_public_notes", project_editor, project_ready)
     return project_editor
+
+
+@pytest.fixture()
+def good_file():
+    headers = puremagic.magic_header_array
+    header = [e for e in headers if e.extension == ".png"][0].byte_match
+    return SimpleUploadedFile("img.png", header, content_type="image/png")
+
+
+@pytest.fixture()
+def malicious_file():
+    headers = puremagic.magic_header_array
+    header = [e for e in headers if e.extension == ".exe"][0].byte_match
+    return SimpleUploadedFile("fake-img.png", header, content_type="image/png")
+
+
+def setup_sesame_cookie(client, user):
+    delete_cache()
+
+    # somehow tests are flaky without this
+    group, _ = CookieGroup.objects.get_or_create(
+        name="Préférences", varname="preferences"
+    )
+    cookie, _ = Cookie.objects.get_or_create(
+        cookiegroup=group,
+        name="enable-sesame",
+        description="Garde trace de la dernière personne connectée pour autoriser la connexion par lien magique pendant la durée de vie de cookie pour la personne",
+    )
+
+    client.cookies.load(
+        {
+            "cookie_consent": f"preferences={(cookie.created + timedelta(minutes=1)).isoformat()}"
+        }
+    )
+    client.cookies.load({"enable-sesame-user-id": str(user.id)})
 
 
 # eof

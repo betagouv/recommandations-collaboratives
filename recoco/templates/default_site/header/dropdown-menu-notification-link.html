@@ -1,0 +1,7 @@
+<a :href="getNotificationLink('{{ notification_url }}')" @click="clickConsummeNotificationAndRedirect($event, {{ notification.pk }}, '{{ notification_url }}', { conversationContext:
+    {% if 'message' in notification.verb %}
+        true
+    {% else %}
+        false
+    {% endif %}
+})" class="stretched-link custom-external-link"></a>

@@ -1,0 +1,20 @@
+{% comment %}
+    Parameter:
+        - label (string): label to display in project navigation
+{% endcomment %}
+{% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
+    <div class="fr-segmented__element">
+        <input value="overview"
+               type="radio"
+               {% if overview %}checked{% endif %}
+               aria-checked="{% if overview %}true{% else %}false{% endif %}"
+               id="segmented-control-overview"
+               name="segmented-control-project"
+               @click="window.location='{% url 'projects-project-detail-overview' project.pk %}'">
+        <label class="fr-label" for="segmented-control-overview">
+            <a class="stretched-link"
+               data-test-id="project-navigation-overview"
+               href="{% url 'projects-project-detail-overview' project.pk %}">{{ label |default:"Présentation" }}</a>
+        </label>
+    </div>
+{% endif %}

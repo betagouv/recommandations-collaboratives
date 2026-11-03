@@ -7,14 +7,12 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-29 11:30:42 CEST
 """
 
-import json
-
 from django import template
 from django.contrib.sites.models import Site
-from django.forms import model_to_dict
 
 from recoco import utils as recoco_utils
 from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.plugins.manager import get_site_plugin_manager
 
 from .. import models
 
@@ -78,17 +76,6 @@ def is_project_owner(project, user):
     return project.owner == user
 
 
-@register.filter(name="to_json")
-def to_json(value, fields=None):
-    """Transforme un objet Python en JSON avec des champs spécifiques."""
-    if fields:
-        field_list = [field.strip() for field in fields.split(",")]
-        data = model_to_dict(value, fields=field_list)
-    else:
-        data = model_to_dict(value)
-    return json.dumps(data)
-
-
 @register.simple_tag
 def count_has_notifications(feed_items):
     """Count elements with notifications (new message)"""
@@ -99,6 +86,27 @@ def count_has_notifications(feed_items):
 def count_message_by_type(feed_items, *args):
     """Count message by type in feed"""
     return len([item for item in feed_items if item.get("type") in args])
+
+
+@register.simple_tag(takes_context=True)
+def project_plugin_tabs(context):
+    request = context.get("request")
+    if request is None:
+        return []
+
+    current_view_name = (
+        request.resolver_match.view_name if request.resolver_match else ""
+    )
+
+    return [
+        {
+            "url_name": entry["url_name"],
+            "label": entry["label"],
+            "active": current_view_name
+            in (entry.get("active_url_names") or [entry["url_name"]]),
+        }
+        for entry in get_site_plugin_manager(request).hook.project_tab_entries()
+    ]
 
 
 # eof

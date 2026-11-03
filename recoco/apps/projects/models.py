@@ -17,17 +17,15 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
-from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
-from django.db.models.query import QuerySet
+from django.db.models.query import Prefetch, QuerySet
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
-from markdownx.utils import markdownify
 from model_utils.models import TimeStampedModel
 from notifications import models as notifications_models
 from notifications.models import Notification
@@ -40,12 +38,13 @@ from recoco.utils import (
     CastedGenericRelation,
     check_if_advisor,
     has_perm,
+    render_markdown,
     strip_accents,
 )
 
+from ..home.validators import file_validators
 from . import apps
 from .utils import generate_ro_key
-from .validators import MimetypeValidator
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -85,6 +84,7 @@ ADVISOR_PERMISSIONS = [
     "projects.change_project",
     "projects.change_location",
     "projects.use_project_tags",
+    "projects.manage_private_documents",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -116,6 +116,12 @@ def create_site_permissions(sender, **kwargs):
         content_type=site_ct,
     )
 
+    auth_models.Permission.objects.get_or_create(
+        codename="see_deleted_projects",
+        name="Can see deleted projects for site",
+        content_type=site_ct,
+    )
+
 
 class ProjectManager(models.Manager):
     """Manager for all projects"""
@@ -137,7 +143,7 @@ class ProjectManager(models.Manager):
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):
-            projects = self.filter(sites=site, deleted=None).exclude(
+            projects = self.filter(sites=site).exclude(
                 project_sites__site=site, project_sites__status="DRAFT"
             )
         else:
@@ -154,7 +160,7 @@ class ProjectManager(models.Manager):
         # Extend scope of projects to those where you're member or invited advisor
         my_projects = get_objects_for_user(
             user, "projects.view_project", klass=Project
-        ).filter(deleted=None, sites=site)
+        ).filter(sites=site)
 
         return (projects | my_projects).distinct()
 
@@ -190,8 +196,9 @@ class ProjectQuerySet(models.QuerySet):
             ),
             conversation_notifications_count=Subquery(
                 notification_query.filter(
-                    action_object_content_type=ContentType.objects.get_for_model(Note),
-                    action_notes__public=True,
+                    action_object_content_type=ContentType.objects.get(
+                        app_label="conversations", model="message"
+                    ),
                 )
                 .unread()
                 .order_by()
@@ -231,8 +238,58 @@ class ProjectQuerySet(models.QuerySet):
             )
         )
 
+    def with_perf_prefetch(self, *args):
+        prefetch_to_do = []
 
-class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
+        if "origin_site" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "project_sites",
+                    ProjectSite.objects.filter(is_origin=True).select_related(
+                        "site", "site__configuration"
+                    ),
+                    to_attr="_origin_site",
+                )
+            )
+        if "owner" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "members",
+                    auth_models.User.objects.filter(
+                        projectmember__is_owner=True
+                    ).select_related(
+                        "profile",
+                        "profile__organization",
+                        "profile__organization__group",
+                    ),
+                    to_attr="_owner",
+                )
+            )
+        if "next_reminder" in args:
+            prefetch_to_do.append(
+                Prefetch(
+                    "reminders",
+                    django_apps.get_model(
+                        app_label="reminders", model_name="Reminder"
+                    )  # Imported lazily to avoid a circular import in reminders.models
+                    .objects.filter(site=Site.objects.get_current(), sent_on=None)
+                    .order_by("deadline"),
+                    to_attr="_next_reminder",
+                )
+            )  # _next_reminder is looked at in getter
+
+        return self.prefetch_related(*prefetch_to_do)
+
+
+class AllProjectManager(ProjectManager.from_queryset(ProjectQuerySet)):
+    pass
+
+
+class ProjectOnSiteManagerBase(CurrentSiteManager, ProjectManager):
+    pass
+
+
+class ProjectOnSiteManager(ProjectOnSiteManagerBase.from_queryset(ProjectQuerySet)):
     pass
 
 
@@ -243,18 +300,23 @@ class ActiveProjectManagerBase(ProjectManager):
         return super().get_queryset().filter(deleted=None)
 
 
-ActiveProjectManager = ActiveProjectManagerBase.from_queryset(ProjectQuerySet)
+class ActiveProjectManager(ActiveProjectManagerBase.from_queryset(ProjectQuerySet)):
+    pass
 
 
 class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
     pass
 
 
-class DeletedProjectManager(ProjectManager):
+class DeletedProjectManagerBase(ProjectManager):
     """Manager for deleted projects"""
 
     def get_queryset(self):
         return super().get_queryset().exclude(deleted=None)
+
+
+class DeletedProjectManager(DeletedProjectManagerBase.from_queryset(ProjectQuerySet)):
+    pass
 
 
 class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
@@ -346,6 +408,7 @@ class Project(models.Model):
     on_site = ActiveProjectOnSiteManager()
     deleted_on_site = DeletedProjectOnSiteManager()
 
+    all = AllProjectManager()
     all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(
@@ -395,7 +458,18 @@ class Project(models.Model):
 
     @property
     def owner(self):
+        # `_owner` may be populated in bulk (use with_perf_prefetch from manager) to avoid N+1 queries
+        # an empty list means "no owner", not "not prefetched".
+        if hasattr(self, "_owner"):
+            return self._owner[0] if self._owner else None
         return self.members.filter(projectmember__is_owner=True).first()
+
+    @property
+    def origin_site(self):
+        # use with_perf_prefetch from manager to enjoy optimization
+        if hasattr(self, "_origin_site"):
+            return self._origin_site[0].site if self._origin_site else None
+        return self.project_sites.origin().site
 
     ro_key = models.CharField(
         max_length=32,
@@ -439,6 +513,12 @@ class Project(models.Model):
     inactive_since = models.DateTimeField(
         null=True, blank=True, verbose_name="Quand le dossier a été déclaré inactif"
     )
+    set_inactive_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="projects_set_inactive",
+    )
     inactive_reason = models.CharField(
         max_length=256,
         blank=True,
@@ -459,6 +539,7 @@ class Project(models.Model):
 
         self.inactive_since = None
         self.inactive_reason = None
+        self.set_inactive_by = None
         self.save()
 
     last_members_activity_at = models.DateTimeField(
@@ -498,7 +579,7 @@ class Project(models.Model):
     @property
     def advisors_note_rendered(self):
         """Return synopsis as markdown"""
-        return markdownify(self.advisors_note)
+        return render_markdown(self.advisors_note)
 
     advisors_note_on = models.DateTimeField(
         verbose_name="Rédigé le", null=True, blank=True
@@ -535,7 +616,7 @@ class Project(models.Model):
     @property
     def impediments_rendered(self):
         """Return impediments as markdown"""
-        return markdownify(self.impediments)
+        return render_markdown(self.impediments)
 
     switchtenders = models.ManyToManyField(
         auth_models.User,
@@ -547,6 +628,10 @@ class Project(models.Model):
 
     @property
     def next_reminder(self):
+        # `_next_reminder` may be populated in bulk (use with_perf_prefetch from manager)
+        # to avoid N+1 queries. An empty list means "no reminder", not "not prefetched".
+        if hasattr(self, "_next_reminder"):
+            return self._next_reminder[0] if self._next_reminder else None
         current_site = Site.objects.get_current()
         return (
             self.reminders.filter(site=current_site, sent_on=None)
@@ -566,6 +651,7 @@ class Project(models.Model):
     class Meta:
         verbose_name = "project"
         verbose_name_plural = "projects"
+        base_manager_name = "all"
         permissions = (
             # General
             # Builtin: ("view_project", "Can view the project"),
@@ -587,6 +673,7 @@ class Project(models.Model):
             ("manage_tasks", "Can manage tasks"),
             # Documents
             ("manage_documents", "Can manage the documents"),
+            ("manage_private_documents", "Can manage advisor space documents"),
             # Invitation/sharing/members
             ("invite_collaborators", "Can invite collaborators"),
             ("invite_advisors", "Can invite advisors"),
@@ -864,7 +951,7 @@ class Note(models.Model):
     @property
     def content_rendered(self):
         """Return content as markdown"""
-        return markdownify(self.content)
+        return render_markdown(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
@@ -875,6 +962,11 @@ class Note(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"Note: #{self.id}"
+
+    def save(self, **kwargs):
+        if self.pk:
+            self.updated_on = timezone.now()
+        super().save(**kwargs)
 
 
 class DocumentManager(models.Manager):
@@ -897,47 +989,6 @@ class DeletedDocumentManager(models.Manager):
 
 class Document(models.Model):
     """Représente un document associé à un project"""
-
-    mimetype_validator = MimetypeValidator(
-        allows=[
-            "text/plain",
-            "image/png",
-            "image/jpg",
-            "image/gif",
-            "image/jpeg",
-            "image/pjpeg",
-            "application/pdf",
-            "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            "application/vnd.oasis.opendocument.text",
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "application/vnd.oasis.opendocument.spreadsheet",
-            "application/vnd.ms-powerpoint",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/vnd.oasis.opendocument.presentation",
-        ],
-    )
-
-    filextension_validator = FileExtensionValidator(
-        [
-            "txt",
-            "md",
-            "png",
-            "jpg",
-            "jpeg",
-            "pdf",
-            "doc",
-            "docx",
-            "odt",
-            "xls",
-            "xlsx",
-            "odc",
-            "ppt",
-            "pptx",
-            "odp",
-        ]
-    )
 
     objects = DocumentManager()
     on_site = DocumentOnSiteManager()
@@ -970,19 +1021,25 @@ class Document(models.Model):
 
     description = models.CharField(max_length=256, default="", blank=True)
 
+    private = models.BooleanField(default=True)  # for advisors only
+
     def upload_path(self, filename):
-        return "projects/%d/%s" % (self.project.pk, filename)
+        return "projects/%d/%s/%s" % (self.project.pk, uuid.uuid4().hex, filename)
 
     the_file = models.FileField(
         null=True,
         blank=True,
         upload_to=upload_path,
-        validators=[mimetype_validator, filextension_validator],
+        validators=file_validators,
+        max_length=255,
     )
     the_link = models.URLField(max_length=500, null=True, blank=True)
 
     def filename(self):
         return os.path.basename(self.the_file.name)
+
+    def feed_label(self):
+        return self.filename() if self.the_file else self.the_link
 
     deleted = models.DateTimeField(null=True, blank=True)
 
@@ -1029,6 +1086,7 @@ class ProjectSearchAdapter(watson.SearchAdapter):
         "commune__name",
         "commune__insee",
         "commune__postal",
+        "owner__profile__organization__name",
     )
 
     def tags_as_list(self, obj):
@@ -1037,17 +1095,6 @@ class ProjectSearchAdapter(watson.SearchAdapter):
     def prepare_content(self, content):
         content = super().prepare_content(content)
         return strip_accents(content)
-
-
-def truncate_string(s, max_length):
-    """Truncate given string to max_length"""
-    if len(s) <= max_length:
-        return s
-    sub = s[:max_length]
-    if s[max_length] != " ":
-        # we are truncating last word, rewind to its begining
-        sub = sub[: sub.rfind(" ")]
-    return f"{sub}…"
 
 
 # eof

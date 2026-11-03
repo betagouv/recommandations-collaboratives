@@ -13,6 +13,23 @@ export function minLengthErrorMessage(minLength) {
 }
 
 /**
+ * Schema for optional text fields.
+ * Allows empty strings, but if non-empty, enforces minLength and maxLength.
+ * @param {number} minLength - Minimum length when field is non-empty (default: 3)
+ * @param {number} maxLength - Maximum length (default: 100)
+ */
+export function textOptional(minLength = 3, maxLength = 100) {
+  return {
+    type: 'string',
+    anyOf: [
+        { maxLength: 0 },
+        { minLength, maxLength },
+      ],
+      errorMessage:  `Entre ${minLength} et ${maxLength} caractères`,
+  };
+}
+
+/**
  * Password schema
  * Note: This schema only validates the required length and character classes. It does not guarantee password strength.
  */

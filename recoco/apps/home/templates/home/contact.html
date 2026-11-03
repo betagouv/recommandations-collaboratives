@@ -1,20 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
-{% load sass_tags %}
 {% block title %}
     Nous contacter
 {% endblock title %}
 {% block og_title %}
     Nous contacter
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/contact/contact.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div class="col-9 fr-py-6w fr-mx-auto">
         <h2 class="fr-mb-2w">
@@ -23,15 +14,19 @@
             </svg>
             Contacter l'équipe {{ request.site.name }}
         </h2>
-        {% if user.is_authenticated %}
-            <p class="text-secondary">
-                Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez
-                copier-coller notre adresse email :
-                {% with request.site.configuration.contact_form_recipient as email %}
-                    <a class="fw-bold" href="mailto:{{ email }}">{{ email }}</a>
-                {% endwith %}
-            </p>
-        {% endif %}
+
+        <p class="text-secondary">
+            {% if not user.is_authenticated %} {# condition is quick fix to unlock brevo after spam was sent from insufficient captcha security #}
+                Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez copier-coller notre adresse email :
+            {% else %}
+                Vous pouvez nous contacter à l'adresse e-mail suivante :
+            {% endif %}
+            {% with request.site.configuration.contact_form_recipient as email %}
+                <a class="fw-bold" href="mailto:{{ email }}">{{ email }}</a>
+            {% endwith %}
+        </p>
+
+        {% if user.is_authenticated %} {# condition is quick fix to unlock brevo after spam was sent from insufficient captcha security #}
         <form method="post" data-test-id="contact-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}" />
@@ -93,6 +88,8 @@
                     class="btn btn-primary"
                     data-test-id="contact-form-submit">Envoyer mon message</button>
         </form>
+        {% endif %}
+
         {% if request.GET.next %}
             <p class="small fr-mt-2w">
                 <a href="{{ request.GET.next }}" class="small">Annuler et revenir à la page précédente</a>

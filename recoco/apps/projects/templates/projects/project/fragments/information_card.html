@@ -1,14 +1,12 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/card_info.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-card-info.css.js' %}
+{% endblock js %}
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 <div class="{% if padding_end is True %}pe-4{% endif %} {% if padding_top is True %}pt-4{% endif %}  {% if full_width %}w-100{% else %}w-50{% endif %} {% if full_height %}h-100{% endif %}"
      data-test-id="project-information-card-{{ data_test }}">
     <div class="d-flex align-items-center justify-content-between fr-mb-1v">
@@ -24,7 +22,7 @@
         {% if "use_advisor_note" in user_project_perms and is_editable %}
             <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-pencil-line fr-text--xs"
                href="{% url "projects-project-topics" project.id %}#advisor-note"
-               data-cy="edit-internal-note">Éditer</a>
+               data-cy="edit-internal-note">Modifier</a>
         {% endif %}
     </div>
     {% if is_advisor_note %}
@@ -36,7 +34,11 @@
         <article class="overflow-hidden">{% include "projects/project/fragments/information_card_description.html" %}</article>
         {% if display_user is not False %}
             <footer class="d-flex fr-mt-3w justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
-                {% include "user/user_card.html" with user=card_user %}
+                {% if card_user %}
+                    {% include "user/user_card.html" with user=card_user %}
+                {% else %}
+                    {% include "user/user_card.html" with user=None user_email=project_creation_request.email user_popup_deactivate=True show_only_email=True %}
+                {% endif %}
                 <div class=" {% if is_editable %}mt-0{% else %}mt-2{% endif %}">
                     <span class="font-italic d-flex fw-light text-end span-style">{{ updated_on }}</span>
                 </div>

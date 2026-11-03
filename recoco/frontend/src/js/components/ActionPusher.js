@@ -1,11 +1,13 @@
 import Alpine from 'alpinejs';
 import MiniSearch from 'minisearch';
-import api, { postExternalRessourceUrl } from '../utils/api';
+import api, { postExternalRessourceUrl, resourcesUrl } from '../utils/api';
+import { truncate } from '../utils/text-parsing';
 
 import { ToastType } from '../models/toastType';
 
 Alpine.data('ActionPusher', () => {
   return {
+    truncate,
     isBusy: true,
     isBusyExternalResource: false,
     canLoadNewExternalResource: false,
@@ -44,7 +46,6 @@ Alpine.data('ActionPusher', () => {
     selected_resources: [],
     public: true,
     draft: false,
-    next: null,
     async init() {
       await this.$store.idbObjectStoreMgmt.init();
       const getAllvalue = await this.$store.idbObjectStoreMgmt.getAll();
@@ -80,9 +81,6 @@ Alpine.data('ActionPusher', () => {
       this.suggestions = this.db.autoSuggest(text, { fuzzy: 0.2 }).slice(0, 2);
 
       return true;
-    },
-    truncate(input, size = 30) {
-      return input.length > size ? `${input.substring(0, size)}...` : input;
     },
     handleFileUpload() {
       if (this.$refs.fileUploadInput.files.length > 0) {
@@ -144,15 +142,17 @@ Alpine.data('ActionPusher', () => {
           this.setIntent(this.results[0]);
         }
       }
+
+      const pushTypeFromParams = params.get('push_type');
+      if (pushTypeFromParams) this.push_type = pushTypeFromParams;
     },
 
     async getResources() {
       this.isBusy = true;
 
-      const response = await fetch('/api/resources/');
-      const resourcesFromApi = await response.json(); //extract JSON from the http response
+      const response = await api.get(resourcesUrl({ limit: 2000 }));
 
-      resourcesFromApi.forEach((t) => {
+      response.data.results.forEach((t) => {
         let entry = {
           id: t.id,
           title: t.title,

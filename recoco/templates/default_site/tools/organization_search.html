@@ -1,28 +1,75 @@
+{% comment %}
+    Parameters :
+        - validation: activate validation with AJV, need to include org_name in validation schema
+{% endcomment %}
+
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/organizationSearch.js' %}
 {% endblock js %}
-<div x-data='OrganizationSearch("{{ value|default:"" }}", {% if isRequired %}true{% else %}false{% endif %}, {% if dsfr %}true{% else %}false{% endif %}, "{{ request.method }}", {% if validation %}true{% else %}false{% endif %})'
-     x-effect='validateData({% if request.method is "POST" %}true{% else %}false{% endif %})'
-     class="{% if dsfr %}fr-input-group {% if errors and validation %}fr-input-group--error{% endif %}{% endif %}">
+<div x-data='OrganizationSearch("{{ value|default:""|escapejs }}")'
+     class="{% if dsfr %}fr-input-group {% if errors and validation %}fr-input-group--error{% endif %}{% endif %}"
+     {% if validation %}
+     :class="{
+         'fr-input-group--error': form['{{ name }}'].valid_class === 'error',
+         'fr-input-group--valid': form['{{ name }}'].valid_class === 'valid',
+     }"
+     {% endif %}>
     <label class="{% if dsfr %}fr-label{% else %} text-info-custom text-grey-dark{% endif %}"
-           for="{{ id_for_label }}">{{ label }}</label>
+           for="{{ id_for_label }}">{{ label }} {% if isRequired %}*{% endif %}</label>
     <input x-on:input.change.debounce="handleOrganizationChange"
            x-model="organization"
-           type="text"
-           {% if dsfr %} class="fr-input fr-input--error {% if errors and validation %}fr-input--error{% endif %}
-           "
+           {% if validation %}
+                {% comment %}
+                    The event call DsrcFormValidator changeInput function
+                    to check validation of this custom field.
+                {% endcomment %}
+                x-init="$watch('organization', (value) => {
+                    form['{{ name }}'].value = value;
+                    changeInput({ target: { name: '{{ name }}' } });
+                })"
+                @focus="touchInput"
+                @blur="validateInput"
+                :class="{
+                    'fr-input--error': form['{{ name }}'].valid_class === 'error',
+                    'fr-input--valid': form['{{ name }}'].valid_class === 'valid',
+                }"
+           {% endif %}
+                type="text"
+           {% if dsfr %}
+                class="fr-input {% if errors and validation %}fr-input--error{% endif %}"
            {% else %}
-           class="{% if small_padding %} fr-py-2v {% else %}py-4 {% endif %}placeholder-grey form-control {% if errors and validation %}is-invalid{% endif %} {% if disabled %}input-disabled{% endif %}"
+                class="{% if small_padding %} fr-py-2v {% else %}py-4 {% endif %}placeholder-grey form-control {% if errors and validation %}is-invalid{% endif %} {% if disabled %}input-disabled{% endif %}"
            {% endif %}
            x-ref="organization"
            id="{{ id_for_label }}"
            name="{{ name }}"
            placeholder="{{ placeholder }}"
-           value="organization"
-           {% if not disabled %}required{% endif %} />
+           value="{{ value|default:'' }}"
+           {% if isRequired or not disabled %}required{% endif %} />
     {% if not dsfr %}
         {% for error in errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+    {% elif validation %}
+        <!-- Display server-side validation errors until the field is changed -->
+        {% if errors %}
+            <ul class="fr-messages-group">
+                {% for error in errors %}
+                    <li class="fr-error-text" x-show="!form['{{ name }}'].changed">{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <!-- Display client-side validation errors here -->
+        <ul x-show="fieldHasError('{{ name }}')"
+            class="fr-messages-group"
+            id="{{ id_for_label }}-desc-error"
+            aria-live="polite">
+            <template x-for="(error, index) in form['{{ name }}'].errors"
+                      :key="index">
+                <li :id="`error_${index}_{{ id_for_label }}`"
+                    x-text="error"
+                    class="fr-error-text"></li>
+            </template>
+        </ul>
     {% endif %}
     <template x-if="results.length > 0">
         <div class="d-flex align-items-center flex-wrap fr-mt-2v fr-mb-2v">

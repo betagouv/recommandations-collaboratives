@@ -2,7 +2,8 @@
   height: calc(100vh - 150px);
 }
 
-.map-marker {
+.project-map .map-marker,
+.project-map-container .map-marker {
   /* background-color: white; */
   border-radius: 50%;
   box-sizing: content-box;
@@ -12,7 +13,8 @@
   z-index: 100;
 }
 
-.map-marker:after {
+.project-map .map-marker:after,
+.project-map-container .map-marker:after {
   content: '';
 
   position: absolute;
@@ -32,7 +34,8 @@
   z-index: 10;
 }
 
-.marker-onclick:after {
+.project-map .marker-onclick:after,
+.project-map-container .marker-onclick:after {
   content: '';
   color: #222;
   background-color: white;
@@ -67,6 +70,16 @@
   text-align: center;
   background-color: white;
   border: solid 2px #222;
+}
+
+.map-marker.realisation-marker {
+  background-image: url(../assets/map/marker.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.map-marker.realisation-marker.is-focused {
+  background-image: url(../assets/map/marker-focused.svg);
 }
 
 .leaflet-popup-content-wrapper,

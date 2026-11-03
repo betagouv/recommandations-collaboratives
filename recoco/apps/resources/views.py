@@ -24,21 +24,23 @@ from django.contrib.syndication.views import Feed
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic.detail import DetailView, View
+from django.views.generic.detail import DetailView, SingleObjectMixin, View
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
 from reversion.models import Version
 from reversion_compare.views import HistoryCompareDetailView
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.demarches_simplifiees.models import DSMapping, DSResource
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.hitcount.models import HitCount
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
@@ -56,19 +58,35 @@ def resource_search(request):
     form.is_valid()
     query = form.cleaned_data.get("query", "")
 
-    limit_area = form.cleaned_data.get("limit_area")
+    limit_areas = request.GET.getlist("limit_area")
+
     searching = form.cleaned_data.get("searching", False)
 
-    if (not searching) and (limit_area is None):
-        limit_area = "AUTO"
+    # Get user's own departments (for "Mes départements" shortcut)
+    user_departments_codes = []
+    if request.user.is_authenticated and request.user.profile:
+        if check_if_advisor(request.user, request.site):
+            user_departments_codes = list(
+                request.user.profile.departments.values_list("code", flat=True)
+            )
+        else:
+            user_departments_codes = list(
+                geomatics_models.Department.objects.filter(
+                    commune__in=projects.Project.on_site.filter(
+                        members=request.user
+                    ).values("commune")
+                ).values_list("code", flat=True)
+            )
+
+    # Auto-filter on first arrival for users with departments
+    if not searching and not limit_areas and user_departments_codes:
+        limit_areas = list(user_departments_codes)
+
+    select_all_departments = not bool(limit_areas)
 
     categories = form.selected_categories
 
-    resources = (
-        models.Resource.search(query, categories)
-        .select_related("category")
-        .prefetch_related("task_recommendations")
-    )
+    resources = models.Resource.search(query, categories)
 
     if form.cleaned_data.get("no_category", False):
         resources = resources.filter(category__isnull=True)
@@ -80,43 +98,26 @@ def resource_search(request):
             imported_from=None
         )
 
-    # If we are a advisor, allow any departement to be filtered
-    # Otherwise, show only departments related to my projects
-    departments = geomatics_models.Department.objects.none()
+    # Determine available departments based on user role
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
-        if limit_area:
-            selected_departments = geomatics_models.Department.objects.none()
-            if limit_area == "AUTO":
-                # Select departments from profile
-                user_departments = request.user.profile.departments.all()
-                if user_departments:
-                    selected_departments = geomatics_models.Department.objects.filter(
-                        code__in=user_departments
-                    )
-                else:
-                    limit_area = None
-            else:
-                # Get current one from parameters
-                selected_departments = geomatics_models.Department.objects.filter(
-                    code=limit_area
-                )
-
-            if selected_departments:
-                resources = resources.limit_area(selected_departments)
-
+    elif request.user.is_authenticated:
+        departments = geomatics_models.Department.objects.filter(
+            commune__in=projects.Project.on_site.filter(members=request.user).values(
+                "commune"
+            )
+        )
     else:
-        communes = []
-        if hasattr(request.user, "email"):
-            communes = [
-                p.commune for p in projects.Project.on_site.filter(members=request.user)
-            ]
-            if not communes:
-                limit_area = None  # does not apply if no projects
+        departments = geomatics_models.Department.objects.none()
 
-            departments = set(c.department for c in communes if c)
-            if limit_area:
-                resources = resources.limit_area(departments)
+    # Apply department filter from URL parameters
+    if limit_areas:
+        selected_departments_qs = geomatics_models.Department.objects.filter(
+            code__in=limit_areas
+        )
+
+        if selected_departments_qs.exists():
+            resources = resources.limit_area(selected_departments_qs)
 
     # staff can search resources
     staff_redux = Q()
@@ -141,6 +142,16 @@ def resource_search(request):
         staff_redux |= Q(status=models.Resource.PUBLISHED)
 
     resources = resources.filter(staff_redux)
+
+    category_options = [
+        {"value": str(c.id), "text": str(c), "search": str(c)}
+        for c in models.Category.on_site.order_by("name").all()
+    ]
+
+    # prefetch and select related must be after all filters, else they are useless
+    resources = resources.select_related("category").prefetch_related(
+        "task_recommendations", "departments"
+    )
 
     return render(
         request,
@@ -215,6 +226,9 @@ class BaseResourceDetailView(DetailView):
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
+    def get_queryset(self):
+        return models.Resource.on_site.with_ds_annotations()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -260,7 +274,67 @@ class BaseResourceDetailView(DetailView):
         else:
             context["contacts_to_display"] = []
 
+        pm = get_site_plugin_manager(self.request)
+        context["resource_sidebar_panels"] = pm.hook.resource_sidebar_panels(
+            resource=self.object, request=self.request
+        )
+
         return context
+
+
+class DuplicateResourceView(
+    LoginRequiredMixin, PermissionRequiredMixin, SingleObjectMixin, View
+):
+    model = models.Resource
+    permission_required = "sites.manage_resources"
+    http_method_names = ["post"]
+    pk_url_kwarg = "resource_id"
+
+    def get_queryset(self):
+        return models.Resource.on_site.all()
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
+
+    def post(self, request, *args, **kwargs):
+        current_site = get_current_site(request)
+        resource_to_copy = self.get_object()
+
+        with transaction.atomic():
+            new_resource = models.Resource.objects.create(
+                site_origin=current_site,
+                status=models.Resource.DRAFT,
+                created_by=request.user,
+                imported_from=resource_to_copy.imported_from,
+                category=resource_to_copy.category,
+                title=resource_to_copy.title,
+                subtitle=resource_to_copy.subtitle,
+                summary=resource_to_copy.summary,
+                content=resource_to_copy.content,
+                support_orga=resource_to_copy.support_orga,
+            )
+
+            new_resource.sites.set([current_site])
+            new_resource.tags.set(resource_to_copy.tags.all())
+
+            for old_ds_resource in resource_to_copy.dsresource_set.all():
+                new_ds_resource = DSResource.objects.create(
+                    name=old_ds_resource.name + str(timezone.now()),
+                    schema=old_ds_resource.schema,
+                    resource=new_resource,
+                )
+                new_ds_resource.departments.set(old_ds_resource.departments.all())
+                for old_mapping in old_ds_resource.ds_mappings.all():
+                    DSMapping.objects.create(
+                        ds_resource=new_ds_resource,
+                        site=old_mapping.site,
+                        enabled=old_mapping.enabled,
+                        mapping=old_mapping.mapping,
+                    )
+
+        url = reverse("resources-resource-update", args=[new_resource.id])
+        return redirect(f"{url}?is_duplicate=true")
 
 
 class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
@@ -270,7 +344,9 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or self.request.user.is_authenticated
+        return resource.public or has_perm(
+            self.request.user, "manage_resources", self.request.site
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -289,24 +365,24 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
         return context
 
-    def get_queryset(self) -> QuerySet[models.Resource]:
-        return super().get_queryset().with_ds_annotations()
-
 
 class EmbededResourceDetailView(BaseResourceDetailView):
-    model = models.Resource
     template_name = "resources/resource/details_embeded.html"
-    pk_url_kwarg = "resource_id"
+
+    def get_object(self, queryset=None):
+        resource = super().get_object(queryset)
+        if not resource.public and not has_perm(
+            self.request.user, "sites.manage_resources", self.request.site
+        ):
+            raise Http404()
+        return resource
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if task_id := self.request.GET.get("task_id"):
-            context["task"] = (
-                self.object.recommandations.filter(pk=task_id)
-                .select_related("ds_folder")
-                .first()
-            )
+        if task_id_str := self.request.GET.get("task_id"):
+            task_id = int(task_id_str)
+            context["task"] = self.object.recommandations.filter(pk=task_id).first()
 
         return context
 
@@ -319,8 +395,11 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     model = models.Resource
     template_name = "resources/resource/delete.html"
-    success_url = reverse_lazy("resources-resource-search")
+    success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
+
+    def get_queryset(self):
+        return models.Resource.on_site.all()
 
     def form_valid(self, form):
         """
@@ -357,7 +436,12 @@ def resource_update(request, resource_id=None):
     """Update informations for resource"""
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
-    resource = get_object_or_404(models.Resource, pk=resource_id)
+    resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
+    selected_departments = list(resource.departments.values_list("code", flat=True))
+
+    categories = list(
+        models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
+    )
 
     if request.method == "POST":
         form = EditResourceForm(request.POST, instance=resource)
@@ -409,6 +493,10 @@ def resource_create(request):
     """
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
+    categories = list(
+        models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
+    )
+
     if request.method == "POST":
         form = EditResourceForm(request.POST)
         if form.is_valid():
@@ -425,7 +513,14 @@ def resource_create(request):
             return redirect(next_url)
     else:
         form = EditResourceForm()
-    return render(request, "resources/resource/create.html", locals())
+    return render(
+        request,
+        "resources/resource/create.html",
+        {
+            "categories": categories,
+            "form": form,
+        },
+    )
 
 
 class EditResourceForm(forms.ModelForm):
@@ -472,6 +567,7 @@ class EditResourceForm(forms.ModelForm):
         ),
         required=False,
     )
+    support_orga = forms.CharField(label="Structure porteuse", required=False)
 
     class Meta:
         model = models.Resource
@@ -484,6 +580,7 @@ class EditResourceForm(forms.ModelForm):
             "category",
             "departments",
             "content",
+            "support_orga",
             "contacts",
             "expires_on",
         ]
@@ -501,7 +598,7 @@ class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, Vi
     def post(self, request, *args, **kwargs):
         resource_id = self.kwargs.get("pk")
 
-        resource = get_object_or_404(models.Resource, pk=resource_id)
+        resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
 
         rev_id = self.kwargs.get("rev_pk")
 
@@ -526,6 +623,9 @@ class ResourceHistoryCompareView(
     permission_required = "sites.manage_resources"
     template_name = "resources/resource/history.html"
 
+    def get_queryset(self) -> QuerySet[models.Resource]:
+        return models.Resource.on_site.all()
+
     def has_permission(self):
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
@@ -542,7 +642,10 @@ class LatestResourcesFeed(Feed):
     description = "Derniers ajouts de ressources"
 
     def items(self):
-        return models.Resource.on_site.order_by("-created_on")[:5]
+        qs = models.Resource.on_site.order_by("-created_on").filter(
+            status__gt=models.Resource.TO_REVIEW
+        )
+        return qs[:5]
 
     def item_title(self, item):
         return item.title
@@ -565,7 +668,11 @@ class LatestResourcesFeed(Feed):
 @login_required
 def create_bookmark(request, resource_id=None):
     """Create bookmark for resource and and connected user"""
-    resource = get_object_or_404(models.Resource, pk=resource_id)
+    resource = get_object_or_404(models.Resource.on_site, pk=resource_id)
+    if not resource.public and not has_perm(
+        request.user, "manage_resources", request.site
+    ):
+        raise Http404()
     try:
         # look if bookmark exists and is deleted
         bookmark = models.Bookmark.deleted_on_site.get(

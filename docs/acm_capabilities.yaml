@@ -1,0 +1,104 @@
+# Capability mapping for the plain-language Access Control Matrix (ACM),
+# read by scripts/generate_acm.py alongside docs/api_permissions.yaml's
+# `roles:` section. Editing this file (or the roles in api_permissions.yaml)
+# and re-running the script regenerates docs/api_acm.pdf — no LLM needed.
+#
+# Each role below is either:
+#   - a real role, keyed by its exact name in api_permissions.yaml's `roles:`
+#     section (its permission set is looked up from there), or
+#   - a "virtual" role (scope: public / authenticated) representing a visitor
+#     with no site/project role at all — not present in api_permissions.yaml
+#     because it grants no permissions to look up.
+#
+# Each capability is evaluated against a role's permission set:
+#   - scope: public        -> Yes for every role (including anonymous)
+#   - scope: authenticated -> Yes for every role except the anonymous one
+#   - requires_any: [...]  -> Yes if the role holds at least one of these
+#   - full_requires_all / partial_requires_all: [...] -> Yes if all of
+#     full_requires_all are held; else Partly if all of
+#     partial_requires_all are held; else No
+
+roles:
+  - key: anonymous
+    virtual: true
+    scope: public
+    label: "Public visitor"
+    subtitle: "not logged in"
+
+  - key: authenticated
+    virtual: true
+    scope: authenticated
+    label: "Any logged-in user"
+    subtitle: "no special role"
+
+  - key: "project:member_draft"
+    label: "Project collaborator"
+    subtitle: "project awaiting validation"
+
+  - key: "project:member"
+    label: "Project collaborator"
+    subtitle: "project validated"
+
+  - key: "project:advisor"
+    label: "Project advisor"
+    subtitle: "incl. \"observer\" advisors -- see note"
+    # footnote_from_role: the generator adds a footnote using the full
+    # `note` text of api_permissions.yaml's roles["project:observer"],
+    # since that role is permission-identical to project:advisor and is
+    # folded into this one row rather than given its own.
+    footnote_from_role: "project:observer"
+
+  - key: "site:advisor"
+    label: "Site coordinator"
+    subtitle: "regional/site-wide advisor"
+
+  - key: "site:staff"
+    label: "Platform staff"
+    subtitle: "site-wide"
+
+  - key: "site:admin"
+    label: "Platform administrator"
+    subtitle: "site-wide"
+
+capabilities:
+  - label: "Browse the public resource catalog"
+    scope: public
+
+  - label: "Use their own account (profile, notifications)"
+    scope: authenticated
+
+  - label: "See a project they belong to"
+    requires_any: [projects.view_project]
+
+  - label: "Take part in that project's discussion (read & post)"
+    requires_any: [projects.use_public_notes]
+
+  - label: "See that project's internal, advisor-only notes"
+    requires_any: [projects.use_private_notes]
+
+  - label: "View & propose recommendations"
+    full_requires_all: [projects.use_tasks]
+    partial_requires_all: [projects.view_tasks]
+    partial_note: >
+      can view and use existing recommendations, but not create, edit or
+      publish one
+
+  - label: "Manage recommendations, documents & team members"
+    full_requires_all: [projects.manage_tasks, projects.manage_documents]
+    partial_requires_all: [projects.manage_documents]
+    partial_note: >
+      can manage documents and invite/manage collaborators, but cannot
+      create, edit or publish recommendations
+
+  - label: "See & approve the full list of projects site-wide"
+    full_requires_all: [sites.moderate_projects, sites.list_projects]
+    partial_requires_all: [sites.list_projects]
+    partial_note: >
+      can see the full list of projects on the site, but cannot approve
+      or reject new ones
+
+  - label: "Manage the site's resource catalog & address book"
+    full_requires_all: [sites.manage_resources, sites.change_addressbook]
+
+  - label: "Configure the platform"
+    full_requires_all: [sites.manage_configuration]

@@ -21,6 +21,7 @@ from recoco.apps.projects.utils import (
     assign_collaborator,
     reactivate_if_necessary,
 )
+from recoco.utils import truncate_string
 
 from .. import models, utils
 
@@ -205,7 +206,7 @@ testdata = (
 
 @pytest.mark.parametrize("string,length,expected", testdata)
 def test_truncate_string(string, length, expected):
-    assert models.truncate_string(string, length) == expected
+    assert truncate_string(string, length) == expected
 
 
 # ----------------------------------------------

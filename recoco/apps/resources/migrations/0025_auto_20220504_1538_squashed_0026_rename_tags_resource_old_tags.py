@@ -6,11 +6,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("resources", "0025_auto_20220504_1538"),
-        ("resources", "0026_rename_tags_resource_old_tags"),
-    ]
-
     dependencies = [
         ("resources", "0024_bookmark_site"),
     ]

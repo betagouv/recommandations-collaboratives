@@ -4,10 +4,6 @@ main {
   overflow-x: initial !important;
 }
 
-[x-cloak] {
-  display: none;
-}
-
 .personal-dashboard-container-inner {
   position: relative;
   background-color: #e6e6e6;
@@ -79,6 +75,13 @@ main {
   border-radius: 4px;
   overflow: hidden;
   transition: height 0.25s ease;
+}
+
+.personal-dashboard-map-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .personal-dashboard-container-inner .project-link {
@@ -179,24 +182,21 @@ main {
 }
 
 .project-marker {
-  width: 27px !important;
-  height: 27px !important;
-  padding: 5px 5px;
+  width: 15px !important;
+  height: 15px !important;
   border-radius: 100%;
   background-color: #222;
-  font-weight: 700;
-  font-size: 9px;
 }
 
 .project-marker:before {
   content: '';
   position: absolute;
 
-  top: 45%;
-  left: calc(50% - 8.5px);
+  top: 51%;
+  left: calc(50% - 4.5px);
 
-  width: 17px;
-  height: 17px;
+  width: 9px;
+  height: 9px;
   background-color: #222;
   transform: rotate(45deg);
   z-index: -1;
@@ -207,8 +207,8 @@ main {
   content: '';
   position: absolute;
 
-  width: 11px;
-  height: 11px;
+  width: 7px;
+  height: 7px;
 
   top: 50%;
   left: 50%;

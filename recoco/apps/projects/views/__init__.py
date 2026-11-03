@@ -7,13 +7,15 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -21,14 +23,13 @@ from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
-from recoco import verbs
+from recoco import utils, verbs
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
-from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
-from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
-from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.geomatics.serializers import RegionSerializer
+from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
 from recoco.apps.projects.models import ProjectCreationRequest
 from recoco.utils import (
     check_if_advisor,
@@ -37,6 +38,7 @@ from recoco.utils import (
     is_staff_for_site,
 )
 
+from ...communication.helpers import normalize_user_name
 from .. import forms, models, signals
 from ..utils import (
     assign_advisor,
@@ -60,7 +62,11 @@ def mark_general_notifications_as_seen(user):
     # Mark some notifications as seen
     project_ct = ContentType.objects.get_for_model(models.Project)
     # FIXME update filter to current verbs
-    notif_verbs = [verbs.Project.AVAILABLE, verbs.Project.SUBMITTED_BY]
+    notif_verbs = [
+        verbs.Project.AVAILABLE,
+        verbs.Project.SUBMITTED_BY,
+        verbs.Project.SUBMITTED_BY_ADVISOR,
+    ]
     notifications = user.notifications.unread().filter(
         verb__in=notif_verbs,
         target_content_type=project_ct.pk,
@@ -127,6 +133,13 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
 
         messages.success(request, f"Le dossier '{project.name}' a été refusé.")
 
+        signals.project_rejected.send(
+            sender=models.Project,
+            site=request.site,
+            moderator=request.user,
+            project=project,
+        )
+
         if owner := project.owner:
             send_email(
                 template_name=communication_constants.TPL_PROJECT_REFUSED,
@@ -142,6 +155,20 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
             )
 
     return redirect(reverse("projects-moderation-list"))
+
+
+def make_site_digest(site):
+    """Return site informations as a dict"""
+    # only used for emails that specifically comment on site
+    # for site params sent in all emails, look at recoco.apps.communication.api.get_site_params
+
+    site_config = SiteConfiguration.objects.get(site=site)
+    data = {
+        "name": site.name,
+        "main_topic": site_config.main_topic or "",
+        "legal_owner": site_config.legal_owner or "",
+    }
+    return data
 
 
 @login_required
@@ -177,7 +204,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             project_site = project.project_sites.get(site=request.site)
 
             if project_site.is_origin:
-                # Update owner permissions now the project is no in DRAFT state anymore
+                # Update owner permissions now the project is not in DRAFT state anymore
                 assign_collaborator(owner, project, is_owner=True)
 
                 # Send an email to the project owner
@@ -205,10 +232,8 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
 
                 params = {
                     "project": digests.make_project_digest(project, owner),
-                    "site": digests.make_site_digest(
-                        project.project_sites.origin().site
-                    ),
-                    "survey_site": digests.make_site_digest(request.site),
+                    "site": make_site_digest(project.project_sites.origin().site),
+                    "survey_site": make_site_digest(request.site),
                     "survey": digests.make_project_survey_digest_for_site(
                         owner,
                         project,
@@ -264,6 +289,12 @@ def project_moderation_advisor_refuse(
         advisor_group = get_group_for_site("advisor", request.site)
         advisor_access_request.user.groups.remove(advisor_group)
 
+    action.send(
+        sender=request.user,
+        verb=verbs.User.ADVISOR_REJECTED,
+        action_object=advisor_access_request.user,
+        target=advisor_access_request,
+    )
     messages.success(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
@@ -312,6 +343,12 @@ def project_moderation_advisor_accept(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
     )
+    action.send(
+        sender=request.user,
+        verb=verbs.User.ADVISOR_ACCEPTED,
+        action_object=advisor_access_request.user,
+        target=advisor_access_request,
+    )
 
     send_email(
         template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED,
@@ -323,6 +360,10 @@ def project_moderation_advisor_accept(
         ],
         params={
             "message": advisor_access_request.comment,
+            "dashboard_url": utils.build_absolute_url(
+                reverse("projects-project-list"),
+                auto_login_user=advisor_access_request.user,
+            ),
         },
     )
 
@@ -370,6 +411,29 @@ def project_list_for_advisor(request):
     return redirect("projects-project-list")
 
 
+def territory_filtering_queryset(user: User) -> QuerySet:
+    # Provide departments/regions for filters
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+                .distinct()
+            )
+        )
+        | user.profile.departments.all()
+    ).distinct()
+
+    return (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related(Prefetch("departments", department_queryset))
+        .distinct()
+        .order_by("name")
+    )
+
+
 @login_required
 @ensure_csrf_cookie
 def project_list(request):
@@ -388,30 +452,11 @@ def project_list(request):
 
     mark_general_notifications_as_seen(request.user)
 
-    department_queryset = (
-        geomatics_models.Department.objects.filter(
-            code__in=(
-                models.Project.on_site.for_user(request.user)
-                .order_by("-created_on", "-updated_on")
-                .prefetch_related("commune__department")
-                .values_list("commune__department", flat=True)
-            )
-        )
-        | request.user.profile.departments.all()
-    ).distinct()
-
-    region_queryset = (
-        geomatics_models.Region.objects.filter(departments__in=department_queryset)
-        .prefetch_related("departments")
-        .distinct()
-        .order_by("name")
-    )
+    regions_to_filter = territory_filtering_queryset(request.user)
 
     context = {
         "site_config": site_config,
-        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
-        "regions": list(RegionSerializer(region_queryset, many=True).data),
-        **locals(),
+        "regions": list(RegionSerializer(regions_to_filter, many=True).data),
     }
 
     return render(request, "projects/project/list-kanban.html", context)
@@ -427,30 +472,10 @@ def project_maplist(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    # Provide departments/regions for filters on the map list, similar to staff view
-    department_queryset = (
-        geomatics_models.Department.objects.filter(
-            code__in=(
-                models.Project.on_site.for_user(request.user)
-                .order_by("-created_on", "-updated_on")
-                .prefetch_related("commune__department")
-                .values_list("commune__department", flat=True)
-            )
-        )
-        | request.user.profile.departments.all()
-    ).distinct()
-
-    region_queryset = (
-        geomatics_models.Region.objects.filter(departments__in=department_queryset)
-        .prefetch_related("departments")
-        .distinct()
-        .order_by("name")
-    )
+    regions_to_filter = territory_filtering_queryset(request.user)
 
     context = {
-        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
-        "regions": list(RegionSerializer(region_queryset, many=True).data),
-        **locals(),
+        "regions": list(RegionSerializer(regions_to_filter, many=True).data),
     }
 
     return render(request, "projects/project/list-map.html", context)
@@ -463,7 +488,7 @@ def project_maplist(request):
 def project_switchtender_join(request, project_id=None):
     """Join as switchtender"""
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
 
     if not can_administrate_project(project, request.user):
         is_regional_actor_for_project_or_403(
@@ -494,7 +519,7 @@ def project_switchtender_join(request, project_id=None):
 @login_required
 def project_observer_join(request, project_id=None):
     """Join as observer"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
 
     if not can_administrate_project(project, request.user):
         is_regional_actor_for_project_or_403(
@@ -555,7 +580,7 @@ def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
     has_perm_or_403(request.user, "sites.delete_projects", request.site)
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()
         project.save()

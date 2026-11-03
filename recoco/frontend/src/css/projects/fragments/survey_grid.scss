@@ -1,0 +1,90 @@
+.knowledge {
+  &__info {
+    background-color: white;
+    border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
+    .info {
+      &__survey-navbar {
+      }
+      &__title {
+        color: var(--light-text-mention-grey, #666);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      &__survey-title {
+        color: var(--light-text-default-grey, #3a3a3a);
+        font-family: Marianne;
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        .badge {
+          height: fit-content;
+        }
+      }
+      &__survey-questions {
+        list-style: none;
+        li {
+          line-height: 1.125rem;
+          padding: 0;
+        }
+        .fr-link {
+          color: var(
+            --light-text-active-blue-france,
+            var(--colors-brand-blue-france-strong, #000091)
+          );
+          font-family: Marianne;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          text-decoration-line: underline !important;
+        }
+      }
+      &__project-origin {
+        color: var(--light-text-mention-grey, #666);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 24px;
+      }
+      &__separator {
+        opacity: 1;
+        margin-right: -12px;
+        margin-top: 20px;
+        padding-bottom: 20px;
+      }
+    }
+  }
+  &__surveys {
+    background-color: #fafafa;
+    &-header {
+      margin-bottom: 1.125rem;
+    }
+  }
+}
+
+// TODO Extract this to a separate file
+.survey-card-cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 2px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  background: var(--light-background-default-grey, #fff);
+  box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
+  &__title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    .badge {
+      font-size: 12px;
+      margin-right: 0.375rem;
+    }
+  }
+}

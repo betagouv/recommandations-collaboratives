@@ -4,11 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("resources", "0020_resource_status"),
-        ("resources", "0021_remove_resource_public"),
-    ]
-
     dependencies = [
         ("resources", "0019_resource_created_by"),
     ]

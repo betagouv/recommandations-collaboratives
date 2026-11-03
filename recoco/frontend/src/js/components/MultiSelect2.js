@@ -31,12 +31,16 @@ document.addEventListener('alpine:init', () => {
           search: options[i].dataset.search,
           selected: Object.values(this.selected).includes(options[i].value),
         });
-
         if (this.options[i].selected) {
           this.selectedElms.push(this.options[i]);
         }
       }
-
+      this.selectedElms = this.options.filter((op) => this.selected.includes(op.value));
+      this.options.forEach((op) => {
+        if (this.selected.includes(op.value)) {
+          op.selected = true;
+        }
+      });
       // searching for the given value
       this.$watch('search', (e) => {
         this.options = [];

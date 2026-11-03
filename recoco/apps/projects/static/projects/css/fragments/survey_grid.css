@@ -1,0 +1,67 @@
+.knowledge__info {
+  background-color: white;
+  border-right: 1px solid var(--light-border-default-grey, #e5e5e5); }
+  .knowledge__info .info__title {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    text-transform: uppercase; }
+  .knowledge__info .info__survey-title {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-family: Marianne;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px; }
+    .knowledge__info .info__survey-title .badge {
+      height: fit-content; }
+  .knowledge__info .info__survey-questions {
+    list-style: none; }
+    .knowledge__info .info__survey-questions li {
+      line-height: 1.125rem;
+      padding: 0; }
+    .knowledge__info .info__survey-questions .fr-link {
+      color: var(--light-text-active-blue-france, var(--colors-brand-blue-france-strong, #000091));
+      font-family: Marianne;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      text-decoration-line: underline !important; }
+  .knowledge__info .info__project-origin {
+    color: var(--light-text-mention-grey, #666);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 24px; }
+  .knowledge__info .info__separator {
+    opacity: 1;
+    margin-right: -12px;
+    margin-top: 20px;
+    padding-bottom: 20px; }
+
+.knowledge__surveys {
+  background-color: #fafafa; }
+  .knowledge__surveys-header {
+    margin-bottom: 1.125rem; }
+
+.survey-card-cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 2px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  background: var(--light-background-default-grey, #fff);
+  box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem; }
+  .survey-card-cta__title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px; }
+    .survey-card-cta__title .badge {
+      font-size: 12px;
+      margin-right: 0.375rem; }

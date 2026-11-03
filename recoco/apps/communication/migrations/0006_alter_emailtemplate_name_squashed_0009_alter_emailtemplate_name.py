@@ -4,13 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("communication", "0006_alter_emailtemplate_name"),
-        ("communication", "0007_alter_emailtemplate_name"),
-        ("communication", "0008_alter_emailtemplate_name"),
-        ("communication", "0009_alter_emailtemplate_name"),
-    ]
-
     dependencies = [
         ("communication", "0005_auto_20220905_1326"),
     ]

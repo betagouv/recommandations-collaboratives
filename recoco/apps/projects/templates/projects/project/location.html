@@ -10,7 +10,7 @@
     Modifier la localisation du dossier - {{ request.site.name }}
 {% endblock og_title %}
 {% current_project request.session as project %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" user_perm_checker %}
 {% if 'change_location' in user_project_perms %}
     {% block js %}
         {{ project.name|json_script:"editNameProject" }}

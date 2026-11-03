@@ -92,6 +92,7 @@ def question_set_create(request, survey_id=None):
             question_set = form.save(commit=False)
             question_set.survey = survey
             question_set.save()
+            form.save_m2m()
             next_url = reverse(
                 "survey-editor-question-set-details", args=[question_set.id]
             )
@@ -155,7 +156,9 @@ def question_create(request, question_set_id=None):
     """Create new question"""
     has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
-    question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
+    question_set = get_object_or_404(
+        models.QuestionSet, survey__site=request.site, pk=question_set_id
+    )
 
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST)

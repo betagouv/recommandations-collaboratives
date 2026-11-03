@@ -6,22 +6,18 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-from datetime import datetime
-
 from actstream import action
 from django.contrib import messages
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from guardian.shortcuts import get_perms
-from notifications import models as notifications_models
 
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics_models
@@ -42,12 +38,14 @@ from recoco.utils import (
 
 from .. import forms, models
 from ..utils import (
+    change_role,
     get_advising_context_for_project,
     is_regional_actor_for_project,
     notify_advisors_of_project,
+    notify_members_of_project,
     refresh_user_projects_in_session,
-    unassign_advisor,
-    unassign_collaborator,
+    remove_advisor,
+    remove_collaborator,
 )
 
 ########################################################################
@@ -243,7 +241,9 @@ def access_revoke_invite(request, project_id, invite_id):
     """Revoke an invitation for a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    invite = get_object_or_404(invites_models.Invite, pk=invite_id, accepted_on=None)
+    invite = get_object_or_404(
+        invites_models.Invite, pk=invite_id, project=project, accepted_on=None
+    )
 
     if invite.role == "SWITCHTENDER":
         has_perm_or_403(request.user, "manage_advisors", project)
@@ -293,6 +293,40 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
         members.filter(member=user).update(is_owner=True)
         project.phone = user.profile.phone_no
         project.save()
+
+    action.send(
+        sender=user,
+        verb=verbs.Project.NEW_OWNER,
+        action_object=project,
+        target=project,
+    )
+
+    notification = {
+        "sender": user,
+        "verb": verbs.Project.NEW_OWNER,
+        "action_object": project,
+        "target": project,
+    }
+    notify_advisors_of_project(project, notification)
+    notify_members_of_project(project, notification)
+
+    return redirect(reverse("projects-project-administration", args=[project_id]))
+
+
+@login_required
+@require_http_methods(["POST"])
+def promote_collaborator_as_advisor(request, project_id, user_id=None):
+    """Promote a collectivity member to referent role"""
+    project = get_object_or_404(models.Project.on_site, pk=project_id)
+
+    is_staff_for_site_or_403(request.user, request.site)
+
+    user = get_object_or_404(auth_models.User, id=user_id)
+    if request.site not in user.profile.sites.all():
+        # user is not on current site
+        raise Http404()
+
+    change_role(user, project, "SWITCHTENDER", request.site)
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
@@ -374,15 +408,7 @@ def access_collaborator_delete(request, project_id: int, username: str):
             )
 
         elif membership in project.projectmember_set.exclude(is_owner=True):
-            unassign_collaborator(membership.member, project)
-
-            # Delete user notification for this project
-            project_ct = ContentType.objects.get_for_model(models.Project)
-            notifications_models.Notification.on_site.filter(
-                recipient=membership.member,
-                target_content_type=project_ct.pk,
-                target_object_id=project.pk,
-            ).delete()
+            remove_collaborator(membership.member, project)
 
             messages.success(
                 request,
@@ -484,20 +510,7 @@ def access_advisor_delete(request, project_id: int, username: str):
     if request.user != ps.switchtender:
         has_perm_or_403(request.user, "manage_advisors", project)
 
-    unassign_advisor(ps.switchtender, project, request.site)
-
-    # Delete user notification for this project
-    project_ct = ContentType.objects.get_for_model(models.Project)
-    notifications_models.Notification.on_site.filter(
-        recipient=ps.switchtender,
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    ).delete()
-
-    # Clean advisor dashboard entry
-    models.UserProjectStatus.objects.filter(
-        site=request.site, user=ps.switchtender, project=project
-    ).delete()
+    remove_advisor(ps.switchtender, project, request.site)
 
     if request.user != ps.switchtender:
         messages.success(
@@ -531,34 +544,28 @@ def set_project_inactive(request, project_id: int):
     ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
-    form = forms.ProjectActiveForm(request.POST, instance=project)
+    project.inactive_since = timezone.now()
+    project.set_inactive_by = request.user
+    project.save()
 
-    if form.is_valid():
-        project = form.save(commit=False)
-        project.inactive_since = timezone.now()
-        project.save()
+    # Notifications
+    notification = {
+        "sender": request.user,
+        "actor": request.user,
+        "verb": verbs.Project.SET_INACTIVE,
+        "action_object": project,
+        "target": project,
+    }
 
-        # Notifications
-        notification = {
-            "sender": request.user,
-            "actor": request.user,
-            "verb": verbs.Project.SET_INACTIVE,
-            "action_object": project,
-            "target": project,
-        }
+    notify_advisors_of_project(project, notification, exclude=request.user)
 
-        notify_advisors_of_project(project, notification, exclude=request.user)
-
-        # Action trace
-        action.send(
-            request.user,
-            verb=verbs.Project.SET_INACTIVE,
-            action_object=project,
-            target=project,
-        )
-
-    else:
-        raise HttpResponseBadRequest("Formulaire invalide")
+    # Action trace
+    action.send(
+        request.user,
+        verb=verbs.Project.SET_INACTIVE,
+        action_object=project,
+        target=project,
+    )
 
     return redirect(reverse("projects-project-administration", args=(project.id,)))
 
@@ -575,7 +582,7 @@ def set_project_active(request, project_id: int):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
     project.reactivate()
-    project.last_manual_reactivation = datetime.now()
+    project.last_manual_reactivation = timezone.now()
     project.save()
 
     # Action trace
@@ -586,6 +593,9 @@ def set_project_active(request, project_id: int):
         target=project,
     )
 
+    referer = request.headers.get("referer")
+    if referer:
+        return redirect(referer)
     return redirect(reverse("projects-project-administration", args=(project.id,)))
 
 

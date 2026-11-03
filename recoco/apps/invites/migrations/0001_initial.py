@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("projects", "0047_alter_task_priority"),
+        ("projects", "0044_auto_20220131_1719_squashed_0047_alter_task_priority"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

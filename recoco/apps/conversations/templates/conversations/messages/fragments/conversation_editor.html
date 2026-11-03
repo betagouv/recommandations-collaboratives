@@ -1,0 +1,11 @@
+{% if advising_position.is_advisor or is_switchtender or is_staff %}
+    {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True can_attach_files=hide_attach_files|yesno:",True" can_attach_contact=hide_attach_contact|yesno:",True" show_send_button=True form_id="conversation-form" placeholder=placeholder|default:"Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+    {% comment %}
+    advising_position.is_advisor : advisor on current project
+    is_switchtender : advisor on current site
+    is_staff : staff on current site
+    {% endcomment %}
+{% else %}
+    {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False can_attach_files=hide_attach_files|yesno:",True" can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder=placeholder|default:"Écrivez votre message ici. Vous pouvez ajouter des fichiers." can_compress_editor=True on_leave_alert=True is_notification_alert=True %}
+{% endif %}
+<input type="hidden" name="contact" :value="message?.contact?.id">

@@ -1,0 +1,26 @@
+{% extends "account/layout/layout.html" %}
+{% comment %} TODO  Revenir sur ce template car la confirmation n'est pas automatique et il manque un rouage{% endcomment %}
+{% block layout_content %}
+    {% if confirmation %}
+        {% with email=confirmation.email_address.email %}
+            {% if can_confirm %}
+                <p>
+                    Merci de confirmer que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail pour l'utilisateur : {{ user_display }}.
+                </p>
+                <form method="post"
+                      action="{% url 'account_confirm_email' confirmation.key %}">
+                    {% csrf_token %}
+                    {{ redirect_field }}
+                    <button type="submit" class="fr-btn w-100 justify-content-center">Confirmer</button>
+                </form>
+            {% else %}
+                <p>Confirmation de l'adresse e-mail {{ email }} impossible. Elle a déjà été confirmée pour un autre compte.</p>
+            {% endif %}
+        {% endwith %}
+    {% else %}
+        {% url 'account_email' as email_url %}
+        <p>
+            Ce lien de confirmation a expiré ou est invalide. Merci de <a href="{{ email_url }}">faire une nouvelle demande de confirmation</a>.
+        </p>
+    {% endif %}
+{% endblock layout_content %}

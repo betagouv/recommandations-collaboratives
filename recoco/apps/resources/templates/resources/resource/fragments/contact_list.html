@@ -1,15 +1,9 @@
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/apps/contactApp.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% if contacts.count %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% is_admin_for_current_site request.user as is_admin %}
@@ -19,7 +13,7 @@
                 <span class="title text-blue text-uppercase fw-bold fr-mb-2v d-block">Contacts</span>
                 <p class="content">
                     Nous avons des <strong>contacts associés</strong>
-                    à cette ressource. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
+                    à cette ressource. Si vous souhaitez y accéder, veuillez <a href="{% url 'account_request_login_code' %}">vous identifier</a>.
                 </p>
             </div>
         {% else %}

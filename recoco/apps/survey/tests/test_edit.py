@@ -8,6 +8,7 @@ created: 2021-08-02 16:24:35 CEST
 """
 
 import pytest
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
@@ -62,6 +63,7 @@ def test_question_set_create_and_redirect(request, client):
         "heading": "new heading",
         "subheading": "new sub heading",
         "icon": "an-icon",
+        "precondition_tags": "toto tata",
     }
 
     with login(client, groups=["example_com_admin"]):
@@ -70,6 +72,7 @@ def test_question_set_create_and_redirect(request, client):
     qs = models.QuestionSet.objects.all()[0]
     assert qs.heading == data["heading"]
     assert qs.subheading == data["subheading"]
+    assert set(qs.precondition_tags.names()) == {"toto", "tata"}
 
     new_url = reverse("survey-editor-question-set-details", args=[qs.id])
     assertRedirects(response, new_url)
@@ -101,12 +104,14 @@ def test_question_set_update_and_redirect(request, client):
         "heading": "new heading",
         "subheading": "new sub heading",
         "icon": "an-icon",
+        "precondition_tags": "toto tata",
     }
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     qs = models.QuestionSet.objects.get(id=qs.id)
+    assert set(qs.precondition_tags.names()) == {"toto", "tata"}
     assert qs.heading == data["heading"]
     assert qs.subheading == data["subheading"]
 
@@ -203,6 +208,24 @@ def test_question_create_error(request, client):
 
     assert models.Question.objects.count() == 0
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_question_create_on_another_site(request, client):
+    another_site = Recipe(Site).make()
+    qs = Recipe(models.QuestionSet, survey__site=another_site).make()
+    url = reverse("survey-editor-question-create", args=[qs.id])
+    data = {
+        "text_short": "short version",
+        "text": "the text of the question",
+        "priority": 1,
+    }
+
+    with login(client, groups=["example_com_admin"]):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 404
+    assert models.Question.objects.count() == 0
 
 
 #
@@ -302,7 +325,11 @@ def test_choice_create_and_redirect(request, client):
         models.Question, question_set__survey__site=get_current_site(request)
     ).make()
     url = reverse("survey-editor-choice-create", args=[question.id])
-    data = {"value": "some value", "text": "the text of the choice"}
+    data = {
+        "value": "some value",
+        "text": "the text of the choice",
+        "conclusion": '<img src = "x" onerror="alert(\'tosanitize\')" />',
+    }
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
@@ -310,6 +337,7 @@ def test_choice_create_and_redirect(request, client):
     choice = models.Choice.objects.all()[0]
     assert choice.text == data["text"]
     assert choice.value == data["value"]
+    assert "tosanitize" not in choice.conclusion
 
     new_url = reverse(
         "survey-editor-question-set-details", args=[question.question_set_id]
@@ -342,7 +370,11 @@ def test_choice_update_and_redirect(request, client):
         models.Choice, question__question_set__survey__site=get_current_site(request)
     ).make()
     url = reverse("survey-editor-choice-update", args=[choice.id])
-    data = {"value": "some value", "text": "the text of the choice"}
+    data = {
+        "value": "some value",
+        "text": "the text of the choice",
+        "conclusion": '<img src = "x" onerror="alert(\'tosanitize\')" />',
+    }
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
@@ -350,6 +382,7 @@ def test_choice_update_and_redirect(request, client):
     choice = models.Choice.objects.get(id=choice.id)
     assert choice.text == data["text"]
     assert choice.value == data["value"]
+    assert "tosanitize" not in choice.conclusion
 
     new_url = reverse(
         "survey-editor-question-set-details", args=[choice.question.question_set_id]

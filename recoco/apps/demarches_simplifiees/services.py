@@ -1,6 +1,9 @@
 import logging
 from typing import Any
+from urllib.parse import urljoin
 
+import requests
+from django.conf import settings
 from django.contrib.sites.models import Site
 
 from recoco.apps.home.models import SiteConfiguration
@@ -8,6 +11,7 @@ from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
 
+from .exceptions import DSAPIError
 from .models import DSMapping, DSResource
 from .utils import MappingField
 
@@ -159,3 +163,58 @@ def resolve_edl_lookup(
             return None
 
     return answer.comment if _take_comment else answer.formatted_value
+
+
+def load_ds_resource_schema(ds_resource_id: int):
+    try:
+        ds_resource = DSResource.objects.get(id=ds_resource_id)
+    except DSResource.DoesNotExist:
+        return
+
+    if ds_resource.schema and len(ds_resource.schema) > 0:
+        return
+
+    resp = requests.get(
+        url=urljoin(ds_resource.preremplir_url, "schema"),
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        raise DSAPIError(
+            f"Failed to load schema for the DS resource {ds_resource.name}",
+            status_code=resp.status_code,
+        )
+
+    ds_resource.schema = resp.json()
+    ds_resource.save()
+
+
+def create_ds_prefill_link(reco):
+    if reco.resource is None:
+        return
+
+    ds_resource: DSResource | None = find_ds_resource_for_project(
+        project=reco.project,
+        resource=reco.resource,
+    )
+    if ds_resource is None:
+        return
+
+    content = make_ds_data_from_project(
+        site=reco.site,
+        project=reco.project,
+        ds_resource=ds_resource,
+    )
+    resp = requests.post(
+        url=urljoin(
+            settings.DS_API_BASE_URL, f"demarches/{ds_resource.number}/dossiers"
+        ),
+        json=content,
+        timeout=30,
+    )
+    if resp.status_code != 201:
+        raise DSAPIError(
+            f"Failed to generate a prefill url for the DS resource {ds_resource.name}",
+            status_code=resp.status_code,
+        )
+
+    return resp.json()["dossier_url"]

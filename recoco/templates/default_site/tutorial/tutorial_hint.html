@@ -1,8 +1,7 @@
 {% load static %}
 <template x-cloak x-if="showTuto">
     <div x-ref="startTourButton"
-         class="{% if type == 'navTuto' %}hint-button-nav align-items-center position-absolute t-0 l-0 fr-p-2w appear-in-with-delay
-                {% elif type == 'searchExtRes' %}hint-button-res-ext align-items-center position-absolute t-0 l-0 fr-p-2w appear-in-with-delay
+         class="{% if type == 'searchExtRes' %}hint-button-res-ext align-items-center position-absolute t-0 l-0 fr-p-2w appear-in-with-delay
                 {% elif type == 'kanbanTuto' %}hint-button-kanban align-items-center position-absolute t-0 l-0 fr-p-2w appear-in-with-delay
                 {% endif %}"
          data-test-id="tutorial-project-launcher">
