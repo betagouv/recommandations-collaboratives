@@ -1,10 +1,14 @@
 {% if user.is_staff %}
-    <ul class="d-flex align-items-center list-unstyled fr-mb-0">
-        {% for tag in resource.tags.all %}
-            <li class="bg-grey fr-mr-2v fr-px-2v fr-py-1v">
-                <a class="text-grey fw-normal text-decoration-none"
-                    href="{% url 'resources-resource-search' %}?query={{ tag.name }}">{{ tag }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="d-flex justify-content-center align-items-center">
+        <span class="resource-details__tags--label fr-mr-2v">Mots-clés :</span>
+        <ul class="d-flex align-items-center list-unstyled gap-2">
+            {% for tag in resource.tags.all %}
+                <li class="resource-details__tags">
+                    <a class="resource-details__tags--link text-decoration-none"
+                        href="{% url 'resources-resource-search' %}?query={{ tag.name }}">
+                        <span class="margin-before-right fr-icon-arrow-right-line fr-icon--sm">{{ tag }}</span></a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endif %}

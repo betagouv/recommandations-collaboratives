@@ -1,6 +1,11 @@
 {% load static %}
 <div class="text-justified font-marianne resource-template">
-    {% include "resources/resource/fragments/title.html" %}
+    <div class="fr-mb-3w">
+        {% include "resources/resource/fragments/title.html" %}
+    </div>
+    <div class="fr-mb-3w">
+        {% include "resources/resource/fragments/tag_list.html" %}
+    </div>
     <div class="resource-details__bordered-container">
         {% include "resources/resource/fragments/summary.html" %}
     </div>
