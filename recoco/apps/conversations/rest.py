@@ -14,7 +14,7 @@ from recoco.utils import has_perm_or_403
 
 from ...rest_api.permissions import BaseConversationPermission
 from . import signals
-from .models import Message
+from .models import Message, exclude_plugin_only_messages
 from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
 
@@ -29,7 +29,9 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        return Message.objects.filter(project_id=project_id).annotate(
+        return exclude_plugin_only_messages(
+            Message.objects.filter(project_id=project_id)
+        ).annotate(
             unread=Count(
                 "notifications",
                 filter=Q(

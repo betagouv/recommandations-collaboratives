@@ -75,6 +75,7 @@ from recoco.apps.home.utils import (
 )
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.plugins.manager import get_plugin_manager, get_site_plugin_manager
+from recoco.apps.plugins.utils import exclude_disabled_plugin_objects
 from recoco.apps.projects.models import (
     Document,
     Project,
@@ -103,9 +104,14 @@ from recoco.utils import (
 def site_projects_action_stream(site):
     ctype = ContentType.objects.get_for_model(Project)
 
+    actions = exclude_disabled_plugin_objects(
+        Action.objects.filter(site=site),
+        "actor_content_type",
+        "action_object_content_type",
+        "target_content_type",
+    )
     return (
-        Action.objects.filter(site=site)
-        .filter(
+        actions.filter(
             Q(target_content_type=ctype)
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
@@ -619,10 +625,14 @@ def organization_details(request, organization_id):
     user_ct = ContentType.objects.get_for_model(User)
 
     actions = (
-        Action.objects.filter(site=request.site)
-        .filter(
-            actor_content_type=user_ct,
-            actor_object_id__in=participant_ids,
+        exclude_disabled_plugin_objects(
+            Action.objects.filter(
+                site=request.site,
+                actor_content_type=user_ct,
+                actor_object_id__in=participant_ids,
+            ),
+            "action_object_content_type",
+            "target_content_type",
         )
         .prefetch_related("actor", "action_object", "target")
         .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
@@ -946,11 +956,13 @@ def user_details(request, user_id):
     crm_user_is_admin = is_admin_for_current_site(crm_user)
 
     actions = (
-        (
+        exclude_disabled_plugin_objects(
             crm_user.actor_actions.exclude(
                 verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
             )
-            | crm_user.action_object_actions.all()
+            | crm_user.action_object_actions.all(),
+            "action_object_content_type",
+            "target_content_type",
         )
         .order_by("-timestamp")[:MAX_ACTIVITY_DISPLAY]
         .select_related("action_object_content_type", "target_content_type")
