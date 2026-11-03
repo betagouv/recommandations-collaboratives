@@ -582,6 +582,9 @@ def organization_details(request, organization_id):
         profile__organization=organization
     )  # clean if we don't need to have their projects anymore
     participants = participants_everywhere.filter(profile__sites=request.site)
+    active_participant_count = participants.filter(
+        profile__deleted__isnull=True
+    ).count()
 
     members_stats = participants.aggregate(
         last_activity=Max("profile__previous_activity_at"),
