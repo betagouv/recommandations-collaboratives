@@ -577,14 +577,18 @@ def organization_details(request, organization_id):
 
     qs = get_queryset_for_site_organizations(request.site)
     organization = get_object_or_404(qs, pk=organization_id)
+    advisor_group_name = make_group_name_for_site("advisor", request.site)
 
     participants_everywhere = User.objects.filter(
         profile__organization=organization
     ).order_by("-profile__deleted", "-is_active")
 
     # clean if we don't need to have their projects anymore
-
-    participants = participants_everywhere.filter(profile__sites=request.site)
+    participants = participants_everywhere.filter(profile__sites=request.site).annotate(
+        is_advisor=Exists(
+            Group.objects.filter(name=advisor_group_name, user=OuterRef("pk"))
+        ),
+    )
     active_participant_count = participants.filter(is_active=True).count()
 
     members_stats = participants.aggregate(
