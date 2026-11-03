@@ -29,6 +29,9 @@ describe('As advisor, I can reply to a recommendation in the conversation @page-
       .should('be.enabled')
       .click();
 
+    cy.get('[data-cy="loader"]')
+      .should('be.visible');
+
     cy.contains(comment);
   });
 });

@@ -34,6 +34,9 @@ Parameters:
      @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
      data-test-id="tiptap-editor">
+    <template x-if="$store.editor.isEditorBusy">
+        {% include "tools/loader.html" with message="Merci de patienter, votre message est en cours d'envoi" %}
+    </template>
     <div data-test-id="tiptap-editor-form-container">
         <div class="tiptap-editor position-relative {% if wide %}is-wide{% endif %}"
              :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage == 3.5}"
