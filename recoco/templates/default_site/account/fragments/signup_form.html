@@ -1,16 +1,16 @@
 {% extends "account/layout/layout.html" %}
 {% load crispy_forms_tags %}
 {% block layout_content %}
-    {% block signup_form %}
-        <form class="signup fr-form-group"
-              id="signup_form"
-              method="post"
-              action="{% url 'account_signup' %}?next={% url 'advisor-access-request' %}">
+{% block signup_form %}
+<div x-data="AjvValidationSchema('schemaAdvisorSignupFormValidator')">
+    <div x-data="DsrcFormValidator('signup_form', schemaValidator, '{{ request.method }}')">
+        <form class="signup fr-form-group" id="signup_form" method="post"
+            action="{% url 'account_signup' %}?next={% url 'advisor-access-request' %}"
+            x-on:input="isFormEdited = true">
+            <input type="hidden" name="js_enabled" id="signup_form_js_enabled" value="false">
             {% csrf_token %}
             {% if redirect_field_value %}
-                <input type="hidden"
-                       name="{{ redirect_field_name }}"
-                       value="{{ redirect_field_value }}" />
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
             <fieldset class="fr-fieldset">
                 <legend class="fr-fieldset__legend fr-mb-2w" id="identity-fieldset-legend">
@@ -20,57 +20,44 @@
                     <p class="fr-hint-text">Sauf mention contraire, tous les champs sont obligatoires.</p>
                 </div>
                 <div x-data="{acceptCgu: false}" class="fr-fieldset__content">
-                    <p>
-                        {{ form.first_name.label }}
-                        {{ form.first_name.errors }}
-                        {{ form.first_name }}
-                    </p>
-                    <p>
-                        {{ form.last_name.label }}
-                        {{ form.last_name.errors }}
-                        {{ form.last_name }}
-                    </p>
-                    <p>
-                        {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True validation=False %}
-                    </p>
-                    <p>
-                        {{ form.organization_position.label }}
-                        {{ form.organization_position.errors }}
-                        {{ form.organization_position }}
-                    </p>
-                    <p>
-                        {{ form.email.label }}
-                        {{ form.email.errors }}
-                        {{ form.email }}
-                    </p>
-                    <p>
-                        {{ form.phone_no.label }}
-                        {{ form.phone_no.errors }}
-                        {{ form.phone_no }}
-                    </p>
-                    <p>{{ form.password1|as_crispy_field:"dsrc_crispy_forms_no_js"  }}</p>
-                    <p>{{ form.password2|as_crispy_field:"dsrc_crispy_forms_no_js"  }}</p>
+                    {{ form.first_name|as_crispy_field }}
+                    {{ form.last_name|as_crispy_field }}
+                    <div class="fr-fieldset__element">
+                        {% include "tools/organization_search.html" with name=form.organization.name
+                        label=form.organization.label value=form.organization.value
+                        id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors
+                        dsfr=True isRequired=True validation=True is_dsfr_element=True %}
+                    </div>
+                    {{ form.organization_position|as_crispy_field }}
+                    {{ form.email|as_crispy_field }}
+                    {{ form.phone_no|as_crispy_field }}
+                    {{ form.password1|as_crispy_field }}
+                    {{ form.password2|as_crispy_field }}
                     {% for error in form.password1.errors %}
-                        <div class="fr-alert fr-alert--error">
-                            <p>{{ error }}</p>
-                        </div>
+                    <div class="fr-alert fr-alert--error">
+                        <p>{{ error }}</p>
+                    </div>
                     {% endfor %}
                     {% for error in form.password2.errors %}
-                        <div class="fr-alert fr-alert--error">
-                            <p>{{ error }}</p>
-                        </div>
+                    <div class="fr-alert fr-alert--error">
+                        <p>{{ error }}</p>
+                    </div>
                     {% endfor %}
                     <p>
                         {{ form.captcha }}
-                        {% for error in form.captcha.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
+                        {% for error in form.captcha.errors %}
+                    <div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
                     </p>
                     {% include "account/fragments/accept_cgu.html" %}
-                    <div class="fr-input-group fr-mt-4v" x-tooltip="!acceptCgu && 'Veuillez accepter les CGU pour vous inscrire'">
-                        <p x-text="acceptCgu.value"></p>
-                        <button class="fr-btn custom-login-button w-100" :disabled="!acceptCgu" type="submit">S'inscrire</button>
+                    <div class="fr-input-group fr-mt-4v"
+                        x-tooltip="!acceptCgu && 'Veuillez accepter les CGU pour vous inscrire'">
+                        <button class="fr-btn custom-login-button w-100" :disabled="!acceptCgu || errors.length > 0"
+                            type="submit" x-on:click="validate">S'inscrire</button>
                     </div>
                 </div>
             </fieldset>
         </form>
-    {% endblock signup_form %}
+    </div>
+</div>
+{% endblock signup_form %}
 {% endblock layout_content %}

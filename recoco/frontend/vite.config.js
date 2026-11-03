@@ -56,6 +56,7 @@ const config = {
         main: resolve('./src/js/main.js'),
         onboarding: resolve('./src/js/apps/onboarding.js'),
         advisorCreateProject: resolve('./src/js/apps/advisorCreateProject.js'),
+        advisorSignup: resolve('./src/js/apps/advisorSignup.js'),
         home: resolve('./src/js/apps/home.js'),
         crm: resolve('./src/js/apps/crm.js'),
         boardProjects: resolve('./src/js/apps/boardProjects.js'),
