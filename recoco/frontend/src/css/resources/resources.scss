@@ -130,4 +130,15 @@
     margin-bottom: 32px;
     border-bottom: 2px solid var(--light-decisions-border-border-default-blue-france, #6A6AF4);
   }
+  &__category {
+    border-radius: 4px;
+    background: var(--light-options-illustration-color-950-default-green-archipel-950, #C7F6FC);
+    display: flex;
+    padding: 0 8px;
+    color: var(--light-options-illustration-color-sun-default-green-archipel-sun-391, #006A6F);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px; /* 171.429% */
+    text-transform: uppercase;
+  }
 }

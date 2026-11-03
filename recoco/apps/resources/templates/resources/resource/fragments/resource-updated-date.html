@@ -5,8 +5,10 @@
     <span class="align-middle fr-mb-0">
         {% if "manage_resources" in user_site_perms %}
             <a href="{% url 'resources-resource-history' resource.pk %}">
-            {% endif %}
-            modifiée le <em>{{ resource.updated_on }}</em>
-            {% if "manage_resources" in user_site_perms %}</a>{% endif %}
+        {% endif %}
+        modifiée le <em>{{ resource.updated_on }}</em>
+        {% if "manage_resources" in user_site_perms %}
+            </a>
+        {% endif %}
     </span>
 </div>
