@@ -61,6 +61,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.change_addressbook",
         "sites.manage_resources",
     ),
+    "trusted_bot": (),
 }
 
 
