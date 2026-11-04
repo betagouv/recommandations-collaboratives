@@ -47,6 +47,7 @@ dsrc_doc/*.md
 docker/docker-compose.local.yml
 **/.vite
 **/cypress/reports/*
+recoco/frontend/coverage/
 
 # local scripts
 scripts/*_local.py

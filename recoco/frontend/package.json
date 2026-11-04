@@ -17,7 +17,6 @@
     "e2e:open": "cypress open",
     "e2e:run": "cypress run",
     "e2e:run-allUrls": "cypress run --spec cypress/e2e/explore/canExploreAllUrls.cy.js",
-    "e2e:parallel": "cypress-parallel -s e2e:run -t 2 -d ./cypress/e2e/**",
     "e2e:start-server-and-test": "start-server-and-test 'yarn e2e:django-server --verbosity 0' http://localhost:8001 'yarn e2e:update-and-test'",
     "e2e:start-server-and-test-allUrls": "start-server-and-test 'yarn e2e:django-server --verbosity 0' http://localhost:8001  'yarn e2e:update-and-test-allUrls'",
     "e2e:start-server-and-test-ui": "start-server-and-test 'yarn e2e:django-server --verbosity 0' http://localhost:8001 'yarn e2e:update-and-test-ui'",
@@ -81,7 +80,6 @@
     "cross-env": "^7.0.3",
     "cypress": "^15.21.1",
     "cypress-mochawesome-reporter": "^5.0.0",
-    "cypress-parallel": "^0.15.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "9.1.0",
     "jest": "^30.4.0",
@@ -128,6 +126,7 @@
     "prosemirror-state": "1.4.4",
     "prosemirror-transform": "1.12.1",
     "prosemirror-view": "1.42.3",
-    "source-map-js": "1.2.2"
+    "source-map-js": "1.2.2",
+    "js-yaml": "^4.3.1"
   }
 }
