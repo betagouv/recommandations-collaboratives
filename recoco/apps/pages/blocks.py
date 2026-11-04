@@ -1,5 +1,6 @@
 import os
 
+from django.apps import apps
 from django.core.exceptions import ValidationError
 from wagtail import blocks
 from wagtail.blocks.struct_block import StructBlockValidationError
@@ -51,6 +52,46 @@ class QuoteBlock(blocks.StructBlock):
 # Homepage ###################################################################
 
 
+def site_pages(model_name, home):
+    """Return the live pages of a model published under the given homepage
+
+    Choosers list the pages of every site, so nothing is displayed without this
+    scoping. A homepage not yet saved has no position in the tree, hence no pages.
+    """
+    model = apps.get_model("pages", model_name)
+    if home is None or home.pk is None:
+        return model.objects.none()
+    return model.objects.live().descendant_of(home)
+
+
+def page_card(page):
+    """Return the content of a card for a page having a hero heading"""
+    hero = page.heading[0].value if page.heading else {}
+    image = hero.get("bg_image")
+    if image:
+        # the card title sits next to it and the card opens the page
+        image.decorative = True
+    return {
+        "title": page.title,
+        "text": hero.get("text"),
+        "image": image,
+        "url": page.url,
+    }
+
+
+class LinkValue(blocks.StructValue):
+    @property
+    def href(self):
+        if self.get("url"):
+            return self["url"]
+        page = self.get("page")
+        return page.url if page else None
+
+    @property
+    def is_external(self):
+        return bool(self.get("url"))
+
+
 class LinkTargetBlock(blocks.StructBlock):
     """An optional link, either to a page of the CMS or to an external URL"""
 
@@ -68,6 +109,9 @@ class LinkTargetBlock(blocks.StructBlock):
                 ]
             )
         return cleaned
+
+    class Meta:
+        value_class = LinkValue
 
 
 class ButtonBlock(LinkTargetBlock):
@@ -114,6 +158,9 @@ class ParagraphBlock(blocks.StructBlock):
         default="left",
     )
 
+    class Meta:
+        template = "pages/blocks/home/paragraph.html"
+
 
 class CarouselImageBlock(ImageBlock):
     ALLOWED_EXTENSIONS = (".png", ".jpg", ".jpeg")
@@ -137,6 +184,9 @@ class CarouselBlock(blocks.StructBlock):
         CarouselImageBlock(label="Image"), label="Images", min_num=1
     )
 
+    class Meta:
+        template = "pages/blocks/home/carousel.html"
+
 
 class StepCardBlock(blocks.StructBlock):
     icon = ImageBlock(label="Icône")
@@ -153,6 +203,9 @@ class StepsBlock(blocks.StructBlock):
     cards = blocks.ListBlock(
         StepCardBlock(label="Étape"), label="Étapes", min_num=1, max_num=4
     )
+
+    class Meta:
+        template = "pages/blocks/home/steps.html"
 
 
 class ShowcaseMoreBlock(blocks.StructBlock):
@@ -205,6 +258,23 @@ class ShowcasesBlock(blocks.StructBlock):
             )
         return cleaned
 
+    def get_showcases(self, value, home):
+        pages = site_pages("ShowcasePage", home)
+        if value["latest_count"]:
+            return pages.order_by("-first_published_at")[: value["latest_count"]]
+
+        allowed = set(pages.values_list("pk", flat=True))
+        return [page for page in value["showcases"] if page and page.pk in allowed]
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context=parent_context)
+        home = (parent_context or {}).get("page")
+        context["cards"] = [page_card(page) for page in self.get_showcases(value, home)]
+        return context
+
+    class Meta:
+        template = "pages/blocks/home/showcases.html"
+
 
 class NewsCardBlock(blocks.StructBlock):
     image = ImageBlock(label="Image")
@@ -212,6 +282,17 @@ class NewsCardBlock(blocks.StructBlock):
     title = blocks.CharBlock(label="Titre")
     text = blocks.RichTextBlock(label="Texte")
     link = LinkTargetBlock(label="Lien", required=False)
+
+    @staticmethod
+    def as_card(value):
+        return {
+            "title": value["title"],
+            "text": value["text"],
+            "image": value["image"],
+            "thematic": value["thematic"],
+            "url": value["link"].href,
+            "is_external": value["link"].is_external,
+        }
 
 
 class NewsBlock(blocks.StructBlock):
@@ -230,6 +311,24 @@ class NewsBlock(blocks.StructBlock):
         min_num=1,
         max_num=4,
     )
+
+    def get_cards(self, value, home):
+        allowed = set(site_pages("NewsPage", home).values_list("pk", flat=True))
+        cards = []
+        for card in value["cards"]:
+            if card.block_type == "card":
+                cards.append(NewsCardBlock.as_card(card.value))
+            elif card.value and card.value.pk in allowed:
+                cards.append(page_card(card.value))
+        return cards
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context=parent_context)
+        context["cards"] = self.get_cards(value, (parent_context or {}).get("page"))
+        return context
+
+    class Meta:
+        template = "pages/blocks/home/news.html"
 
 
 class HomeBodyBlock(blocks.StreamBlock):

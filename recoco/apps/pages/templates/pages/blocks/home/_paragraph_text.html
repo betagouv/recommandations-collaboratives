@@ -1,0 +1,12 @@
+{% load wagtailcore_tags %}
+<div class="fr-mt-2v home-page__richtext home-page-paragraph--{{ value.width }} home-page__text--{{ value.alignment }}">
+    {{ value.text|richtext }}
+    {% if value.button.href %}
+        <a href="{{ value.button.href }}"
+           class="fr-btn fr-btn--secondary"
+           {% if value.button.is_external %}target="_blank" rel="noopener"{% endif %}>
+            {{ value.button.label }}
+            {% if value.button.is_external %}<span class="visually-hidden">Nouvelle fenêtre</span>{% endif %}
+        </a>
+    {% endif %}
+</div>

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load django_vite static waffle_tags wagtailcore_tags wagtailimages_tags %}
+{% block title %}
+    {{ page.seo_title|default:page.title }}
+{% endblock title %}
+{% block og_title %}
+    {{ page.seo_title|default:page.title }}
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/styles/home.css.js' %}
+    {% vite_asset 'js/styles/home-cms-page-home.css.js' %}
+{% endblock js %}
+{% block content %}
+    <div class="hero-div">
+        <div class="hero-div__sub-container">
+            {% if page.banner_text %}
+                <div class="hero-div__custom-banner z-2">
+                    <span class="fr-icon-information-line fr-mr-1v" aria-hidden="true"></span>
+                    <p class="fr-m-0 fr-mr-2v">{{ page.banner_text }}</p>
+                    {% if page.banner_link_page %}
+                        <a class="fw-700" href="{% pageurl page.banner_link_page %}">{{ page.banner_link_label }}</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="d-flex">
+                <div class="hero-div__text-part home-page__hero-text">
+                    <h1 class="fr-h1">{{ hero_title }}</h1>
+                    <p>{{ hero_baseline }}</p>
+                    <div class="hero-div__buttons" data-test-id="intro-uv">
+                        {% if page.show_project_cta %}
+                            {% flag "enable_submit_new_project" %}
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'onboarding' %}?prefill=true"
+                                       class="fr-btn"
+                                       data-test-id="button-need-help">Solliciter {{ request.site.name }}</a>
+                                {% else %}
+                                    <a href="{% url 'onboarding-project' %}"
+                                       class="fr-btn"
+                                       data-test-id="button-need-help">Solliciter {{ request.site.name }}</a>
+                                {% endif %}
+                            {% endflag %}
+                        {% endif %}
+                        {% if page.show_contact_cta %}
+                            <a class="fr-mt-3v fr-ml-1w normal-link-style"
+                               href="{% url 'home-contact' %}">Nous contacter</a>
+                        {% endif %}
+                    </div>
+                    {% if page.cta_alternative %}
+                        <div class="blue-hero-banner fr-mt-4w fr-p-4v home-page__richtext">{{ page.cta_alternative|richtext }}</div>
+                    {% endif %}
+                </div>
+                <div class="w-50 hero-div__img-div">
+                    {% if page.hero_image %}
+                        {% image page.hero_image fill-550x550 class="center-cropped img-shadow" alt="" %}
+                    {% else %}
+                        <img src="{% static 'home/img/home/image_placeholder.png' %}"
+                             class="center-cropped img-shadow home-page__hero-placeholder"
+                             alt="" />
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for section in page.body %}
+        {% include_block section %}
+    {% empty %}
+        {% if placeholder_about %}
+            {% include "pages/blocks/home/paragraph.html" with value=placeholder_about %}
+        {% endif %}
+        {% include "pages/blocks/home/steps.html" with value=placeholder_steps %}
+    {% endfor %}
+    <div class="border-bottom"></div>
+{% endblock content %}
+{% block footer %}
+    <div class="row justify-content-center" id="footer">{% include "footer/footer.html" %}</div>
+{% endblock footer %}

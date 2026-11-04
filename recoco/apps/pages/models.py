@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.templatetags.static import static
+from django.utils.html import format_html
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.blocks import RichTextBlock
 from wagtail.fields import RichTextField, StreamField
@@ -102,6 +104,34 @@ class HomePage(Page):
 
     HERO_IMAGE_MIN_SIZE = 500
 
+    # Displayed until the editor fills the page: same content as the core homepage
+    PLACEHOLDER_BASELINE = (
+        "Porteurs de dossiers, recevez des conseils personnalisés "
+        "des conseillers compétents."
+    )
+    PLACEHOLDER_STEPS = [
+        (
+            "search.png",
+            "Icone de recherche",
+            "Les porteurs décrivent leur dossier et ses besoins",
+        ),
+        (
+            "form.png",
+            "Icone d'un fichier",
+            "Les conseillers compétents la guident à chaque étape",
+        ),
+        (
+            "community.png",
+            "Icone de communauté",
+            "Les porteurs font avancer leur dossier",
+        ),
+        (
+            "progress.png",
+            "Icone de progrès",
+            "Tous alimentent l’évolution du dossier et des besoins",
+        ),
+    ]
+
     parent_page_types = ["wagtailcore.Page"]
 
     banner_text = models.CharField("Texte", max_length=255, blank=True)
@@ -115,15 +145,27 @@ class HomePage(Page):
         related_name="+",
     )
 
-    hero_title = models.CharField("Titre", max_length=255)
-    hero_baseline = models.CharField("Accroche", max_length=255)
+    hero_title = models.CharField(
+        "Titre",
+        max_length=255,
+        blank=True,
+        help_text="Si vide, le nom du site est affiché.",
+    )
+    hero_baseline = models.CharField(
+        "Accroche",
+        max_length=255,
+        blank=True,
+        help_text="Si vide, une accroche générique est affichée.",
+    )
     hero_image = models.ForeignKey(
         "wagtailimages.Image",
         verbose_name="Image",
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="Image carrée, 500×500 pixels minimum.",
+        help_text="Image carrée, 500×500 pixels minimum. "
+        "Si vide, une illustration générique est affichée.",
     )
     show_project_cta = models.BooleanField(
         "Afficher le bouton de dépôt de dossier", default=True
@@ -137,19 +179,24 @@ class HomePage(Page):
         features=["bold", "italic", "link"],
     )
 
-    body = StreamField(HomeBodyBlock(), blank=True, verbose_name="Sections")
+    body = StreamField(
+        HomeBodyBlock(),
+        blank=True,
+        verbose_name="Sections",
+        help_text="Si vide, la présentation du site (description et bénéficiaires "
+        "de sa configuration) et un parcours en quatre étapes sont affichés.",
+    )
 
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
-                FieldPanel("banner_text"),
-                FieldPanel("banner_link_label"),
-                FieldPanel("banner_link_page"),
-            ],
-            heading="Bandeau d’information",
-        ),
-        MultiFieldPanel(
-            [
+                FieldPanel("banner_text", heading="Bandeau d’information : texte"),
+                FieldPanel(
+                    "banner_link_label", heading="Bandeau d’information : texte du lien"
+                ),
+                FieldPanel(
+                    "banner_link_page", heading="Bandeau d’information : page liée"
+                ),
                 FieldPanel("hero_title"),
                 FieldPanel("hero_baseline"),
                 FieldPanel("hero_image"),
@@ -171,6 +218,53 @@ class HomePage(Page):
     class Meta:
         verbose_name = "Page d’accueil"
         verbose_name_plural = "Pages d’accueil"
+
+    def get_placeholder_about(self, site_name, site_config):
+        description = site_config.description if site_config else None
+        if not description:
+            return None
+
+        text = format_html("<p>{}</p>", description)
+        if site_config.target_audience:
+            text = format_html(
+                "{}<p>Bénéficiaires du service : {}</p>",
+                text,
+                site_config.target_audience,
+            )
+        return {
+            "title": f"À propos de {site_name}",
+            "text": text,
+            "width": "wide",
+            "alignment": "left",
+        }
+
+    def get_placeholder_steps(self, site_name):
+        return {
+            "title": f"Comment fonctionne {site_name} ?",
+            "cards": [
+                {
+                    "icon_url": static(f"home/img/home/{icon}"),
+                    "icon_alt": alt,
+                    "text": text,
+                }
+                for icon, alt, text in self.PLACEHOLDER_STEPS
+            ],
+        }
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        site_name = request.site.name
+
+        context["hero_title"] = self.hero_title or site_name
+        context["hero_baseline"] = self.hero_baseline or self.PLACEHOLDER_BASELINE
+        if not self.body:
+            site_config = getattr(request, "site_config", None)
+            context["placeholder_about"] = self.get_placeholder_about(
+                site_name, site_config
+            )
+            context["placeholder_steps"] = self.get_placeholder_steps(site_name)
+
+        return context
 
     def clean(self):
         super().clean()

@@ -1,10 +1,15 @@
 import pytest
 from django.core.exceptions import ValidationError
+from django.utils.html import escape
+from model_bakery import baker
 from wagtail.blocks.stream_block import StreamBlockValidationError
 from wagtail.blocks.struct_block import StructBlockValidationError
 from wagtail.images.models import Image
 from wagtail.images.tests.utils import get_test_image_file
 from wagtail.models import Page
+from wagtail.models import Site as WagtailSite
+
+from recoco.apps.home.models import SiteConfiguration
 
 from .blocks import (
     ButtonBlock,
@@ -13,8 +18,11 @@ from .blocks import (
     NewsBlock,
     ShowcaseMoreBlock,
     ShowcasesBlock,
+    page_card,
 )
-from .models import HomePage, NewsPage, SimplePage
+from .models import HomePage, NewsPage, ShowcasePage, SimplePage
+
+pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
@@ -250,3 +258,307 @@ def test_news_cards_are_limited_to_four(news_page):
         block.clean(value)
 
     assert isinstance(error.value.block_errors["cards"], StreamBlockValidationError)
+
+
+def add_child_with_hero(parent, model, title, **kwargs):
+    return parent.add_child(
+        instance=model(
+            title=title,
+            heading=[("hero", {"title": title, "text": f"{title} text"})],
+            content=[("richtext", "<p>x</p>")],
+            **kwargs,
+        )
+    )
+
+
+@pytest.fixture
+def home(root_page, make_image):
+    return root_page.add_child(instance=make_home(root_page, hero_image=make_image()))
+
+
+@pytest.fixture
+def other_home(root_page, make_image):
+    return root_page.add_child(
+        instance=make_home(
+            root_page, title="Autre", slug="autre", hero_image=make_image()
+        )
+    )
+
+
+@pytest.fixture
+def served_home(home):
+    WagtailSite.objects.update(is_default_site=False)
+    WagtailSite.objects.create(
+        hostname="testserver", root_page=home, is_default_site=True
+    )
+    return home
+
+
+def set_body(page, body):
+    page.body = body
+    page.save()
+    return page
+
+
+def test_page_card_uses_the_page_hero(home):
+    card = page_card(add_child_with_hero(home, ShowcasePage, "Friche"))
+
+    assert card["title"] == "Friche"
+    assert card["text"] == "Friche text"
+    assert card["image"] is None
+    assert card["url"] is None or card["url"].endswith("/friche/")
+
+
+def test_latest_showcases_only_keep_live_pages_of_the_site(home, other_home):
+    older = add_child_with_hero(home, ShowcasePage, "Ancien")
+    latest = add_child_with_hero(home, ShowcasePage, "Récent")
+    add_child_with_hero(home, ShowcasePage, "Brouillon", live=False)
+    add_child_with_hero(other_home, ShowcasePage, "Autre site")
+    block = ShowcasesBlock()
+
+    pages = block.get_showcases({"latest_count": 5, "showcases": []}, home)
+
+    assert list(pages) == [latest, older]
+
+
+def test_latest_showcases_are_limited_to_the_requested_count(home):
+    add_child_with_hero(home, ShowcasePage, "Ancien")
+    latest = add_child_with_hero(home, ShowcasePage, "Récent")
+    block = ShowcasesBlock()
+
+    pages = block.get_showcases({"latest_count": 1, "showcases": []}, home)
+
+    assert list(pages) == [latest]
+
+
+def test_handpicked_showcases_keep_their_order_and_stay_on_the_site(home, other_home):
+    first = add_child_with_hero(home, ShowcasePage, "Premier")
+    second = add_child_with_hero(home, ShowcasePage, "Second")
+    draft = add_child_with_hero(home, ShowcasePage, "Brouillon", live=False)
+    foreign = add_child_with_hero(other_home, ShowcasePage, "Autre site")
+    block = ShowcasesBlock()
+
+    pages = block.get_showcases(
+        {"latest_count": None, "showcases": [second, foreign, draft, None, first]},
+        home,
+    )
+
+    assert pages == [second, first]
+
+
+def test_latest_count_takes_over_the_handpicked_selection(home):
+    picked = add_child_with_hero(home, ShowcasePage, "Choisi")
+    latest = add_child_with_hero(home, ShowcasePage, "Récent")
+    block = ShowcasesBlock()
+
+    pages = block.get_showcases({"latest_count": 1, "showcases": [picked]}, home)
+
+    assert list(pages) == [latest]
+
+
+@pytest.mark.django_db
+def test_unsaved_homepage_shows_no_showcase(root_page, home):
+    add_child_with_hero(home, ShowcasePage, "Friche")
+    block = ShowcasesBlock()
+
+    pages = block.get_showcases(
+        {"latest_count": 3, "showcases": []}, make_home(root_page)
+    )
+
+    assert list(pages) == []
+
+
+def test_news_cards_drop_pages_outside_the_site(home, other_home):
+    local = add_child_with_hero(home, NewsPage, "Ici")
+    foreign = add_child_with_hero(other_home, NewsPage, "Ailleurs")
+    draft = add_child_with_hero(home, NewsPage, "Brouillon", live=False)
+    block = NewsBlock()
+    value = block_value(
+        block,
+        title="T",
+        cards=[
+            {"type": "news_page", "value": page.pk} for page in (foreign, local, draft)
+        ],
+    )
+
+    cards = block.get_cards(value, home)
+
+    assert [card["title"] for card in cards] == ["Ici"]
+
+
+def test_home_page_renders_the_hero_and_the_sections(client, served_home):
+    set_body(
+        served_home,
+        [
+            (
+                "paragraph",
+                {
+                    "title": "Notre mission",
+                    "text": "<p>Service public</p>",
+                    "width": "narrow",
+                    "alignment": "center",
+                },
+            ),
+            ("steps", {"title": "Comment ça marche", "cards": []}),
+        ],
+    )
+
+    response = client.get("/p/")
+
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert "<h1" in content and "Titre" in content
+    assert "Notre mission" in content
+    assert "Service public" in content
+    assert "home-page__text--center" in content
+    assert "Comment ça marche" in content
+
+
+def test_home_page_numbers_steps_without_image(client, served_home, make_image):
+    image = make_image()
+    card = {
+        "icon": {"image": image, "decorative": True, "alt_text": ""},
+        "number_image": None,
+        "text": "Une étape",
+    }
+    served_home.body = [("steps", {"title": "Étapes", "cards": [card, card]})]
+    served_home.save()
+
+    content = client.get("/p/").content.decode()
+
+    assert ">1</span>" in content
+    assert ">2</span>" in content
+
+
+def test_home_page_shows_banner_only_with_text(client, served_home):
+    assert "hero-div__custom-banner" not in client.get("/p/").content.decode()
+
+    served_home.banner_text = "Webinaire"
+    served_home.save()
+
+    assert "hero-div__custom-banner" in client.get("/p/").content.decode()
+
+
+@pytest.mark.parametrize(
+    "show,expected", [(True, True), (False, False)], ids=["shown", "hidden"]
+)
+def test_home_page_contact_link_follows_its_switch(client, served_home, show, expected):
+    served_home.show_contact_cta = show
+    served_home.save()
+
+    content = client.get("/p/").content.decode()
+
+    assert (
+        "Nous contacter</a>" in content.split('class="hero-div"')[1].split("footer")[0]
+    ) is expected
+
+
+def test_home_page_hides_empty_showcase_and_news_sections(client, served_home):
+    set_body(
+        served_home,
+        [
+            ("showcases", {"title": "Exemples vides", "latest_count": 3}),
+            ("news", {"title": "Actus vides", "cards": []}),
+        ],
+    )
+
+    content = client.get("/p/").content.decode()
+
+    assert "Exemples vides" not in content
+    assert "Actus vides" not in content
+
+
+@pytest.fixture
+def empty_home(root_page):
+    home = root_page.add_child(instance=HomePage(title="Accueil"))
+    WagtailSite.objects.update(is_default_site=False)
+    WagtailSite.objects.create(
+        hostname="testserver", root_page=home, is_default_site=True
+    )
+    return home
+
+
+def site_config(site, **kwargs):
+    SiteConfiguration.objects.filter(site=site).delete()
+    return baker.make(SiteConfiguration, site=site, **kwargs)
+
+
+def test_empty_home_page_shows_the_site_name_and_generic_hero(
+    client, current_site, empty_home
+):
+    content = client.get("/p/").content.decode()
+
+    assert f'<h1 class="fr-h1">{current_site.name}</h1>' in content
+    assert HomePage.PLACEHOLDER_BASELINE in content
+    assert "home/img/home/image_placeholder.png" in content
+
+
+def test_empty_home_page_shows_the_generic_steps(client, current_site, empty_home):
+    content = client.get("/p/").content.decode()
+
+    assert f"Comment fonctionne {current_site.name} ?" in content
+    assert "home/img/home/search.png" in content
+    for _icon, _alt, text in HomePage.PLACEHOLDER_STEPS:
+        assert escape(text) in content
+
+
+def test_empty_home_page_presents_the_site_from_its_configuration(
+    client, current_site, empty_home
+):
+    site_config(
+        current_site, description="Un service public", target_audience="Les communes"
+    )
+
+    content = client.get("/p/").content.decode()
+
+    assert f"À propos de {current_site.name}" in content
+    assert "<p>Un service public</p>" in content
+    assert "Bénéficiaires du service : Les communes" in content
+
+
+def test_empty_home_page_skips_the_presentation_without_description(
+    client, current_site, empty_home
+):
+    site_config(current_site, description=None)
+
+    content = client.get("/p/").content.decode()
+
+    assert f"À propos de {current_site.name}" not in content
+
+
+def test_site_description_is_escaped_in_the_placeholder(
+    client, current_site, empty_home
+):
+    site_config(current_site, description="<script>alert(1)</script>")
+
+    content = client.get("/p/").content.decode()
+
+    assert "<script>alert(1)</script>" not in content
+    assert "&lt;script&gt;alert(1)" in content
+
+
+def test_filled_hero_replaces_the_placeholders(client, make_image, empty_home):
+    empty_home.hero_title = "Mon titre"
+    empty_home.hero_baseline = "Mon accroche"
+    empty_home.hero_image = make_image()
+    empty_home.save()
+
+    content = client.get("/p/").content.decode()
+
+    assert '<h1 class="fr-h1">Mon titre</h1>' in content
+    assert "Mon accroche" in content
+    assert HomePage.PLACEHOLDER_BASELINE not in content
+    assert "image_placeholder.png" not in content
+
+
+def test_any_section_replaces_the_placeholder_sections(
+    client, current_site, empty_home
+):
+    site_config(current_site, description="Un service public")
+    paragraph = {"title": "T", "text": "<p>x</p>", "width": "wide", "alignment": "left"}
+    set_body(empty_home, [("paragraph", paragraph)])
+
+    content = client.get("/p/").content.decode()
+
+    assert f"À propos de {current_site.name}" not in content
+    assert "Comment fonctionne" not in content
