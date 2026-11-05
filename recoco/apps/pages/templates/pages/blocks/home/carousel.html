@@ -1,10 +1,12 @@
 {% load wagtailimages_tags %}
-<div class="fr-container fr-my-4w">
-    <ul class="fr-raw-list home-page-carousel"
-        tabindex="0"
-        aria-label="Galerie d’images">
-        {% for image in value.images %}
-            <li class="home-page-carousel__item">{% image image max-320x200 class="home-page-carousel__image" %}</li>
-        {% endfor %}
-    </ul>
+<div class="home-page-section home-page-section--{{ value.background }} fr-py-4w">
+    <div class="fr-container">
+        <ul class="fr-raw-list home-page-carousel"
+            tabindex="0"
+            aria-label="Galerie d’images">
+            {% for image in value.images %}
+                <li class="home-page-carousel__item">{% image image max-320x200 class="home-page-carousel__image" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>

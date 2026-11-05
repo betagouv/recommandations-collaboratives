@@ -1,12 +1,12 @@
 {% load wagtailimages_tags %}
 {% if cards %}
-    <section class="fr-py-6w specific-backgroundcolor-1b1b35">
+    <section class="home-page-section home-page-section--{{ value.background }} fr-py-6w">
         <div class="fr-container fr-pt-2w fr-pb-6w">
-            <h2 class="fr-h3 fr-text-inverted--grey text-center fr-pb-6w">{{ value.title }}</h2>
+            <h2 class="fr-h3 text-center fr-pb-6w">{{ value.title }}</h2>
             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                 {% for card in cards %}
                     <div class="fr-col-12 fr-col-sm-6 fr-col-md-{% if cards|length == 4 %}3{% else %}4{% endif %} d-flex">
-                        <div class="fr-background-default--grey {% if cards|length == 4 %}w-100{% else %}w-75{% endif %} h-100 fr-m-auto{% if card.url %} fr-enlarge-link{% endif %}">
+                        <div class="home-page__tile {% if cards|length == 4 %}w-100{% else %}w-75{% endif %} h-100 fr-m-auto{% if card.url %} fr-enlarge-link{% endif %}">
                             {% if card.image %}
                                 <div class="w-100">{% image card.image width-600 class="fr-responsive-img" %}</div>
                             {% endif %}

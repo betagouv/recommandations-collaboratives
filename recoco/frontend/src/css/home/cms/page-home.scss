@@ -32,6 +32,38 @@
   &__text--justify {
     text-align: justify;
   }
+
+  // Cards stand out from their section: white unless the section is white
+  &__tile {
+    background-color: var(
+      --home-page-tile-background,
+      var(--background-default-grey)
+    );
+  }
+}
+
+// Background chosen by the editor for each section. Doubled class: the wide
+// paragraph also has the background of the portals dark section.
+.home-page-section {
+  &.home-page-section--white {
+    --home-page-tile-background: var(--background-alt-grey);
+
+    background-color: var(--background-default-grey);
+  }
+
+  &.home-page-section--grey {
+    background-color: var(--background-alt-grey);
+  }
+
+  &.home-page-section--blue {
+    background-color: var(--background-alt-blue-france);
+  }
+}
+
+// The wide paragraph is spaced from the hero, not glued to a previous section:
+// a white gap would separate two coloured sections
+.home-page-section + .home-page-section.hero-div__dark-section {
+  margin-top: 0;
 }
 
 // Same type as the text of the portals dark section

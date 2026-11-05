@@ -52,6 +52,14 @@ class QuoteBlock(blocks.StructBlock):
 # Homepage ###################################################################
 
 
+BACKGROUND_CHOICES = [("white", "Blanc"), ("grey", "Gris"), ("blue", "Bleu")]
+
+
+def background_block(default):
+    """Background of a homepage section, chosen by the editor"""
+    return blocks.ChoiceBlock(label="Fond", choices=BACKGROUND_CHOICES, default=default)
+
+
 def site_pages(model_name, home):
     """Return the live pages of a model published under the given homepage
 
@@ -157,6 +165,7 @@ class ParagraphBlock(blocks.StructBlock):
         ],
         default="left",
     )
+    background = background_block("blue")
 
     class Meta:
         template = "pages/blocks/home/paragraph.html"
@@ -183,6 +192,7 @@ class CarouselBlock(blocks.StructBlock):
     images = blocks.ListBlock(
         CarouselImageBlock(label="Image"), label="Images", min_num=1
     )
+    background = background_block("white")
 
     class Meta:
         template = "pages/blocks/home/carousel.html"
@@ -203,6 +213,7 @@ class StepsBlock(blocks.StructBlock):
     cards = blocks.ListBlock(
         StepCardBlock(label="Étape"), label="Étapes", min_num=1, max_num=4
     )
+    background = background_block("white")
 
     class Meta:
         template = "pages/blocks/home/steps.html"
@@ -245,6 +256,7 @@ class ShowcasesBlock(blocks.StructBlock):
         default=[],
     )
     more = ShowcaseMoreBlock(label="Encart « voir plus »", required=False)
+    background = background_block("grey")
 
     def clean(self, value):
         cleaned = super().clean(value)
@@ -311,6 +323,7 @@ class NewsBlock(blocks.StructBlock):
         min_num=1,
         max_num=4,
     )
+    background = background_block("blue")
 
     def get_cards(self, value, home):
         allowed = set(site_pages("NewsPage", home).values_list("pk", flat=True))

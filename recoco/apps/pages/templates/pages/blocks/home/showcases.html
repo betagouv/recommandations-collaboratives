@@ -1,6 +1,6 @@
 {% load wagtailimages_tags %}
 {% if cards or value.more.list_page %}
-    <section class="fr-background-alt--grey fr-py-8w">
+    <section class="home-page-section home-page-section--{{ value.background }} fr-py-8w">
         <h2 class="fr-h3 fr-pb-4v text-center">{{ value.title }}</h2>
         <div class="home-page-showcases">
             {% for card in cards %}

@@ -1,6 +1,6 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 {% if value.width == "wide" %}
-    <section class="fr-mx-0 hero-div__dark-section">
+    <section class="home-page-section home-page-section--{{ value.background }} fr-mx-0 hero-div__dark-section">
         <h2>{{ value.title }}</h2>
         {% if value.side_image %}
             <div class="fr-grid-row fr-grid-row--gutters">
@@ -14,7 +14,7 @@
         {% endif %}
     </section>
 {% else %}
-    <section class="fr-background-alt--grey fr-py-4w">
+    <section class="home-page-section home-page-section--{{ value.background }} fr-py-4w">
         <div class="fr-container fr-pt-2w">
             <div class="fr-grid-row fr-grid-row--gutters">
                 {% if value.side_image %}

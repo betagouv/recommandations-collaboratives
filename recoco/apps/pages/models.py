@@ -236,11 +236,13 @@ class HomePage(Page):
             "text": text,
             "width": "wide",
             "alignment": "left",
+            "background": "blue",
         }
 
     def get_placeholder_steps(self, site_name):
         return {
             "title": f"Comment fonctionne {site_name} ?",
+            "background": "grey",
             "cards": [
                 {
                     "icon_url": static(f"home/img/home/{icon}"),
