@@ -11,6 +11,7 @@ import logging
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, Prefetch, Q
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -43,12 +44,13 @@ class IsTaskViewerOrManagerToWrite(permissions.BasePermission):
 
     def has_permission(self, request, view):
         project_id = int(view.kwargs.get("project_id"))
-        project = projects_models.Project.on_site.get(pk=project_id)
+        project = get_object_or_404(projects_models.Project.on_site, pk=project_id)
 
         if request.method in permissions.SAFE_METHODS:
-            return request.user.has_perm(
-                "projects.view_tasks", project
-            ) or request.user.has_perm("sites.list_projects", request.site)
+            return request.user.has_perm("projects.view_tasks", project) or (
+                request.user.has_perm("sites.list_projects", request.site)
+                and project.sites.filter(id=request.site.id).exists()
+            )
 
         return request.user.has_perm("projects.use_tasks", project)
 
