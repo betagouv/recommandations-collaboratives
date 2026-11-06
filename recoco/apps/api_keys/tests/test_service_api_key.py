@@ -6,7 +6,6 @@ from django.contrib.sites.models import Site
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -93,15 +92,13 @@ def test_key_of_another_site_is_rejected(make_key, current_site):
 
 
 @pytest.mark.django_db
-def test_endpoint_accepts_a_valid_key(
-    api_client, make_key, service_account, current_site, make_project
-):
+def test_endpoint_accepts_a_valid_key(api_client, make_key, service_account):
     _, key = make_key()
-    assign_perm("list_projects", service_account, current_site)
 
     response = api_client.get(
-        reverse("projects-detail", args=[make_project().id]),
+        reverse("auth-check"),
         HTTP_AUTHORIZATION=f"Api-Key {key}",
     )
 
     assert response.status_code == 200
+    assert response.json()["id"] == service_account.id

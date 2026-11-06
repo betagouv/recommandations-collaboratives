@@ -21,11 +21,7 @@ DJANGO_DEBUG = True
 ACCOUNT_RATE_LIMITS = False
 ALLOWED_HOSTS = ["localhost", "example.localhost"]
 
-INSTALLED_APPS += (
-    "drf_spectacular",
-    "drf_spectacular_sidecar",
-    "django_extensions",
-)
+INSTALLED_APPS += ("django_extensions",)
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

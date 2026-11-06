@@ -52,18 +52,54 @@ def service_account_key(current_site):
 
 
 @pytest.mark.django_db
-def test_api_key_authenticates_on_an_opted_in_endpoint(
-    api_client, service_account_key, make_project
-):
+def test_auth_check_accepts_a_valid_api_key(api_client, service_account_key):
     service_account, key = service_account_key
-    url = reverse("projects-detail", args=[make_project().id])
 
-    assert api_client.get(url).status_code == 403
-    assert api_client.get(url, HTTP_AUTHORIZATION="Api-Key nope").status_code == 403
+    response = api_client.get(
+        reverse("auth-check"), HTTP_AUTHORIZATION=f"Api-Key {key}"
+    )
 
-    response = api_client.get(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
     assert response.status_code == 200, response.data
     assert response.wsgi_request.user == service_account
+    assert response.json() == {
+        "id": service_account.id,
+        "username": service_account.username,
+    }
+
+
+@pytest.mark.django_db
+def test_auth_check_refuses_anonymous_requests(api_client):
+    assert api_client.get(reverse("auth-check")).status_code == 403
+
+
+@pytest.mark.django_db
+def test_auth_check_refuses_an_invalid_api_key(api_client, service_account_key):
+    response = api_client.get(reverse("auth-check"), HTTP_AUTHORIZATION="Api-Key nope")
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_auth_check_accepts_a_logged_in_user(api_client):
+    user = baker.make(get_user_model())
+    api_client.force_authenticate(user=user)
+
+    response = api_client.get(reverse("auth-check"))
+
+    assert response.status_code == 200
+    assert response.json()["id"] == user.id
+
+
+@pytest.mark.django_db
+def test_api_key_is_refused_on_project_detail(
+    api_client, service_account_key, make_project
+):
+    _, key = service_account_key
+    url = reverse("projects-detail", args=[make_project().id])
+
+    response = api_client.get(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
