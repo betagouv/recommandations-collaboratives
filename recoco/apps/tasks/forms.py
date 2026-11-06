@@ -9,7 +9,7 @@ created : 2021-12-14 10:36:20 CEST
 
 from django import forms
 from django.contrib.sites.models import Site
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from markdownx.fields import MarkdownxFormField
 
 from recoco.apps.addressbook.models import Contact
@@ -111,10 +111,11 @@ class PushTypeActionForm(forms.Form):
 class CreateActionBaseForm(forms.ModelForm):
     """Base form for action creation"""
 
-    topic_name = forms.CharField(required=False)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contact"].queryset = Contact.on_site
 
-    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
-        self.fields["contact"].queryset = contact_queryset
+    topic_name = forms.CharField(required=False)
 
 
 class CreateActionWithoutResourceForm(CreateActionBaseForm):
@@ -126,57 +127,30 @@ class CreateActionWithoutResourceForm(CreateActionBaseForm):
 
 
 class CreateActionWithResourceForm(CreateActionBaseForm):
-    resource = (
-        forms.ModelChoiceField(
-            queryset=resources_models.Resource.objects.exclude(
-                status=resources_models.Resource.DRAFT
-            ).with_ds_annotations()
-        ),
-    )
-
-    content = forms.CharField(required=False)
-
-    def clean_resource(self):
-        resource = self.cleaned_data["resource"]
-
-        try:
-            resource = (
-                resources_models.Resource.on_site.exclude(
-                    status=resources_models.Resource.DRAFT
-                )
-                .with_ds_annotations()
-                .get(pk=resource.pk)
-            )
-        except resources_models.Resource.DoesNotExist:
-            self.add_error(field="resource", error="Cette ressource n'existe pas")
-            raise
-
-        return resource
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["resource"].queryset = resources_models.Resource.on_site.exclude(
+            status=resources_models.Resource.DRAFT
+        ).with_ds_annotations()
 
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public", "resource", "contact"]
 
-
-class CreateTaskForm(forms.ModelForm):
-    """Form new project task creation"""
-
-    # TODO seems to not be used any more
-
-    content = MarkdownxFormField(required=False)
-
-    class Meta:
-        model = models.Task
-        fields = [
-            "intent",
-            "content",
-            "public",
-            "resource",
-        ]
+    resource = forms.ModelChoiceField(
+        queryset=resources_models.Resource.on_site
+    )  # resource is overriden in init
 
 
 class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["resource"].queryset = resources_models.Resource.on_site.exclude(
+            status=resources_models.Resource.DRAFT
+        ).with_ds_annotations()
+        self.fields["contact"].queryset = Contact.on_site
 
     content = MarkdownxFormField(required=False)
     topic_name = forms.CharField(required=False)
@@ -191,9 +165,6 @@ class UpdateTaskForm(forms.ModelForm):
             "public",
             "contact",
         ]
-
-    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
-        self.fields["contact"].queryset = contact_queryset
 
 
 class RemindTaskForm(forms.Form):

@@ -170,6 +170,7 @@ TEMPLATES = [
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
                 "recoco.apps.projects.context_processors.matomo_context_processor",
                 "recoco.apps.home.context_processors.embed",
+                "recoco.apps.home.context_processors.sentry_frontend",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -260,6 +261,9 @@ CONTENT_SECURITY_POLICY = {
             "https://api-adresse.data.gouv.fr/",
             "https://www.google.com",
             "https://stats.beta.gouv.fr",
+            "https://sentry.incubateur.net",
+            "https://storage.crisp.chat",
+            "wss://client.relay.rescue.crisp.chat",  # Fallback if primary WebSocket servers are down
         ],
         "font-src": [SELF, "https://client.crisp.chat/"],
         "frame-ancestors": [SELF],
@@ -274,6 +278,7 @@ CONTENT_SECURITY_POLICY = {
             "https://secure.gravatar.com",
             "https://data.geopf.fr",
             "https://*.tile.openstreetmap.fr",
+            "https://storage.crisp.chat",  # help to display img shared in chat
         ],
         "script-src": [
             SELF,
@@ -282,12 +287,12 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://www.gstatic.com/",
             UNSAFE_EVAL,
-            UNSAFE_INLINE,  # fixme crisp uses this
+            UNSAFE_INLINE,  # fixme
         ],  # fixme with @alpine/csp and manual checks
         "style-src": [
             SELF,
             "https://client.crisp.chat",
-            UNSAFE_INLINE,
+            UNSAFE_INLINE,  # crisp uses this
         ],  # fixme with @alpine/csp and manual checks
         "worker-src": [SELF, "blob:", "https://*.crisp.chat"],
     },
@@ -676,4 +681,16 @@ ACRA_API_TOKEN = os.environ.get("ACRA_API_TOKEN", "")
 MATOMO_URL = os.environ.get("MATOMO_URL", "")
 MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
 
+# Leaflet
+LEAFLET_CONFIG = {
+    "TILES": [
+        (
+            "OSM France",
+            "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
+            {
+                "attribution": '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            },
+        )
+    ],
+}
 # eof

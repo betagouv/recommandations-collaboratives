@@ -16,7 +16,11 @@ from .utils import MappingField, project_mapping_fields
 
 
 class DSResource(TimeStampedModel):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text="Indiquer le nom technique/l'identifiant de la démarche",
+    )
     schema = models.JSONField(default=dict, null=True, blank=True)
     resource = models.ForeignKey(
         Resource, null=True, blank=True, on_delete=models.SET_NULL
@@ -42,7 +46,16 @@ class DSResource(TimeStampedModel):
 
     @property
     def preremplir_url(self) -> str:
+        # https://doc.demarches-simplifiees.fr/pour-aller-plus-loin/api-de-preremplissage#demarrage-rapide
         return urljoin(settings.DS_BASE_URL, f"preremplir/{self.name}/")
+
+    @property
+    def create_prefill_draft_url(self):
+        return urljoin(
+            # https://doc.demarches-simplifiees.fr/pour-aller-plus-loin/api-de-preremplissage#preremplissage-en-post
+            settings.DS_API_BASE_URL,
+            f"demarches/{self.number}/dossiers",
+        )
 
     @property
     def fields(self) -> list[MappingField]:

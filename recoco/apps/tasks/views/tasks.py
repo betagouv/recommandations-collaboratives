@@ -18,7 +18,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
-from recoco.apps.addressbook.models import Contact
 from recoco.apps.demarches_simplifiees.services import create_ds_prefill_link
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.utils import (
@@ -265,9 +264,6 @@ def update_task(request, task_id=None):
 
     if request.method == "POST":
         form = UpdateTaskForm(request.POST, instance=task)
-        form.set_contact_queryset(
-            Contact.objects.filter(site_id=request.site.id),
-        )
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
@@ -320,7 +316,7 @@ def task_generate_ds_prefill(request, task_id):
         return
     has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
-    url = create_ds_prefill_link(task_id)
+    url = create_ds_prefill_link(task)
     if not url:
         messages.error(
             request,

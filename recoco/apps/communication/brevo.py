@@ -116,8 +116,7 @@ class Brevo:
             # when the site defines no sender name, fall back on the default
             # identity configured in the settings
             sender = brevo_sdk.SendSmtpEmailSender(
-                name=sender_name or settings.DEFAULT_SENDER_NAME,
-                email=settings.DEFAULT_SENDER_EMAIL,
+                name=sender_name or settings.DEFAULT_SENDER_NAME
             )
 
             send_smtp_email = brevo_sdk.SendSmtpEmail(

@@ -10,7 +10,6 @@ created : 2021-12-14 10:36:20 CEST
 import nh3
 from django import forms
 from django.db import transaction
-from django.db.models import QuerySet
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 
@@ -75,8 +74,9 @@ class PrivateNoteForm(forms.ModelForm):
         model = models.Note
         fields = ["content", "contact"]
 
-    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
-        self.fields["contact"].queryset = contact_queryset
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contact"].queryset = Contact.on_site
 
 
 ##################################################

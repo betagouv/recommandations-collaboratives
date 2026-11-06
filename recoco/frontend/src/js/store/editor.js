@@ -7,6 +7,7 @@ document.addEventListener('alpine:init', () => {
     currentMessageJSON: '',
     isEditing: false,
     isSubmitted: false,
+    isEditorBusy: false,
     setContent(content) {
       Alpine.raw(this.editorInstance).commands.setContent(content);
     },

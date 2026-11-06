@@ -2,7 +2,6 @@
 
 
 from django import forms
-from django.db.models import QuerySet
 
 from recoco.apps.addressbook.models import Contact
 
@@ -16,5 +15,6 @@ class MessageForm(forms.ModelForm):
         model = models.Message
         fields = ["in_reply_to"]
 
-    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
-        self.fields["contact"].queryset = contact_queryset
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contact"].queryset = Contact.on_site
