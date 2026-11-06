@@ -16,7 +16,11 @@ from .utils import MappingField, project_mapping_fields
 
 
 class DSResource(TimeStampedModel):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text="Indiquer le nom technique/l'identifiant de la démarche",
+    )
     schema = models.JSONField(default=dict, null=True, blank=True)
     resource = models.ForeignKey(
         Resource, null=True, blank=True, on_delete=models.SET_NULL
