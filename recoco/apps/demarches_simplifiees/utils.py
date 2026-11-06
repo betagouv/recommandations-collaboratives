@@ -11,10 +11,12 @@ def hash_data(data: dict[str, Any]) -> str:
 
 @dataclass
 class MappingField:
-    id: str
-    label: str
-    lookup: str | None = None
-    options: list[str] | None = None
+    id: str  # field identifier (often simlified lookup)
+    label: str  # field label to known what it is about
+    lookup: str | None = None  # field lookup on recoco side
+    options: list[str] | None = (
+        None  # the possible values for "choice" fields. collected from ds
+    )
 
 
 project_mapping_fields: list[MappingField] = [
@@ -92,5 +94,8 @@ project_mapping_fields: list[MappingField] = [
         id="project.location",
         label="Localisation",
         lookup="location",
+    ),
+    MappingField(
+        id="project.location_gps", label="Localisation GPS", lookup="location_gps_json"
     ),
 ]

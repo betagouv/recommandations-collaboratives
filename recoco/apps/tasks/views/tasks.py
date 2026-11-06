@@ -320,7 +320,7 @@ def task_generate_ds_prefill(request, task_id):
         return
     has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
-    url = create_ds_prefill_link(task_id)
+    url = create_ds_prefill_link(task)
     if not url:
         messages.error(
             request,
