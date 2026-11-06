@@ -1,0 +1,32 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+{% if value.width == "wide" %}
+    <section class="home-page-section home-page-section--{{ value.background }} fr-mx-0 hero-div__dark-section">
+        <h2>{{ value.title }}</h2>
+        {% if value.side_image %}
+            <div class="fr-grid-row fr-grid-row--gutters">
+                <div class="fr-col-12 fr-col-sm-3 text-center">
+                    {% image value.side_image max-320x320 class="fr-responsive-img specific-maxwidth-160px" %}
+                </div>
+                <div class="fr-col-12 fr-col-sm-9">{% include "pages/blocks/home/_paragraph_text.html" %}</div>
+            </div>
+        {% else %}
+            {% include "pages/blocks/home/_paragraph_text.html" %}
+        {% endif %}
+    </section>
+{% else %}
+    <section class="home-page-section home-page-section--{{ value.background }} fr-py-4w">
+        <div class="fr-container fr-pt-2w">
+            <div class="fr-grid-row fr-grid-row--gutters">
+                {% if value.side_image %}
+                    <div class="fr-col-12 fr-col-sm-3 text-center">
+                        {% image value.side_image max-320x320 class="fr-responsive-img specific-maxwidth-160px" %}
+                    </div>
+                {% endif %}
+                <div class="fr-col-12{% if value.side_image %} fr-col-sm-9{% endif %}">
+                    <h2 class="fr-h3">{{ value.title }}</h2>
+                    {% include "pages/blocks/home/_paragraph_text.html" %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endif %}

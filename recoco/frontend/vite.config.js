@@ -176,6 +176,9 @@ const config = {
         homeAuthStyles: resolve('./src/js/styles/home-auth.css.js'),
         homePrivacyStyles: resolve('./src/js/styles/home-privacy.css.js'),
         homeActorsStyles: resolve('./src/js/styles/home-actors.css.js'),
+        homeCmsPageHomeStyles: resolve(
+          './src/js/styles/home-cms-page-home.css.js'
+        ),
         homeCmsPageTextStyles: resolve(
           './src/js/styles/home-cms-page-text.css.js'
         ),
