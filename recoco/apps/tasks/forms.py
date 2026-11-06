@@ -137,6 +137,10 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
         model = models.Task
         fields = ["intent", "content", "public", "resource", "contact"]
 
+    resource = forms.ModelChoiceField(
+        queryset=resources_models.Resource.on_site
+    )  # resource is overriden in init
+
 
 class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
