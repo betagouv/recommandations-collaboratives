@@ -15,8 +15,8 @@
     min-width: 18.75rem;
     border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
     position: sticky;
-    height: calc(100vh - var(--height-header-nav));
-    top: var(--height-header-nav);
+    height: calc(100vh - 128px);
+    top: 128px;
 
     // overflow-y: auto;
     overflow-y: hidden;
