@@ -104,7 +104,9 @@
         <div class="col-8 fr-px-6w fr-mx-auto font-marianne" id="resource-main">
             {% include "resources/resource/fragments/flag.html" %}
             <div class="d-flex justify-content-center gap-2 fr-mb-3w" id="resource-details">
-                {% include "resources/resource/fragments/category_list.html" %}
+                {% if resource.category %}
+                    {% include "resources/resource/fragments/category_list.html" %}
+                {% endif %}
                 {% include "resources/resource/fragments/resource-updated-date.html" %}
             </div>
             {% include "resources/resource/fragments/resource_content.html" with resource=resource contacts=contacts %}
