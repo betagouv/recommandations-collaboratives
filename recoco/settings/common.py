@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     "django_json_widget",
     "waffle",
     "django_htmx",
+    "plugin_mi_depafi",
 ]
 
 SITE_ID = SiteID(default=1)
