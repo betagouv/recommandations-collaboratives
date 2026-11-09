@@ -2,10 +2,10 @@
     <span>
         Cette ressource est disponible dans les départements suivants :
     </span>
-    <ul class="d-flex flex-wrap list-unstyled">
+    <ul>
         {% for department in resource.departments.all %}
             <li class="fr-mx-1v">
-                - {{ department.name }}
+                {{ department.name }}
             </li>
         {% endfor %}
     </ul>
