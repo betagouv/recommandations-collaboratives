@@ -108,15 +108,6 @@
                 {% include "resources/resource/fragments/resource-updated-date.html" %}
             </div>
             {% include "resources/resource/fragments/resource_content.html" with resource=resource contacts=contacts %}
-            {% comment %}
-                <div class="bd-callout">
-                    <svg class="bi fr-mr-2v align-middle" width="24" height="24">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill" />
-                    </svg>
-                    &nbsp;
-                    Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'">nous interpeller</a>.
-                </div>
-            {% endcomment %}
         </div>
         <div class="col-4 fr-mx-auto" id="resource-footer">
             <!-- Sidebar -->
