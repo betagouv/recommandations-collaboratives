@@ -116,11 +116,12 @@ INSTALLED_APPS = [
     "django_json_widget",
     "waffle",
     "django_htmx",
+    "plugin_mi_depafi",
 ]
 
 SITE_ID = SiteID(default=1)
 
-DATABASE_ROUTERS = ["recoco.apps.plugins.routers.TenantPluginRouter"]
+DATABASE_ROUTERS = ["recoco.apps.plugins.routers.PluginRouter"]
 
 SILENCED_SYSTEM_CHECKS = [
     "sites.E101"  # Check to ensure SITE_ID is an int - ours is an object
@@ -133,7 +134,7 @@ MIDDLEWARE = [
     "multisite.middleware.DynamicSiteMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
-    "recoco.apps.plugins.middlewares.TenantPluginSchemaMiddleware",
+    "recoco.apps.plugins.middlewares.TenantPluginsMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -345,6 +346,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Technical sender address, shared by every site (must be a verified sender on
 # Brevo). The displayed name comes from SiteConfiguration.sender_name.
 DEFAULT_SENDER_EMAIL = "ne-pas-repondre@recoconseil.fr"
+BREVO_SENDER_EMAIL = "noreply@recoconseil.fr"
 # Displayed name used when the site has no SiteConfiguration, or no sender_name
 DEFAULT_SENDER_NAME = "Recoco"
 DEFAULT_FROM_EMAIL = f"{DEFAULT_SENDER_NAME} <{DEFAULT_SENDER_EMAIL}>"

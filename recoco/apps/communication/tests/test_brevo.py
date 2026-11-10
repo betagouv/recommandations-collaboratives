@@ -59,6 +59,7 @@ def test_brevo_send_email_uses_given_sender_name(mocker, client):
 
     send_smtp_email = brevo.api_instance.send_transac_email.call_args.args[0]
     assert send_smtp_email.sender.name == "My Site"
+    assert send_smtp_email.sender.email == settings.BREVO_SENDER_EMAIL
 
 
 def test_brevo_send_email_without_sender_name_uses_default_sender(mocker, client):
@@ -74,6 +75,7 @@ def test_brevo_send_email_without_sender_name_uses_default_sender(mocker, client
 
     send_smtp_email = brevo.api_instance.send_transac_email.call_args.args[0]
     assert send_smtp_email.sender.name == settings.DEFAULT_SENDER_NAME
+    assert send_smtp_email.sender.email == settings.BREVO_SENDER_EMAIL
 
 
 def test_brevo_send_test_email(mocker, client):
