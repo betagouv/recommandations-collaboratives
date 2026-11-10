@@ -27,7 +27,9 @@
                             <span class="text-info-custom text-grey-dark fr-mb-2v fr-pl-2v">{{ date|naturalday|capfirst }}</span>
                             <div class="activity-stream-actions-container d-flex flex-column">
                                 {% for action in actions %}
+                                {% with hide_project_name=True %}
                                     {% display_action action %}
+                                {% endwith %}
                                 {% endfor %}
                             </div>
                         </li>
