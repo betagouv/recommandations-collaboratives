@@ -1,3 +1,7 @@
+from datetime import timedelta
+
+from django.contrib.auth.models import update_last_login
+from django.utils import timezone
 from rest_framework import authentication, exceptions
 from rest_framework.settings import api_settings
 
@@ -40,7 +44,12 @@ class ServiceAPIKeyAuthentication(authentication.BaseAuthentication):
         if api_key.has_expired or api_key.site_id != request.site.id:
             raise exceptions.AuthenticationFailed(self.invalid_key_message)
 
-        return api_key.user, api_key
+        user = api_key.user
+        # mirror a regular login, at most once per hour to avoid a write per request
+        if not user.last_login or user.last_login < timezone.now() - timedelta(hours=1):
+            update_last_login(None, user)
+
+        return user, api_key
 
     def authenticate_header(self, request):
         return self.keyword

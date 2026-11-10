@@ -104,3 +104,57 @@ def test_endpoint_accepts_a_valid_key(api_client, make_key, service_account):
 
     assert response.status_code == 200
     assert response.json()["id"] == service_account.id
+
+
+@pytest.mark.django_db
+def test_valid_key_updates_last_login(make_key, service_account, current_site):
+    _, key = make_key()
+    assert service_account.last_login is None
+
+    ServiceAPIKeyAuthentication().authenticate(
+        make_request(current_site, f"Api-Key {key}")
+    )
+
+    service_account.refresh_from_db()
+    assert service_account.last_login is not None
+
+
+@pytest.mark.django_db
+def test_last_login_is_updated_at_most_once_per_hour(
+    make_key, service_account, current_site
+):
+    _, key = make_key()
+    recent = timezone.now() - timedelta(minutes=10)
+    service_account.last_login = recent
+    service_account.save()
+
+    ServiceAPIKeyAuthentication().authenticate(
+        make_request(current_site, f"Api-Key {key}")
+    )
+    service_account.refresh_from_db()
+    assert service_account.last_login == recent
+
+    old = timezone.now() - timedelta(hours=2)
+    service_account.last_login = old
+    service_account.save()
+
+    ServiceAPIKeyAuthentication().authenticate(
+        make_request(current_site, f"Api-Key {key}")
+    )
+    service_account.refresh_from_db()
+    assert service_account.last_login > old
+
+
+@pytest.mark.django_db
+def test_rejected_key_does_not_update_last_login(
+    make_key, service_account, current_site
+):
+    make_key()
+
+    with pytest.raises(AuthenticationFailed):
+        ServiceAPIKeyAuthentication().authenticate(
+            make_request(current_site, "Api-Key not.a-valid-key")
+        )
+
+    service_account.refresh_from_db()
+    assert service_account.last_login is None
