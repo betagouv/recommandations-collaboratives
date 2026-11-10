@@ -1,14 +1,16 @@
-{% load activity_tags %}
-
 <ul class="hide-ul-style fr-mt-1w {% if not wrap %}w-100{% endif %}">
     {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
     {% for date_group in actions_by_date %}
         <li class="timeline__date">le {{ date_group.grouper }}</li>
         {% for action in date_group.list %}
             {% with font_size_class="font-size-12px" %}
-                {% display_action action %}
+                {% include "actstream/action.html" %}
             {% endwith %}
         {% endfor %}
+    {% empty %}
+    <p>
+        Aucune activité pour le moment
+    </p>
     {% endfor %}
 </ul>
 {% if not no_explain_trunc %}
