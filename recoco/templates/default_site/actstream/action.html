@@ -10,6 +10,7 @@
 
 {% get_verbs as verbs %}
 {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% comment %} TODO filter verbs.CRM.NOTE_CREATED in view instead of in template {% endcomment %}
 {% if action.verb != verbs.CRM.NOTE_CREATED or 'use_crm' in user_site_perms %}
     <div class="fr-mb-2v">
         <!-- User -->
