@@ -61,6 +61,8 @@ def test_some_views_are_opted_in():
 @pytest.fixture
 def rightless_key(current_site):
     user = baker.make(User, is_active=True)
+    user.profile.is_bot = True
+    user.profile.save()
     _, key = ServiceAPIKey.objects.create_key(
         name="svc-rightless", user=user, site=current_site
     )

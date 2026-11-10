@@ -44,6 +44,8 @@ def test_obtain_token(client, request):
 def service_account_key(current_site):
     service_account = baker.make(get_user_model(), is_active=True)
     service_account.profile.sites.add(current_site)
+    service_account.profile.is_bot = True
+    service_account.profile.save()
     assign_perm("list_projects", service_account, current_site)
     _, key = ServiceAPIKey.objects.create_key(
         name="svc-test", user=service_account, site=current_site

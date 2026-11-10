@@ -24,6 +24,8 @@ def make_request(site, header):
 def service_account(current_site):
     user = baker.make(User, is_active=True)
     user.profile.sites.add(current_site)
+    user.profile.is_bot = True
+    user.profile.save()
     return user
 
 
