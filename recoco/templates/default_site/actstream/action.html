@@ -11,14 +11,16 @@
 {% get_verbs as verbs %}
 {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 {% if action.verb != verbs.CRM.NOTE_CREATED or 'use_crm' in user_site_perms %}
-    <div class="d-flex align-items-center fr-mb-2v">
+    <div class="fr-mb-2v">
         <!-- User -->
         {% if action.actor %}
+        <span class="d-inline-flex align-middle">
             {% include "user/user_card.html" with user=action.actor show_organization=True font_size_class=font_size_class|default:"font-very-small" %}
+        </span>
         {% else %}
             <span class="actor">(compte supprimé)</span>
         {% endif %}
-        <div class="fr-ml-1v {{ font_size_class|default:'font-very-small' }}"
+        <div class="d-inline {{ font_size_class|default:'font-very-small' }}"
              data-test-id="project-activity-notification">
             <span class="text-grey-dark fw-light">
                 {% if action.verb == verbs.Project.INVITATION and action.action_object.role %}
