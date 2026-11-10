@@ -23,3 +23,13 @@ class ServiceAPIKeyAdmin(APIKeyModelAdmin):
     list_select_related = ("user", "site")
     search_fields = ("name", "prefix", "user__username", "user__email")
     raw_id_fields = ("user",)
+
+    # read-only: keys are never created, edited or deleted from the admin
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
