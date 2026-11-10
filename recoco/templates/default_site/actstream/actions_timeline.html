@@ -1,4 +1,4 @@
-<ul class="hide-ul-style fr-mt-1w {% if not wrap %}w-100{% endif %}">
+<ul class="hide-ul-style fr-mt-1w w-100">
     {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
     {% for date_group in actions_by_date %}
         <li class="timeline__date">le {{ date_group.grouper }}</li>
@@ -7,12 +7,13 @@
                 {% include "actstream/action.html" %}
             {% endwith %}
         {% endfor %}
-    {% empty %}
+    {% endfor %}
+</ul>
+{% if actions.count == 0 %}
     <p>
         Aucune activité pour le moment
     </p>
-    {% endfor %}
-</ul>
+{% endif %}
 {% if not no_explain_trunc %}
 <p class="fr-mt-3w">
     <span class="fr-icon-information-fill" aria-hidden="true"></span> Il est possible que des activités plus anciennes ne soient pas affichées ici.
