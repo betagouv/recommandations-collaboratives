@@ -41,9 +41,6 @@
                                     vous a <span class="notification__verb--highlight"
        x-text="getSummaryNotification({{ notification.pk }})"></span>
                                 </span>
-                                <span class="notification__project">
-                                    <span class="notification__verb--no-margin">dans le dossier</span> {{ notification.target }}
-                                </span>
                             </div>
                         {% else %}
                             <div class="notification__verb">{{ notification.verb }}</div>
