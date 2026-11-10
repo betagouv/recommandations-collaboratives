@@ -1,0 +1,4 @@
+<strong class="text-dark fw-bold">a envoyé</strong>
+<a class="d-inline {% if underlined_link %}fr-link--underline{% else %}hover-underline{% endif %} text-dark"
+   href="{{ action.action_object.get_absolute_url }}">{{ action.action_object.feed_label|default:"un message" }}</a>
+{% if action.verb == verbs.Conversation.PRIVATE_MESSAGE %}dans l'espace conseillers{% endif %}

@@ -1,0 +1,14 @@
+{% load polymorphic_formset_tags %}
+
+<strong class="text-dark fw-bold">{{ action.verb }}</strong>
+<a class="d-inline {% if underlined_link %}fr-link--underline{% else %}hover-underline{% endif %} text-dark"
+   href="{{ action.action_object.get_absolute_url }}">{{ action.action_object.title|default:"sans intitulé" }}</a>
+{% if action.target|as_model_name == "user" %}
+    sur
+    <span class="d-inline-flex align-middle">
+        {% include "user/user_card.html" with user=action.target show_organization=True font_size_class="font-very-small" %}
+    </span>
+{% elif action.target|as_model_name == "organization" %}
+    sur <a class="d-inline {% if underlined_link %}fr-link--underline{% else %}hover-underline{% endif %} text-dark"
+    href="{% url 'crm-organization-details' action.target.pk %}">{{ action.target.name }}</a>
+{% endif %}

@@ -1,55 +1,67 @@
-{# Activity notification template used in a Projects's CRM activity stream and Project Overview activity stream #}
-{% load i18n %}
-{% load static %}
+{% comment %}
+    Parameters:
+    - hide_project_name
+    - font_size_class
+    - underlined_link
+{% endcomment %}
 {% load common_tags %}
+{% load polymorphic_formset_tags %}
+{% load guardian_tags %}
+
 {% get_verbs as verbs %}
-<div class="d-flex align-items-center fr-mb-2v">
-  <img
-    class="fr-mt-1v align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
-    width="18px"
-    :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
-    data-gravatar-key="{{ action.actor }}-18"
-    data-bs-toggle="tooltip"
-    data-bs-placement="bottom"
-    tabindex="0">
-  <div class="fr-mt-1v fr-ml-1v font-very-small"
-       data-test-id="project-activity-notification">
-        <span class="text-grey-dark fw-light">
-            <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
-              {{ action.actor.last_name|default:"" }}</strong>
-            <span
-              class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization.name|default:'' }}</span>
-            <span class="d-inline-block">
-                <span class="d-inline">
-                    {% if action.verb == verbs.Project.INVITATION %}
-                      {% if action.action_object.role %}
-                        <span>a invité
-                                <strong
-                                  class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
-                                <strong class="text-dark">
-                                    {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
-                                      conseiller·e
-                                    {% else %}
-                                      demandeur ou partenaire
-                                    {% endif %}
-                                </strong>
+{% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
+{% if action.verb != verbs.CRM.NOTE_CREATED or 'use_crm' in user_site_perms %}
+    <div class="d-flex align-items-center fr-mb-2v">
+        <!-- User -->
+        {% if action.actor %}
+            {% include "user/user_card.html" with user=action.actor show_organization=True font_size_class=font_size_class|default:"font-very-small" %}
+        {% else %}
+            <span class="actor">(compte supprimé)</span>
+        {% endif %}
+        <div class="fr-ml-1v {{ font_size_class|default:'font-very-small' }}"
+             data-test-id="project-activity-notification">
+            <span class="text-grey-dark fw-light">
+                {% if action.verb == verbs.Project.INVITATION and action.action_object.role %}
+                    <!--Exception INVITATION-->
+                    {% include "actstream/fragments/invitation.html" %}
+                {% elif action.verb == verbs.Conversation.POST_MESSAGE or action.verb == verbs.Conversation.PRIVATE_MESSAGE or action.verb == verbs.Conversation.PUBLIC_MESSAGE %}
+                    <!--Exception MESSAGE-->
+                    {% include "actstream/fragments/message.html" %}
+                {% elif action.verb == verbs.CRM.NOTE_CREATED %}
+                    <!--Exception NOTE CREATED-->
+                    {% include "actstream/fragments/crm_note.html" %}
+                {% else %}
+
+                    <!-- Verb -->
+                    <strong class="text-dark fw-bold">{{ action.verb }}</strong>
+
+                    <!-- Complement -->
+                    {% if action.action_object != action.target %}
+                        {% if action.action_object|as_model_name == "user" %}
+                            <span class="d-inline-flex align-middle">
+                                {% include "user/user_card.html" with user=action.action_object show_organization=True font_size_class=font_size_class|default:"font-very-small" user_activity=True %}
                             </span>
-                      {% endif %}
-                    {% else %}
-                      <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
-                         href="{{ action.action_object.get_absolute_url }}">{{ action.verb }}</a>
-                      {% if action.action_object.feed_label %}
-                        {{ action.action_object.feed_label }}
-                      {% elif action.action_object.email %}
-                        {{ action.action_object.first_name|default:action.actor.email }} {{ action.action_object.last_name|default:"" }}
-                        <span
-                          class="fw-normal font-italic">{{ action.action_object.profile.organization.name|default:'' }}</span>
-                      {% endif %}
-                      {% if action.description %}
-                        <div class="d-inline-block">{{ action.description }}</div>{% endif %}
+                        {% elif action.action_object.feed_label %}
+                            {% if action.action_object.get_absolute_url %}
+                                <a class="d-inline {% if underlined_link %}fr-link--underline{% else %}hover-underline{% endif %} text-dark"
+                                   href="{{ action.action_object.get_absolute_url }}">{{ action.action_object.feed_label }}</a>
+                            {% else %}
+                                {{ action.action_object.feed_label }}
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
-                </span>
+                {% endif %}
+
+                <!-- Project name -->
+                {% if not hide_project_name and action.target|as_model_name == "project" %}
+                    {% if action.action_object and action.action_object != action.target %}dans le dossier{% endif %}
+                    <a class="d-inline {% if underlined_link %}fr-link--underline{% else %}hover-underline{% endif %} text-dark"
+                       href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                {% endif %}
+
+                <!-- Description additionnal content -->
+                {% if action.description %}<div class="d-inline-block">{{ action.description }}</div>{% endif %}
             </span>
-        </span>
-  </div>
-</div>
+        </div>
+    </div>
+{% endif %}
