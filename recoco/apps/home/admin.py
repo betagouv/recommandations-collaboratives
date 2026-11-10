@@ -18,6 +18,7 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = "Profile"
     fk_name = "user"
+    readonly_fields = ("is_bot",)
 
 
 class IsMultipleSiteFilter(admin.SimpleListFilter):
@@ -48,6 +49,7 @@ class CustomUserAdmin(UserAdmin):
         "first_name",
         "last_name",
         "is_staff",
+        "is_bot",
         "organization",
         "sites",
     )
@@ -61,6 +63,7 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "is_superuser",
         "is_active",
+        "profile__is_bot",
         IsMultipleSiteFilter,
         "groups",
         "profile__sites",
@@ -76,6 +79,10 @@ class CustomUserAdmin(UserAdmin):
             .prefetch_related("profile__sites")
             .select_related("profile__organization")
         )
+
+    @admin.display(description="Bot", boolean=True)
+    def is_bot(self, instance):
+        return instance.profile.is_bot
 
     @admin.display(description="Organization")
     def organization(self, instance):
