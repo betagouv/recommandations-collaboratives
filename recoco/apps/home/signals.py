@@ -9,6 +9,7 @@ import re
 
 import sentry_sdk
 from actstream import action
+from allauth.account.models import EmailAddress
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
@@ -16,7 +17,7 @@ from django.contrib.auth.models import Group, User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Exists, OuterRef, Subquery, Value
-from django.db.models.signals import m2m_changed, pre_save
+from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 
 from recoco import verbs
@@ -59,6 +60,25 @@ def watch_organisation_to_understand_mystery(instance: UserProfile, **kwargs):
         )
         sentry_sdk.capture_exception(Exception(text))
         print(text)
+
+
+@receiver(post_save, sender=UserProfile)
+def disable_human_login_for_bots(sender, instance: UserProfile, **kwargs):
+    """A bot only authenticates with an API key: no password, no email.
+
+    Without an email, login by code, password reset and ProConnect
+    cannot reach the account either.
+    """
+    if not instance.is_bot:
+        return
+
+    user = instance.user
+    if user.has_usable_password() or user.email:
+        user.set_unusable_password()
+        user.email = ""
+        user.save(update_fields=["password", "email"])
+
+    EmailAddress.objects.filter(user=user).delete()
 
 
 @receiver(m2m_changed, sender=User.groups.through)
