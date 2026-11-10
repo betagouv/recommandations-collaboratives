@@ -3,7 +3,7 @@
 {% load common_tags %}
 {% comment %} {{ grouped_notifications|json_script:"notifications" }} {% endcomment %}
 {% get_verbs as verbs %}
-<div class="" id="user-tools-main-menu-notifications">
+<div id="user-tools-main-menu-notifications">
     <ul class="dropdown-menu notifications fr-mt-0">
         <li>
             {% if unread_notifications_count > 0 %}
