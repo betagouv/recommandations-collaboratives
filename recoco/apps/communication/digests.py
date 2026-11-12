@@ -290,7 +290,7 @@ def make_digest_of_project_recommendations_from_notifications(
     actions = [notification.action_object for notification in project_notifications]
 
     # Display not visited first
-    actions.sort(key=lambda action: action.visited, reverse=True)
+    actions.sort(key=lambda action: action.visited)
 
     return make_digest_of_project_recommendations(project, actions, user)
 
@@ -407,6 +407,7 @@ def make_action_digest(action, user):
 ########################################################################
 
 
+# todo dead code
 def send_digests_for_new_sites_by_user(user, dry_run=False):
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
@@ -493,6 +494,7 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
+        .unread()
         .filter(verb=verbs.Conversation.POST_MESSAGE, target_object_id=project.id)
     )
     # Messages made only of nodes of plugins the site has not enabled are left
@@ -740,6 +742,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
 
     return send_digest_by_user(
         user,
+        dry_run=dry_run,
         template_name=communication_constants.TPL_DIGEST_FOR_NON_SWITCHTENDER,
         queryset=queryset,
     )

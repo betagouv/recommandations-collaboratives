@@ -1,6 +1,5 @@
 import logging
 
-import sentry_sdk
 import sib_api_v3_sdk as brevo_sdk
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -143,7 +142,8 @@ class Brevo:
                 print(
                     f"error sending email to users {','.join(str(recipient.id) for recipient in recipients if hasattr(recipient, 'id'))}"
                 )
-                sentry_sdk.capture_exception(e)
+                # sentry_sdk.capture_exception(e)
+                raise e
 
     def get_emails_from_transactionid(self, transaction_id):
         return self.api_instance.get_transac_emails_list(message_id=transaction_id)
