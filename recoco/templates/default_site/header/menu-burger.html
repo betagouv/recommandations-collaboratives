@@ -29,6 +29,7 @@
                         </a>
                     </li>
                     {% include "header/menu-top-secondary-left.html" %}
+                    {% if user.is_authenticated or not request.site_config or request.site_config.public_resources %}
                     <li>
                         <a href="{% url 'resources-resource-search' %}"
                            class="responsive-header__element-mobile fr-link fr-nav__link"
@@ -37,6 +38,7 @@
                             <span class="align-middle">Ressources</span>
                         </a>
                     </li>
+                    {% endif %}
                     {% include "header/menu-top-secondary-right.html" %}
                 </ul>
             </div>

@@ -367,6 +367,17 @@ class SiteConfiguration(models.Model):
         verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
 
+    public_resources = models.BooleanField(
+        default=True,
+        verbose_name="Ressources publiques",
+        help_text=(
+            "Si cette option est activée, les ressources publiées sont visibles par "
+            "tous les visiteurs, y compris non connectés, et peuvent être indexées "
+            "par les moteurs de recherche. Sinon, seuls les utilisateurs connectés "
+            "peuvent les consulter."
+        ),
+    )
+
     enabled_plugins = models.JSONField(
         default=list,
         blank=True,

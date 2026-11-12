@@ -71,6 +71,7 @@ class SiteConfigurationForm(forms.ModelForm):
             "crm_available_tags",
             "reminder_interval",
             "accept_handover",
+            "public_resources",
             "crisp_token",
         ]
 

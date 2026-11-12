@@ -2,14 +2,14 @@
 {% wagtail_site as current_site %}
 {% url 'home' as home_url %}
 
-{% if user.is_authenticated == False %}
+{% if user.is_authenticated == False %}{% if not request.site_config or request.site_config.public_resources %}
     <li class="fr-nav__item">
         <a type="link"
         href="{% url 'resources-resource-search' %}"
         class="fr-nav__link"
         {% if url_name == 'resources-resource-search' %}aria-current="page"{% endif %}>Ressources</a>
     </li>
-{% endif %}
+{% endif %}{% endif %}
 {% include "header/submenu_static_link.html" %}
 {% for menuitem in current_site.root_page.get_children.live.in_menu %}
     <li class="fr-nav__item">
