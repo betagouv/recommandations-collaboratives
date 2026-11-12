@@ -742,6 +742,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
 
     return send_digest_by_user(
         user,
+        dry_run=dry_run,
         template_name=communication_constants.TPL_DIGEST_FOR_NON_SWITCHTENDER,
         queryset=queryset,
     )
