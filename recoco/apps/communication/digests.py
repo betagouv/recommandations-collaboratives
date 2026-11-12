@@ -494,6 +494,7 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
+        .unread()
         .filter(verb=verbs.Conversation.POST_MESSAGE, target_object_id=project.id)
     )
     # Messages made only of nodes of plugins the site has not enabled are left
