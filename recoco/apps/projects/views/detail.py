@@ -419,6 +419,7 @@ def project_create_or_update_topics(request, project_id=None):
                     sender=request.user,
                     verb=verbs.Project.UPDATE_ADVISORS_NOTE,
                     action_object=project,
+                    target=project,
                 )
 
                 notify_advisors_of_project(
@@ -427,6 +428,7 @@ def project_create_or_update_topics(request, project_id=None):
                         "sender": request.user,
                         "verb": verbs.Project.UPDATE_ADVISORS_NOTE,
                         "action_object": project,
+                        "target": project,
                     },
                     exclude=request.user,
                 )
