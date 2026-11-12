@@ -407,6 +407,7 @@ def make_action_digest(action, user):
 ########################################################################
 
 
+# todo dead code
 def send_digests_for_new_sites_by_user(user, dry_run=False):
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
