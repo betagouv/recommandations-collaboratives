@@ -1,0 +1,21 @@
+<ul class="hide-ul-style fr-mt-1w w-100">
+    {% regroup actions by timestamp|date:"j F Y" as actions_by_date %}
+    {% for date_group in actions_by_date %}
+        <li class="timeline__date">le {{ date_group.grouper }}</li>
+        {% for action in date_group.list %}
+            {% with font_size_class="font-size-12px" %}
+                {% include "actstream/action.html" %}
+            {% endwith %}
+        {% endfor %}
+    {% endfor %}
+</ul>
+{% if actions.count == 0 %}
+    <p>
+        Aucune activité pour le moment
+    </p>
+{% endif %}
+{% if not no_explain_trunc %}
+<p class="fr-mt-3w">
+    <span class="fr-icon-information-fill" aria-hidden="true"></span> Il est possible que des activités plus anciennes ne soient pas affichées ici.
+</p>
+{% endif %}
