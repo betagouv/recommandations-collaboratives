@@ -103,6 +103,7 @@ constraint-dependencies = [
     "jupyterlab>=4.6.2",
     "jupyter-server>=2.21.0",
     "oauthlib>=4.0.1",
+    "paramiko>=5.0.0",
     "pillow==13.0.0",
     "pillow-heif==1.3.0",
     "redis==5.0.4",
