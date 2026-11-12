@@ -14,7 +14,7 @@ def create_trusted_bot_groups(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0051_advisors_login_required"),
+        ("home", "0052_remove_siteconfiguration_schema_name"),
     ]
 
     operations = [
