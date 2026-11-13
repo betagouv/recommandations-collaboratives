@@ -180,6 +180,13 @@ class UserProfile(models.Model):
 
     requires_2fa = models.BooleanField(default=False)
 
+    is_bot = models.BooleanField(
+        default=False,
+        editable=False,
+        verbose_name="compte de service (bot)",
+        help_text="Compte technique utilisé pour les accès machine-à-machine",
+    )
+
     class Meta:
         verbose_name = "profil utilisateur"
         verbose_name_plural = "profils utilisateurs"

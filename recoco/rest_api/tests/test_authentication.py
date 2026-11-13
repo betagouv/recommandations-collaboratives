@@ -3,7 +3,10 @@ import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
+
+from recoco.apps.api_keys.models import ServiceAPIKey
 
 
 @pytest.mark.django_db
@@ -35,3 +38,100 @@ def test_obtain_token(client, request):
     assert decoded_token["first_name"] == "Anakin"
     assert decoded_token["last_name"] == "Skywalker"
     assert decoded_token["email"] == "anakin.skywalker@example.com"
+
+
+@pytest.fixture
+def service_account_key(current_site):
+    service_account = baker.make(get_user_model(), is_active=True)
+    service_account.profile.sites.add(current_site)
+    service_account.profile.is_bot = True
+    service_account.profile.save()
+    assign_perm("list_projects", service_account, current_site)
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-test", user=service_account, site=current_site
+    )
+    return service_account, key
+
+
+@pytest.mark.django_db
+def test_auth_check_accepts_a_valid_api_key(api_client, service_account_key):
+    service_account, key = service_account_key
+
+    response = api_client.get(
+        reverse("auth-check"), HTTP_AUTHORIZATION=f"Api-Key {key}"
+    )
+
+    assert response.status_code == 200, response.data
+    assert response.wsgi_request.user == service_account
+    assert response.json() == {
+        "id": service_account.id,
+        "username": service_account.username,
+    }
+
+
+@pytest.mark.django_db
+def test_auth_check_refuses_anonymous_requests(api_client):
+    assert api_client.get(reverse("auth-check")).status_code == 403
+
+
+@pytest.mark.django_db
+def test_auth_check_refuses_an_invalid_api_key(api_client, service_account_key):
+    response = api_client.get(reverse("auth-check"), HTTP_AUTHORIZATION="Api-Key nope")
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_auth_check_accepts_a_logged_in_user(api_client):
+    user = baker.make(get_user_model())
+    api_client.force_authenticate(user=user)
+
+    response = api_client.get(reverse("auth-check"))
+
+    assert response.status_code == 200
+    assert response.json()["id"] == user.id
+
+
+@pytest.mark.django_db
+def test_api_key_is_refused_on_project_detail(
+    api_client, service_account_key, make_project
+):
+    _, key = service_account_key
+    url = reverse("projects-detail", args=[make_project().id])
+
+    response = api_client.get(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_api_key_is_refused_on_endpoints_without_the_mixin(
+    api_client, service_account_key
+):
+    _, key = service_account_key
+
+    response = api_client.get(
+        reverse("challenge-definitions-list"), HTTP_AUTHORIZATION=f"Api-Key {key}"
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_api_key_gives_access_to_the_openapi_schema(api_client, service_account_key):
+    _, key = service_account_key
+    url = reverse("schema")
+
+    assert api_client.get(url).status_code == 403
+
+    response = api_client.get(url, HTTP_AUTHORIZATION=f"Api-Key {key}")
+
+    assert response.status_code == 200, response.data
+    assert response["Content-Type"].startswith("application/vnd.oai.openapi")
+
+
+@pytest.mark.django_db
+def test_openapi_schema_is_readable_by_a_logged_in_user(api_client):
+    api_client.force_authenticate(user=baker.make(get_user_model()))
+
+    assert api_client.get(reverse("schema")).status_code == 200

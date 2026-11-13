@@ -281,3 +281,47 @@ def test_ensure_2fa_post_clear_forward_clears_2fa(group_suffix):
     user.groups.clear()
     user.profile.refresh_from_db()
     assert not user.profile.requires_2fa
+
+
+@pytest.mark.django_db
+def test_becoming_a_bot_disables_password_and_email():
+    user = baker.make(auth_models.User, email="bot@example.com")
+    user.set_password("secret")
+    user.save()
+    baker.make("account.EmailAddress", user=user, email=user.email, verified=True)
+
+    user.profile.is_bot = True
+    user.profile.save()
+
+    user.refresh_from_db()
+    assert not user.has_usable_password()
+    assert user.email == ""
+    assert not user.emailaddress_set.exists()
+
+
+@pytest.mark.django_db
+def test_human_keeps_password_and_email():
+    user = baker.make(auth_models.User, email="human@example.com")
+    user.set_password("secret")
+    user.save()
+    baker.make("account.EmailAddress", user=user, email=user.email, verified=True)
+
+    user.profile.organization_position = "maire"
+    user.profile.save()
+
+    user.refresh_from_db()
+    assert user.check_password("secret")
+    assert user.email == "human@example.com"
+    assert user.emailaddress_set.exists()
+
+
+@pytest.mark.django_db
+def test_bot_cannot_login_with_its_former_password(client):
+    user = baker.make(auth_models.User, username="bot", email="bot@example.com")
+    user.set_password("secret")
+    user.save()
+
+    user.profile.is_bot = True
+    user.profile.save()
+
+    assert not client.login(username="bot", password="secret")  # noqa: S106

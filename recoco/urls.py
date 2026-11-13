@@ -13,6 +13,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
@@ -36,6 +37,7 @@ admin.site.login = secure_admin_login(admin.site.login)
 
 urlpatterns = [
     path("api/", include(rest_api_urls)),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
@@ -62,14 +64,12 @@ urlpatterns.extend(hitcount_urls)
 if settings.DEBUG:
     import debug_toolbar
     from drf_spectacular.views import (
-        SpectacularAPIView,
         SpectacularRedocView,
         SpectacularSwaggerView,
     )
 
     urlpatterns += [
         path(r"__debug__/", include(debug_toolbar.urls)),
-        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
         path(
             "api/schema/swagger-ui/",
             SpectacularSwaggerView.as_view(url_name="schema"),
