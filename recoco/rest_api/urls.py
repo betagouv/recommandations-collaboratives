@@ -128,6 +128,16 @@ api_urls = [
         projects_rest.ProjectList.as_view(),
         name="projects-list",
     ),
+    path(
+        "projects/create/",
+        projects_rest.ProjectCreate.as_view(),
+        name="projects-create",
+    ),
+    path(
+        "projects/<int:pk>/members/",
+        projects_rest.ProjectMembershipCreate.as_view(),
+        name="projects-members-create",
+    ),
     # path(
     #     "projects/my_departments",
     #     projects_rest.ProjectDepartmentList.as_view(),
