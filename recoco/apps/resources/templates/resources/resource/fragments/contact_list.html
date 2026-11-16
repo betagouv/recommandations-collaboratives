@@ -7,7 +7,7 @@
 {% if contacts.count %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% is_admin_for_current_site request.user as is_admin %}
-    <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
+    <div x-data="ContactList" id="contact-list" class="resource-details__bordered-container">
         {% if user.is_anonymous %}
             <div class="flag blue">
                 <span class="title text-blue text-uppercase fw-bold fr-mb-2v d-block">Contacts</span>
@@ -17,7 +17,7 @@
                 </p>
             </div>
         {% else %}
-            <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
+            <span class="resource-details__title--secondary d-block fr-mb-2w">👩‍💼 Contacts</span>
             <div class="d-flex flex-wrap flex-row"
                  x-data="ContactAsk({% if is_staff or is_admin or is_administrating_project %}true{% else %}false{% endif %}, {{ contacts_to_display }})"
                  x-init="init">

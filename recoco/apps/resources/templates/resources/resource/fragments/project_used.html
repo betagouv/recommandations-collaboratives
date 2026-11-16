@@ -1,13 +1,13 @@
 <div>
-    <span class="align-middle text-info-custom text-grey-dark">
+    <span class="resource-details__used-by-projects">
         Cette ressource a été recommandée sur les dossiers suivants :
     </span>
     <ul class="fr-mt-2w text-grey-dark d-flex flex-column">
         {% for project in projects_used_by %}
             <li class="text-dark">
                 <div class="d-flex">
-                    <a class="text-info-custom text-grey-dark text-decoration-none hover-underline white-space-pre text-overflow-ellipsis overflow-hidden"
-                       href="{% url 'projects-project-detail' project.pk %}"><strong class="text-dark fw-normal">{{ project.name }}</strong>{{ project.owner.profile.organization.name|default:project.org_name }}</a>
+                    <a class="resource-details__used-by-projects text-decoration-none hover-underline white-space-pre text-overflow-ellipsis overflow-hidden"
+                       href="{% url 'projects-project-detail' project.pk %}"><strong class="text-dark">{{ project.name }}</strong> - {{ project.owner.profile.organization.name|default:project.org_name }}</a>
                 </div>
             </li>
         {% endfor %}
