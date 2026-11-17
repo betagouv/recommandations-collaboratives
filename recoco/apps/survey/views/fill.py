@@ -129,9 +129,6 @@ def survey_create_session_for_project(request, project_id, site_id=None):
         survey = site_config.project_survey
 
     session, _ = models.Session.objects.get_or_create(project=project, survey=survey)
-    signals.survey_session_started.send(
-        sender=None, survey=survey, project=project, request=request
-    )
 
     url = reverse("survey-session-start", args=(session.id,))
     if "first_time" in request.GET:
