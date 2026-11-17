@@ -1,7 +1,9 @@
 import json
+from unittest.mock import Mock, patch
 from urllib.parse import urlparse
 
 import pytest
+from actstream import action
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
@@ -717,3 +719,29 @@ def test_notification_annotation_updated_on_message_edit(
     # Assert the action stream annotation was updated to reflect the new document count
     notification.refresh_from_db()
     assert notification.data["annotations"]["documents"]["count"] == 1
+
+
+@pytest.mark.django_db
+def test_activities_include_verbs_from_plugin_hook(
+    project_ready, project_editor, client
+):
+    plugin_verb = "plugin verb"
+    other_verb = "other verb"
+    for verb in (plugin_verb, other_verb):
+        action.send(project_editor, verb=verb, target=project_ready, public=True)
+
+    url = reverse("projects-conversations-activities-list", args=[project_ready.pk])
+    plugin_manager = Mock()
+    plugin_manager.hook.conversation_activity_verbs.return_value = [[plugin_verb]]
+
+    with (
+        patch(
+            "recoco.apps.conversations.rest.get_site_plugin_manager",
+            return_value=plugin_manager,
+        ),
+        login(client, user=project_editor),
+    ):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert [a["verb"] for a in response.json()] == [plugin_verb]
