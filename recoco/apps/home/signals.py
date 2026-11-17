@@ -73,12 +73,42 @@ def disable_human_login_for_bots(sender, instance: UserProfile, **kwargs):
         return
 
     user = instance.user
-    if user.has_usable_password() or user.email:
-        user.set_unusable_password()
-        user.email = ""
+    if _strip_human_credentials(user):
         user.save(update_fields=["password", "email"])
 
     EmailAddress.objects.filter(user=user).delete()
+
+
+def _is_bot(user_id):
+    return (
+        user_id is not None
+        and UserProfile.objects.filter(user_id=user_id, is_bot=True).exists()
+    )
+
+
+def _strip_human_credentials(user):
+    """Drop password and email from a bot; return whether anything changed."""
+    if not (user.has_usable_password() or user.email):
+        return False
+    user.set_unusable_password()
+    user.email = ""
+    return True
+
+
+@receiver(pre_save, sender=User)
+def keep_bots_without_human_credentials(sender, instance: User, **kwargs):
+    """Saving a bot, e.g. from the user admin, cannot give it back a password
+    or an email (the profile signal above only runs when the profile is saved).
+    """
+    if _is_bot(instance.pk):
+        _strip_human_credentials(instance)
+
+
+@receiver(post_save, sender=EmailAddress)
+def keep_bots_without_email_address(sender, instance: EmailAddress, **kwargs):
+    """An email address would open login by code, password reset and ProConnect."""
+    if _is_bot(instance.user_id):
+        instance.delete()
 
 
 @receiver(m2m_changed, sender=User.groups.through)

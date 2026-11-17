@@ -37,6 +37,11 @@ class ServiceAPIKey(AbstractAPIKey):
     class Meta(AbstractAPIKey.Meta):
         verbose_name = "clé d'API"
         verbose_name_plural = "clés d'API"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"], name="api_keys_serviceapikey_unique_name"
+            )
+        ]
 
     def clean(self):
         super().clean()

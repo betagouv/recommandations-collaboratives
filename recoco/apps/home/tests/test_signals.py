@@ -11,6 +11,7 @@ from sesame.utils import get_query_string
 
 from conftest import setup_sesame_cookie
 from recoco.apps.home.adapters import UVAccountAdapter
+from recoco.apps.home.hijack import superusers_and_staff_but_not_bots
 from recoco.utils import confirm_mail, login
 
 
@@ -325,3 +326,74 @@ def test_bot_cannot_login_with_its_former_password(client):
     user.profile.save()
 
     assert not client.login(username="bot", password="secret")  # noqa: S106
+
+
+@pytest.fixture
+def bot():
+    user = baker.make(auth_models.User, username="bot")
+    user.profile.is_bot = True
+    user.profile.save()
+    return user
+
+
+@pytest.mark.django_db
+def test_setting_a_password_on_a_bot_does_not_stick(bot, client):
+    bot.set_password("secret")
+    bot.save()
+
+    bot.refresh_from_db()
+    assert not bot.has_usable_password()
+    assert not client.login(username="bot", password="secret")  # noqa: S106
+
+
+@pytest.mark.django_db
+def test_setting_an_email_on_a_bot_does_not_stick(bot):
+    bot.email = "bot@example.com"
+    bot.save()
+
+    bot.refresh_from_db()
+    assert bot.email == ""
+
+
+@pytest.mark.django_db
+def test_bot_cannot_get_an_email_address(bot):
+    baker.make("account.EmailAddress", user=bot, email="bot@example.com")
+
+    assert not bot.emailaddress_set.exists()
+
+
+@pytest.mark.django_db
+def test_human_keeps_a_password_set_later():
+    user = baker.make(auth_models.User, email="human@example.com")
+    user.set_password("secret")
+    user.save()
+
+    user.refresh_from_db()
+    assert user.check_password("secret")
+    assert user.email == "human@example.com"
+
+
+@pytest.mark.django_db
+def test_bot_password_cannot_be_set_from_the_admin(bot, client):
+    admin = auth_models.User.objects.create_superuser("admin", "admin@example.com")
+    with login(client, user=admin):
+        client.post(
+            reverse("admin:auth_user_password_change", args=[bot.pk]),
+            data={
+                "usable_password": "true",
+                "password1": "a-Very-long-secret-42",
+                "password2": "a-Very-long-secret-42",
+            },
+        )
+
+    bot.refresh_from_db()
+    assert not bot.has_usable_password()
+
+
+@pytest.mark.django_db
+def test_bot_cannot_be_hijacked(bot):
+    admin = auth_models.User.objects.create_superuser("admin", "admin@example.com")
+    human = baker.make(auth_models.User)
+
+    assert not superusers_and_staff_but_not_bots(hijacker=admin, hijacked=bot)
+    assert superusers_and_staff_but_not_bots(hijacker=admin, hijacked=human)

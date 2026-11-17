@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
@@ -9,7 +11,8 @@ from recoco.apps.api_keys.models import ServiceAPIKey
 class Command(BaseCommand):
     help = (
         "Manage bot accounts and their API key: "
-        "create a bot with a key, renew its key, or delete the bot"
+        "create a bot with a key, renew its key (revoking the previous ones), "
+        "or delete the bot"
     )
 
     def add_arguments(self, parser):
@@ -43,12 +46,14 @@ class Command(BaseCommand):
 
     def renew(self, name, _site_domain):
         user = self._get_bot(name)
-        api_key = user.api_keys.select_related("site").first()
+        # most recent key, revoked or not, tells which site to renew for
+        api_key = user.api_keys.select_related("site").order_by("-created").first()
         if api_key is None:
             raise CommandError(f"Bot {name!r} has no API key to renew")
 
         site = api_key.site
-        user.api_keys.all().delete()
+        # revoke rather than delete, to keep a trace of past keys
+        user.api_keys.filter(revoked=False).update(revoked=True)
         self._issue_key(user, site)
 
     def delete(self, name, _site_domain):
@@ -62,9 +67,16 @@ class Command(BaseCommand):
         except User.DoesNotExist as exc:
             raise CommandError(f"No bot named {name!r}") from exc
 
+    @staticmethod
+    def _key_name(user):
+        """<username>-<random id>, so each key of a bot gets a distinct name"""
+        suffix = uuid.uuid4().hex[:8]
+        max_length = ServiceAPIKey._meta.get_field("name").max_length
+        return f"{user.username[: max_length - len(suffix) - 1]}-{suffix}"
+
     def _issue_key(self, user, site):
         _, key = ServiceAPIKey.objects.create_key(
-            name=user.username, user=user, site=site
+            name=self._key_name(user), user=user, site=site
         )
         self.stdout.write(
             self.style.SUCCESS(f"API key for {user.username!r} on {site.domain}:")

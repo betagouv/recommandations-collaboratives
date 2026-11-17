@@ -472,7 +472,7 @@ ACTSTREAM_SETTINGS = {"MANAGER": "actstream.managers.ActionManager"}
 PHONENUMBER_DEFAULT_REGION = "FR"
 
 # Hijack
-HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
+HIJACK_PERMISSION_CHECK = "recoco.apps.home.hijack.superusers_and_staff_but_not_bots"
 
 THROTTLE_RATES = {"anon": "100/day", "user_but_exception": "10000/day"}
 # Rest Framework

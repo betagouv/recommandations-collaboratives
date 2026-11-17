@@ -47,17 +47,54 @@ def test_create_refuses_existing_username(current_site):
 
 
 @pytest.mark.django_db
-def test_renew_replaces_the_key(current_site):
+def test_renew_revokes_the_old_key(current_site):
     old_key = run("create", "--name", "svc-bot", "--site", current_site.domain)
+    old_prefix = old_key.partition(".")[0]
 
     new_key = run("renew", "--name", "svc-bot")
 
     assert new_key != old_key
     bot = User.objects.get(username="svc-bot")
-    assert bot.api_keys.count() == 1
+    assert bot.api_keys.count() == 2
+    assert bot.api_keys.get(prefix=old_prefix).revoked
+    assert bot.api_keys.filter(revoked=False).count() == 1
     assert ServiceAPIKey.objects.get_from_key(new_key).site == current_site
     with pytest.raises(ServiceAPIKey.DoesNotExist):
         ServiceAPIKey.objects.get_from_key(old_key)
+
+
+@pytest.mark.django_db
+def test_renew_twice_keeps_a_single_usable_key(current_site):
+    run("create", "--name", "svc-bot", "--site", current_site.domain)
+    run("renew", "--name", "svc-bot")
+
+    last_key = run("renew", "--name", "svc-bot")
+
+    bot = User.objects.get(username="svc-bot")
+    assert bot.api_keys.count() == 3
+    assert bot.api_keys.filter(revoked=False).count() == 1
+    assert ServiceAPIKey.objects.get_from_key(last_key).site == current_site
+
+
+@pytest.mark.django_db
+def test_each_key_gets_a_unique_name(current_site):
+    run("create", "--name", "svc-bot", "--site", current_site.domain)
+    run("renew", "--name", "svc-bot")
+
+    names = list(ServiceAPIKey.objects.values_list("name", flat=True))
+
+    assert len(set(names)) == 2
+    assert all(name.startswith("svc-bot-") for name in names)
+
+
+@pytest.mark.django_db
+def test_key_name_fits_even_with_a_long_username(current_site):
+    username = "b" * 150
+    run("create", "--name", username, "--site", current_site.domain)
+
+    name = ServiceAPIKey.objects.get().name
+    assert len(name) <= ServiceAPIKey._meta.get_field("name").max_length
+    assert name.startswith("b")
 
 
 @pytest.mark.django_db

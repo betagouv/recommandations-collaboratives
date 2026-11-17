@@ -3,6 +3,7 @@ from datetime import timedelta
 import pytest
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db import IntegrityError
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -158,3 +159,11 @@ def test_rejected_key_does_not_update_last_login(
 
     service_account.refresh_from_db()
     assert service_account.last_login is None
+
+
+@pytest.mark.django_db
+def test_key_names_are_unique(make_key):
+    make_key()
+
+    with pytest.raises(IntegrityError):
+        make_key()
