@@ -20,6 +20,7 @@ from django.db.models import Exists, OuterRef
 from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.encoding import force_str
 from guardian.core import ObjectPermissionChecker
 from guardian.ctypes import get_content_type
@@ -652,6 +653,20 @@ class AdvisorAccessRequest(TimeStampedModel):
     @property
     def is_rejected(self) -> bool:
         return self.status == "REJECTED"
+
+    def feed_label(self):
+        department_str = ", ".join(
+            [f"{dep.name} ({dep.code})" for dep in self.departments.all()]
+        )
+        return f'sur les départements {department_str} avec le commentaire : "{self.comment}"'
+
+    def get_absolute_url(self):
+        if self.is_pending:
+            return (
+                reverse("advisor-access-request-moderator", args=[self.id])
+                + f"#action-{self.pk}"
+            )
+        return None
 
 
 # eof
