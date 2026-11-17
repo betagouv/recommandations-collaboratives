@@ -1,5 +1,5 @@
 """Every view opened to service API keys must refuse a key whose user has no
-rights at all.
+rights at all, except the auth check, whose only job is to accept a valid key.
 
 Views are discovered from the URL resolver, so a view that later opts into
 ``ServiceAPIKeyAllowedMixin`` is covered without touching this file.
@@ -14,6 +14,9 @@ from ..authentication import ServiceAPIKeyAllowedMixin
 from ..models import ServiceAPIKey
 
 IGNORED_METHODS = {"options", "head", "trace"}
+
+# views that any valid key may reach, rights or not
+OPEN_TO_ANY_KEY = {"auth-check"}
 
 
 def _walk(patterns, namespace="", params=()):
@@ -58,6 +61,11 @@ def test_some_views_are_opted_in():
     assert OPTED_IN_ENDPOINTS
 
 
+def test_open_views_are_opted_in():
+    # an exemption for a view that is no longer opted in would go unnoticed
+    assert OPEN_TO_ANY_KEY <= {name for name, _, _ in OPTED_IN_ENDPOINTS}
+
+
 @pytest.fixture
 def rightless_key(current_site):
     user = baker.make(User, is_active=True)
@@ -75,7 +83,7 @@ def rightless_key(current_site):
     OPTED_IN_ENDPOINTS,
     ids=[f"{method.upper()} {name}" for name, _, method in OPTED_IN_ENDPOINTS],
 )
-def test_rightless_key_is_refused_everywhere(
+def test_rightless_key_is_refused_everywhere_but_auth_check(
     api_client, rightless_key, name, params, method
 ):
     url = reverse(name, kwargs={param: 1 for param in params})
@@ -84,6 +92,7 @@ def test_rightless_key_is_refused_everywhere(
         url, HTTP_AUTHORIZATION=f"Api-Key {rightless_key}"
     )
 
-    assert response.status_code == 403, (
+    expected = 200 if name in OPEN_TO_ANY_KEY else 403
+    assert response.status_code == expected, (
         f"{method.upper()} {url} -> {response.status_code}"
     )
