@@ -9,6 +9,7 @@ from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 
 from recoco import verbs
+from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects import models as projects_models
 from recoco.utils import has_perm_or_403
 
@@ -93,7 +94,13 @@ class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         project = projects_models.Project.objects.get(id=project_id)
         has_perm_or_403(self.request.user, "projects.view_public_notes", project)
 
-        return project.target_actions.filter(verb__in=self.activity_verbs, public=True)
+        activity_verbs = list(self.activity_verbs)
+        for plugin_verbs in get_site_plugin_manager(
+            self.request
+        ).hook.conversation_activity_verbs():
+            activity_verbs.extend(plugin_verbs)
+
+        return project.target_actions.filter(verb__in=activity_verbs, public=True)
 
 
 class ParticipantViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
