@@ -13,6 +13,7 @@
 {% comment %} TODO filter verbs.CRM.NOTE_CREATED in view instead of in template {% endcomment %}
 {% if action.verb != verbs.CRM.NOTE_CREATED or 'use_crm' in user_site_perms %}
     <div class="fr-mb-2v">
+
         <!-- User -->
         {% if action.actor %}
         <span class="d-inline-flex align-middle">
@@ -21,6 +22,7 @@
         {% else %}
             <span class="actor">(compte supprimé)</span>
         {% endif %}
+
         <div class="d-inline {{ font_size_class|default:'font-very-small' }}"
              data-test-id="project-activity-notification">
             <span class="text-grey-dark fw-light">
@@ -64,11 +66,6 @@
 
                 <!-- Description additionnal content -->
                 {% if action.description %}<div class="d-inline-block">{{ action.description }}</div>{% endif %}
-
-                <!-- Exception display timestamp for invitation -->
-                {% if action.verb == verbs.Project.INVITATION %}
-                    <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
-                {% endif %}
             </span>
         </div>
     </div>
