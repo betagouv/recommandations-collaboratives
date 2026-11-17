@@ -1535,11 +1535,8 @@ def make_low_reach_project_query(
             ),
             last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
             last_public_msg_at=Max(
-                "notes__created_on",
-                filter=Q(
-                    public_messages=True,
-                    public_messages__posted_by__in=F("members__id"),
-                ),
+                "public_messages__created",
+                filter=Q(public_messages__posted_by__in=F("members__id")),
             ),
             has_task_status=Exists(
                 Task.objects.filter(
@@ -1615,7 +1612,7 @@ def make_low_reach_project_query(
         qs.select_related("commune")
         .prefetch_related(
             "tasks",
-            "notes",
+            "public_messages",
             "switchtenders__profile__organization",
             "crm_annotations__tags",
         )
