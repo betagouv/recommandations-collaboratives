@@ -1,0 +1,33 @@
+{% comment %}
+
+    Template: filter_generic.html
+    Description: Select for filter purpose
+
+    Context Variables:
+        - label: string
+        - queryparam : string
+        - default_option: string
+        - a11y_label: string
+        - rounded_version: boolean
+        - values: list of values
+        - current_value: one value
+        - js_activate: to activate js event
+        - x_model: to bind on parent model
+        - on_change: event to trigger
+
+{% endcomment %}
+
+<div class="fr-select-group {% if rounded_version %}fr-select-group--rounded{% endif %} d-flex align-items-center fr-mb-0">
+    <label class="fr-label text-nowrap fr-mr-1w" for="{{ queryparam }}-filter">
+        {{ label }} :
+    </label>
+    <select class="fr-select fr-mt-0" aria-describedby="{{ queryparam }}-filter-messages" id="{{ queryparam }}-filter" name="{{ queryparam }}" {% if js_activate %}x-model="{{ x_model }}" @change="{{ on_change }}" {% else %}onchange="this.form.submit()"{% endif %}>
+        <option value="">{{ default_option }}</option>
+        {% for value, label in values %}
+            <option value="{{ value }}" {% if current_value == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <div class="fr-messages-group fr-sr-only" id="{{ queryparam }}-filter-messages" aria-live="polite">
+        {{ a11y_label }}
+    </div>
+</div>
