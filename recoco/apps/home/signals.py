@@ -13,6 +13,7 @@ from allauth.account.models import EmailAddress
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group, User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
@@ -72,10 +73,11 @@ def watch_organisation_to_understand_mystery(instance: UserProfile, **kwargs):
 
 @receiver(post_save, sender=UserProfile)
 def disable_human_login_for_bots(sender, instance: UserProfile, **kwargs):
-    """A bot only authenticates with an API key: no password, no email.
+    """A bot only authenticates with an API key: no password, no email, no
+    ProConnect link and no 2FA device.
 
-    Without an email, login by code, password reset and ProConnect
-    cannot reach the account either.
+    Without an email, login by code and password reset cannot reach the
+    account; without a social account, ProConnect cannot log into it.
     """
     if not instance.is_bot:
         return
@@ -86,6 +88,8 @@ def disable_human_login_for_bots(sender, instance: UserProfile, **kwargs):
         user.save(update_fields=["password", "email", "is_staff", "is_superuser"])
 
     EmailAddress.objects.filter(user=user).delete()
+    SocialAccount.objects.filter(user=user).delete()
+    Authenticator.objects.filter(user=user).delete()
     # a bot key skips 2FA: it cannot keep human rights from a previous life
     user.user_permissions.clear()
     user.groups.remove(*human_role_groups(user.groups.all()))
@@ -125,6 +129,21 @@ def keep_bots_without_human_credentials(sender, instance: User, **kwargs):
 @receiver(post_save, sender=EmailAddress)
 def keep_bots_without_email_address(sender, instance: EmailAddress, **kwargs):
     """An email address would open login by code, password reset and ProConnect."""
+    if is_bot(instance.user_id):
+        instance.delete()
+
+
+@receiver(post_save, sender=SocialAccount)
+def keep_bots_without_social_account(sender, instance: SocialAccount, **kwargs):
+    """ProConnect logs in by its own account id, not by email: a social account
+    linked to a bot would open a login that skips the API key."""
+    if is_bot(instance.user_id):
+        instance.delete()
+
+
+@receiver(post_save, sender=Authenticator)
+def keep_bots_without_authenticator(sender, instance: Authenticator, **kwargs):
+    """A bot never logs in interactively, so it has no use for a 2FA device."""
     if is_bot(instance.user_id):
         instance.delete()
 

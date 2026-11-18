@@ -1,6 +1,7 @@
 import pytest
 from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.core import mail
@@ -518,3 +519,43 @@ def test_bot_privileges_cannot_be_given_from_the_admin(bot, client):
     bot.refresh_from_db()
     assert not bot.is_staff
     assert not bot.groups.exists()
+
+
+@pytest.mark.django_db
+def test_becoming_a_bot_drops_proconnect_link_and_2fa_devices():
+    user = baker.make(auth_models.User)
+    baker.make(SocialAccount, user=user, provider="proconnect", uid="agent-sub")
+    baker.make(Authenticator, type="totp", user=user)
+
+    user.profile.is_bot = True
+    user.profile.save()
+
+    assert not SocialAccount.objects.filter(user=user).exists()
+    assert not Authenticator.objects.filter(user=user).exists()
+
+
+@pytest.mark.django_db
+def test_bot_cannot_get_a_proconnect_link(bot):
+    baker.make(SocialAccount, user=bot, provider="proconnect", uid="bot-sub")
+
+    assert not SocialAccount.objects.filter(user=bot).exists()
+
+
+@pytest.mark.django_db
+def test_bot_cannot_get_a_2fa_device(bot):
+    baker.make(Authenticator, type="totp", user=bot)
+
+    assert not Authenticator.objects.filter(user=bot).exists()
+
+
+@pytest.mark.django_db
+def test_human_keeps_proconnect_link_and_2fa_devices():
+    user = baker.make(auth_models.User)
+    baker.make(SocialAccount, user=user, provider="proconnect", uid="agent-sub")
+    baker.make(Authenticator, type="totp", user=user)
+
+    user.profile.organization_position = "maire"
+    user.profile.save()
+
+    assert SocialAccount.objects.filter(user=user).exists()
+    assert Authenticator.objects.filter(user=user).exists()
