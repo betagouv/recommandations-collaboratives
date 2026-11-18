@@ -7,6 +7,7 @@ Alpine.data('MenuProjects', (isCollectivity = false) => {
     displayedProjectList: [],
     maxDisplayedProject: 5,
     currentProject: null,
+    isProjectLoading: true,
     async getProjetctsData() {
       let projectList = this.$store.projectQueue.get();
 
@@ -44,6 +45,7 @@ Alpine.data('MenuProjects', (isCollectivity = false) => {
         0,
         this.maxDisplayedProject + 1
       );
+      this.isProjectLoading = false;
     },
     sortByRecentlyVisitedProjects() {
       this.$store.projectQueue.get().forEach((projectId) => {
@@ -57,6 +59,7 @@ Alpine.data('MenuProjects', (isCollectivity = false) => {
       //     this.displayedProjectList.push(project);
       //   }
       // });
+      this.isProjectLoading = false;
     },
     // onSearch() {
     //   this.filterProjects(this.search);
