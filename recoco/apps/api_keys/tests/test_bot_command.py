@@ -98,21 +98,68 @@ def test_key_name_fits_even_with_a_long_username(current_site):
 
 
 @pytest.mark.django_db
-def test_delete_removes_bot_and_keys(current_site):
-    run("create", "--name", "svc-bot", "--site", current_site.domain)
+def test_disable_deactivates_bot_and_revokes_keys(current_site):
+    key = run("create", "--name", "svc-bot", "--site", current_site.domain)
 
-    run("delete", "--name", "svc-bot")
+    run("disable", "--name", "svc-bot")
 
-    assert not User.objects.filter(username="svc-bot").exists()
-    assert not ServiceAPIKey.objects.exists()
+    bot = User.objects.get(username="svc-bot")
+    assert not bot.is_active
+    assert bot.profile.disabled is not None
+    assert bot.api_keys.count() == 1
+    assert not bot.api_keys.filter(revoked=False).exists()
+    with pytest.raises(ServiceAPIKey.DoesNotExist):
+        ServiceAPIKey.objects.get_from_key(key)
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("action", ["renew", "delete"])
-def test_renew_and_delete_never_touch_human_users(action):
-    human = baker.make(User, username="human")
+def test_renew_refuses_a_disabled_bot(current_site):
+    run("create", "--name", "svc-bot", "--site", current_site.domain)
+    run("disable", "--name", "svc-bot")
+
+    with pytest.raises(CommandError):
+        run("renew", "--name", "svc-bot")
+
+    assert not ServiceAPIKey.objects.filter(revoked=False).exists()
+
+
+@pytest.mark.django_db
+def test_enable_reactivates_bot_with_a_single_new_key(current_site):
+    old_key = run("create", "--name", "svc-bot", "--site", current_site.domain)
+    run("disable", "--name", "svc-bot")
+    # a key left usable by hand must not survive the enable
+    ServiceAPIKey.objects.update(revoked=False)
+
+    new_key = run("enable", "--name", "svc-bot")
+
+    bot = User.objects.get(username="svc-bot")
+    assert bot.is_active
+    assert bot.profile.disabled is None
+    assert bot.api_keys.count() == 2
+    assert bot.api_keys.filter(revoked=False).count() == 1
+    assert ServiceAPIKey.objects.get_from_key(new_key).site == current_site
+    with pytest.raises(ServiceAPIKey.DoesNotExist):
+        ServiceAPIKey.objects.get_from_key(old_key)
+
+
+@pytest.mark.django_db
+def test_enable_refuses_an_active_bot(current_site):
+    key = run("create", "--name", "svc-bot", "--site", current_site.domain)
+
+    with pytest.raises(CommandError):
+        run("enable", "--name", "svc-bot")
+
+    assert ServiceAPIKey.objects.count() == 1
+    assert ServiceAPIKey.objects.get_from_key(key)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("action", ["renew", "disable", "enable"])
+def test_renew_disable_and_enable_never_touch_human_users(action):
+    human = baker.make(User, username="human", is_active=action != "enable")
 
     with pytest.raises(CommandError):
         run(action, "--name", "human")
 
-    assert User.objects.filter(pk=human.pk).exists()
+    human.refresh_from_db()
+    assert human.is_active == (action != "enable")

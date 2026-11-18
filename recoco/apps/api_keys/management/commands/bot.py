@@ -6,17 +6,19 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from recoco.apps.api_keys.models import ServiceAPIKey
+from recoco.apps.home.utils import deactivate_user, reactivate_user
 
 
 class Command(BaseCommand):
     help = (
         "Manage bot accounts and their API key: "
         "create a bot with a key, renew its key (revoking the previous ones), "
-        "or delete the bot"
+        "disable the bot (deactivating it and revoking its keys), "
+        "or enable a disabled bot again with a new key"
     )
 
     def add_arguments(self, parser):
-        parser.add_argument("action", choices=["create", "renew", "delete"])
+        parser.add_argument("action", choices=["create", "renew", "disable", "enable"])
         parser.add_argument("--name", required=True, help="Username of the bot")
         parser.add_argument(
             "--site",
@@ -46,20 +48,37 @@ class Command(BaseCommand):
 
     def renew(self, name, _site_domain):
         user = self._get_bot(name)
-        # most recent key, revoked or not, tells which site to renew for
+        if not user.is_active:
+            raise CommandError(f"Bot {name!r} is disabled")
+        self._rotate_key(user)
+
+    def disable(self, name, _site_domain):
+        # deactivate rather than delete: keeps what the bot created
+        # and a trace of its keys
+        user = self._get_bot(name)
+        deactivate_user(user)
+        user.api_keys.filter(revoked=False).update(revoked=True)
+        self.stdout.write(self.style.SUCCESS(f"Bot {name!r} disabled"))
+
+    def enable(self, name, _site_domain):
+        user = self._get_bot(name)
+        if user.is_active:
+            raise CommandError(f"Bot {name!r} is not disabled")
+        if user.profile.deleted:
+            raise CommandError(f"Bot {name!r} is deleted and cannot be enabled")
+        reactivate_user(user)
+        self._rotate_key(user)
+
+    def _rotate_key(self, user):
+        """Revoke every usable key of the bot and issue a new one."""
+        # most recent key, revoked or not, tells which site to issue it for
         api_key = user.api_keys.select_related("site").order_by("-created").first()
         if api_key is None:
-            raise CommandError(f"Bot {name!r} has no API key to renew")
+            raise CommandError(f"Bot {user.username!r} has no API key to renew")
 
-        site = api_key.site
         # revoke rather than delete, to keep a trace of past keys
         user.api_keys.filter(revoked=False).update(revoked=True)
-        self._issue_key(user, site)
-
-    def delete(self, name, _site_domain):
-        user = self._get_bot(name)
-        user.delete()  # cascades to its API keys
-        self.stdout.write(self.style.SUCCESS(f"Bot {name!r} deleted"))
+        self._issue_key(user, api_key.site)
 
     def _get_bot(self, name):
         try:
