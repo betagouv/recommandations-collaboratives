@@ -4,7 +4,10 @@ from allauth.mfa.signals import authenticator_added, authenticator_removed
 from django.contrib.auth import get_user
 from django.contrib.auth import models as auth_models
 from django.core import mail
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from pytest_django.asserts import assertContains
 from sesame.utils import get_query_string
@@ -397,3 +400,121 @@ def test_bot_cannot_be_hijacked(bot):
 
     assert not superusers_and_staff_but_not_bots(hijacker=admin, hijacked=bot)
     assert superusers_and_staff_but_not_bots(hijacker=admin, hijacked=human)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("flag", ["is_staff", "is_superuser"])
+def test_bot_cannot_be_made_staff_or_superuser(bot, flag):
+    setattr(bot, flag, True)
+
+    with pytest.raises(ValidationError):
+        bot.save()
+
+    bot.refresh_from_db()
+    assert not getattr(bot, flag)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("group_suffix", SENSITIVE_GROUPS)
+def test_bot_cannot_join_sensitive_group(bot, group_suffix):
+    group = auth_models.Group.objects.get(name=f"example_com_{group_suffix}")
+
+    with pytest.raises(ValidationError), transaction.atomic():
+        bot.groups.add(group)
+
+    assert not bot.groups.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("group_suffix", SENSITIVE_GROUPS)
+def test_bot_cannot_be_added_to_sensitive_group_reverse(bot, group_suffix):
+    group = auth_models.Group.objects.get(name=f"example_com_{group_suffix}")
+    human = baker.make(auth_models.User)
+
+    with pytest.raises(ValidationError), transaction.atomic():
+        group.user_set.add(human, bot)
+
+    assert not group.user_set.exists()
+
+
+@pytest.mark.django_db
+def test_bot_can_join_non_sensitive_group(bot):
+    trusted_bot = auth_models.Group.objects.get(name="example_com_trusted_bot")
+    regular = baker.make(auth_models.Group, name="regular_users")
+
+    bot.groups.add(trusted_bot, regular)
+
+    assert bot.groups.count() == 2
+    assert not bot.profile.requires_2fa
+
+
+@pytest.mark.django_db
+def test_human_can_still_join_sensitive_group():
+    user = baker.make(auth_models.User)
+    group = auth_models.Group.objects.get(name="example_com_staff")
+
+    user.groups.add(group)
+
+    assert user.groups.filter(pk=group.pk).exists()
+
+
+@pytest.mark.django_db
+def test_bot_cannot_get_global_permissions(bot):
+    permission = auth_models.Permission.objects.get(codename="change_project")
+
+    with pytest.raises(ValidationError), transaction.atomic():
+        bot.user_permissions.add(permission)
+    with pytest.raises(ValidationError), transaction.atomic():
+        permission.user_set.add(bot)
+
+    assert not bot.user_permissions.exists()
+
+
+@pytest.mark.django_db
+def test_bot_can_get_site_object_permissions(bot, current_site):
+    assign_perm("sites.list_projects", bot, current_site)
+
+    assert bot.has_perm("sites.list_projects", current_site)
+
+
+@pytest.mark.django_db
+def test_becoming_a_bot_drops_human_privileges():
+    user = baker.make(auth_models.User, is_staff=True, is_superuser=True)
+    staff = auth_models.Group.objects.get(name="example_com_staff")
+    trusted_bot = auth_models.Group.objects.get(name="example_com_trusted_bot")
+    user.groups.add(staff, trusted_bot)
+    user.user_permissions.add(
+        auth_models.Permission.objects.get(codename="change_project")
+    )
+
+    user.profile.is_bot = True
+    user.profile.save()
+
+    user.refresh_from_db()
+    assert not user.is_staff
+    assert not user.is_superuser
+    assert not user.user_permissions.exists()
+    assert list(user.groups.all()) == [trusted_bot]
+
+
+@pytest.mark.django_db
+def test_bot_privileges_cannot_be_given_from_the_admin(bot, client):
+    admin = auth_models.User.objects.create_superuser("admin", "admin@example.com")
+    staff = auth_models.Group.objects.get(name="example_com_staff")
+    with login(client, user=admin):
+        response = client.post(
+            reverse("admin:auth_user_change", args=[bot.pk]),
+            data={
+                "username": bot.username,
+                "is_active": "on",
+                "is_staff": "on",
+                "groups": [staff.pk],
+                "date_joined_0": "2026-01-01",
+                "date_joined_1": "00:00:00",
+            },
+        )
+
+    assertContains(response, "Un compte bot ne peut")
+    bot.refresh_from_db()
+    assert not bot.is_staff
+    assert not bot.groups.exists()

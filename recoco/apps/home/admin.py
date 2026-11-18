@@ -3,9 +3,12 @@ from django.contrib import admin
 from django.contrib.admin import RelatedFieldListFilter
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm
+from django.core.exceptions import ValidationError
 from django.db.models import Count
 
 from . import models
+from .bots import BOT_PRIVILEGE_ERROR, human_role_groups, is_bot
 
 
 @admin.register(models.SiteConfiguration)
@@ -41,7 +44,29 @@ class MysteriousOrgaFieldFilter(RelatedFieldListFilter):
         return [(781, "Mairie")]
 
 
+class BotAwareUserChangeForm(UserChangeForm):
+    """Shows a form error, rather than a crash from the model signals, when
+    someone tries to give human privileges to a bot."""
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not is_bot(self.instance.pk):
+            return cleaned_data
+
+        groups = cleaned_data.get("groups")
+        permissions = cleaned_data.get("user_permissions")
+        if (
+            cleaned_data.get("is_staff")
+            or cleaned_data.get("is_superuser")
+            or (permissions is not None and permissions.exists())
+            or (groups is not None and human_role_groups(groups).exists())
+        ):
+            raise ValidationError(BOT_PRIVILEGE_ERROR)
+        return cleaned_data
+
+
 class CustomUserAdmin(UserAdmin):
+    form = BotAwareUserChangeForm
     inlines = (ProfileInline,)
     list_display = (
         "username",
