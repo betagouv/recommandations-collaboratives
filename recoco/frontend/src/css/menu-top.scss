@@ -62,6 +62,10 @@
       width: 415px;
       --padding-y-item: 0.3rem;
       --ul-type: none;
+      &.max-width {
+        max-width: 415px;
+        width: 100%;
+      }
       .item-projects__button-open {
         text-align: left;
         overflow: hidden;
@@ -132,6 +136,30 @@
       }
       li.list-project__search-container {
         padding: 0.5rem;
+      }
+      .navigation__item-one-project {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5rem;
+        &:not([href]) {
+          --idle: transparent;
+          --hover: var(--background-disabled-grey-hover);
+          --active: var(--background-disabled-grey-active);
+          background: var(--light-decisions-background-background-default-grey-hover, #F6F6F6);
+          color: var(--text-disabled-grey);
+          .navigation__item-one-project-name,.navigation__item-one-project-organization {
+            color: var(--text-disabled-grey);
+          }
+        }
+        &:hover {
+          background: var(--light-decisions-background-background-action-low-blue-france-hover, #C1C1FB);
+        }
+        &-name {
+          color: var(--light-decisions-text-text-action-high-blue-france, #000091);
+        }
+        &-organization {
+          color: var(--light-text-mention-grey, #666);
+        }
       }
     }
   }
