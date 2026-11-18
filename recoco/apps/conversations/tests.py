@@ -745,3 +745,56 @@ def test_activities_include_verbs_from_plugin_hook(
 
     assert response.status_code == 200
     assert [a["verb"] for a in response.json()] == [plugin_verb]
+
+
+@pytest.mark.django_db
+def test_activities_exclude_verbs_from_disabled_plugin(
+    project_ready, project_editor, client
+):
+    plugin_verb = "plugin verb"
+    action.send(project_editor, verb=plugin_verb, target=project_ready, public=True)
+
+    url = reverse("projects-conversations-activities-list", args=[project_ready.pk])
+    plugin_manager = Mock()
+    plugin_manager.hook.conversation_activity_verbs.return_value = []
+
+    with (
+        patch(
+            "recoco.apps.conversations.rest.get_site_plugin_manager",
+            return_value=plugin_manager,
+        ),
+        login(client, user=project_editor),
+    ):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert plugin_verb not in [a["verb"] for a in response.json()]
+
+
+@pytest.mark.django_db
+def test_activities_plugin_verbs_do_not_leak_to_next_request(
+    project_ready, project_editor, client
+):
+    plugin_verb = "plugin verb"
+    action.send(project_editor, verb=plugin_verb, target=project_ready, public=True)
+
+    url = reverse("projects-conversations-activities-list", args=[project_ready.pk])
+    enabled_plugin_manager = Mock()
+    enabled_plugin_manager.hook.conversation_activity_verbs.return_value = [
+        [plugin_verb]
+    ]
+    disabled_plugin_manager = Mock()
+    disabled_plugin_manager.hook.conversation_activity_verbs.return_value = []
+
+    with (
+        patch(
+            "recoco.apps.conversations.rest.get_site_plugin_manager",
+            side_effect=[enabled_plugin_manager, disabled_plugin_manager],
+        ),
+        login(client, user=project_editor),
+    ):
+        client.get(url)
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert plugin_verb not in [a["verb"] for a in response.json()]
