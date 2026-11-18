@@ -38,7 +38,7 @@
         "element": "#overview-step-2"
       },
       {
-        "intro": "Vous devez être conseiller ou observateur pour accéder aux échanges.",
+        "intro": "Vous devez être conseiller pour accéder aux échanges.",
         "element": "#overview-step-3"
       },
       {
@@ -46,7 +46,7 @@
         "element": "#overview-step-4"
       },
       {
-        "intro": "Pour vous déclarer conseiller ou observateur sur ce dossier, c’est ici.",
+        "intro": "Pour vous déclarer conseiller sur ce dossier, c’est ici.",
         "element": "#overview-step-5"
       }
     ]
