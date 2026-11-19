@@ -14,6 +14,10 @@ Alpine.store('projects', {
       expiringData: true,
       expiringTime: 1,
     });
+    this.projectSiteLocalStorage = new LocalStorageMgmt({
+      dataLabel: 'sitesConfig',
+      version: '3.12.2'
+    });
   },
   setProjectsToLocalStorage(projects) {
     this.projectsLocalStorage.set(projects);
@@ -34,13 +38,13 @@ Alpine.store('projects', {
   },
   async getSitesConfig() {
     const json = await api.get(sitesConfigUrl());
-    localStorage.setItem('sitesConfig', JSON.stringify(json.data));
+    this.projectSiteLocalStorage.set(json.data);
     return (this.sitesConfig = json.data);
   },
   async mapperProjetsProjectSites(projects, currentSiteId) {
     if (this.sitesConfig.length === 0) {
       this.sitesConfig =
-        JSON.parse(localStorage.getItem('sitesConfig')) ||
+        this.projectSiteLocalStorage.get() ||
         (await this.getSitesConfig());
     }
     projects.forEach((project) => {
