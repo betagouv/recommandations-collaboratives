@@ -25,7 +25,7 @@ def restore_actions(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0052_remove_siteconfiguration_schema_name"),
+        ("home", "0053_trusted_bot_groups"),
     ]
 
     operations = [
