@@ -1,0 +1,40 @@
+{% load wagtailimages_tags %}
+{% if cards or value.more.list_page %}
+    <section class="home-page-section home-page-section--{{ value.background }} fr-py-8w">
+        <h2 class="fr-h3 fr-pb-4v text-center">{{ value.title }}</h2>
+        <div class="home-page-showcases">
+            {% for card in cards %}
+                <div class="fr-card fr-card--horizontal home-page-showcases__card{% if card.url %} fr-enlarge-link{% endif %}">
+                    <div class="fr-card__body">
+                        <div class="fr-card__content">
+                            <h3 class="fr-card__title">
+                                {% if card.url %}
+                                    <a href="{{ card.url }}">{{ card.title }}</a>
+                                {% else %}
+                                    {{ card.title }}
+                                {% endif %}
+                            </h3>
+                            {% if card.text %}<p class="fr-card__desc">{{ card.text }}</p>{% endif %}
+                        </div>
+                    </div>
+                    {% if card.image %}
+                        <div class="fr-card__header">
+                            <div class="fr-card__img">{% image card.image fill-600x400 class="fr-responsive-img" %}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            {% if value.more.list_page %}
+                <div class="fr-card fr-enlarge-link fr-card--horizontal home-page-showcases__card home-page-showcases__more specific-backgroundcolor-1b1b35">
+                    <div class="fr-card__body">
+                        <div class="fr-card__content">
+                            <h3 class="fr-card__title">
+                                <a href="{{ value.more.list_page.url }}">{{ value.more.text }}</a>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endif %}
