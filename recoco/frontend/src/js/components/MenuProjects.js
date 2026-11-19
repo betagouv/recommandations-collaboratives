@@ -1,5 +1,4 @@
 import Alpine from 'alpinejs';
-// import Fuse from 'fuse.js';
 
 Alpine.data('MenuProjects', (isCollectivity = false) => {
   return {
@@ -26,20 +25,6 @@ Alpine.data('MenuProjects', (isCollectivity = false) => {
         );
         this.currentProject = project;
       }
-      // const fuseOptions = {
-      //   keys: [
-      //     'name',
-      //     'commune.name',
-      //     'commune.insee',
-      //     'commune.department.name',
-      //   ],
-      //   isCaseSensitive: false,
-      //   minMatchCharLength: 1,
-      //   threshold: 0.3,
-      //   findAllMatches: true,
-      //   ignoreLocation: true,
-      // };
-      // this.fuse = new Fuse(this.rawProjectList, fuseOptions);
 
       this.displayedProjectList = this.rawProjectList.splice(
         0,
@@ -54,23 +39,7 @@ Alpine.data('MenuProjects', (isCollectivity = false) => {
           this.displayedProjectList.unshift(project);
         }
       });
-      // this.rawProjectList.forEach((project) => {
-      //   if (!this.displayedProjectList.includes(project)) {
-      //     this.displayedProjectList.push(project);
-      //   }
-      // });
       this.isProjectLoading = false;
     },
-    // onSearch() {
-    //   this.filterProjects(this.search);
-    // },
-    // filterProjects(search) {
-    //   if (search === '') {
-    //     this.displayedProjectList = [...this.rawProjectList];
-    //     return;
-    //   }
-    //   const filtered = this.fuse.search(search).map((r) => r.item);
-    //   this.displayedProjectList = [...filtered];
-    // },
   };
 });
