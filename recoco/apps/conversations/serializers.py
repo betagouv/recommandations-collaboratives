@@ -213,15 +213,17 @@ class ActivityTaskSerializer(serializers.ModelSerializer):
 
 
 class GenericRelatedField(serializers.Field):
+    # Plugins register their own models here (see plugin AppConfig.ready())
+    model_serializer_mapping = {
+        User: ActivityUserSerializer,
+        Project: ActivityProjectSerializer,
+        Task: ActivityTaskSerializer,
+    }
+
     def to_representation(self, value):
-        if isinstance(value, User):
-            return ActivityUserSerializer(value).data
-
-        if isinstance(value, Project):
-            return ActivityProjectSerializer(value).data
-
-        if isinstance(value, Task):
-            return ActivityTaskSerializer(value).data
+        for model, serializer in self.model_serializer_mapping.items():
+            if isinstance(value, model):
+                return serializer(value).data
 
         # Not found - return string.
         return str(value)

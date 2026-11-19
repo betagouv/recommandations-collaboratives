@@ -126,6 +126,19 @@ class ConversationSpec(HookSpec):
                 return mark_safe(render_to_string("plugin_giphy/conversation_extra.html"))
         """
 
+    @hookspec
+    def conversation_activity_verbs(self):
+        """Return a list of actstream verb strings (see ``recoco.verbs``) to add
+        to the activities (traces) displayed in the project conversation feed.
+
+        Only public actions targeting the project are displayed.
+
+        Example:
+            @hookimpl
+            def conversation_activity_verbs(self):
+                return [PluginVerbs.GIPHY_ADDED]
+        """
+
 
 class DigestSpec(HookSpec):
     @hookspec

@@ -106,6 +106,7 @@ class Command(BaseCommand):
         logger.info("** Sending general switchtender digests **")
         # XXX pourquoi groups__in=[] et non groups=advisor_group
         for user in user_qs.filter(groups__in=[advisor_group]):
+            # todo clean dead code (no action sent with that verb)
             if digests.send_digests_for_new_sites_by_user(user, dry_run):
                 logger.info(f"* Sent new site digest for {user}")
 

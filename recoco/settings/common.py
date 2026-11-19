@@ -112,7 +112,6 @@ INSTALLED_APPS = [
     "django_json_widget",
     "waffle",
     "django_htmx",
-    "plugin_mi_depafi",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -471,7 +470,7 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 # Hijack
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 
-THROTTLE_RATES = {"anon": "100/day", "user": "10000/day"}
+THROTTLE_RATES = {"anon": "100/day", "user_but_exception": "10000/day"}
 # Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -492,7 +491,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
+        "recoco.apps.home.throttling.UserButExceptionThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": THROTTLE_RATES,
 }
