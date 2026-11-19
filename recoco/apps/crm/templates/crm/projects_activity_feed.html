@@ -23,11 +23,7 @@
             <ul class="bg-white fr-pt-2w fr-px-3w border rounded crm-activity">
                 <div class="fr-p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
                     <article class="overflow-hidden">
-                        {% for action in actions %}
-                            {% include "crm/fragments/activity_action.html" %}
-                        {% empty %}
-                            -- Pas encore d'activité de la part du staff --
-                        {% endfor %}
+                        {% include "actstream/actions_timeline.html" %}
                     </article>
                 </div>
             </ul>

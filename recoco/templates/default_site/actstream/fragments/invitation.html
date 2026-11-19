@@ -1,0 +1,10 @@
+<span>a invité
+    <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
+    <strong class="text-dark">
+        {% if action.action_object.role == "COLLABORATOR" %}
+            demandeur ou partenaire
+        {% else %}
+            conseiller·e
+        {% endif %}
+    </strong>
+</span>

@@ -47,50 +47,50 @@ class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
     INVITATION_OWNER = "a invité en tant que référent"
 
-    JOINED_BY_INVITATION = "a accepté l'invitation"
-    JOINED_OWNER = "a rejoint en tant que référent le dossier"
-    NEW_OWNER = "est dorénavant référent sur le dossier"
+    JOINED_BY_INVITATION = "a accepté l'invitation à rejoindre"
+    JOINED_OWNER = "a rejoint en tant que référent"
+    NEW_OWNER = "est dorénavant référent sur"
 
-    SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
+    SUBMITTED = "a été déposé"  # legaccy, replaced by SUBMITTED_BY
     SUBMITTED_BY = "a déposé une nouvelle demande"
-    SUBMITTED_BY_ADVISOR = "a créé en tant que conseiller le dossier"
+    SUBMITTED_BY_ADVISOR = "a créé en tant que conseiller"
 
     VALIDATED = "a été validé"
-    VALIDATED_BY = "a validé le dossier"
-    REJECTED_BY = "a refusé à la modération le dossier"
+    VALIDATED_BY = "a validé"
+    REJECTED_BY = "a refusé à la modération"
 
-    # FIXME redondant avec VALIDATED
-    AVAILABLE = "a déposé le dossier"
+    # legacy, replaced by SUBMITTED et SUBMITTED_BY
+    AVAILABLE = "a déposé"
 
-    # FIXME to be removed
-    BECAME_SWITCHTENDER = "est devenu·e aiguilleur·se sur le dossier"
+    # legacy
+    BECAME_SWITCHTENDER = "est devenu·e aiguilleur·se sur"
 
-    BECAME_ADVISOR = "est devenu·e conseiller·ère sur le dossier"
-    BECAME_OBSERVER = "est devenu·e observateur·rice sur le dossier"
-    LEFT_ADVISING = "ne suit plus le dossier"
-    LEFT_OBSERVING = "ne suit plus le dossier"
+    BECAME_ADVISOR = "est devenu·e conseiller·ère sur"
+    BECAME_OBSERVER = "est devenu·e observateur·rice sur"
+    LEFT_ADVISING = "ne suit plus"
+    LEFT_OBSERVING = "ne suit plus"
 
-    # Only related to advisor kanban
+    # Only related to advisor kanban # todo guillaume on garde..?
     USER_STATUS_UPDATED = "a changé l'état de son suivi dossier"
 
     GOT_WHATSUP_REMINDER = "a reçu un rappel de suivi de dossier"
 
-    SET_INACTIVE = "a mis en pause le dossier"
-    SET_ACTIVE = "a réactivé le dossier"
+    SET_INACTIVE = "a mis en pause"
+    SET_ACTIVE = "a réactivé"
 
-    EDITED = "a modifié les informations du dossier"
-    UPDATE_ADVISORS_NOTE = "a modifié la note interne du dossier"
+    EDITED = "a modifié les informations sur"
+    UPDATE_ADVISORS_NOTE = "a modifié la note interne sur"
 
 
 class Survey:
-    STARTED = "a commencé à remplir l'état des lieux"
+    STARTED = "a commencé à remplir l'état des lieux"  # legacy
     UPDATED = "a mis à jour l'état des lieux"
 
 
 class Conversation:
-    PUBLIC_MESSAGE = "a envoyé un message dans l'espace conversation"  # deprecated but reflects state in db so should not be deleted
-    PRIVATE_MESSAGE = "a envoyé un message dans l'espace conseillers"
-    POST_MESSAGE = "a envoyé un message"
+    PUBLIC_MESSAGE = "a envoyé dans l'espace conversation"  # deprecated but reflects state in db so should not be deleted
+    PRIVATE_MESSAGE = "a envoyé dans l'espace conseillers"
+    POST_MESSAGE = "a envoyé"
 
 
 # eof

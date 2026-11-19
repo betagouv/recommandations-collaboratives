@@ -13,7 +13,6 @@ from notifications.signals import notify
 from recoco import verbs
 from recoco.apps.survey import signals as survey_signals
 from recoco.apps.training import utils as training_utils
-from recoco.utils import is_staff_for_site
 
 from . import models
 from .utils import (
@@ -267,24 +266,6 @@ def notify_project_member_joined(sender, project, **kwargs):
     notify_advisors_of_project(project, notification)
     if not project.inactive_since:
         notify_members_of_project(project, notification, exclude=sender)
-
-
-########################################################################
-# Reminders
-########################################################################
-
-reminder_created = django.dispatch.Signal()
-
-
-@receiver(reminder_created)
-def log_reminder_created(sender, task, project, user, **kwargs):
-    if not is_staff_for_site(user):
-        action.send(
-            user,
-            verb=verbs.Recommendation.REMINDER_ADDED,
-            action_object=task,
-            target=project,
-        )
 
 
 ######
