@@ -6,9 +6,7 @@ Views are discovered from the URL resolver, so a view that later opts into
 """
 
 import pytest
-from django.contrib.auth.models import User
 from django.urls import URLPattern, URLResolver, get_resolver, reverse
-from model_bakery import baker
 
 from ..authentication import ServiceAPIKeyAllowedMixin
 from ..models import ServiceAPIKey
@@ -67,12 +65,9 @@ def test_open_views_are_opted_in():
 
 
 @pytest.fixture
-def rightless_key(current_site):
-    user = baker.make(User, is_active=True)
-    user.profile.is_bot = True
-    user.profile.save()
+def rightless_key(current_site, service_account):
     _, key = ServiceAPIKey.objects.create_key(
-        name="svc-rightless", user=user, site=current_site
+        name="svc-rightless", user=service_account, site=current_site
     )
     return key
 

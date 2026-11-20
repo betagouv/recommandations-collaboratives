@@ -8,12 +8,9 @@ from ..models import ServiceAPIKey
 
 
 @pytest.mark.django_db
-def test_api_keys_are_read_only_in_admin(current_site):
-    bot = baker.make(User, is_active=True)
-    bot.profile.is_bot = True
-    bot.profile.save()
+def test_api_keys_are_read_only_in_admin(current_site, service_account):
     api_key, _ = ServiceAPIKey.objects.create_key(
-        name="svc", user=bot, site=current_site
+        name="svc", user=service_account, site=current_site
     )
 
     request = RequestFactory().get("/")
