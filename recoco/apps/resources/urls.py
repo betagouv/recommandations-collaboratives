@@ -13,6 +13,16 @@ from . import views
 
 urlpatterns = [
     path(
+        r"ressource/patches/",
+        views.ResourcePatchListView.as_view(),
+        name="resources-patches-list",
+    ),
+    path(
+        r"ressource/<int:resource_id>/patches/<int:patch_pk>/",
+        views.ResourcePatchReviewView.as_view(),
+        name="resources-patch-review",
+    ),
+    path(
         r"ressource/",
         views.resource_search,
         name="resources-resource-search",
