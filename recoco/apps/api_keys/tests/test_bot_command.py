@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
 from model_bakery import baker
 
+from recoco.apps.home.utils import deactivate_user
+
 from ..models import ServiceAPIKey
 
 
@@ -110,6 +112,37 @@ def test_disable_deactivates_bot_and_revokes_keys(current_site):
     assert not bot.api_keys.filter(revoked=False).exists()
     with pytest.raises(ServiceAPIKey.DoesNotExist):
         ServiceAPIKey.objects.get_from_key(key)
+
+
+@pytest.mark.django_db
+def test_disable_refuses_an_already_disabled_bot(current_site):
+    run("create", "--name", "svc-bot", "--site", current_site.domain)
+    run("disable", "--name", "svc-bot")
+    disabled = User.objects.get(username="svc-bot").profile.disabled
+
+    with pytest.raises(CommandError, match="already disabled"):
+        run("disable", "--name", "svc-bot")
+
+    bot = User.objects.get(username="svc-bot")
+    assert bot.profile.disabled == disabled
+
+
+@pytest.mark.django_db
+def test_renew_without_a_key_says_so(service_account):
+    with pytest.raises(CommandError, match="no API key to renew"):
+        run("renew", "--name", service_account.username)
+
+
+@pytest.mark.django_db
+def test_enable_without_a_key_leaves_the_bot_disabled(service_account):
+    deactivate_user(service_account)
+
+    with pytest.raises(CommandError, match="no API key to enable it with"):
+        run("enable", "--name", service_account.username)
+
+    service_account.refresh_from_db()
+    assert not service_account.is_active
+    assert service_account.profile.disabled is not None
 
 
 @pytest.mark.django_db

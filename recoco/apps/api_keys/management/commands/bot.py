@@ -14,7 +14,9 @@ class Command(BaseCommand):
         "Manage bot accounts and their API key: "
         "create a bot with a key, renew its key (revoking the previous ones), "
         "disable the bot (deactivating it and revoking its keys), "
-        "or enable a disabled bot again with a new key"
+        "or enable a disabled bot again with a new key. "
+        "A disabled bot keeps its groups and permissions, "
+        "and gets them back when enabled."
     )
 
     def add_arguments(self, parser):
@@ -50,12 +52,14 @@ class Command(BaseCommand):
         user = self._get_bot(name)
         if not user.is_active:
             raise CommandError(f"Bot {name!r} is disabled")
-        self._rotate_key(user)
+        self._rotate_key(user, f"Bot {name!r} has no API key to renew")
 
     def disable(self, name, _site_domain):
         # deactivate rather than delete: keeps what the bot created
         # and a trace of its keys
         user = self._get_bot(name)
+        if not user.is_active:
+            raise CommandError(f"Bot {name!r} is already disabled")
         deactivate_user(user)
         user.api_keys.filter(revoked=False).update(revoked=True)
         self.stdout.write(self.style.SUCCESS(f"Bot {name!r} disabled"))
@@ -67,14 +71,14 @@ class Command(BaseCommand):
         if user.profile.deleted:
             raise CommandError(f"Bot {name!r} is deleted and cannot be enabled")
         reactivate_user(user)
-        self._rotate_key(user)
+        self._rotate_key(user, f"Bot {name!r} has no API key to enable it with")
 
-    def _rotate_key(self, user):
+    def _rotate_key(self, user, no_key_message):
         """Revoke every usable key of the bot and issue a new one."""
         # most recent key, revoked or not, tells which site to issue it for
         api_key = user.api_keys.select_related("site").order_by("-created").first()
         if api_key is None:
-            raise CommandError(f"Bot {user.username!r} has no API key to renew")
+            raise CommandError(no_key_message)
 
         # revoke rather than delete, to keep a trace of past keys
         user.api_keys.filter(revoked=False).update(revoked=True)
