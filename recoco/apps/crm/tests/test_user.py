@@ -1061,30 +1061,26 @@ def test_crm_user_reminder_details_accessible_w_perm(request, client):
 )
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_crm_user_changes_are_not_available_for_bots(
-    client, current_site, service_account, url_name, method
+    client, staff_user, service_account, url_name, method
 ):
     url = reverse(url_name, args=[service_account.id])
 
-    with login(client) as user:
-        assign_perm("use_crm", user, current_site)
-        response = getattr(client, method)(url)
+    client.force_login(staff_user)
+    response = getattr(client, method)(url)
 
     assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_crm_cannot_deactivate_a_bot(client, current_site, service_account):
+def test_crm_cannot_deactivate_a_bot(client, current_site, staff_user, service_account):
     """CRM deactivation leaves keys unrevoked, so a later reactivation
     would revive them: the CRM must not touch a bot at all."""
     _, key = ServiceAPIKey.objects.create_key(
         name="svc-bot", user=service_account, site=current_site
     )
 
-    with login(client) as user:
-        assign_perm("use_crm", user, current_site)
-        response = client.post(
-            reverse("crm-user-deactivate", args=[service_account.id])
-        )
+    client.force_login(staff_user)
+    response = client.post(reverse("crm-user-deactivate", args=[service_account.id]))
 
     assert response.status_code == 404
     service_account.refresh_from_db()
@@ -1094,15 +1090,42 @@ def test_crm_cannot_deactivate_a_bot(client, current_site, service_account):
 
 
 @pytest.mark.django_db
-def test_crm_cannot_reactivate_a_bot(client, current_site, service_account):
+def test_crm_cannot_reactivate_a_bot(client, staff_user, service_account):
     deactivate_user(service_account)
 
-    with login(client) as user:
-        assign_perm("use_crm", user, current_site)
-        response = client.post(
-            reverse("crm-user-reactivate", args=[service_account.id])
-        )
+    client.force_login(staff_user)
+    response = client.post(reverse("crm-user-reactivate", args=[service_account.id]))
 
     assert response.status_code == 404
     service_account.refresh_from_db()
     assert service_account.is_active is False
+
+
+@pytest.mark.django_db
+def test_crm_user_details_offers_no_change_on_a_bot(
+    client, staff_user, service_account
+):
+    deactivate_user(service_account)
+
+    client.force_login(staff_user)
+    response = client.get(reverse("crm-user-details", args=[service_account.id]))
+
+    assert response.status_code == 200
+    assertNotContains(response, reverse("crm-user-update", args=[service_account.id]))
+    assertNotContains(
+        response, reverse("crm-user-reactivate", args=[service_account.id])
+    )
+    assertContains(response, "ne peut être réactivé que depuis le serveur")
+
+
+@pytest.mark.django_db
+def test_crm_user_details_offers_changes_on_a_human(client, current_site, staff_user):
+    human = baker.make(auth_models.User)
+    human.profile.sites.add(current_site)
+    deactivate_user(human)
+
+    client.force_login(staff_user)
+    response = client.get(reverse("crm-user-details", args=[human.id]))
+
+    assertContains(response, reverse("crm-user-update", args=[human.id]))
+    assertContains(response, reverse("crm-user-reactivate", args=[human.id]))
