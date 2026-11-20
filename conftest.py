@@ -62,6 +62,16 @@ def admin_user(current_site):
     return admin
 
 
+@pytest.fixture
+def service_account(current_site):
+    """A bot of the current site: it only authenticates with an API key."""
+    user = baker.make(User, is_active=True)
+    user.profile.sites.add(current_site)
+    user.profile.is_bot = True
+    user.profile.save()
+    return user
+
+
 # -- Project Fixtures
 @pytest.fixture
 def make_project(request):

@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 import pytest
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import IntegrityError
 from django.test.client import RequestFactory
@@ -19,15 +18,6 @@ def make_request(site, header):
     request.site = site
     request.META["HTTP_AUTHORIZATION"] = header
     return request
-
-
-@pytest.fixture
-def service_account(current_site):
-    user = baker.make(User, is_active=True)
-    user.profile.sites.add(current_site)
-    user.profile.is_bot = True
-    user.profile.save()
-    return user
 
 
 @pytest.fixture
