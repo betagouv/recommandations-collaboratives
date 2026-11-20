@@ -9,6 +9,8 @@ from django.utils import timezone
 from model_bakery import baker
 from rest_framework.exceptions import AuthenticationFailed
 
+from recoco.apps.home.models import UserProfile
+
 from ..authentication import ServiceAPIKeyAuthentication
 from ..models import ServiceAPIKey
 
@@ -77,6 +79,20 @@ def test_expired_key_is_rejected(make_key, current_site):
 def test_key_of_another_site_is_rejected(make_key, current_site):
     other_site = baker.make(Site, domain="autre.example.com")
     _, key = make_key(site=other_site)
+
+    with pytest.raises(AuthenticationFailed):
+        ServiceAPIKeyAuthentication().authenticate(
+            make_request(current_site, f"Api-Key {key}")
+        )
+
+
+@pytest.mark.django_db
+def test_key_of_a_user_who_is_no_longer_a_bot_is_rejected(
+    make_key, service_account, current_site
+):
+    _, key = make_key()
+    # a bulk update skips the signal that deletes the keys of non-bot users
+    UserProfile.objects.filter(user=service_account).update(is_bot=False)
 
     with pytest.raises(AuthenticationFailed):
         ServiceAPIKeyAuthentication().authenticate(

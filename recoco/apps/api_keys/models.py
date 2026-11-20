@@ -10,7 +10,9 @@ class ServiceAPIKeyManager(BaseAPIKeyManager):
         return (
             super()
             .get_usable_keys()
-            .filter(user__is_active=True)
+            # also checked here: the signal that deletes the keys of a user
+            # who stops being a bot is skipped by bulk updates
+            .filter(user__is_active=True, user__profile__is_bot=True)
             .select_related("user", "site")
         )
 
