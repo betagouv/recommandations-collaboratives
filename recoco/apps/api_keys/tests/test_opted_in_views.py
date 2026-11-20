@@ -1,0 +1,93 @@
+"""Every view opened to service API keys must refuse a key whose user has no
+rights at all, except the auth check, whose only job is to accept a valid key.
+
+Views are discovered from the URL resolver, so a view that later opts into
+``ServiceAPIKeyAllowedMixin`` is covered without touching this file.
+"""
+
+import pytest
+from django.urls import URLPattern, URLResolver, get_resolver, reverse
+
+from ..authentication import ServiceAPIKeyAllowedMixin
+from ..models import ServiceAPIKey
+
+IGNORED_METHODS = {"options", "head", "trace"}
+
+# views that any valid key may reach, rights or not
+OPEN_TO_ANY_KEY = {"auth-check"}
+
+
+def _walk(patterns, namespace="", params=()):
+    for entry in patterns:
+        entry_params = params + tuple(entry.pattern.regex.groupindex)
+        if isinstance(entry, URLResolver):
+            ns = f"{namespace}{entry.namespace}:" if entry.namespace else namespace
+            yield from _walk(entry.url_patterns, ns, entry_params)
+        elif isinstance(entry, URLPattern) and entry.name:
+            yield entry, f"{namespace}{entry.name}", entry_params
+
+
+def _methods(callback, view_class):
+    actions = getattr(callback, "actions", None)  # viewsets
+    if actions:
+        return sorted(set(actions) - IGNORED_METHODS)
+    return sorted(
+        method
+        for method in view_class.http_method_names
+        if method not in IGNORED_METHODS and hasattr(view_class, method)
+    )
+
+
+def opted_in_endpoints():
+    endpoints = set()
+    for pattern, name, params in _walk(get_resolver().url_patterns):
+        view_class = getattr(pattern.callback, "cls", None)
+        if not (view_class and issubclass(view_class, ServiceAPIKeyAllowedMixin)):
+            continue
+        if "format" in params:  # DRF's `.json` suffix duplicates of each route
+            continue
+        for method in _methods(pattern.callback, view_class):
+            endpoints.add((name, tuple(sorted(set(params))), method))
+    return sorted(endpoints)
+
+
+OPTED_IN_ENDPOINTS = opted_in_endpoints()
+
+
+def test_some_views_are_opted_in():
+    # guard against the discovery silently finding nothing
+    assert OPTED_IN_ENDPOINTS
+
+
+def test_open_views_are_opted_in():
+    # an exemption for a view that is no longer opted in would go unnoticed
+    assert OPEN_TO_ANY_KEY <= {name for name, _, _ in OPTED_IN_ENDPOINTS}
+
+
+@pytest.fixture
+def rightless_key(current_site, service_account):
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-rightless", user=service_account, site=current_site
+    )
+    return key
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "name,params,method",
+    OPTED_IN_ENDPOINTS,
+    ids=[f"{method.upper()} {name}" for name, _, method in OPTED_IN_ENDPOINTS],
+)
+def test_rightless_key_is_refused_everywhere_but_auth_check(
+    api_client, rightless_key, name, params, method
+):
+    url = reverse(name, kwargs={param: 1 for param in params})
+
+    response = getattr(api_client, method)(
+        url, HTTP_AUTHORIZATION=f"Api-Key {rightless_key}"
+    )
+
+    expected = 200 if name in OPEN_TO_ANY_KEY else 403
+    assert response.status_code == expected, (
+        f"{method.upper()} {url} -> {response.status_code}"
+    )

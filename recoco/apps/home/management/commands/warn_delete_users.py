@@ -34,9 +34,9 @@ class Command(BaseCommand):
             days=FIRST_WARNING_DAYS_BEFORE - SECOND_WARNING_DAYS_BEFORE
         )
 
-        not_deleted_profiles = UserProfile.all.filter(
-            deleted=None
-        )  # we keep disabled users
+        # we keep disabled users; bots have no mailbox to be warned at
+        # and are disabled from the server, never deleted for inactivity
+        not_deleted_profiles = UserProfile.all.filter(deleted=None, is_bot=False)
 
         # resets warning of users who used the platform lately
         not_deleted_profiles.filter(

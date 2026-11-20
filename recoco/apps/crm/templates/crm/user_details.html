@@ -46,8 +46,10 @@
                                 title="Usurper l'identité"></button>
                     </form>
                 {% endif %}
-                <a class="fr-btn fr-btn--tertiary fr-btn--sm user-crm__actions-btn--style fr-icon-pencil-line"
-                   href="{% url 'crm-user-update' crm_user.pk %}"></a>
+                {% if not crm_user.profile.is_bot %}
+                    <a class="fr-btn fr-btn--tertiary fr-btn--sm user-crm__actions-btn--style fr-icon-pencil-line"
+                       href="{% url 'crm-user-update' crm_user.pk %}"></a>
+                {% endif %}
             </div>
             <!-- User info -->
             <div class="d-flex flex-column fr-p-5v">
@@ -144,10 +146,14 @@
         <div class="user-banner user-banner--desactivated">
             {% if crm_user.profile.disabled %}
                 <p class="fr-m-0 font-size-14px">Cet utilisateur a été désactivé.</p>
-                <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" class="user-banner__btn user-banner__btn--white">Réactiver le compte utilisateur</button>
-                </form>
+                {% if crm_user.profile.is_bot %}
+                    <p class="fr-m-0 font-size-14px">Ce compte de service ne peut être réactivé que depuis le serveur.</p>
+                {% else %}
+                    <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="user-banner__btn user-banner__btn--white">Réactiver le compte utilisateur</button>
+                    </form>
+                {% endif %}
             {% elif crm_user.profile.deleted %}
                 <p class="fr-m-0 font-size-14px">
                     Ce compte a été supprimé. La personne ne peut plus se connecter à {{ request.site.name }}.
