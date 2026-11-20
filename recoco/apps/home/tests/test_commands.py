@@ -329,6 +329,38 @@ def test_gdpr_command_deletes(user_to_delete, mocker, current_site):
 
 
 @pytest.mark.django_db
+@freeze_time("2025-12-23")
+@pytest.mark.parametrize(
+    "nb_deletion_warnings,previous_deletion_warning_at",
+    [(0, None), (1, datetime(2024, 12, 22)), (2, datetime(2024, 12, 22))],
+    ids=["first-warning", "second-warning", "deletion"],
+)
+def test_gdpr_command_leaves_bots_alone(
+    service_account,
+    current_site,
+    mocker,
+    nb_deletion_warnings,
+    previous_deletion_warning_at,
+):
+    profile = service_account.profile
+    profile.previous_activity_site = current_site
+    profile.previous_activity_at = datetime(2023, 12, 22)
+    profile.nb_deletion_warnings = nb_deletion_warnings
+    profile.previous_deletion_warning_at = previous_deletion_warning_at
+    profile.save()
+
+    patch = mocker.patch("recoco.apps.home.utils.send_email")
+    call_command("warn_delete_users", stdout=StringIO())
+
+    assert patch.call_count == 0
+    service_account.refresh_from_db()
+    profile.refresh_from_db()
+    assert service_account.is_active
+    assert profile.deleted is None
+    assert profile.nb_deletion_warnings == nb_deletion_warnings
+
+
+@pytest.mark.django_db
 @pytest.mark.skip(reason="has side effects on other tests")
 def test_gdpr_command_update_verbs(current_site):
     v1_old = "old v1"
