@@ -154,6 +154,8 @@
                                 <fieldset class="fr-fieldset">
                                     {{ form.accept_handover|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Un autre portail Recommandations-collaboratives peut vous proposer d’intervenir sur un dossier déposé chez lui. Vous devrez accepter ou refuser ce dossier, et il apparaîtra dans votre liste de dossiers si vous l’acceptez.</span>
+                                    {{ form.public_resources|as_crispy_field:"dsrc_crispy_forms_no_js" }}
+                                    <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Les ressources publiques sont visibles par tous les visiteurs, même non connectés, et peuvent être référencées par les moteurs de recherche (Google, etc.). Décochez cette option pour réserver la consultation des ressources aux utilisateurs connectés.</span>
                                     {{ form.crisp_token|as_crispy_field:"dsrc_crispy_forms_no_js" }}
                                     <span class="fr-icon-info-fill fr-hint-text fr-hint-text-blue fr-pl-1w fr-mb-3w">Crisp est un outil de chat qui vous permet de répondre en direct aux questions de vos visiteurs. L’équipe Reco-co peut soit répondre à vos visiteurs (sur des questions d’utilisation de la plateforme), soit vous indiquer comment mettre en place votre propre chat pour répondre vous-même.</span>
                                 </fieldset>

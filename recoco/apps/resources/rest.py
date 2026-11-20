@@ -20,6 +20,7 @@ from .serializers import (
     ResourceURIImportSerializer,
     ResourceWritableSerializer,
 )
+from .utils import resources_are_public
 
 ########################################################################
 # REST API
@@ -38,6 +39,15 @@ class IsResourceManagerOrReadOnly(permissions.BasePermission):
         return has_perm(request.user, "sites.manage_resources", request.site)
 
 
+class IsAuthenticatedOrPublicResources(permissions.BasePermission):
+    """
+    Deny anonymous access when the current site does not expose resources publicly
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated or resources_are_public(request)
+
+
 class ResourceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows resources to be listed or edited, with pagination support.
@@ -45,6 +55,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
 
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
+        IsAuthenticatedOrPublicResources,
         IsResourceManagerOrReadOnly,
     ]
     pagination_class = StandardResultsSetPagination

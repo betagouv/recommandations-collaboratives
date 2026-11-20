@@ -45,12 +45,18 @@ from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
 from . import models
+from .utils import (
+    PublicResourcesOrLoginMixin,
+    public_resources_or_login,
+    resources_are_public,
+)
 
 ########################################################################
 # Searching resources
 ########################################################################
 
 
+@public_resources_or_login
 def resource_search(request):
     """Search existing resources"""
 
@@ -337,7 +343,9 @@ class DuplicateResourceView(
         return redirect(f"{url}?is_duplicate=true")
 
 
-class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
+class ResourceDetailView(
+    PublicResourcesOrLoginMixin, UserPassesTestMixin, BaseResourceDetailView
+):
     model = models.Resource
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
@@ -366,7 +374,7 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
         return context
 
 
-class EmbededResourceDetailView(BaseResourceDetailView):
+class EmbededResourceDetailView(PublicResourcesOrLoginMixin, BaseResourceDetailView):
     template_name = "resources/resource/details_embeded.html"
 
     def get_object(self, queryset=None):
@@ -640,6 +648,11 @@ class LatestResourcesFeed(Feed):
     title = "Nouvelles Ressources"
     link = "/resources/feed"
     description = "Derniers ajouts de ressources"
+
+    def __call__(self, request, *args, **kwargs):
+        if not resources_are_public(request):
+            raise Http404()
+        return super().__call__(request, *args, **kwargs)
 
     def items(self):
         qs = models.Resource.on_site.order_by("-created_on").filter(
