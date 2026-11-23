@@ -1,20 +1,21 @@
-"""Every view opened to service API keys must refuse a key whose user has no
-rights at all, except the auth check, whose only job is to accept a valid key.
+"""Every view that accepts service API keys must refuse a key whose user has no
+rights at all, except the open ones (auth check, OpenAPI schema).
 
-Views are discovered from the URL resolver, so a view that later opts into
-``ServiceAPIKeyAllowedMixin`` is covered without touching this file.
+Views are discovered from the URL resolver by their authentication_classes,
+so a view that later accepts keys is covered without touching this file.
 """
 
 import pytest
 from django.urls import URLPattern, URLResolver, get_resolver, reverse
 
-from ..authentication import ServiceAPIKeyAllowedMixin
+from ..authentication import ServiceAPIKeyAuthentication
 from ..models import ServiceAPIKey
 
 IGNORED_METHODS = {"options", "head", "trace"}
 
-# views that any valid key may reach, rights or not
-OPEN_TO_ANY_KEY = {"auth-check"}
+# views that any valid key may reach, rights or not: the auth check, and the
+# OpenAPI schema (open to any authenticated user, see SPECTACULAR_SETTINGS)
+OPEN_TO_ANY_KEY = {"auth-check", "schema", "swagger-ui", "redoc"}
 
 
 def _walk(patterns, namespace="", params=()):
@@ -42,7 +43,8 @@ def opted_in_endpoints():
     endpoints = set()
     for pattern, name, params in _walk(get_resolver().url_patterns):
         view_class = getattr(pattern.callback, "cls", None)
-        if not (view_class and issubclass(view_class, ServiceAPIKeyAllowedMixin)):
+        auth_classes = getattr(view_class, "authentication_classes", ())
+        if ServiceAPIKeyAuthentication not in auth_classes:
             continue
         if "format" in params:  # DRF's `.json` suffix duplicates of each route
             continue
@@ -78,7 +80,7 @@ def rightless_key(current_site, service_account):
     OPTED_IN_ENDPOINTS,
     ids=[f"{method.upper()} {name}" for name, _, method in OPTED_IN_ENDPOINTS],
 )
-def test_rightless_key_is_refused_everywhere_but_auth_check(
+def test_rightless_key_is_refused_everywhere_but_open_views(
     api_client, rightless_key, name, params, method
 ):
     url = reverse(name, kwargs={param: 1 for param in params})

@@ -55,14 +55,16 @@ class ServiceAPIKeyAuthentication(authentication.BaseAuthentication):
         return self.keyword
 
 
-class ServiceAPIKeyAllowedMixin:
-    """Opts a view into service API key authentication.
-
-    Key authentication is deliberately kept out of
-    DEFAULT_AUTHENTICATION_CLASSES: a view without this mixin cannot be
-    reached with an API key.
-    """
-
-    authentication_classes = list(api_settings.DEFAULT_AUTHENTICATION_CLASSES) + [
-        ServiceAPIKeyAuthentication
-    ]
+# Login methods for a view that service API keys may reach.
+# The Key login is kept out of DEFAULT_AUTHENTICATION_CLASSES.
+# Views that accepts this method needs to declare it
+#   class MyView(APIView):
+#       authentication_classes = WITH_SERVICE_API_KEY
+#
+#   @api_view(["GET"])
+#   @authentication_classes(WITH_SERVICE_API_KEY)
+#   def my_view(request): ...
+WITH_SERVICE_API_KEY = [
+    *api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    ServiceAPIKeyAuthentication,
+]

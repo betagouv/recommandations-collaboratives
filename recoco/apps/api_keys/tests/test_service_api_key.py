@@ -7,7 +7,11 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from recoco.apps.home.models import UserProfile
 
@@ -173,3 +177,23 @@ def test_key_names_are_unique(make_key):
 
     with pytest.raises(IntegrityError):
         make_key()
+
+
+class SessionAndKeyView(APIView):
+    authentication_classes = [SessionAuthentication, ServiceAPIKeyAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"id": request.user.id})
+
+
+@pytest.mark.django_db
+def test_view_with_its_own_auth_classes_accepts_a_key(
+    make_key, service_account, current_site
+):
+    _, key = make_key()
+
+    response = SessionAndKeyView.as_view()(make_request(current_site, f"Api-Key {key}"))
+
+    assert response.status_code == 200
+    assert response.data == {"id": service_account.id}

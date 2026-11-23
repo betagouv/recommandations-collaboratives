@@ -4,13 +4,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .authentication import ServiceAPIKeyAllowedMixin
+from .authentication import WITH_SERVICE_API_KEY
 
 
-class AuthCheckView(ServiceAPIKeyAllowedMixin, APIView):
+class AuthCheckView(APIView):
     """Let a client (e.g. a robot using a service API key) check that its
     credentials are accepted: 200 when authenticated, 403 otherwise."""
 
+    authentication_classes = WITH_SERVICE_API_KEY
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
