@@ -26,6 +26,7 @@ from recoco.apps.addressbook.models import Contact
 from recoco.apps.demarches_simplifiees import models as ds_models
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.hitcount.models import Hit, HitCount
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models
 from recoco.apps.resources import models as resources_models
@@ -1634,6 +1635,64 @@ def test_staff_can_access_feed(client, current_site, staff_user):
         assert resource.title in response.text
     assert review_resource.title not in response.text
     assert draft_resource.title not in response.text
+
+
+########################################################################
+# non public resources
+########################################################################
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url_name,with_id",
+    [
+        ("resources-resource-search", False),
+        ("resources-resource-detail", True),
+        ("resources-resource-detail-embeded", True),
+    ],
+)
+def test_non_public_resources_redirect_anonymous_to_login(
+    client, current_site, url_name, with_id
+):
+    baker.make(home_models.SiteConfiguration, site=current_site, public_resources=False)
+    resource = baker.make(
+        models.Resource, sites=[current_site], status=models.Resource.PUBLISHED
+    )
+    url = reverse(url_name, args=[resource.id] if with_id else [])
+
+    response = client.get(url)
+
+    assertRedirects(
+        response,
+        f"{reverse('account_login')}?next={url}",
+        fetch_redirect_response=False,
+    )
+
+
+@pytest.mark.django_db
+def test_non_public_resource_detail_available_for_logged_in_user(client, current_site):
+    baker.make(home_models.SiteConfiguration, site=current_site, public_resources=False)
+    resource = baker.make(
+        models.Resource,
+        sites=[current_site],
+        status=models.Resource.PUBLISHED,
+        title="A Nice title",
+    )
+
+    with login(client):
+        response = client.get(reverse("resources-resource-detail", args=[resource.id]))
+
+    assert response.status_code == 200
+    assertContains(response, resource.title)
+
+
+@pytest.mark.django_db
+def test_non_public_resources_feed_not_found(client, current_site):
+    baker.make(home_models.SiteConfiguration, site=current_site, public_resources=False)
+
+    response = client.get(reverse("resources-feed"))
+
+    assert response.status_code == 404
 
 
 # eof

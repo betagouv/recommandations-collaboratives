@@ -17,6 +17,7 @@ from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery.recipe import Recipe, baker
 
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.utils import assign_collaborator
 from recoco.apps.tasks import models as task_models
@@ -41,6 +42,16 @@ def test_anonymous_can_see_resources_list_api(request, api_client):
     response = api_client.get(url)
     assert response.status_code == 200
     assert response.data["results"][0]["title"] == resource.title
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_see_non_public_resources_list_api(api_client, current_site):
+    baker.make(home_models.SiteConfiguration, site=current_site, public_resources=False)
+    baker.make(models.Resource, sites=[current_site], status=models.Resource.PUBLISHED)
+
+    url = reverse("resources-list")
+    response = api_client.get(url)
+    assert response.status_code in (401, 403)
 
 
 @pytest.mark.django_db
