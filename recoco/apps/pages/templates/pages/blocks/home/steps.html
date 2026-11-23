@@ -1,0 +1,29 @@
+{% load wagtailimages_tags %}
+<section class="home-page-section home-page-section--{{ value.background }} fr-py-6w">
+    <div class="fr-container fr-pt-2w fr-pb-6w">
+        <h2 class="fr-h3 text-center fr-pb-6w">{{ value.title }}</h2>
+        <ol class="fr-raw-list fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+            {% for card in value.cards %}
+                <li class="fr-col-12 fr-col-sm-6 fr-col-md-3">
+                    <div class="home-page__tile fr-p-2w h-100">
+                        <div class="w-100 fr-p-2w fr-m-auto specific-maxwidth-160px">
+                            {% if card.icon_url %}
+                                <img src="{{ card.icon_url }}" class="fr-responsive-img" alt="{{ card.icon_alt }}" />
+                            {% else %}
+                                {% image card.icon max-320x320 class="fr-responsive-img" %}
+                            {% endif %}
+                        </div>
+                        {% if card.number_image %}
+                            <div class="w-100 fr-p-2w specific-maxwidth-160px">
+                                {% image card.number_image max-120x120 class="home-page-steps__number" %}
+                            </div>
+                        {% else %}
+                            <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">{{ forloop.counter }}</span>
+                        {% endif %}
+                        <p class="fr-h6">{{ card.text }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+</section>
