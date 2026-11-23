@@ -5,7 +5,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0052_remove_siteconfiguration_schema_name"),
+        ("home", "0053_siteconfiguration_public_resources"),
+        ("home", "0053_trusted_bot_groups"),
     ]
 
     operations = [
