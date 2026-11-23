@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import sentry_sdk
 from cookie_consent.util import get_cookie_value_from_request
+from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
@@ -51,6 +52,16 @@ class EmbedMiddleware:
         request.is_embedded = request.session.get("is_embedded", False)
 
         response = self.get_response(request)
+
+        if request.is_embedded:
+            # A SameSite=Lax cookie is dropped inside a cross-site iframe, so
+            # the banner would come back on every load. Follow the session
+            # cookie: is_embedded lives in the session, so if that one cannot
+            # cross sites here, relaxing this one buys nothing anyway.
+            morsel = response.cookies.get(settings.COOKIE_CONSENT_NAME)
+            if morsel is not None and settings.SESSION_COOKIE_SECURE:
+                morsel["samesite"] = "None"
+                morsel["secure"] = True
 
         site_config = getattr(request, "site_config", None)
         if request.is_embedded and site_config is not None:
