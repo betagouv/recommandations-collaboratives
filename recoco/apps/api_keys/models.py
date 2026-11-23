@@ -42,7 +42,14 @@ class ServiceAPIKey(AbstractAPIKey):
         constraints = [
             models.UniqueConstraint(
                 fields=["name"], name="api_keys_serviceapikey_unique_name"
-            )
+            ),
+            # one usable key per bot and site, so renewing a site's key is never
+            # ambiguous
+            models.UniqueConstraint(
+                fields=["user", "site"],
+                condition=models.Q(revoked=False),
+                name="api_keys_serviceapikey_one_active_per_site",
+            ),
         ]
 
     def clean(self):

@@ -179,6 +179,33 @@ def test_key_names_are_unique(make_key):
         make_key()
 
 
+@pytest.mark.django_db
+def test_a_bot_has_one_usable_key_per_site(service_account, current_site):
+    ServiceAPIKey.objects.create_key(
+        name="svc-a", user=service_account, site=current_site
+    )
+
+    with pytest.raises(IntegrityError):
+        ServiceAPIKey.objects.create_key(
+            name="svc-b", user=service_account, site=current_site
+        )
+
+
+@pytest.mark.django_db
+def test_revoked_keys_do_not_count_against_one_key_per_site(
+    service_account, current_site
+):
+    ServiceAPIKey.objects.create_key(
+        name="svc-a", user=service_account, site=current_site, revoked=True
+    )
+
+    ServiceAPIKey.objects.create_key(
+        name="svc-b", user=service_account, site=current_site
+    )
+
+    assert service_account.api_keys.count() == 2
+
+
 class SessionAndKeyView(APIView):
     authentication_classes = [SessionAuthentication, ServiceAPIKeyAuthentication]
     permission_classes = [IsAuthenticated]

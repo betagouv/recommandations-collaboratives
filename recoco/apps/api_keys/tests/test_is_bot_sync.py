@@ -47,7 +47,9 @@ def test_unsetting_is_bot_deletes_keys(current_site, service_account):
     bot = service_account
     other_bot = baker.make(User, is_active=True)
     set_bot(other_bot, True)
-    ServiceAPIKey.objects.create_key(name="a", user=bot, site=current_site)
+    ServiceAPIKey.objects.create_key(
+        name="a", user=bot, site=current_site, revoked=True
+    )
     ServiceAPIKey.objects.create_key(name="b", user=bot, site=current_site)
     ServiceAPIKey.objects.create_key(name="c", user=other_bot, site=current_site)
 
