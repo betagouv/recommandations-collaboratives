@@ -188,13 +188,15 @@
                             <div class="d-flex justify-content-between fr-mb-2w">
                                 <h6 class="text-uppercase fw-bold fr-m-0 d-block h6-specific-fontsize-14">Demandeur et partenaires</h6>
                                 <div class="d-block"
-                                     {% if project.status == 'DRAFT' %} data-bs-toggle="tooltip" data-bs-title="Vous pourrez inviter des personnes dès que votre dossier aura été accepté par les administrateurs." {% endif %}>
+                                     {% if project.status == 'DRAFT' %} data-bs-toggle="tooltip" data-bs-title="Vous pourrez inviter des personnes dès que votre dossier aura été accepté par les administrateurs."
+                                     {% elif not "invite_collaborators" in user_project_perms %} data-bs-toggle="tooltip" data-bs-title="Vous devez être Conseiller pour cela" {% endif %}>
                                     <button @click="openInviteMemberModal"
                                             data-toggle="modal"
                                             data-target="#InviteMemberModal"
                                             data-cy="invite-project-member-button"
                                             class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm"
                                             {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}disabled{% endif %}>
+
                                         Inviter
                                     </button>
                                 </div>
