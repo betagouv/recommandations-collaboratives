@@ -297,6 +297,7 @@ const config = {
         ),
         statistics: resolve('./src/js/apps/statistics.js'),
         advisorConvStyles: resolve('./src/js/styles/advisor-conv.css.js'),
+        TooltipLock: resolve('./src/js/components/TooltipLock.js'),
       },
       output: {
         chunkFileNames: undefined,

@@ -3,7 +3,7 @@
         - label (string): label to display in project navigation
 {% endcomment %}
 <div class="fr-segmented__element"
-     {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %} aria-describedby="tooltip-lock-access-settings" {% endif %}>
+     {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %} x-data="TooltipLock" x-tooltip="tooltipProps()"{% endif %}>
     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-settings" %}
     <input value="administrationPanel"
            type="radio"
