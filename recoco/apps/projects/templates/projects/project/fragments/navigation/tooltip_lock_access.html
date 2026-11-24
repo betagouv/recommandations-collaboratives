@@ -1,8 +1,12 @@
 <template x-ref="template">
-    <span id="{{ id }}">Pour accéder à cet onglet,
-        <span class="specific-span"
+    {% if is_switchtender %}
+        <span id="{{ id }}">Pour accéder à cet onglet,
+            <span class="specific-span"
             data-fr-opened="false"
             aria-expanded="false"
             aria-controls="modal-action">rejoignez le dossier</span>
-    </span>
+        </span>
+    {% else %}
+        <span id="{{ id }}">Vous n'êtes pas membre de ce dossier.</span>
+    {% endif %}
 </template>
