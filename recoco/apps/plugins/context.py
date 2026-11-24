@@ -44,3 +44,11 @@ def tenant_context(site):
         tenant_plugins_context(get_site_configuration(site)),
     ):
         yield
+
+
+def tenant_context_decorator(f):
+    def wraps(*args, **kwargs):
+        with tenant_context(f):
+            return f(*args, **kwargs)
+
+    return wraps
