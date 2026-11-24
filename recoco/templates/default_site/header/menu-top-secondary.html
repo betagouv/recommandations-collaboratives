@@ -77,7 +77,6 @@
                                             x-text='currentProject.name'></span>
                                         <span class="list-project__project-org-name_title no-underline"
                                             x-text="currentProject.org_name"></span>
-                                        {% comment %} <span class="no-underline" x-text="currentProject.commune.name"></span> {% endcomment %}
                                     </div>
                                 </template>
                                 <template x-if="!currentProject">
@@ -93,10 +92,7 @@
                             {% endif %}
                         </button>
                         <div class="fr-collapse fr-menu list-project__container" id="project_list">
-                            <ul x-data="{search:''}"class="fr-menu__list list-project">
-                                {% comment %} <li class="list-project__search-container">
-                                        <input type="search" class="fr-input" placeholder="Rechercher votre dossier" @input.debounce.400ms="onSearch()" x-model="search">
-                                </li> {% endcomment %}
+                            <ul class="fr-menu__list list-project">
                                 {% if project %}
                                     <li class="list-project__header">
                                         <template x-if="displayedProjectList.length > 0">
@@ -197,7 +193,5 @@
                 </a>
             </li>
         {% endfor %}
-        {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
-        {% comment %} {% include "header/menu-top-secondary-right.html" %} {% endcomment %}
     </ul>
 {% endwith %}
