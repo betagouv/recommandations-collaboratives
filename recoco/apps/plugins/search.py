@@ -2,6 +2,7 @@ from django.db.models import QuerySet
 from watson import search as watson
 from watson.models import SearchEntry
 
+from .context import tenant_context
 from .resolvers import get_enabled_plugins
 from .utils import is_plugin_label
 
@@ -57,3 +58,29 @@ def tenant_search(search_text, models=None, exclude=(), **kwargs):
         # watson.search treats an empty list as "every registered model" which we want to avoid
         return SearchEntry.objects.none()
     return watson.search(search_text, models=scoped_models, exclude=exclude, **kwargs)
+
+
+class PluginSearchAdapter(watson.SearchAdapter):
+    def get_title(self, obj):
+        with tenant_context(obj.site):
+            return super().get_title(obj)
+
+    def get_description(self, obj):
+        with tenant_context(obj.site):
+            return super().get_description(obj)
+
+    def get_content(self, obj):
+        with tenant_context(obj.site):
+            return super().get_content(obj)
+
+    def get_url(self, obj):
+        with tenant_context(obj.site):
+            return super().get_url(obj)
+
+    def get_meta(self, obj):
+        with tenant_context(obj.site):
+            return super().get_meta(obj)
+
+    def serialize_meta(self, obj):
+        with tenant_context(obj.site):
+            return super().serialize_meta(obj)
