@@ -2,6 +2,7 @@
 {% if matomo_url and matomo_site_id %}
 <script>
   var _paq = window._paq = window._paq || [];
+  window.matomoSiteName = '{{ request.site.name|escapejs }}';
   _paq.push(['setCustomDimension', customDimensionId = 1, customDimensionValue = '{{ request.site.domain }}']);
   _paq.push(['setCustomDimension', customDimensionId = 2, customDimensionValue = '{{ matomo_user_roles }}']);
   _paq.push(['trackPageView']);
