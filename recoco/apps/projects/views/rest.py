@@ -78,7 +78,7 @@ from ..serializers import (
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
-from ..utils import get_roles, remove_member, remove_role
+from ..utils import delete_project, get_roles, remove_member, remove_role
 
 ########################################################################
 # Project API
@@ -88,6 +88,11 @@ from ..utils import get_roles, remove_member, remove_role
 class CanCreateProjects(permissions.BasePermission):
     def has_permission(self, request, view):
         return has_perm(request.user, "sites.create_projects", request.site)
+
+
+class CanDeleteProjects(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.delete_projects", request.site)
 
 
 class CanManageProjectMembers(permissions.BasePermission):
@@ -212,6 +217,30 @@ class ProjectCreate(CreateAPIView):
     authentication_classes = WITH_SERVICE_API_KEY
     permission_classes = [IsServiceAPIKey, CanCreateProjects]
     serializer_class = NewProjectSerializer
+
+
+class ProjectDelete(APIView):
+    """Delete a project of the current site
+
+    The deletion is a soft delete: the project is only marked as deleted, as
+    when it is deleted from the site administration, and nothing is removed
+    from the database. A project already deleted is not found, so its deletion
+    date is kept.
+
+    The caller needs the `sites.delete_projects` permission on the current
+    site, and must authenticate with a service API key: only bots may delete
+    projects this way, not even staff, site admins or superusers, who delete
+    them from the site administration.
+    """
+
+    authentication_classes = WITH_SERVICE_API_KEY
+    permission_classes = [IsServiceAPIKey, CanDeleteProjects]
+
+    @extend_schema(request=None, responses={204: None})
+    def delete(self, request, pk, format=None):
+        project = get_object_or_404(models.Project.on_site, pk=pk)
+        delete_project(project)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectMembershipMixin:

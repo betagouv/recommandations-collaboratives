@@ -135,6 +135,11 @@ api_urls = [
         name="projects-create",
     ),
     path(
+        "projects/<int:pk>/delete/",
+        projects_rest.ProjectDelete.as_view(),
+        name="projects-delete",
+    ),
+    path(
         "projects/<int:pk>/members/",
         projects_rest.ProjectMembershipList.as_view(),
         name="projects-members-list",

@@ -1,7 +1,8 @@
 """
 Project endpoints that bots reach with a service API key: creating a project
-that skips moderation, and managing the members of a project (attaching them,
-listing them, removing them or their roles, changing the owner).
+that skips moderation, deleting a project, and managing the members of a
+project (attaching them, listing them, removing them or their roles, changing
+the owner).
 
 Only bots may use them, with a service API key and a permission granted on the
 site: not staff, site admins (who hold every site permission) or superusers.
@@ -736,3 +737,119 @@ def test_current_owner_is_a_noop(manager_client, project, make_member):
     assert project.owner == owner
     assert models.ProjectMember.objects.filter(project=project).count() == 2
     assert not notifications_models.Notification.objects.exists()
+
+
+########################################################################
+# delete a project
+########################################################################
+
+
+def delete_project_url(project):
+    return reverse("projects-delete", args=[project.id])
+
+
+@pytest.fixture
+def deleter_client(bot_client, service_account, current_site):
+    """A bot client allowed to delete the projects of the site"""
+    assign_perm("sites.delete_projects", service_account, current_site)
+    return bot_client
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_delete_project(api_client, project):
+    response = api_client.delete(delete_project_url(project))
+
+    assert response.status_code in (401, 403)
+    project.refresh_from_db()
+    assert project.deleted is None
+
+
+@pytest.mark.django_db
+def test_bot_without_permission_cannot_delete_project(bot_client, project):
+    response = bot_client.delete(delete_project_url(project))
+
+    assert response.status_code == 403
+    project.refresh_from_db()
+    assert project.deleted is None
+
+
+@pytest.mark.django_db
+def test_bot_with_permission_on_another_site_cannot_delete_project(
+    bot_client, service_account, project
+):
+    assign_perm("sites.delete_projects", service_account, baker.make(Site))
+
+    response = bot_client.delete(delete_project_url(project))
+
+    assert response.status_code == 403
+    project.refresh_from_db()
+    assert project.deleted is None
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("username", ["staff_user", "admin_user"])
+def test_staff_and_admin_cannot_delete_project(request, api_client, project, username):
+    # staff hold `delete_projects` on the site, but delete from the site instead
+    api_client.force_authenticate(request.getfixturevalue(username))
+
+    response = api_client.delete(delete_project_url(project))
+
+    assert response.status_code == 403
+    project.refresh_from_db()
+    assert project.deleted is None
+
+
+@pytest.mark.django_db
+def test_superuser_cannot_delete_project(api_client, project):
+    api_client.force_authenticate(baker.make(auth_models.User, is_superuser=True))
+
+    response = api_client.delete(delete_project_url(project))
+
+    assert response.status_code == 403
+    project.refresh_from_db()
+    assert project.deleted is None
+
+
+@pytest.mark.django_db
+def test_bot_deletes_a_project(deleter_client, project):
+    response = deleter_client.delete(delete_project_url(project))
+
+    assert response.status_code == 204
+    project.refresh_from_db()
+    assert project.deleted is not None
+    assert project.updated_on == project.deleted
+    # a soft delete: nothing is removed from the database
+    assert models.Project.objects_deleted.filter(pk=project.pk).exists()
+
+
+@pytest.mark.django_db
+def test_already_deleted_project_is_not_found(deleter_client, project):
+    utils.delete_project(project)
+    deleted_on = project.deleted
+
+    response = deleter_client.delete(delete_project_url(project))
+
+    assert response.status_code == 404
+    project.refresh_from_db()
+    assert project.deleted == deleted_on
+
+
+@pytest.mark.django_db
+def test_project_of_another_site_is_not_deleted(deleter_client, make_project):
+    project = make_project(site=baker.make(Site))
+
+    response = deleter_client.delete(delete_project_url(project))
+
+    assert response.status_code == 404
+    project.refresh_from_db()
+    assert project.deleted is None
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post", "put", "patch"])
+def test_only_delete_is_allowed(deleter_client, project, method):
+    response = getattr(deleter_client, method)(delete_project_url(project))
+
+    assert response.status_code == 405
+    project.refresh_from_db()
+    assert project.deleted is None
