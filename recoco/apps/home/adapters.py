@@ -51,6 +51,15 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
             return False
         return login.user.profile.login_with_code
 
+    def get_login_stages(self) -> list[str]:
+        # custom MFA conditions
+        return [
+            "recoco.apps.home.stages.RecocoMFAAuthenticateStage"
+            if stage == "allauth.mfa.stages.AuthenticateStage"
+            else stage
+            for stage in super().get_login_stages()
+        ]
+
     def clean_email(self, email: str) -> str:
         # brevo conditions:
         # - Longueur totale de l’adresse ≤ 254 caractères
