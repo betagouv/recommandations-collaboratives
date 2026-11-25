@@ -9,6 +9,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
@@ -863,6 +864,48 @@ def test_unassigned_user_should_not_see_recommendations(request):
         response = client.get(url)
 
     assert response.status_code == 403
+
+
+########################################################################
+# task followups
+########################################################################
+
+
+@pytest.mark.parametrize("group", ["example_com_staff", "example_com_advisor"])
+@pytest.mark.django_db
+def test_task_followups_are_not_available_across_sites(
+    api_client, current_site, make_project, settings, group
+):
+    """Being able to list the projects of a site must not give access to the
+    followups of another one; the positive control below confirms the 404 is
+    site-related and not a blanket failure."""
+    other_site = baker.make(Site, domain="other-site.example.com")
+    other_site_task = baker.make(
+        models.Task, project=make_project(site=other_site), site=other_site, public=True
+    )
+    with settings.SITE_ID.override(other_site.pk):
+        other_site_followup = baker.make(models.TaskFollowup, task=other_site_task)
+
+    same_site_task = baker.make(
+        models.Task, project=make_project(), site=current_site, public=True
+    )
+    same_site_followup = baker.make(models.TaskFollowup, task=same_site_task)
+
+    with login(api_client, groups=[group]):
+        for task, followup, status_code in (
+            (other_site_task, other_site_followup, 404),
+            (same_site_task, same_site_followup, 200),
+        ):
+            url = reverse(
+                "project-tasks-followups-list", args=[task.project_id, task.pk]
+            )
+            assert api_client.get(url).status_code == status_code
+
+            url = reverse(
+                "project-tasks-followups-detail",
+                args=[task.project_id, task.pk, followup.pk],
+            )
+            assert api_client.get(url).status_code == status_code
 
 
 #################################################################
