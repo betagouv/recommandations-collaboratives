@@ -303,14 +303,14 @@ class TaskFollowupPermission(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
+        project_id = view.kwargs.get("project_id")
+        project = get_object_or_404(projects_models.Project.on_site, pk=project_id)
+
         # conseiller regional
         if request.method in permissions.SAFE_METHODS and has_perm(
             request.user, "list_projects", request.site
         ):
             return True
-
-        project_id = view.kwargs.get("project_id")
-        project = projects_models.Project.on_site.get(pk=project_id)
 
         # conseiller ponctuel
         if request.method in permissions.SAFE_METHODS and has_perm(
