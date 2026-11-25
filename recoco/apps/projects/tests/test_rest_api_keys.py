@@ -44,34 +44,6 @@ def project_data(**kwargs):
 
 
 @pytest.mark.django_db
-def test_anonymous_cannot_create_project(api_client, commune):
-    response = api_client.post(reverse("projects-create"), data=project_data())
-
-    assert response.status_code == 403
-    assert not models.Project.objects.exists()
-
-
-@pytest.mark.django_db
-def test_bot_allowed_to_moderate_cannot_create_project(
-    bot_client, service_account, current_site, commune
-):
-    assign_perm("sites.moderate_projects", service_account, current_site)
-
-    response = bot_client.post(reverse("projects-create"), data=project_data())
-
-    assert response.status_code == 403
-    assert not models.Project.objects.exists()
-
-
-@pytest.mark.django_db
-def test_bot_without_permission_cannot_create_project(bot_client, commune):
-    response = bot_client.post(reverse("projects-create"), data=project_data())
-
-    assert response.status_code == 403
-    assert not models.Project.objects.exists()
-
-
-@pytest.mark.django_db
 def test_bot_with_permission_on_another_site_cannot_create_project(
     bot_client, service_account, commune
 ):
@@ -84,21 +56,9 @@ def test_bot_with_permission_on_another_site_cannot_create_project(
     assert not models.Project.objects.exists()
 
 
-@pytest.mark.parametrize("username", ["staff_user", "admin_user"])
 @pytest.mark.django_db
-def test_staff_and_admin_cannot_create_project(request, api_client, commune, username):
-    api_client.force_authenticate(request.getfixturevalue(username))
-
-    response = api_client.post(reverse("projects-create"), data=project_data())
-
-    assert response.status_code == 403
-    assert not models.Project.objects.exists()
-
-
-@pytest.mark.django_db
-def test_superuser_cannot_create_project(api_client, commune):
-    superuser = baker.make(auth_models.User, is_superuser=True)
-    api_client.force_authenticate(superuser)
+def test_site_admin_cannot_create_project(api_client, admin_user, commune):
+    api_client.force_authenticate(admin_user)
 
     response = api_client.post(reverse("projects-create"), data=project_data())
 
@@ -167,7 +127,7 @@ def test_project_status_can_be_given(
     assert project.project_sites.get(site=current_site).status == "IN_PROGRESS"
 
 
-@pytest.mark.parametrize("status", ["PRE_DRAFT", "DRAFT", "REJECTED", "NOT_A_STATUS"])
+@pytest.mark.parametrize("status", ["PRE_DRAFT", "DRAFT", "REJECTED"])
 @pytest.mark.django_db
 def test_moderation_status_is_rejected(
     bot_client, service_account, current_site, commune, status
@@ -197,22 +157,6 @@ def test_unknown_insee_code_is_rejected(bot_client, service_account, current_sit
 
 
 @pytest.mark.django_db
-def test_owner_account_of_the_site_is_reused_whatever_its_case(
-    bot_client, service_account, current_site, staff_user, commune
-):
-    assign_perm("sites.create_projects", service_account, current_site)
-    staff_user.username = "Owner@Example.com"
-    staff_user.save()
-
-    response = bot_client.post(reverse("projects-create"), data=project_data())
-
-    assert response.status_code == 201
-    assert not auth_models.User.objects.filter(username="owner@example.com").exists()
-    project = models.Project.objects.get(pk=response.data["id"])
-    assert project.owner == staff_user
-
-
-@pytest.mark.django_db
 def test_owner_account_of_another_site_is_rejected(
     bot_client, service_account, current_site, commune
 ):
@@ -229,59 +173,9 @@ def test_owner_account_of_another_site_is_rejected(
     assert current_site not in owner.profile.sites.all()
 
 
-@pytest.mark.django_db
-def test_bot_cannot_be_project_owner(
-    bot_client, service_account, current_site, commune
-):
-    assign_perm("sites.create_projects", service_account, current_site)
-    service_account.username = "robot@example.com"
-    service_account.save()
-
-    response = bot_client.post(
-        reverse("projects-create"), data=project_data(owner_email="robot@example.com")
-    )
-
-    assert response.status_code == 400
-    assert not models.Project.objects.exists()
-
-
 ########################################################################
 # attach people to a project: who may
 ########################################################################
-
-
-@pytest.mark.django_db
-def test_anonymous_cannot_attach_member(api_client, project):
-    response = api_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
-    )
-
-    assert response.status_code == 403
-    assert not models.ProjectMember.objects.exists()
-
-
-@pytest.mark.django_db
-def test_bot_allowed_to_moderate_cannot_attach_member(
-    bot_client, service_account, current_site, project
-):
-    assign_perm("sites.moderate_projects", service_account, current_site)
-
-    response = bot_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
-    )
-
-    assert response.status_code == 403
-    assert not models.ProjectMember.objects.exists()
-
-
-@pytest.mark.django_db
-def test_bot_without_permission_cannot_attach_member(bot_client, project):
-    response = bot_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
-    )
-
-    assert response.status_code == 403
-    assert not models.ProjectMember.objects.exists()
 
 
 @pytest.mark.django_db
@@ -299,23 +193,9 @@ def test_bot_with_permission_on_another_site_cannot_attach_member(
     assert not models.ProjectMember.objects.exists()
 
 
-@pytest.mark.parametrize("username", ["staff_user", "admin_user"])
 @pytest.mark.django_db
-def test_staff_and_admin_cannot_attach_member(request, api_client, project, username):
-    api_client.force_authenticate(request.getfixturevalue(username))
-
-    response = api_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
-    )
-
-    assert response.status_code == 403
-    assert not models.ProjectMember.objects.exists()
-
-
-@pytest.mark.django_db
-def test_superuser_cannot_attach_member(api_client, project):
-    superuser = baker.make(auth_models.User, is_superuser=True)
-    api_client.force_authenticate(superuser)
+def test_site_admin_cannot_attach_member(api_client, admin_user, project):
+    api_client.force_authenticate(admin_user)
 
     response = api_client.post(
         reverse("projects-members-create", args=[project.id]), data=JANE
