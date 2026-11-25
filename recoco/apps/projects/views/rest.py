@@ -52,7 +52,6 @@ from recoco.utils import (
     get_group_for_site,
     has_perm,
     has_perm_or_403,
-    is_staff_for_site,
 )
 
 from .. import models, signals
@@ -215,19 +214,17 @@ class ProjectCreate(CreateAPIView):
     serializer_class = NewProjectSerializer
 
 
-class IsStaffForSite(permissions.BasePermission):
-    """Allow the staff of the current site"""
-
-    def has_permission(self, request, view):
-        return is_staff_for_site(request.user, request.site)
-
-
 class ProjectMembershipMixin:
-    """Give the project of the url to the membership views and serializers"""
+    """Give the project of the url to the membership views and serializers
 
-    # restricted to staff, so that it never allows someone the project
-    # administration refuses, cf. test_project_membership_api_never_allows_more
-    permission_classes = [permissions.IsAuthenticated, IsStaffForSite]
+    Only bots may manage the members of a project: the caller needs the
+    `sites.manage_project_members` permission on the current site, and must
+    authenticate with a service API key. No site group holds the permission,
+    it is granted per site to bots.
+    """
+
+    authentication_classes = WITH_SERVICE_API_KEY
+    permission_classes = [IsServiceAPIKey, CanManageProjectMembers]
 
     @cached_property
     def project(self) -> models.Project:
@@ -243,7 +240,7 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
     The owner comes first, the others being ordered by username. Someone can
     be both participant and advisor, or participant and observer, but not both
     advisor and observer. Only the advisors and observers of the current site
-    are listed. The caller must be staff for the current site.
+    are listed.
 
     `POST` attaches someone to the project. The person is given by email, in
     the `email` field, and its account is created if it does not exist yet.
@@ -262,20 +259,12 @@ class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
     if it belongs to the current site. The project history records that the
     person joined, the first time they get the role.
 
-    For `POST`, the caller needs the `sites.manage_project_members` permission
-    on that site, and must authenticate with a service API key: only bots may
-    attach people this way. No site group holds the permission, it is granted
-    per site to bots.
-
-    In any case, the project has to be one of the current site.
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project. No site group holds the permission, it is granted per site to
+    bots.
     """
-
-    authentication_classes = WITH_SERVICE_API_KEY
-
-    def get_permissions(self):
-        if self.request.method == "POST":
-            return [IsServiceAPIKey(), CanManageProjectMembers()]
-        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -343,8 +332,10 @@ class ProjectMembershipDetail(ProjectMembershipDetailMixin, APIView):
     A `404` is answered if the person is not a member of the project, and a
     `400` if they are the owner of the project, who cannot be removed.
 
-    The project has to be one of the current site, and the caller must be
-    staff for that site.
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project.
     """
 
     @extend_schema(responses={204: None})
@@ -372,8 +363,10 @@ class ProjectMembershipRoleDetail(ProjectMembershipDetailMixin, APIView):
     and a `400` if the role is `COLLABORATOR` and they are the owner of the
     project, who cannot stop being a participant.
 
-    The project has to be one of the current site, and the caller must be
-    staff for that site.
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project.
     """
 
     @extend_schema(
@@ -417,8 +410,10 @@ class ProjectOwnerDetail(ProjectMembershipMixin, GenericAPIView):
     project are notified of the change. Giving the current owner is a no-op,
     nobody being notified. The answer gives back the `email`.
 
-    The project has to be one of the current site, and the caller must be
-    staff for that site.
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project.
     """
 
     serializer_class = ProjectOwnerSerializer
