@@ -1,12 +1,13 @@
-const generateTrackEvent = (
+export const generateTrackEvent = (
   event,
   action,
-  name,
+  name = window.matomoSiteName,
   path = window.location.pathname
 ) => {
   if (window._paq === undefined) return;
   window._paq.push(['trackEvent', event, action, name, path]);
 };
+
 export const trackClickOnRecoLink = () => {
   generateTrackEvent('Click', 'reco-shortcut-link');
 };
