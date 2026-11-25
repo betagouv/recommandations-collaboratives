@@ -11,8 +11,10 @@ created: <2021-09-13 lun. 15:38>
 import uuid
 from typing import TYPE_CHECKING
 
+from actstream import action
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
@@ -20,9 +22,11 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
+from notifications import models as notifications_models
 from notifications.signals import notify
 
 from recoco import utils as uv_utils
+from recoco import verbs
 
 from . import models
 
@@ -69,6 +73,45 @@ def assign_collaborator(user, project, is_owner=False):
     )
 
     return created
+
+
+def set_owner(user, project):
+    """Make someone the owner of a project, and tell the project team
+
+    The person is made a collaborator first if needed, and the former owner
+    remains a collaborator. Nothing happens if the person is already the
+    owner. Return whether the owner changed.
+    """
+    if project.owner == user:
+        return False
+
+    with transaction.atomic():
+        assign_collaborator(user, project)
+
+        members = models.ProjectMember.objects.filter(project=project)
+        members.update(is_owner=False)
+        members.filter(member=user).update(is_owner=True)
+
+        project.phone = user.profile.phone_no
+        project.save()
+
+    action.send(
+        sender=user,
+        verb=verbs.Project.NEW_OWNER,
+        action_object=project,
+        target=project,
+    )
+
+    notification = {
+        "sender": user,
+        "verb": verbs.Project.NEW_OWNER,
+        "action_object": project,
+        "target": project,
+    }
+    notify_advisors_of_project(project, notification)
+    notify_members_of_project(project, notification)
+
+    return True
 
 
 @transaction.atomic
@@ -171,6 +214,99 @@ def assign_observer(user, project, site=None):
 
 # XXX currently no difference, but may need different perms in the future
 unassign_observer = unassign_advisor
+
+
+def delete_project_notifications(user, project):
+    """Delete the notifications of someone about a project"""
+    project_ct = ContentType.objects.get_for_model(models.Project)
+    notifications_models.Notification.on_site.filter(
+        recipient=user,
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    ).delete()
+
+
+@transaction.atomic
+def remove_collaborator(user, project):
+    """Remove a collaborator from a project, along with her notifications"""
+    unassign_collaborator(user, project)
+    delete_project_notifications(user, project)
+
+
+@transaction.atomic
+def remove_advisor(user, project, site):
+    """Remove an advisor from a project, along with her notifications and
+    dashboard entry"""
+    unassign_advisor(user, project, site)
+    delete_project_notifications(user, project)
+    models.UserProjectStatus.objects.filter(
+        site=site, user=user, project=project
+    ).delete()
+
+
+@transaction.atomic
+def remove_member(user, project, site):
+    """Remove someone from a project, whatever its roles on the given site"""
+    remove_collaborator(user, project)
+    remove_advisor(user, project, site)
+
+
+def assign_role(user, project, role, site):
+    """Attach someone to a project with the given invite role"""
+    if role == "COLLABORATOR":
+        assign_collaborator(user, project)
+    elif role == "SWITCHTENDER":
+        assign_advisor(user, project, site=site)
+    elif role == "OBSERVER":
+        assign_observer(user, project, site=site)
+    else:
+        raise ValueError(f"Unhandled invite role '{role}'")
+
+
+def get_roles(user, project, site):
+    """Return the invite roles someone holds on a project, for the given site"""
+    roles = []
+
+    if project.projectmember_set.filter(member=user).exists():
+        roles.append("COLLABORATOR")
+
+    switchtending = project.switchtender_sites.filter(
+        site=site, switchtender=user
+    ).first()
+    if switchtending:
+        roles.append("OBSERVER" if switchtending.is_observer else "SWITCHTENDER")
+
+    return roles
+
+
+@transaction.atomic
+def remove_role(user, project, role, site):
+    """Remove one invite role of someone on a project, keeping the others
+
+    Roles share permissions, hence those of the remaining roles are assigned
+    again once the given one is removed.
+    """
+    if role == "COLLABORATOR":
+        remove_collaborator(user, project)
+    elif role in ("SWITCHTENDER", "OBSERVER"):
+        remove_advisor(user, project, site)
+    else:
+        raise ValueError(f"Unhandled invite role '{role}'")
+
+    for remaining_role in get_roles(user, project, site):
+        assign_role(user, project, remaining_role, site)
+
+
+@transaction.atomic
+def change_role(user, project, role, site):
+    """Make someone hold only the given invite role on a project
+
+    Removing a role may remove permissions shared with the new one, hence all
+    of them are removed before assigning the new one.
+    """
+    unassign_collaborator(user, project)
+    unassign_advisor(user, project, site=site)
+    assign_role(user, project, role, site)
 
 
 def can_administrate_project(project, user):
