@@ -120,7 +120,7 @@ def find_verified_user_for_site(email, site):
     """Return the user with given email or None if there is none yet
 
     An existing account must already belong to the site, so that a site cannot
-    pull in accounts from another one, and cannot be a bot.
+    pull in accounts from another one, and cannot be a bot nor disabled.
     """
     # the username and the main email are trusted as is, other addresses must be
     # verified, as anyone can add the address of someone else to their account
@@ -132,7 +132,11 @@ def find_verified_user_for_site(email, site):
     ).order_by("pk")
 
     for user in users:
-        if user.profile.is_bot or site not in user.profile.sites.all():
+        if (
+            not user.is_active
+            or user.profile.is_bot
+            or site not in user.profile.sites.all()
+        ):
             raise UnavailableAccountException(
                 "Cette adresse correspond à un compte qui n'est pas utilisable ici."
             )

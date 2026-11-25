@@ -77,6 +77,15 @@ def test_find_verified_user_for_site_refuses_bot(current_site, service_account):
         find_verified_user_for_site(service_account.username, current_site)
 
 
+@pytest.mark.django_db
+def test_find_verified_user_for_site_refuses_disabled_account(current_site, staff_user):
+    staff_user.is_active = False
+    staff_user.save()
+
+    with pytest.raises(UnavailableAccountException):
+        find_verified_user_for_site(staff_user.username, current_site)
+
+
 ########################################################################
 # get or create user for site
 ########################################################################
