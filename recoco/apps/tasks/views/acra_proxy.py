@@ -7,12 +7,12 @@ import sentry_sdk
 from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco.apps.projects import models as project_models
-from recoco.utils import has_perm_or_403
+from recoco.utils import has_perm
 
 logger = logging.getLogger(__name__)
 
@@ -30,15 +30,18 @@ def _acra_url(path):
     return f"{base}{path}"
 
 
+class CanManageTasks(BasePermission):
+    def has_permission(self, request, view):
+        project = get_object_or_404(
+            project_models.Project, sites=request.site, pk=view.kwargs["project_id"]
+        )
+        return has_perm(request.user, "projects.manage_tasks", project)
+
+
 class AcraAskView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, CanManageTasks]
 
     def post(self, request, project_id):
-        project = get_object_or_404(
-            project_models.Project, sites=request.site, pk=project_id
-        )
-        has_perm_or_403(request.user, "projects.manage_tasks", project)
-
         try:
             response = requests.post(
                 _acra_url("/ask"),
@@ -60,14 +63,9 @@ class AcraAskView(APIView):
 
 
 class AcraCoRecommendationsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, CanManageTasks]
 
     def get(self, request, project_id):
-        project = get_object_or_404(
-            project_models.Project, sites=request.site, pk=project_id
-        )
-        has_perm_or_403(request.user, "projects.manage_tasks", project)
-
         params = [
             ("resource_ids", rid)
             for rid in request.query_params.getlist("resource_ids")

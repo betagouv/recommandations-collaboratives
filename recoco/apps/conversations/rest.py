@@ -5,13 +5,13 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthenticated
 from rest_framework.response import Response
 
 from recoco import verbs
 from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.apps.projects import models as projects_models
-from recoco.utils import has_perm_or_403
+from recoco.utils import has_perm
 
 from ...rest_api.permissions import BaseConversationPermission
 from . import signals
@@ -22,6 +22,12 @@ from .serializers import ActivitySerializer, MessageSerializer, ParticipantSeria
 class MessagePermission(BaseConversationPermission):
     def has_object_permission(self, request, view, obj: Message):
         return request.method in SAFE_METHODS or obj.posted_by == request.user
+
+
+class CanViewConversation(BasePermission):
+    def has_permission(self, request, view):
+        project = projects_models.Project.objects.get(pk=view.kwargs["project_id"])
+        return has_perm(request.user, "projects.view_public_notes", project)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -82,6 +88,7 @@ class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
 
     serializer_class = ActivitySerializer
+    permission_classes = [CanViewConversation]
 
     activity_verbs = [
         verbs.Recommendation.IN_PROGRESS,
@@ -92,7 +99,6 @@ class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         project = projects_models.Project.objects.get(id=project_id)
-        has_perm_or_403(self.request.user, "projects.view_public_notes", project)
 
         activity_verbs = list(self.activity_verbs)
         for plugin_verbs in get_site_plugin_manager(
@@ -111,11 +117,11 @@ class ParticipantViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     queryset = User.objects
     serializer_class = ParticipantSerializer
+    permission_classes = [CanViewConversation]
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         project = projects_models.Project.objects.get(id=project_id)
-        has_perm_or_403(self.request.user, "projects.view_public_notes", project)
 
         return (
             self.queryset.prefetch_related("project_messages")

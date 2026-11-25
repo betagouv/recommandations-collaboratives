@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests as req
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.models import Site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
@@ -56,6 +57,21 @@ def test_acra_returns_404_for_unknown_project(user_with_manage_tasks, url_name, 
     client = APIClient()
     client.force_authenticate(user=user_with_manage_tasks)
     response = getattr(client, method)(reverse(url_name, args=[99999]))
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "url_name,method",
+    [("tasks-acra-ask", "post"), ("tasks-acra-co-recommendations", "get")],
+)
+@pytest.mark.django_db
+def test_acra_is_not_available_across_sites(make_project, url_name, method):
+    project = make_project(site=baker.make(Site))
+    user = baker.make(auth_models.User)
+    assign_perm("projects.manage_tasks", user, project)
+    client = APIClient()
+    client.force_authenticate(user=user)
+    response = getattr(client, method)(reverse(url_name, args=[project.id]))
     assert response.status_code == 404
 
 
