@@ -55,6 +55,10 @@ class Message(TimeStampedModel):
         query_kwargs = {"message-id": self.pk}
         return f"{url_no_query}?{urlencode(query_kwargs)}"
 
+    def feed_label(self):
+        # todo détail comme dans les mails (et les notifs..?)
+        return "un message"
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     def soft_delete(self):

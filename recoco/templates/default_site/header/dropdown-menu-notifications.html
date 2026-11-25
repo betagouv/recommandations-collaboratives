@@ -3,7 +3,7 @@
 {% load common_tags %}
 {% comment %} {{ grouped_notifications|json_script:"notifications" }} {% endcomment %}
 {% get_verbs as verbs %}
-<div class="" id="user-tools-main-menu-notifications">
+<div id="user-tools-main-menu-notifications">
     <ul class="dropdown-menu notifications fr-mt-0">
         <li>
             {% if unread_notifications_count > 0 %}
@@ -40,9 +40,6 @@
                                 <span class="notification__verb">
                                     vous a <span class="notification__verb--highlight"
        x-text="getSummaryNotification({{ notification.pk }})"></span>
-                                </span>
-                                <span class="notification__project">
-                                    <span class="notification__verb--no-margin">dans le dossier</span> {{ notification.target }}
                                 </span>
                             </div>
                         {% else %}

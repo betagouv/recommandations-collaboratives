@@ -160,3 +160,6 @@ class Note(models.Model):
             return f"{self.content[:10]}..."
 
         return "Note sans nom"
+
+    def feed_label(self):
+        return str(self)

@@ -699,6 +699,9 @@ class Project(models.Model):
             return f"{self.name} - {self.location}"
         return f"{self.commune.name} - {self.name}"
 
+    def feed_label(self):
+        return f"le dossier {self}"
+
 
 class ProjectMember(models.Model):
     class Meta:

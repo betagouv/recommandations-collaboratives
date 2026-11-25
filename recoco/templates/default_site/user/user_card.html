@@ -9,7 +9,8 @@
 {% load projects_extra %}
 {% comment %}
 Parameter Django:
-    - show_organization
+    - show_organization (bolean)
+    - font_size_class (string)
 {% endcomment %}
 {% get_obj_perms request.user for request.site as "user_site_perms" user_perm_checker %}
 <div x-data="User()"
@@ -20,7 +21,7 @@ Parameter Django:
                 {% if not user_popup_deactivate %}@click="onUserClick"{% endif %}
                 class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
-            <span class="fr-mr-1v d-flex align-items-center font-size-12px">
+            <span class="fr-mr-1v d-flex align-items-center {{ font_size_class|default:'font-size-12px' }}">
                 {% if user %}
                     <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active and not user_email %}border-0{% else %}neutral-role-border border-2{% endif %}"
                          :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
@@ -49,9 +50,9 @@ Parameter Django:
             </span>
             {% if show_organization is not False %}
                 {% if user.profile.organization.name %}
-                    <span class="user-card__org-name fw-normal font-italic font-size-12px">{{ user.profile.organization.name }}</span>
+                    <span class="user-card__org-name fw-normal font-italic {{ font_size_class|default:'font-size-12px' }}">{{ user.profile.organization.name }}</span>
                 {% elif project_owner and project.org_name %}
-                    <span class="user-card__org-name fw-normal font-italic font-size-12px">{{ project.org_name }}</span>
+                    <span class="user-card__org-name fw-normal font-italic {{ font_size_class|default:'font-size-12px' }}">{{ project.org_name }}</span>
                 {% endif %}
             {% endif %}
             {% include "account/fragments/unvalidated_email_indicator.html" %}
