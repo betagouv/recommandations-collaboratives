@@ -7,4 +7,7 @@ class ApiKeysConfig(AppConfig):
     verbose_name = "Clés d'API"
 
     def ready(self):
-        from . import signals  # noqa: F401
+        from . import (
+            schema,  # noqa: F401
+            signals,  # noqa: F401
+        )
