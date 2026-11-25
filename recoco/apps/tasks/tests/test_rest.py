@@ -9,8 +9,11 @@ created: 2021-06-01 10:11:56 CEST
 
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications.signals import notify
 from rest_framework.test import APIClient
@@ -941,4 +944,109 @@ def test_project_user_cannot_publish_already_published_task(
     assert task.public is True
 
 
-# eof
+########################################################################
+# tasks are limited to the active projects of the current site
+########################################################################
+
+
+@pytest.mark.django_db
+def test_project_tasks_are_not_available_across_sites(api_client, make_project):
+    project = make_project(site=baker.make(Site))
+    user = baker.make(auth_models.User)
+    assign_perm("projects.view_tasks", user, project)
+
+    api_client.force_authenticate(user=user)
+    response = api_client.get(reverse("project-tasks-list", args=[project.id]))
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_project_tasks_are_not_available_for_deleted_project(api_client, make_project):
+    project = make_project(deleted=timezone.now())
+    user = baker.make(auth_models.User)
+    assign_perm("projects.view_tasks", user, project)
+
+    api_client.force_authenticate(user=user)
+    response = api_client.get(reverse("project-tasks-list", args=[project.id]))
+
+    assert response.status_code == 404
+
+
+########################################################################
+# task followups: permissions
+########################################################################
+
+
+@pytest.fixture
+def random_user():
+    return baker.make(auth_models.User)
+
+
+@pytest.fixture
+def task_viewer(project):
+    user = baker.make(auth_models.User)
+    assign_perm("projects.view_tasks", user, project)
+    return user
+
+
+@pytest.fixture
+def site_advisor(current_site):
+    user = baker.make(auth_models.User)
+    assign_perm("sites.list_projects", user, current_site)
+    return user
+
+
+@pytest.fixture
+def task_user(project):
+    user = baker.make(auth_models.User)
+    assign_perm("projects.use_tasks", user, project)
+    return user
+
+
+@pytest.mark.parametrize(
+    "username,res_code",
+    [
+        ("task_user", 200),
+        ("task_viewer", 200),
+        ("site_advisor", 200),
+        ("staff_user", 200),
+        ("random_user", 403),
+    ],
+)
+@pytest.mark.django_db
+def test_who_can_read_task_followups(
+    username, res_code, request, api_client, current_site, project
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    user = request.getfixturevalue(username)
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+    response = api_client.get(url)
+
+    assert response.status_code == res_code
+
+
+@pytest.mark.parametrize(
+    "username,res_code",
+    [
+        ("task_user", 201),
+        ("task_viewer", 403),
+        ("site_advisor", 403),
+        ("staff_user", 201),
+        ("random_user", 403),
+    ],
+)
+@pytest.mark.django_db
+def test_who_can_create_task_followups(
+    username, res_code, request, api_client, current_site, project
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    user = request.getfixturevalue(username)
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+    response = api_client.post(url, data={"comment": "hey"})
+
+    assert response.status_code == res_code

@@ -606,13 +606,20 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
 # /projects/status/:X (PATCH => "status")
 
 
+class IsProjectLister(permissions.BasePermission):
+    """Advisors and staff of the site, who may list its projects"""
+
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.list_projects", request.site)
+
+
 class ProjectSiteViewSet(viewsets.GenericViewSet):
     """
     API endpoint for listing project state relative to a site
     """
 
     serializer_class = ProjectSiteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsProjectLister]
 
     def get_queryset(self):
         qs = models.ProjectSite.objects.filter(site=self.request.site)
@@ -625,16 +632,12 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
         return qs
 
     def list(self, request):
-        has_perm_or_403(self.request.user, "list_projects", self.request.site)
-
         serializer = self.get_serializer_class()
         data = serializer(self.get_queryset(), many=True).data
 
         return Response(data, status=status.HTTP_200_OK)
 
     def partial_update(self, request, pk=None):
-        has_perm_or_403(self.request.user, "list_projects", self.request.site)
-
         project_site = get_object_or_404(
             self.get_queryset(),
             pk=pk,
