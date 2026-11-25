@@ -41,13 +41,15 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
 
         return saved_user
 
-    def is_login_by_code_required(self, request, **kwargs):
+    def is_login_by_code_required(self, login):
         if settings.DEBUG:
             return False
-        if not request.user or request.user.is_anonymous:
+        if not login.user or login.user.is_anonymous:
             # fallback for cases with login started as a way to prevent enumeration by allauth
             return False
-        return request.user.profile.login_with_code
+        if login.signal_kwargs and login.signal_kwargs.get("sociallogin"):
+            return False
+        return login.user.profile.login_with_code
 
     def clean_email(self, email: str) -> str:
         # brevo conditions:
