@@ -20,12 +20,14 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
+from recoco.apps.api_keys.authentication import WITH_SERVICE_API_KEY
+from recoco.apps.api_keys.permissions import IsServiceAPIKey
 from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
@@ -55,8 +57,10 @@ from ..filters import (
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
+    NewProjectSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
+    ProjectMembershipSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
@@ -67,6 +71,16 @@ from ..serializers import (
 ########################################################################
 # Project API
 ########################################################################
+
+
+class CanCreateProjects(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.create_projects", request.site)
+
+
+class CanManageProjectMembers(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.manage_project_members", request.site)
 
 
 class ProjectDetail(
@@ -146,6 +160,81 @@ class ProjectDetail(
             #     )
             return Response(UserProjectSerializer(p, context=context).data)
         return Response(write_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectCreate(CreateAPIView):
+    """Create a project on the current site
+
+    The project is submitted on behalf of its owner by the authenticated
+    caller, and skips moderation: it is created already validated, and no one
+    is notified of its submission.
+
+    Two fields differ from the other project endpoints:
+
+    - `insee`: the commune is given as an INSEE code rather than as a primary
+      key, since that is what identifies a commune unambiguously for an API
+      client. An unknown code is rejected with a `400`.
+    - `owner_email`: the owner is given as an email address. If no account
+      exists for it, one is created and added to the current site; the user is
+      then assigned to the project as its owner.
+
+    Both are write-only: the created project is returned with its full
+    `commune` representation, and without the owner email.
+
+    The `status` of the project on the current site can be given, and defaults
+    to `TO_PROCESS`, which is the status of a project that has been validated
+    but not yet processed.
+
+    An account that already exists is only accepted if it belongs to the
+    current site, otherwise the request is rejected with a `400`.
+
+    The project history records who validated the project and that its owner
+    joined it.
+
+    The caller needs the `sites.create_projects` permission on the current
+    site, and must authenticate with a service API key: only bots may create
+    projects this way, not even site admins or superusers. No site group holds
+    the permission, it is granted per site to bots.
+    """
+
+    authentication_classes = WITH_SERVICE_API_KEY
+    permission_classes = [IsServiceAPIKey, CanCreateProjects]
+    serializer_class = NewProjectSerializer
+
+
+class ProjectMembershipCreate(CreateAPIView):
+    """Attach a participant, an advisor or an observer to a project
+
+    The person is given by email, in the `email` field, and its account is
+    created if it does not exist yet. The `role` field says how it is attached
+    to the project:
+
+    - `COLLABORATOR`: a participant, member of the project team;
+    - `SWITCHTENDER`: an advisor, who follows the project for the site;
+    - `OBSERVER`: an observer, an advisor who is only kept informed.
+
+    The attachment is immediate: unlike an invitation, no email is sent and
+    there is nothing to accept. Attaching someone who already holds the role
+    on this project is a no-op, and still answers a `201`. Attaching an advisor
+    as an observer, or the other way around, switches their role.
+
+    As for project creation, an account that already exists is only accepted
+    if it belongs to the current site. The project history records that the
+    person joined, the first time they get the role.
+
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may attach people this way.
+    No site group holds the permission, it is granted per site to bots.
+    """
+
+    authentication_classes = WITH_SERVICE_API_KEY
+    permission_classes = [IsServiceAPIKey, CanManageProjectMembers]
+    serializer_class = ProjectMembershipSerializer
+
+    def perform_create(self, serializer):
+        project = get_object_or_404(models.Project.on_site, pk=self.kwargs["pk"])
+        serializer.save(project=project)
 
 
 class ProjectList(ListAPIView):
