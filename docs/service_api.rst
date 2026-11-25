@@ -39,10 +39,12 @@ Overview
      - same, creating the account if there is none
    * - ``home.utils.UnavailableAccountException``
      - know that an account exists but cannot be used here
+   * - ``validate_email_for_site`` (``recoco.rest_api.serializers``)
+     - refuse such an account in a serializer
    * - ``bot_key``, ``bot_client``, ``service_account`` (``conftest.py``)
      - test as a bot
 
-All of these live under ``recoco.apps``, except the fixtures.
+All of these live under ``recoco.apps``, unless stated otherwise.
 
 
 Bots and keys
@@ -179,11 +181,7 @@ For a function view:
         email = serializers.EmailField(max_length=150)
 
         def validate_email(self, value):
-            try:
-                find_verified_user_for_site(value, self.current_site)
-            except UnavailableAccountException as exc:
-                raise serializers.ValidationError(str(exc)) from exc
-            return value
+            return validate_email_for_site(value, self.current_site)
 
         @transaction.atomic
         def create(self, validated_data):
@@ -194,7 +192,7 @@ For a function view:
             return validated_data
 
 ``BaseSerializerMixin`` provides ``current_site`` and ``current_user``, the
-latter being the bot. The lookup in ``validate_email`` turns a refusal into a
+latter being the bot. ``validate_email_for_site`` turns a refusal into a
 ``400``; the account is only created once all the data is valid.
 
 4. The route
@@ -331,8 +329,8 @@ Checklist
 - ``IsServiceAPIKey`` first, if reserved to bots
 - one permission class, checked against ``request.site``
 - objects read through ``on_site``
-- people found with the helpers, and ``UnavailableAccountException`` turned into
-  a ``400``
+- people found with the helpers, and emails checked with
+  ``validate_email_for_site``
 - several writes wrapped in ``transaction.atomic``
 - a docstring on the view: it is shown in the OpenAPI schema
 - tests for each refusal
