@@ -1,12 +1,14 @@
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter, get_adapter
 from allauth.socialaccount.internal import jwtkit
-from allauth.socialaccount.models import SocialToken
+from allauth.socialaccount.models import SocialLogin, SocialToken
 from allauth.socialaccount.providers.openid_connect.views import (
     OpenIDConnectOAuth2Adapter,
 )
 from django.contrib.auth.models import User
+from django.http import HttpRequest
 from django.utils.crypto import get_random_string
+from waffle.templatetags import waffle_tags
 
 from recoco.apps.home.adapters import confirm_email
 
@@ -51,6 +53,9 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             # TODO: add siret to signup form
             # "siret": sociallogin.account.extra_data.get("siret", ""),
         }
+
+    def is_open_for_signup(self, request: HttpRequest, sociallogin: SocialLogin):
+        return waffle_tags.flag_is_active(request, "proconnect_signup")
 
 
 class CustomOpenIDConnectOAuth2Adapter(OpenIDConnectOAuth2Adapter):
