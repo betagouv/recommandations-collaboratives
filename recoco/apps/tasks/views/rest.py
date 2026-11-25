@@ -346,6 +346,12 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
             task_id=self.task_id, task__project_id=self.project_id
         )
 
+    def perform_create(self, serializer):
+        # ensure the given task and project are consistent
+        get_object_or_404(models.Task, pk=self.task_id, project_id=self.project_id)
+
+        serializer.save()
+
     def get_serializer_context(self):
         return super().get_serializer_context() | {
             "task_id": self.task_id,

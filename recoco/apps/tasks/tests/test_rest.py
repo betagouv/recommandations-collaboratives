@@ -873,39 +873,137 @@ def test_unassigned_user_should_not_see_recommendations(request):
 
 @pytest.mark.parametrize("group", ["example_com_staff", "example_com_advisor"])
 @pytest.mark.django_db
-def test_task_followups_are_not_available_across_sites(
-    api_client, current_site, make_project, settings, group
+def test_task_followups_list_is_not_available_across_sites(
+    api_client, make_project, group
 ):
-    """Being able to list the projects of a site must not give access to the
-    followups of another one; the positive control below confirms the 404 is
-    site-related and not a blanket failure."""
+    other_site = baker.make(Site, domain="other-site.example.com")
+    project = make_project(site=other_site)
+    task = baker.make(models.Task, project=project, site=other_site, public=True)
+
+    with login(api_client, groups=[group]):
+        url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+        response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize("group", ["example_com_staff", "example_com_advisor"])
+@pytest.mark.django_db
+def test_task_followup_detail_is_not_available_across_sites(
+    api_client, make_project, settings, group
+):
+    other_site = baker.make(Site, domain="other-site.example.com")
+    project = make_project(site=other_site)
+    task = baker.make(models.Task, project=project, site=other_site, public=True)
+    with settings.SITE_ID.override(other_site.pk):
+        followup = baker.make(models.TaskFollowup, task=task)
+
+    with login(api_client, groups=[group]):
+        url = reverse(
+            "project-tasks-followups-detail", args=[project.id, task.id, followup.id]
+        )
+        response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize("group", ["example_com_staff", "example_com_advisor"])
+@pytest.mark.django_db
+def test_task_followups_list_is_available_on_current_site(
+    api_client, current_site, project, group
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    followup = baker.make(models.TaskFollowup, task=task)
+
+    with login(api_client, groups=[group]):
+        url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+        response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert [f["id"] for f in response.data] == [followup.id]
+
+
+@pytest.mark.parametrize("group", ["example_com_staff", "example_com_advisor"])
+@pytest.mark.django_db
+def test_task_followup_detail_is_available_on_current_site(
+    api_client, current_site, project, group
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    followup = baker.make(models.TaskFollowup, task=task)
+
+    with login(api_client, groups=[group]):
+        url = reverse(
+            "project-tasks-followups-detail", args=[project.id, task.id, followup.id]
+        )
+        response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == followup.id
+
+
+@pytest.mark.django_db
+def test_project_collaborator_can_create_task_followup(
+    api_client, current_site, project
+):
+    user = baker.make(auth_models.User)
+    utils.assign_collaborator(user, project)
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+    response = api_client.post(url, data={"comment": "hey", "status": models.Task.DONE})
+
+    assert response.status_code == 201
+
+    followup = task.followups.get()
+    assert followup.who == user
+
+    task.refresh_from_db()
+    assert task.status == models.Task.DONE
+
+
+@pytest.mark.django_db
+def test_task_followup_cannot_be_created_on_task_of_another_project(
+    api_client, current_site, project, make_project
+):
+    user = baker.make(auth_models.User)
+    utils.assign_collaborator(user, project)
+    other_task = baker.make(
+        models.Task,
+        project=make_project(),
+        site=current_site,
+        public=True,
+        status=models.Task.PROPOSED,
+    )
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project.id, other_task.id])
+    response = api_client.post(url, data={"comment": "hey", "status": models.Task.DONE})
+
+    assert response.status_code == 404
+    assert other_task.followups.count() == 0
+
+    other_task.refresh_from_db()
+    assert other_task.status == models.Task.PROPOSED
+
+
+@pytest.mark.django_db
+def test_task_followup_cannot_be_created_on_task_of_another_site(
+    api_client, project, make_project
+):
+    user = baker.make(auth_models.User)
+    utils.assign_collaborator(user, project)
     other_site = baker.make(Site, domain="other-site.example.com")
     other_site_task = baker.make(
         models.Task, project=make_project(site=other_site), site=other_site, public=True
     )
-    with settings.SITE_ID.override(other_site.pk):
-        other_site_followup = baker.make(models.TaskFollowup, task=other_site_task)
 
-    same_site_task = baker.make(
-        models.Task, project=make_project(), site=current_site, public=True
-    )
-    same_site_followup = baker.make(models.TaskFollowup, task=same_site_task)
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project.id, other_site_task.id])
+    response = api_client.post(url, data={"comment": "hey"})
 
-    with login(api_client, groups=[group]):
-        for task, followup, status_code in (
-            (other_site_task, other_site_followup, 404),
-            (same_site_task, same_site_followup, 200),
-        ):
-            url = reverse(
-                "project-tasks-followups-list", args=[task.project_id, task.pk]
-            )
-            assert api_client.get(url).status_code == status_code
-
-            url = reverse(
-                "project-tasks-followups-detail",
-                args=[task.project_id, task.pk, followup.pk],
-            )
-            assert api_client.get(url).status_code == status_code
+    assert response.status_code == 404
+    assert other_site_task.followups.count() == 0
 
 
 #################################################################
