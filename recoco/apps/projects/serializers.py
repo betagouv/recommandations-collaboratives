@@ -18,7 +18,7 @@ from recoco.rest_api.serializers import BaseSerializerMixin, validate_email_for_
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
-from .utils import assign_advisor, assign_collaborator, assign_observer
+from .utils import assign_collaborator, assign_role, set_owner
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -335,6 +335,18 @@ class NewProjectSerializer(ProjectSerializer):
         return project
 
 
+class ProjectMemberSerializer(serializers.Serializer):
+    """Someone attached to a project, with the invite roles they hold on it"""
+
+    email = serializers.EmailField(source="user.email")
+    first_name = serializers.CharField(source="user.first_name")
+    last_name = serializers.CharField(source="user.last_name")
+    roles = serializers.ListField(
+        child=serializers.ChoiceField(choices=Invite.INVITE_ROLES)
+    )
+    is_owner = serializers.BooleanField()
+
+
 class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
     """Attach someone, given by email, to a project with the given role"""
 
@@ -357,12 +369,7 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
         project = validated_data["project"]
         role = validated_data["role"]
 
-        if role == "COLLABORATOR":
-            joined = assign_collaborator(user, project)
-        elif role == "SWITCHTENDER":
-            joined = assign_advisor(user, project, site=self.current_site)
-        else:
-            joined = assign_observer(user, project, site=self.current_site)
+        joined = assign_role(user, project, role, self.current_site)
 
         # history only, no notification (no project_*_joined signal is sent)
         if joined:
@@ -372,6 +379,23 @@ class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
                 action_object=project,
                 target=project,
             )
+
+        return validated_data
+
+
+class ProjectOwnerSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Make someone, given by email, the owner of a project"""
+
+    email = serializers.EmailField(max_length=150)
+
+    def validate_email(self, value):
+        return validate_email_for_site(value, self.current_site)
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = get_or_create_user_for_site(validated_data["email"], self.current_site)
+
+        set_owner(user, validated_data["project"])
 
         return validated_data
 

@@ -186,7 +186,7 @@ def test_bot_with_permission_on_another_site_cannot_attach_member(
     assign_perm("sites.manage_project_members", service_account, other_site)
 
     response = bot_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
+        reverse("projects-members-list", args=[project.id]), data=JANE
     )
 
     assert response.status_code == 403
@@ -198,7 +198,7 @@ def test_site_admin_cannot_attach_member(api_client, admin_user, project):
     api_client.force_authenticate(admin_user)
 
     response = api_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
+        reverse("projects-members-list", args=[project.id]), data=JANE
     )
 
     assert response.status_code == 403
@@ -214,7 +214,7 @@ def test_project_of_another_site_is_not_found(
     other_project = make_project(site=other_site)
 
     response = bot_client.post(
-        reverse("projects-members-create", args=[other_project.id]), data=JANE
+        reverse("projects-members-list", args=[other_project.id]), data=JANE
     )
 
     assert response.status_code == 404
@@ -233,7 +233,7 @@ def test_bot_attaches_a_collaborator(
     assign_perm("sites.manage_project_members", service_account, current_site)
 
     response = bot_client.post(
-        reverse("projects-members-create", args=[project.id]),
+        reverse("projects-members-list", args=[project.id]),
         data={"email": "JANE@example.com", "role": "COLLABORATOR"},
     )
 
@@ -277,7 +277,7 @@ def test_bot_attaches_an_advisor(
     staff_user.save()
 
     response = bot_client.post(
-        reverse("projects-members-create", args=[project.id]),
+        reverse("projects-members-list", args=[project.id]),
         data={"email": "john@example.com", "role": role},
     )
 
@@ -300,13 +300,13 @@ def test_attaching_again_writes_no_new_history(
 
     assert (
         bot_client.post(
-            reverse("projects-members-create", args=[project.id]), data=JANE
+            reverse("projects-members-list", args=[project.id]), data=JANE
         ).status_code
         == 201
     )
     assert (
         bot_client.post(
-            reverse("projects-members-create", args=[project.id]), data=JANE
+            reverse("projects-members-list", args=[project.id]), data=JANE
         ).status_code
         == 201
     )
@@ -325,7 +325,7 @@ def test_member_account_of_another_site_is_rejected(
     jane.profile.sites.add(other_site)
 
     response = bot_client.post(
-        reverse("projects-members-create", args=[project.id]), data=JANE
+        reverse("projects-members-list", args=[project.id]), data=JANE
     )
 
     assert response.status_code == 400

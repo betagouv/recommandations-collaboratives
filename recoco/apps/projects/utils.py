@@ -252,13 +252,16 @@ def remove_member(user, project, site):
 
 
 def assign_role(user, project, role, site):
-    """Attach someone to a project with the given invite role"""
+    """Attach someone to a project with the given invite role
+
+    Return whether the person just got the role.
+    """
     if role == "COLLABORATOR":
-        assign_collaborator(user, project)
+        return assign_collaborator(user, project)
     elif role == "SWITCHTENDER":
-        assign_advisor(user, project, site=site)
+        return assign_advisor(user, project, site=site)
     elif role == "OBSERVER":
-        assign_observer(user, project, site=site)
+        return assign_observer(user, project, site=site)
     else:
         raise ValueError(f"Unhandled invite role '{role}'")
 
