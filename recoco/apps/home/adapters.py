@@ -118,9 +118,7 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         if redirect_url == reverse_lazy("advisor-access-request"):
             return redirect(redirect_url)
         if request.resolver_match.url_name == "account_confirm_login_code":
-            confirm_email(
-                request, user
-            )  # this is a connexion by email so the email is valid
+            reset_session_to_validate_if_needed(user, request)
         if not user.is_active:
             return self.respond_user_inactive(request, user)
 

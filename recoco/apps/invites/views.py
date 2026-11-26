@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from recoco.apps.home.adapters import confirm_email
+from recoco.apps.home.adapters import confirm_email, reset_session_to_validate_if_needed
 from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
@@ -61,6 +61,8 @@ def invite_accept(request, invite_id):
             if existing_account != request.user:
                 return HttpResponseForbidden()
             user = request.user
+            # they arrived by clicking an email so it is valid
+            reset_session_to_validate_if_needed(user, request)
 
         # New account
         elif request.user.is_authenticated:
@@ -69,6 +71,8 @@ def invite_accept(request, invite_id):
 
         elif form.is_valid():
             user = form.save()
+            # they arrived by clicking an email so it is valid
+            confirm_email(request, user)
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
         else:
@@ -80,9 +84,6 @@ def invite_accept(request, invite_id):
 
         # user now has access to site
         user.profile.sites.add(current_site)
-
-        # they arrived by clicking an email so it is valid
-        confirm_email(request, user)
 
         # Now, grant the user her new rights
         if invite.role == "SWITCHTENDER":
