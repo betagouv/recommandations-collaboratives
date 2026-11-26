@@ -206,7 +206,7 @@ function MapDashboard(currentSiteId, regions) {
             <div class="dashboard-marker-popup ${item.status === 'NEW' && 'new-project'} tmp-usevar" style="${item.status === 'NEW' ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
                 ${roleTemplate != null ? roleTemplate : ''}
                 <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.id}/presentation">
-                    <span class="text-nowrap fw-bold title-info text-dark fr-mr-2v location">${item.commune.name}</span>
+                    <span class="text-nowrap fw-bold title-info text-dark fr-mr-2v location">${item?.commune?.name || "Commune non renseignée" }</span>
                     <span class="text-nowrap text-info-custom text-grey-dark name">${item.name}</span>
                 </a>
             </div>
