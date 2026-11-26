@@ -20,6 +20,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.db import transaction
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -109,6 +110,50 @@ def make_new_site(
         return site
 
     return None
+
+
+class UnavailableAccountException(Exception):
+    pass
+
+
+def find_verified_user_for_site(email, site):
+    """Return the user with given email or None if there is none yet
+
+    An existing account must already belong to the site, so that a site cannot
+    pull in accounts from another one, and cannot be a bot nor disabled.
+    """
+    # the username and the main email are trusted as is, other addresses must be
+    # verified, as anyone can add the address of someone else to their account
+    verified_addresses = EmailAddress.objects.filter(email__iexact=email, verified=True)
+    users = User.objects.filter(
+        Q(username__iexact=email)
+        | Q(email__iexact=email)
+        | Q(pk__in=verified_addresses.values("user_id"))
+    ).order_by("pk")
+
+    for user in users:
+        if (
+            not user.is_active
+            or user.profile.is_bot
+            or site not in user.profile.sites.all()
+        ):
+            raise UnavailableAccountException(
+                "Cette adresse correspond à un compte qui n'est pas utilisable ici."
+            )
+
+    return users.first()
+
+
+def get_or_create_user_for_site(email, site):
+    """Return the user with given email, created on the site if needed"""
+    user = find_verified_user_for_site(email, site)
+
+    if user is None:
+        email = email.lower()
+        user = User.objects.create_user(username=email, email=email)
+        user.profile.sites.add(site)
+
+    return user
 
 
 # rgpd users auto deletion

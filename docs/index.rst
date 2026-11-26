@@ -17,6 +17,7 @@ Documentation de Recommandations Collaboratives
    workflows.rst
    js_components.rst
    plugins.rst
+   service_api.rst
 
 
 

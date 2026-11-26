@@ -16,6 +16,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe, related
 from rest_framework.test import APIClient
 
+from recoco.apps.api_keys.models import ServiceAPIKey
 from recoco.apps.projects.models import Project, ProjectSite
 
 
@@ -70,6 +71,23 @@ def service_account(current_site):
     user.profile.is_bot = True
     user.profile.save()
     return user
+
+
+@pytest.fixture
+def bot_key(current_site, service_account):
+    """A service API key of the current site, whose bot holds no right yet."""
+    _, key = ServiceAPIKey.objects.create_key(
+        name="svc-bot", user=service_account, site=current_site
+    )
+    return key
+
+
+@pytest.fixture
+def bot_client(bot_key):
+    """An API client authenticated with `bot_key`."""
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f"Api-Key {bot_key}")
+    return client
 
 
 # -- Project Fixtures
