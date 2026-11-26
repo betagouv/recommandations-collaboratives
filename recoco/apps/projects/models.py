@@ -123,6 +123,20 @@ def create_site_permissions(sender, **kwargs):
         content_type=site_ct,
     )
 
+    # bots only, granted per site and given to no site group: create projects
+    # that skip moderation, attach people to projects
+    auth_models.Permission.objects.get_or_create(
+        codename="create_projects",
+        name="Can create validated projects for site",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="manage_project_members",
+        name="Can attach members and advisors to projects for site",
+        content_type=site_ct,
+    )
+
 
 class ProjectManager(models.Manager):
     """Manager for all projects"""

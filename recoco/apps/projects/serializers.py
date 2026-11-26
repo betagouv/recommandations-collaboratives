@@ -1,18 +1,24 @@
 import nh3
+from actstream import action
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from notifications import models as notifications_models
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
+from recoco.apps.geomatics.models import Commune
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
+from recoco.apps.home.utils import get_or_create_user_for_site
+from recoco.apps.invites.models import Invite
 from recoco.apps.tasks import models as task_models
-from recoco.rest_api.serializers import BaseSerializerMixin
+from recoco.rest_api.serializers import BaseSerializerMixin, validate_email_for_site
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
+from .utils import assign_advisor, assign_collaborator, assign_observer
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
@@ -236,6 +242,138 @@ class UserProjectSerializer(ProjectSerializer):
             "unread_private_messages": unread_private_messages.count(),
             "new_recommendations": new_recommendations.count(),
         }
+
+
+# a project created through the API skips moderation, so it cannot start in
+# one of the moderation states
+API_PROJECT_STATES = [
+    (state, label)
+    for state, label in ProjectSite.PROJECTSITE_STATES
+    if state not in ("PRE_DRAFT", "DRAFT", "REJECTED")
+]
+
+
+class NewProjectSerializer(ProjectSerializer):
+    """Create an already validated project, on the current site"""
+
+    class Meta(ProjectSerializer.Meta):
+        fields = ProjectSerializer.Meta.fields + ["insee", "owner_email"]
+        read_only_fields = ProjectSerializer.Meta.read_only_fields + [
+            "created_on",
+            "updated_on",
+            "inactive_since",
+            "is_diagnostic_done",
+        ]
+
+    insee = serializers.CharField(max_length=5, write_only=True)
+    owner_email = serializers.EmailField(max_length=150, write_only=True)
+
+    description = serializers.CharField(required=True)
+    tags = TagListSerializerField(required=False)
+
+    # read only on the parent serializer, since it belongs to the project site
+    status = serializers.ChoiceField(
+        choices=API_PROJECT_STATES,
+        required=False,
+        default="TO_PROCESS",
+    )
+
+    def validate_owner_email(self, value):
+        return validate_email_for_site(value, self.current_site)
+
+    def validate(self, data):
+        insee = data["insee"]
+
+        commune = Commune.get_by_insee_code(insee)
+        if commune is None:
+            raise serializers.ValidationError(
+                {"insee": f"No commune found for insee code '{insee}'."}
+            )
+
+        # commune is read only on the parent serializer, it is only writable
+        # here, through the insee code
+        data["commune"] = commune
+
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data.pop("insee")
+        owner_email = validated_data.pop("owner_email")
+        # status is not a field of the project, but of its site
+        status = validated_data.pop("status")
+
+        # the caller submits the project on behalf of its owner,
+        # cf. onboarding.views.prefill_project_submit
+        validated_data["submitted_by"] = self.current_user
+
+        project = super().create(validated_data)
+
+        # the project skips moderation, it is created already validated
+        project.project_sites.create(
+            site=self.current_site, status=status, is_origin=True
+        )
+
+        owner = get_or_create_user_for_site(owner_email, self.current_site)
+        assign_collaborator(owner, project, is_owner=True)
+
+        # keep the project history as the moderation and the invitation would,
+        # but without notifying anyone (no project_* signal is sent)
+        action.send(
+            self.current_user,
+            verb=verbs.Project.VALIDATED_BY,
+            action_object=project,
+            target=project,
+        )
+        action.send(
+            owner,
+            verb=verbs.Project.JOINED_OWNER,
+            action_object=project,
+            target=project,
+        )
+
+        return project
+
+
+class ProjectMembershipSerializer(BaseSerializerMixin, serializers.Serializer):
+    """Attach someone, given by email, to a project with the given role"""
+
+    # verb of the history entry for each role, as the invitation writes it
+    JOINED_VERBS = {
+        "COLLABORATOR": verbs.Project.JOINED_BY_INVITATION,
+        "SWITCHTENDER": verbs.Project.BECAME_ADVISOR,
+        "OBSERVER": verbs.Project.BECAME_OBSERVER,
+    }
+
+    email = serializers.EmailField(max_length=150)
+    role = serializers.ChoiceField(choices=Invite.INVITE_ROLES)
+
+    def validate_email(self, value):
+        return validate_email_for_site(value, self.current_site)
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = get_or_create_user_for_site(validated_data["email"], self.current_site)
+        project = validated_data["project"]
+        role = validated_data["role"]
+
+        if role == "COLLABORATOR":
+            joined = assign_collaborator(user, project)
+        elif role == "SWITCHTENDER":
+            joined = assign_advisor(user, project, site=self.current_site)
+        else:
+            joined = assign_observer(user, project, site=self.current_site)
+
+        # history only, no notification (no project_*_joined signal is sent)
+        if joined:
+            action.send(
+                user,
+                verb=self.JOINED_VERBS[role],
+                action_object=project,
+                target=project,
+            )
+
+        return validated_data
 
 
 class ProjectForListSerializer(BaseSerializerMixin):
