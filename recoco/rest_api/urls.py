@@ -136,8 +136,23 @@ api_urls = [
     ),
     path(
         "projects/<int:pk>/members/",
-        projects_rest.ProjectMembershipCreate.as_view(),
-        name="projects-members-create",
+        projects_rest.ProjectMembershipList.as_view(),
+        name="projects-members-list",
+    ),
+    path(
+        "projects/<int:pk>/members/<str:email>/",
+        projects_rest.ProjectMembershipDetail.as_view(),
+        name="projects-members-detail",
+    ),
+    path(
+        "projects/<int:pk>/members/<str:email>/<str:role>/",
+        projects_rest.ProjectMembershipRoleDetail.as_view(),
+        name="projects-members-role-detail",
+    ),
+    path(
+        "projects/<int:pk>/owner/",
+        projects_rest.ProjectOwnerDetail.as_view(),
+        name="projects-owner-detail",
     ),
     # path(
     #     "projects/my_departments",

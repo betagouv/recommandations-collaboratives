@@ -10,6 +10,7 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
+from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -18,9 +19,16 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+)
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,6 +36,7 @@ from rest_framework.views import APIView
 from recoco import verbs
 from recoco.apps.api_keys.authentication import WITH_SERVICE_API_KEY
 from recoco.apps.api_keys.permissions import IsServiceAPIKey
+from recoco.apps.invites.models import Invite
 from recoco.apps.plugins.manager import get_site_plugin_manager
 from recoco.rest_api.filters import (
     TagsFilterbackend,
@@ -60,13 +69,16 @@ from ..serializers import (
     NewProjectSerializer,
     ProjectForListSerializer,
     ProjectLocationSerializer,
+    ProjectMemberSerializer,
     ProjectMembershipSerializer,
+    ProjectOwnerSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
+from ..utils import get_roles, remove_member, remove_role
 
 ########################################################################
 # Project API
@@ -202,12 +214,37 @@ class ProjectCreate(CreateAPIView):
     serializer_class = NewProjectSerializer
 
 
-class ProjectMembershipCreate(CreateAPIView):
-    """Attach a participant, an advisor or an observer to a project
+class ProjectMembershipMixin:
+    """Give the project of the url to the membership views and serializers
 
-    The person is given by email, in the `email` field, and its account is
-    created if it does not exist yet. The `role` field says how it is attached
-    to the project:
+    Only bots may manage the members of a project: the caller needs the
+    `sites.manage_project_members` permission on the current site, and must
+    authenticate with a service API key. No site group holds the permission,
+    it is granted per site to bots.
+    """
+
+    authentication_classes = WITH_SERVICE_API_KEY
+    permission_classes = [IsServiceAPIKey, CanManageProjectMembers]
+
+    @cached_property
+    def project(self) -> models.Project:
+        return get_object_or_404(models.Project.on_site, pk=self.kwargs["pk"])
+
+
+class ProjectMembershipList(ProjectMembershipMixin, CreateAPIView):
+    """List or attach the participants, advisors and observers of a project
+
+    `GET` lists the people attached to the project, each one once, with an
+    `email`, a `first_name`, a `last_name`, the `roles` they hold on the
+    project, and an `is_owner` flag, true only for the owner of the project.
+    The owner comes first, the others being ordered by username. Someone can
+    be both participant and advisor, or participant and observer, but not both
+    advisor and observer. Only the advisors and observers of the current site
+    are listed.
+
+    `POST` attaches someone to the project. The person is given by email, in
+    the `email` field, and its account is created if it does not exist yet.
+    The `role` field says how it is attached to the project:
 
     - `COLLABORATOR`: a participant, member of the project team;
     - `SWITCHTENDER`: an advisor, who follows the project for the site;
@@ -224,17 +261,169 @@ class ProjectMembershipCreate(CreateAPIView):
 
     The project has to be one of the current site, and the caller needs the
     `sites.manage_project_members` permission on that site, and must
-    authenticate with a service API key: only bots may attach people this way.
-    No site group holds the permission, it is granted per site to bots.
+    authenticate with a service API key: only bots may manage the members of a
+    project. No site group holds the permission, it is granted per site to
+    bots.
     """
 
-    authentication_classes = WITH_SERVICE_API_KEY
-    permission_classes = [IsServiceAPIKey, CanManageProjectMembers]
-    serializer_class = ProjectMembershipSerializer
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return ProjectMemberSerializer
+        return ProjectMembershipSerializer
 
     def perform_create(self, serializer):
-        project = get_object_or_404(models.Project.on_site, pk=self.kwargs["pk"])
-        serializer.save(project=project)
+        serializer.save(project=self.project)
+
+    @extend_schema(responses=ProjectMemberSerializer(many=True))
+    def get(self, request, *args, **kwargs):
+        members = {}
+
+        for membership in self.project.projectmember_set.select_related("member"):
+            members[membership.member] = {
+                "user": membership.member,
+                "roles": ["COLLABORATOR"],
+                "is_owner": membership.is_owner,
+            }
+
+        switchtendings = self.project.switchtender_sites.on_site().select_related(
+            "switchtender"
+        )
+        for switchtending in switchtendings:
+            member = members.setdefault(
+                switchtending.switchtender,
+                {"user": switchtending.switchtender, "roles": [], "is_owner": False},
+            )
+            member["roles"].append(
+                "OBSERVER" if switchtending.is_observer else "SWITCHTENDER"
+            )
+
+        members = sorted(
+            members.values(), key=lambda m: (not m["is_owner"], m["user"].username)
+        )
+
+        serializer = self.get_serializer(members, many=True)
+        return Response(serializer.data)
+
+
+class ProjectMembershipDetailMixin(ProjectMembershipMixin):
+    """Give the member of the url, along with the roles they hold"""
+
+    def get_member(self) -> tuple[User, list[str]]:
+        user = get_object_or_404(User, username=self.kwargs["email"].lower())
+
+        roles = get_roles(user, self.project, self.request.site)
+        if not roles:
+            raise Http404
+
+        return user, roles
+
+    def is_owner(self, user) -> bool:
+        return self.project.projectmember_set.filter(
+            member=user, is_owner=True
+        ).exists()
+
+
+class ProjectMembershipDetail(ProjectMembershipDetailMixin, APIView):
+    """Remove a member from a project, whatever their roles
+
+    The member is given by email, in the url. Their notifications about the
+    project are deleted too.
+
+    A `404` is answered if the person is not a member of the project, and a
+    `400` if they are the owner of the project, who cannot be removed.
+
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project.
+    """
+
+    @extend_schema(responses={204: None})
+    def delete(self, request, *args, **kwargs):
+        user, _ = self.get_member()
+
+        if self.is_owner(user):
+            raise ValidationError(
+                {"email": "The owner of a project cannot be removed."}
+            )
+
+        remove_member(user, self.project, request.site)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProjectMembershipRoleDetail(ProjectMembershipDetailMixin, APIView):
+    """Remove one role of a member of a project, keeping the others
+
+    The member is given by email, and the role by its value, in the url, with
+    the same values as for attaching someone to the project. Their
+    notifications about the project are deleted too.
+
+    A `404` is answered if the person does not hold the role on the project,
+    and a `400` if the role is `COLLABORATOR` and they are the owner of the
+    project, who cannot stop being a participant.
+
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project.
+    """
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "role",
+                location=OpenApiParameter.PATH,
+                enum=[role for role, _ in Invite.INVITE_ROLES],
+            )
+        ],
+        responses={204: None},
+    )
+    def delete(self, request, *args, **kwargs):
+        user, roles = self.get_member()
+
+        role = self.kwargs["role"]
+        if role not in roles:
+            raise Http404
+
+        if role == "COLLABORATOR" and self.is_owner(user):
+            raise ValidationError(
+                {"role": "The owner of a project cannot stop being a participant."}
+            )
+
+        remove_role(user, self.project, role, request.site)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProjectOwnerDetail(ProjectMembershipMixin, GenericAPIView):
+    """Change the owner of a project
+
+    `PUT` makes the person given by email, in the `email` field, the owner of
+    the project. As for project creation, their account is created if it does
+    not exist yet, and an account that already exists is only accepted if it
+    belongs to the current site.
+
+    The person is made a participant of the project if they are not one yet,
+    and the former owner remains a participant. The project phone number is
+    replaced by the one of the new owner, and the advisors and members of the
+    project are notified of the change. Giving the current owner is a no-op,
+    nobody being notified. The answer gives back the `email`.
+
+    The project has to be one of the current site, and the caller needs the
+    `sites.manage_project_members` permission on that site, and must
+    authenticate with a service API key: only bots may manage the members of a
+    project.
+    """
+
+    serializer_class = ProjectOwnerSerializer
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(project=self.project)
+
+        return Response(serializer.data)
 
 
 class ProjectList(ListAPIView):
