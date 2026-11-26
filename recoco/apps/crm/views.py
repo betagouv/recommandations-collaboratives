@@ -741,11 +741,20 @@ def user_list(request):
     return render(request, "crm/user_list.html", locals())
 
 
+def get_human_user_or_404(request, user_id):
+    """A user of the current site that the CRM may change: never a bot, which
+    is managed from the server only (reactivating one would revive its keys).
+    """
+    return get_object_or_404(
+        User, pk=user_id, profile__sites=request.site, profile__is_bot=False
+    )
+
+
 @login_required
 def user_update(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_human_user_or_404(request, user_id)
     profile = crm_user.profile
 
     group_name = make_group_name_for_site("advisor", request.site)
@@ -831,7 +840,7 @@ def user_update(request, user_id=None):
 def user_deactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_human_user_or_404(request, user_id)
 
     if request.method == "POST":
         deactivate_user(crm_user)
@@ -847,7 +856,7 @@ def user_deactivate(request, user_id=None):
 def user_reactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_human_user_or_404(request, user_id)
 
     if request.method == "POST":
         if crm_user.profile.deleted:
@@ -865,7 +874,7 @@ def user_reactivate(request, user_id=None):
 def user_set_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_human_user_or_404(request, user_id)
     profile = crm_user.profile
 
     if request.method == "POST":
@@ -888,7 +897,7 @@ def user_set_advisor(request, user_id=None):
 def user_unset_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_human_user_or_404(request, user_id)
     profile = crm_user.profile
 
     if request.method == "POST":

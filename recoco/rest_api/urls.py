@@ -6,6 +6,7 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from recoco.apps.addressbook import rest as addressbook_rest
+from recoco.apps.api_keys import rest as api_keys_rest
 from recoco.apps.conversations import rest as conversations_rest
 from recoco.apps.geomatics import rest as geomatics_rest
 from recoco.apps.home import rest as home_rest
@@ -175,6 +176,11 @@ auth_urls = [
         "token/refresh/",
         TokenRefreshView.as_view(),
         name="token-refresh",
+    ),
+    path(
+        "auth/check/",
+        api_keys_rest.AuthCheckView.as_view(),
+        name="auth-check",
     ),
 ]
 

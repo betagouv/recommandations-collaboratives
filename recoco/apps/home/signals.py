@@ -9,17 +9,27 @@ import re
 
 import sentry_sdk
 from actstream import action
+from allauth.account.models import EmailAddress
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth.models import Group, User, update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Subquery, Value
-from django.db.models.signals import m2m_changed, pre_save
+from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 
 from recoco import verbs
+from recoco.apps.home.bots import (
+    BOT_PRIVILEGE_ERROR,
+    HUMAN_ROLE_GROUP_REGEX,
+    human_role_group_ids,
+    human_role_groups,
+    is_bot,
+)
 from recoco.apps.home.models import UserProfile
 from recoco.apps.projects.utils import refresh_user_projects_in_session
 
@@ -61,6 +71,118 @@ def watch_organisation_to_understand_mystery(instance: UserProfile, **kwargs):
         print(text)
 
 
+@receiver(post_save, sender=UserProfile)
+def disable_human_login_for_bots(sender, instance: UserProfile, **kwargs):
+    """A bot only authenticates with an API key: no password, no email, no
+    ProConnect link and no 2FA device.
+
+    Without an email, login by code and password reset cannot reach the
+    account; without a social account, ProConnect cannot log into it.
+    """
+    if not instance.is_bot:
+        return
+
+    user = instance.user
+    changed_privileges = _strip_human_privileges(user)
+    if _strip_human_credentials(user) or changed_privileges:
+        user.save(update_fields=["password", "email", "is_staff", "is_superuser"])
+
+    EmailAddress.objects.filter(user=user).delete()
+    SocialAccount.objects.filter(user=user).delete()
+    Authenticator.objects.filter(user=user).delete()
+    # a bot key skips 2FA: it cannot keep human rights from a previous life
+    user.user_permissions.clear()
+    user.groups.remove(*human_role_groups(user.groups.all()))
+
+
+def _strip_human_privileges(user):
+    """Drop staff and superuser flags from a bot; return whether anything changed."""
+    if not (user.is_staff or user.is_superuser):
+        return False
+    user.is_staff = False
+    user.is_superuser = False
+    return True
+
+
+def _strip_human_credentials(user):
+    """Drop password and email from a bot; return whether anything changed."""
+    if not (user.has_usable_password() or user.email):
+        return False
+    user.set_unusable_password()
+    user.email = ""
+    return True
+
+
+@receiver(pre_save, sender=User)
+def keep_bots_without_human_credentials(sender, instance: User, **kwargs):
+    """Saving a bot, e.g. from the user admin, cannot give it back a password
+    or an email (the profile signal above only runs when the profile is saved).
+    """
+    if not is_bot(instance.pk):
+        return
+
+    _strip_human_credentials(instance)
+    if instance.is_staff or instance.is_superuser:
+        raise ValidationError(BOT_PRIVILEGE_ERROR)
+
+
+@receiver(post_save, sender=EmailAddress)
+def keep_bots_without_email_address(sender, instance: EmailAddress, **kwargs):
+    """An email address would open login by code, password reset and ProConnect."""
+    if is_bot(instance.user_id):
+        instance.delete()
+
+
+@receiver(post_save, sender=SocialAccount)
+def keep_bots_without_social_account(sender, instance: SocialAccount, **kwargs):
+    """ProConnect logs in by its own account id, not by email: a social account
+    linked to a bot would open a login that skips the API key."""
+    if is_bot(instance.user_id):
+        instance.delete()
+
+
+@receiver(post_save, sender=Authenticator)
+def keep_bots_without_authenticator(sender, instance: Authenticator, **kwargs):
+    """A bot never logs in interactively, so it has no use for a 2FA device."""
+    if is_bot(instance.user_id):
+        instance.delete()
+
+
+@receiver(m2m_changed, sender=User.groups.through)
+def keep_bots_out_of_human_role_groups(
+    sender, instance, action, reverse, pk_set, **kwargs
+):
+    """A bot key skips 2FA, so a bot cannot join a group that requires it."""
+    if action != "pre_add":
+        return
+
+    if not reverse:  # user.groups.add(...)
+        if is_bot(instance.pk) and human_role_group_ids(pk_set):
+            raise ValidationError(BOT_PRIVILEGE_ERROR)
+        return
+
+    # group.user_set.add(...)
+    if (
+        human_role_group_ids([instance.pk])
+        and UserProfile.objects.filter(user_id__in=pk_set, is_bot=True).exists()
+    ):
+        raise ValidationError(BOT_PRIVILEGE_ERROR)
+
+
+@receiver(m2m_changed, sender=User.user_permissions.through)
+def keep_bots_without_global_permissions(
+    sender, instance, action, reverse, pk_set, **kwargs
+):
+    """Global permissions apply to every site: bots get per-site object
+    permissions instead."""
+    if action != "pre_add":
+        return
+
+    user_ids = pk_set if reverse else {instance.pk}
+    if UserProfile.objects.filter(user_id__in=user_ids, is_bot=True).exists():
+        raise ValidationError(BOT_PRIVILEGE_ERROR)
+
+
 @receiver(m2m_changed, sender=User.groups.through)
 def ensure_2fa_requirement(sender, instance, **kwargs):
     signal_action = kwargs.get("action")  # add/remove/clear
@@ -74,7 +196,7 @@ def ensure_2fa_requirement(sender, instance, **kwargs):
         return
 
     user_profile_qs = UserProfile.objects.none()
-    group_regex = r".*(staff|admin|advisor)$"
+    group_regex = HUMAN_ROLE_GROUP_REGEX
 
     # user.groups.add/remove and group.users.add/remove:
     # we compute requirement after the change, no matter reverse or not
