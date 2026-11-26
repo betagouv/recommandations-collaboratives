@@ -1,4 +1,3 @@
-from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter, get_adapter
 from allauth.socialaccount.internal import jwtkit
 from allauth.socialaccount.models import SocialLogin, SocialToken
@@ -10,7 +9,7 @@ from django.http import HttpRequest
 from django.utils.crypto import get_random_string
 from waffle.templatetags import waffle_tags
 
-from recoco.apps.home.adapters import confirm_email
+from recoco.apps.home.adapters import reset_session_to_validate_if_needed
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -26,18 +25,6 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         You can use this hook to intervene, e.g. abort the login by
         raising an ImmediateHttpResponse
         """
-
-        def reset_session_to_validate_if_needed(user, request):
-            if EmailAddress.objects.filter(
-                email=user.email, verified=True
-            ).exists():  # address is valid
-                return
-
-            user.set_unusable_password()
-            # this resets all session
-            # cf https://docs.djangoproject.com/en/5.2/topics/auth/default/#session-invalidation-on-password-change
-
-            confirm_email(request, user)
 
         user = sociallogin.user
         try:

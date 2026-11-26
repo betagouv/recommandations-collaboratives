@@ -138,3 +138,16 @@ def send_confirmation_email(request, user, signup=False):
 def confirm_email(request, user):
     email_address, _ = EmailAddress.objects.get_or_create(user=user, email=user.email)
     UVAccountAdapter().confirm_email(request, email_address)
+
+
+def reset_session_to_validate_if_needed(user, request):
+    if EmailAddress.objects.filter(
+        email=user.email, verified=True
+    ).exists():  # address is valid
+        return
+
+    user.set_unusable_password()
+    # this resets all session
+    # cf https://docs.djangoproject.com/en/5.2/topics/auth/default/#session-invalidation-on-password-change
+
+    confirm_email(request, user)
