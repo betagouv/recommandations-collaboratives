@@ -4,7 +4,7 @@
 {% endcomment %}
 {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
     <div class="fr-segmented__element"
-         {% if 'use_private_notes' not in user_project_perms %}aria-describedby="tooltip-lock-access-internal-followup"{% endif %}>
+         {% if 'use_private_notes' not in user_project_perms %}x-data="TooltipLock" x-tooltip="tooltipProps()"{% endif %}>
         {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-internal-followup" %}
         <input value="internalFollowup"
                type="radio"

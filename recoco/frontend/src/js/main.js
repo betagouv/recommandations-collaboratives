@@ -16,6 +16,7 @@ import '../css/DSFR/custom-dsfr.scss';
 import '../css/DSFR/marianne.css';
 // Tooltips
 import 'tippy.js/dist/tippy.css';
+import 'tippy.js/themes/light-border.css'
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';

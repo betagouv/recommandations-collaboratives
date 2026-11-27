@@ -3,7 +3,7 @@
         - label (string): label to display in project navigation
 {% endcomment %}
 <div class="fr-segmented__element"
-     {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
+     {% if 'manage_documents' not in user_project_perms %}x-data="TooltipLock" x-tooltip="tooltipProps()"{% endif %}>
     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-files-links" %}
     <input value="filesLinks"
            type="radio"

@@ -4,7 +4,7 @@
 {% endcomment %}
 <div class="fr-segmented__element"
      :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage === 3}"
-     {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
+     {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} x-data="TooltipLock" x-tooltip="tooltipProps()"{% endif %}>
     <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 3">
         {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
     </template>
