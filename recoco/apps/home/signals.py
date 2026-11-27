@@ -9,6 +9,7 @@ import re
 
 import sentry_sdk
 from actstream import action
+from allauth.account.signals import email_confirmed
 from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from allauth.mfa.models import Authenticator
 from allauth.mfa.signals import authenticator_added, authenticator_removed
@@ -20,8 +21,18 @@ from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
 
 from recoco import verbs
+from recoco.apps.home.config import EMAIL_CONFIRMED_BY_LOGIN_CODE_ATTR
 from recoco.apps.home.models import UserProfile
 from recoco.apps.projects.utils import refresh_user_projects_in_session
+
+
+@receiver(email_confirmed)
+def flag_email_confirmed_by_login_code(sender, request, email_address, **kwargs):
+    # allauth verifies the address before pre_login runs, so the adapter could not
+    # tell the address was unverified until now: leave it a note on the request for pre_login to get
+    resolver_match = getattr(request, "resolver_match", None)
+    if resolver_match and resolver_match.url_name == "account_confirm_login_code":
+        setattr(request, EMAIL_CONFIRMED_BY_LOGIN_CODE_ATTR, True)
 
 
 @receiver(user_logged_in)
