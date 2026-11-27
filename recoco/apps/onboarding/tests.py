@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 import pytest
 from actstream.models import Action
+from django.contrib.auth import get_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -21,7 +22,7 @@ from recoco.apps.invites import models as invites_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.survey import models as survey_models
-from recoco.utils import login
+from recoco.utils import confirm_mail, login
 
 
 #########################################
@@ -862,6 +863,73 @@ def test_prefill_project_with_survey_fills_it(request, client):
 
     session = project.survey_session
     assert session
+
+
+#########################################
+# Onboarding: Step3, signin for existing users
+#########################################
+SIGNIN_PASSWORD = "!correctPassword01"  # noqa: S105
+
+
+def setup_onboarding_signin(current_site, email_verified):
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    user = baker.make(auth.User, email="bob@bob.fr", username="bob@bob.fr")
+    user.set_password(SIGNIN_PASSWORD)
+    user.save()
+    if email_verified:
+        confirm_mail(user)
+    project_creation_request = baker.make(
+        projects_models.ProjectCreationRequest,
+        project__sites=[current_site],
+        email=user.email,
+        site=current_site,
+    )
+    return user, project_creation_request
+
+
+@pytest.mark.django_db
+def test_onboarding_signin_assigns_project_to_user(client, current_site):
+    user, project_creation_request = setup_onboarding_signin(
+        current_site, email_verified=True
+    )
+    project = project_creation_request.project
+
+    response = client.post(
+        reverse("onboarding-signin"),
+        {"login": user.email, "password": SIGNIN_PASSWORD},
+    )
+
+    assert response.status_code == 302
+    assert response.url == reverse("onboarding-summary", args=(project.pk,))
+    project.refresh_from_db()
+    assert project.owner == user
+    assert not projects_models.ProjectCreationRequest.objects.filter(
+        pk=project_creation_request.pk
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_onboarding_signin_with_unconfirmed_email_does_not_crash(
+    client, current_site, mocker
+):
+    mocker.patch.object(UVAccountAdapter, "send_mail")
+    user, project_creation_request = setup_onboarding_signin(
+        current_site, email_verified=False
+    )
+    project = project_creation_request.project
+
+    response = client.post(
+        reverse("onboarding-signin"),
+        {"login": user.email, "password": SIGNIN_PASSWORD},
+    )
+
+    # allauth asks to confirm the address first so the onboarding process is interrupted
+    assert response.status_code == 302
+    assert not get_user(client).is_authenticated
+    assert not project.members.exists()
+    assert projects_models.ProjectCreationRequest.objects.filter(
+        pk=project_creation_request.pk
+    ).exists()
 
 
 # eof

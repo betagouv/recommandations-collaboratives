@@ -15,6 +15,7 @@ import pytest
 from allauth.account.models import EmailAddress
 from allauth.mfa.models import Authenticator
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
@@ -823,6 +824,38 @@ def test_login_with_code_validates_email(client, mocker):
     assert EmailAddress.objects.filter(
         email=user_not_validated.email, verified=True
     ).exists()
+
+
+@pytest.mark.django_db
+def test_login_with_code_invalidates_password_set_before_email_was_verified(
+    client, mocker
+):
+    """Account pre-hijacking: someone signs up with another person's address and
+    a password, without verifying it. When the real owner later logs in by code,
+    the squatter's password must stop working."""
+    mocker.patch(settings.ACCOUNT_ADAPTER + ".send_mail")
+    email = "squatted@email.fr"
+    password = "SquatterPassword12%"  # noqa: S105
+
+    # squatter signup
+    squatted = baker.make(auth_models.User, email=email, username=email)
+    squatted.set_password(password)
+    squatted.save()
+    EmailAddress.objects.create(
+        user=squatted, email=email, primary=True, verified=False
+    )
+
+    # owner login by code
+    response = client.post(reverse("account_request_login_code"), {"email": email})
+    adapter = import_string(settings.ACCOUNT_ADAPTER)
+    code = adapter.send_mail.call_args.args[2]["code"]
+    client.post(response.url, {"code": code})
+
+    assert EmailAddress.objects.get(user=squatted, email=email).verified
+    squatted.refresh_from_db()
+    assert not squatted.has_usable_password()
+    # the mailbox owner's own session survives the password change
+    assert auth.get_user(client) == squatted
 
 
 ################################################################

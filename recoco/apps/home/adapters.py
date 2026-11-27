@@ -10,7 +10,11 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 
 from . import utils
-from .config import EMAIL_CONFIRMATION_FLOW_SESSION_KEY, SIGNUP_USER_ID_SESSION_KEY
+from .config import (
+    EMAIL_CONFIRMATION_FLOW_SESSION_KEY,
+    EMAIL_CONFIRMED_BY_LOGIN_CODE_ATTR,
+    SIGNUP_USER_ID_SESSION_KEY,
+)
 from .validators import EmailValidatorForBrevo
 
 
@@ -118,6 +122,9 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         if redirect_url == reverse_lazy("advisor-access-request"):
             return redirect(redirect_url)
         if request.resolver_match.url_name == "account_confirm_login_code":
+            if getattr(request, EMAIL_CONFIRMED_BY_LOGIN_CODE_ATTR, False):
+                # flag set on email confirmation if it was done by allauth on a login by code so the account was never used before and password is deemed usafe
+                invalidate_password(user)
             reset_session_to_validate_if_needed(user, request)
         if not user.is_active:
             return self.respond_user_inactive(request, user)
@@ -140,12 +147,17 @@ def confirm_email(request, user):
 
 def reset_session_to_validate_if_needed(user, request):
     if EmailAddress.objects.filter(
-        email=user.email, verified=True
+        user=user, email=user.email, verified=True
     ).exists():  # address is valid
         return
-
-    user.set_unusable_password()
-    # this resets all session
-    # cf https://docs.djangoproject.com/en/5.2/topics/auth/default/#session-invalidation-on-password-change
+    invalidate_password(user)
 
     confirm_email(request, user)
+
+
+def invalidate_password(user):
+    user.set_unusable_password()
+    # persist it: confirm_email does not always save the user
+    user.save(update_fields=["password"])
+    # this resets all session
+    # cf https://docs.djangoproject.com/en/5.2/topics/auth/default/#session-invalidation-on-password-change
