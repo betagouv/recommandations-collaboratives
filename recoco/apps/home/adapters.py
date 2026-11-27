@@ -140,12 +140,13 @@ def confirm_email(request, user):
 
 def reset_session_to_validate_if_needed(user, request):
     if EmailAddress.objects.filter(
-        email=user.email, verified=True
+        user=user, email=user.email, verified=True
     ).exists():  # address is valid
         return
 
     user.set_unusable_password()
     # this resets all session
     # cf https://docs.djangoproject.com/en/5.2/topics/auth/default/#session-invalidation-on-password-change
+    user.save(update_fields=["password"])
 
     confirm_email(request, user)
