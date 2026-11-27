@@ -186,15 +186,7 @@ function MapDashboard(currentSiteId, regions) {
             `;
       }
 
-      if (item.is_observer) {
-        roleTemplate = `
-            <div class="project-card-top-information observer">
-                <span>Observateur</span>
-            </div>
-            `;
-      }
-
-      if (item.is_switchtender && !item.is_observer) {
+      if (item.is_switchtender) {
         roleTemplate = `
             <div class="project-card-top-information advisor">
                 <span>Conseiller</span>
