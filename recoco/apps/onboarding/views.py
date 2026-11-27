@@ -89,17 +89,16 @@ class OnboardingLogin(LoginView):
 
     def form_valid(self, form):
         """Process the valid form submission"""
-        try:
-            # Get project creation request for this email if it exists
-            project_creation_request = (
-                projects.ProjectCreationRequest.objects.filter(
-                    site=self.request.site, email=form.cleaned_data.get("login")
-                )
-                .order_by("-created")
-                .first()
+        # Get project creation request for this email if it exists
+        project_creation_request = (
+            projects.ProjectCreationRequest.objects.filter(
+                site=self.request.site, email=form.cleaned_data.get("login")
             )
-        except projects.ProjectCreationRequest.DoesNotExist as e:
-            raise Http404 from e
+            .order_by("-created")
+            .first()
+        )
+        if project_creation_request is None:
+            raise Http404
 
         project = project_creation_request.project
 

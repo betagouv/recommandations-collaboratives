@@ -21,7 +21,7 @@ from recoco.apps.invites import models as invites_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.survey import models as survey_models
-from recoco.utils import login
+from recoco.utils import confirm_mail, login
 
 
 #########################################
@@ -862,6 +862,27 @@ def test_prefill_project_with_survey_fills_it(request, client):
 
     session = project.survey_session
     assert session
+
+
+#########################################
+# Onboarding: Step3, signin for existing users
+#########################################
+SIGNIN_PASSWORD = "!correctPassword01"  # noqa: S105
+
+
+def test_onboarding_signin_with_unconfirmed_email_does_not_crash(current_site, client):
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    user = baker.make(auth.User, email="bob@bob.fr", username="bob@bob.fr")
+    user.set_password(SIGNIN_PASSWORD)
+    user.save()
+    confirm_mail(user)
+
+    response = client.post(
+        reverse("onboarding-signin"),
+        {"login": user.email, "password": SIGNIN_PASSWORD},
+    )
+
+    assert response.status_code == 404
 
 
 # eof
