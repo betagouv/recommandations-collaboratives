@@ -11,6 +11,7 @@ import uuid
 
 from allauth.account.utils import complete_signup
 from allauth.account.views import LoginView
+from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
@@ -102,7 +103,18 @@ class OnboardingLogin(LoginView):
 
         project = project_creation_request.project
 
-        super().form_valid(form)
+        response = super().form_valid(form)
+
+        if not self.request.user.is_authenticated:
+            # allauth stopped the login (email to confirm, second factor...):
+            # follow its redirect, the project stays unassigned until a real login
+            messages.warning(
+                self.request,
+                (
+                    "Vous avez déjà un compte. Connectez-vous avant de reprendre le dépôt de dossier."
+                ),
+            )
+            return response
 
         # Update project with new user
         project.submitted_by = self.request.user
